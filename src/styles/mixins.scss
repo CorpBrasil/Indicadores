@@ -1,0 +1,29 @@
+@mixin btnForm($color, $background, $width) {
+    width: $width;
+    padding: 1rem;
+    border-radius: 5px;
+    color: $color;
+    background-color: $background;
+    letter-spacing: 0.08em;
+    border: none;
+    transition: cubic-bezier(0.075, 0.82, 0.165, 1) 0.5s;
+    
+    &:hover {
+        filter: contrast(1.5);
+    }
+}
+
+@mixin btnTable($url, $background, $color: false) {
+    transition: cubic-bezier(0.075, 0.82, 0.165, 1) 0.1s;
+    position: relative;
+    width: 40px;
+    height: 100%;
+    background: url($url) $background center no-repeat;
+    border: none;
+    background-size: 1rem; 
+
+    &:hover {
+        background-size: 1.2rem;
+    }
+
+}

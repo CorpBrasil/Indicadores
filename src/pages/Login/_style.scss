@@ -1,0 +1,52 @@
+@import '../../styles/mixins.scss';
+
+.container-login {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    .box-login {
+        width: 420px;
+        margin: 0 1rem;
+
+        .logo-IEB {
+            margin: 2rem 0 1rem 0;
+        }
+    
+        .title-login {
+            margin: 1rem 0 2rem 0;
+        }
+
+        .form-login {
+            display: flex;
+            justify-content: center;
+            flex-direction: column;
+
+            &__label {
+                height: 4.5em;
+                display: flex;
+                flex-direction: column;
+                margin: 0.1rem 0;
+            }
+
+            &__text {
+                padding: 1rem;
+                border-radius: 5px;
+                background-color: #eee;
+                border: none;
+                transition: cubic-bezier(0.075, 0.82, 0.165, 1) 0.1s;
+
+                &:focus {
+                    border-bottom: 2px solid #F39200;
+                }
+            }
+
+            &__btn {
+                @include btnForm(#fff, #F39200, 100%);
+                margin: 1em auto;
+            }
+
+        }
+    }
+}

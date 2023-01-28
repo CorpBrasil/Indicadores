@@ -1,0 +1,103 @@
+@import '../../styles/mixins.scss';
+
+.modal-createVisit {
+    position: fixed;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    bottom: 0;
+    background: rgb(0 0 0 / 70%);
+
+    .box-createVisit {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 550px;
+        background-color: #fff;
+        border-radius: 5px;
+        padding: 1rem;
+
+        &__close {
+            display: flex;
+            justify-content: flex-end;
+            width: 100%;
+        
+            .btn-close {
+              width: 30px;
+              height: 30px;
+              background: url(../../images/icons/CloseB.svg) 50% no-repeat;
+              background-size: 1rem;
+              border: none;
+
+            }
+          }
+
+          h4 {
+            font-size: 1.5rem;
+            margin: 1rem 0;
+          }
+        
+          .form-createVisit {
+            width: 90%;
+            display: flex;
+            flex-direction: column;
+
+            &__double {
+              display: flex;
+              justify-content: space-between;
+            }
+
+            &__label {
+                height: 4.5em;
+                display: flex;
+                flex-direction: column;
+                margin: 0.4rem 0;
+
+                p {
+                  margin: 0.4rem;
+                }
+
+            &__text {
+              padding: 1rem;
+              border-radius: 5px;
+              background-color: #eee;
+              border: none;
+              transition: cubic-bezier(0.075, 0.82, 0.165, 1) 0.1s;
+
+              &:disabled {
+                color: #000;
+                background-color: #d1d1d1;
+              }
+
+              &:focus {
+                  border-bottom: 2px solid #F39200;
+              }
+          }
+
+            .radio {
+              margin: 0.5rem 0;
+              display: flex;
+              justify-content: center;
+
+              label {
+                margin: 0 1rem 0 0.3rem;
+              }
+            }
+          }
+
+          .margin-top {
+            margin-top: 1rem;
+          }
+
+
+            &__btn {
+                margin-bottom: 1.5rem;
+                @include btnForm(#fff, #F39200, 100%);
+            }
+          }
+    }
+}
