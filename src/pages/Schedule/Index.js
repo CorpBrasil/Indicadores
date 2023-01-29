@@ -73,7 +73,7 @@ const Schedule = () => {
     try {
       Swal.fire({
         title: "Infinit Energy Brasil",
-        html: `Você deseja deletar essa <b>Visita?</b>`,
+        html: `Você deseja deletar essa <b>Visita</b>?`,
         icon: "warning",
         showCancelButton: true,
         confirmButtonColor: "#F39200",
@@ -99,15 +99,55 @@ const Schedule = () => {
 
   const confirmVisit = async (ref, type) => {
     console.log(type, ref)
-    const visitRef = doc(dataBase, "Agendas", year, month, ref);
+    const visitRef = doc(dataBase, "Agendas", year, month, ref.id);
 
     if (type === "confirm") {
-      await updateDoc(visitRef, { //Atualizar dados sem sobrescrever os existentes
-        "confirmar": true
+      Swal.fire({
+        title: "Infinit Energy Brasil",
+        html: `Você deseja confirmar essa <b>Visita</b>?`,
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonColor: "#F39200",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Sim",
+        cancelButtonText: "Não",
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          Swal.fire({
+            title: "Infinit Energy Brasil",
+            html: `A Visita em <b>${ref.cidade}</b> foi confirmada com sucesso.`,
+            icon: "success",
+            showConfirmButton: true,
+            confirmButtonColor: "#F39200"
+          })
+          await updateDoc(visitRef, { //Atualizar dados sem sobrescrever os existentes
+            "confirmar": true
+          })
+        }
       })
     } else {
-      await updateDoc(visitRef, { //Atualizar dados sem sobrescrever os existentes
-        "confirmar": false
+      Swal.fire({
+        title: "Infinit Energy Brasil",
+        html: `Você deseja cancelar essa <b>visita</b>?`,
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonColor: "#F39200",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Sim",
+        cancelButtonText: "Não",
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          Swal.fire({
+            title: "Infinit Energy Brasil",
+            html: `A Visita em <b>${ref.cidade}</b> foi cancelada com sucesso.`,
+            icon: "success",
+            showConfirmButton: true,
+            confirmButtonColor: "#F39200"
+          })
+          await updateDoc(visitRef, { //Atualizar dados sem sobrescrever os existentes
+            "confirmar": false
+          })
+        }
       })
     }
   }
@@ -190,14 +230,14 @@ const Schedule = () => {
 
                     {info.confirmar === false && (info.tecnicoUID === user.id || user.email === 'admin@infinitenergy.com.br') ?
                       <>
-                        <button className='btn-confirm' onClick={() => confirmVisit(info.id, 'confirm')}></button>
+                        <button className='btn-confirm' onClick={() => confirmVisit(info, 'confirm')}></button>
                       </>
                       : <>
                       </>}
 
                     {info.confirmar === true && (info.tecnicoUID === user.id || user.email === 'admin@infinitenergy.com.br') ?
                       <>
-                        <button className='btn-cancel' onClick={() => confirmVisit(info.id, 'cancel')}></button>
+                        <button className='btn-cancel' onClick={() => confirmVisit(info, 'cancel')}></button>
                       </>
                       : <>
                       </>}
