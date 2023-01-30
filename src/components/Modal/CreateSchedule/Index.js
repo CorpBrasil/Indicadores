@@ -1,9 +1,9 @@
 import { doc, setDoc, collection, addDoc } from 'firebase/firestore';
 import { useForm } from "react-hook-form"; // cria formulário personalizado
 import Swal from "sweetalert2"; // cria alertas personalizado
-import { dataBase } from '../../firebase/database';
+import { dataBase } from '../../../firebase/database';
 
-import './_style.scss';
+import '../_modal.scss';
 
 const CreateSchedule = ({ returnSchedule, schedules }) => {
 
@@ -73,15 +73,16 @@ const CreateSchedule = ({ returnSchedule, schedules }) => {
   }
 
   return (
-    <div className='modal-createSchedule'>
-       <div className='box-createSchedule'>
-            <div>
+    <div className='modal-visit'>
+       <div className='box-visit'>
+            <div className='box-visit__close'>
                 <button onClick={returnSchedule} className='btn-close' />
             </div>
             <h4>Criar nova Agenda</h4> 
-        <form className='form-schedule' onSubmit={handleSubmit(onSubmit)}>
+        <form className='form-visit' onSubmit={handleSubmit(onSubmit)}>
+          <label className="form-visit__label">
           <input
-                    className="form-schedule__year"
+                    className="form-visit__text"
                     type="number"
                     min={2023}
                     max={2999}
@@ -89,7 +90,8 @@ const CreateSchedule = ({ returnSchedule, schedules }) => {
                     {...register("ano")}
                     required
                   />
-        <input className='form-schedule__btn' type="submit" value="CRIAR"/>
+          </label>
+        <input className='form-visit__btn' type="submit" value="CRIAR"/>
       </form> 
         </div> 
         

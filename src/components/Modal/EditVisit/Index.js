@@ -5,10 +5,9 @@ import Swal from "sweetalert2"; // cria alertas personalizado
 import * as moment from 'moment';
 import 'moment/locale/pt-br';
 
-import './../../styles/_visit.scss';
+import '../_modal.scss';
 
 const EditVisit = ({ returnSchedule, scheduleRef, visitRef, membersRef}) => {
-  const [city] = useState();
   const [ tecs, setTecs] = useState();
   const {
     register,
@@ -22,7 +21,7 @@ const EditVisit = ({ returnSchedule, scheduleRef, visitRef, membersRef}) => {
       reset({
         dia: moment(new Date(visitRef.dia)).format('YYYY-MM-DD'),
         cidade: visitRef.cidade,
-        saida: visitRef.saidaEmpresa,
+        chegada: visitRef.chegadaCliente,
         visita: visitRef.visita,
         tecnico: visitRef.tecnico,
         consultora: visitRef.consultora,
@@ -54,37 +53,34 @@ const EditVisit = ({ returnSchedule, scheduleRef, visitRef, membersRef}) => {
       }).then(async (result) => {
         if (result.isConfirmed) {
           let diaRef, saidaEmpresaRef, chegadaClienteRef, TempoVisita, SaidaClienteRef, ChegadaEmpresaRef, tempoRotaRef;
-          const saida = userData.saida;
+          const chegada = userData.chegada;
           moment.locale('pt-br');
           console.log(moment.locale())
           const tempo = moment(userData.visita, 'hh:mm');
-          saidaEmpresaRef = saida;
+          chegadaClienteRef = chegada;
 
-          const saidaF = moment(saida, 'hh:mm'); //Horario de saida 
+          const saidaEmpresa = moment(chegada, 'hh:mm'); //Horario de chegada 
+          const chegadaCliente = moment(chegada, 'hh:mm'); //Horario de chegada 
           const day = moment(userData.dia); // Pega o dia escolhido
 
           diaRef = day.format('YYYY MM DD');
 
-          saidaF.add(visitRef.tempoRota + 600, "seconds").format('hh:mm'); // Adiciona o tempo de viagem ida
+          saidaEmpresa.subtract(visitRef.tempoRota, "seconds").format('hh:mm'); // Pega o tempo que o tecnico vai precisar sair da empresa
           
           TempoVisita = userData.visita;
+          saidaEmpresaRef = saidaEmpresa.format('kk:mm');
 
-          const saidaH = saidaF.format('kk'); // Transforma em horas
-          const saidaM = saidaF.format('mm'); // Trabsforma em minutos
-
-
-          day.set({'hour': saidaH, 'minute': saidaM})
-          chegadaClienteRef = day.format('kk:mm');
+          // day.add((visitRef.tempoRota * 2), "seconds").format('hh:mm'); // Adiciona o tempo de viagem ida
 
           const tempoVisitaH = tempo.format('hh');
           const tempoVisitaM = tempo.format('mm');
           
-          day.add(tempoVisitaH, 'h'); 
-          day.add(tempoVisitaM, 'm');
-          SaidaClienteRef = day.format('kk:mm');
+          chegadaCliente.add(tempoVisitaH, 'h'); 
+          chegadaCliente.add(tempoVisitaM, 'm');
+          SaidaClienteRef = chegadaCliente.format('kk:mm');
 
-          day.add(visitRef.tempoRota, "seconds").format('hh:mm'); //Adiciona tempo de viagem volta
-          ChegadaEmpresaRef = day.format('kk:mm');
+          chegadaCliente.add(visitRef.tempoRota, "seconds").format('hh:mm'); //Adiciona tempo de viagem volta
+          ChegadaEmpresaRef = chegadaCliente.format('kk:mm');
           tempoRotaRef = visitRef.tempoRota;
 
           console.log({
@@ -96,7 +92,9 @@ const EditVisit = ({ returnSchedule, scheduleRef, visitRef, membersRef}) => {
             chegadaEmpresa: ChegadaEmpresaRef,
             consultora: userData.consultora,
             tecnico: userData.tecnico,
-            cidade: city
+            cidade: visitRef.cidade,
+            tempoRota: tempoRotaRef,
+
           })
 
           await updateDoc(scheduleRef, {
@@ -133,18 +131,18 @@ const EditVisit = ({ returnSchedule, scheduleRef, visitRef, membersRef}) => {
     }
 
   return (
-    <div className='modal-Visit'>
-       <div className='box-Visit'>
-            <div className='box-Visit__close'>
+    <div className='modal-visit'>
+       <div className='box-visit'>
+            <div className='box-visit__close'>
                 <button onClick={returnSchedule} className='btn-close' />
             </div>
             <h4>Editar Visita</h4> 
-        <form className='form-Visit' onSubmit={handleSubmit(onSubmit)}>
-          <div className='form-Visit__double'>
-          <label className="form-Visit__label">
+        <form className='form-visit' onSubmit={handleSubmit(onSubmit)}>
+          <div className='form-visit__double'>
+          <label className="form-visit__label">
             <p>Dia</p>
               <input
-                className="form-Visit__text small"
+                className="form-visit__text small"
                 type="date"
                 placeholder="Digite o dia"
                 autoComplete="off"
@@ -152,32 +150,32 @@ const EditVisit = ({ returnSchedule, scheduleRef, visitRef, membersRef}) => {
                 required
               />
             </label>
-          <label className="form-Visit__label">
+          <label className="form-visit__label">
             <p>Cidade</p>
               <input
-                className="form-Visit__text small"
+                className="form-visit__text small"
                 placeholder="Digite a cidade"
                 {...register("cidade")}
                 disabled
               />
             </label>
           </div>
-        <div className='form-Visit__double'>
-        <label className="form-Visit__label">
-          <p>Hórario de Saida</p>
+        <div className='form-visit__double'>
+        <label className="form-visit__label">
+          <p>Hórario Marcado</p>
             <input
-              className="form-Visit__text small"
+              className="form-visit__text small"
               type="time"
-              placeholder="Digite o hórario de saida"
+              placeholder="Digite o hórario marcado"
               autoComplete="off"
-              {...register("saida")}
+              {...register("chegada")}
               required
             />
           </label>
-        <label className="form-Visit__label">
+        <label className="form-visit__label">
           <p>Tempo de Visita</p>
             <input
-              className="form-Visit__text small"
+              className="form-visit__text small"
               type="time"
               placeholder="Digite o hórario de saida"
               autoComplete="off"
@@ -186,10 +184,10 @@ const EditVisit = ({ returnSchedule, scheduleRef, visitRef, membersRef}) => {
             />
           </label>
         </div>
-        <label className="form-Visit__label">
+        <label className="form-visit__label">
           <p>Consultora</p>
             <input
-              className="form-Visit__text"
+              className="form-visit__text"
               type="text"
               autoComplete="off"
               {...register("consultora")}
@@ -206,7 +204,7 @@ const EditVisit = ({ returnSchedule, scheduleRef, visitRef, membersRef}) => {
                 ))}
             </div>
           </div>
-        <input className='form-Visit__btn' type="submit" value="ALTERAR"/>
+        <input className='form-visit__btn' type="submit" value="ALTERAR"/>
       </form> 
         </div>
 

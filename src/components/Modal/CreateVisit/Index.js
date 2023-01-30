@@ -5,14 +5,14 @@ import Swal from "sweetalert2"; // cria alertas personalizado
 import * as moment from 'moment';
 import 'moment/locale/pt-br';
 
-import useAuth from '../../hooks/useAuth';
+import useAuth from '../../../hooks/useAuth';
 import 'animate.css';
 
 import { usePlacesWidget } from "react-google-autocomplete";
 import { DistanceMatrixService, GoogleMap, useLoadScript } from '@react-google-maps/api';
 
 
-import './../../styles/_visit.scss';
+import '../_modal.scss';
 
 const CreateVisit = ({ returnSchedule, scheduleRef, membersRef, userRef}) => {
   const { user } = useAuth();
@@ -72,39 +72,34 @@ const CreateVisit = ({ returnSchedule, scheduleRef, membersRef, userRef}) => {
       }).then(async (result) => {
         if (result.isConfirmed) {
           let diaRef, saidaEmpresaRef, chegadaClienteRef, TempoVisita, SaidaClienteRef, ChegadaEmpresaRef, tempoRotaRef;
-          const saida = userData.saida;
+          const chegada = userData.chegada;
           moment.locale('pt-br');
           console.log(moment.locale())
           const tempo = moment(userData.visita, 'hh:mm');
-          saidaEmpresaRef = saida;
+          chegadaClienteRef = chegada;
 
-          const saidaF = moment(saida, 'hh:mm'); //Horario de saida 
+          const saidaEmpresa = moment(chegada, 'hh:mm'); //Horario de chegada 
+          const chegadaCliente = moment(chegada, 'hh:mm'); //Horario de chegada 
           const day = moment(userData.dia); // Pega o dia escolhido
 
           diaRef = day.format('YYYY MM DD');
 
-          saidaF.add(rotaTempo + 600, "seconds").format('hh:mm'); // Adiciona o tempo de viagem ida
+          saidaEmpresa.subtract(rotaTempo + 600, "seconds").format('hh:mm'); // Pega o tempo que o tecnico vai precisar sair da empresa
           
           TempoVisita = userData.visita;
-
-          const saidaH = saidaF.format('kk'); // Transforma em horas
-          const saidaM = saidaF.format('mm'); // Trabsforma em minutos
-
-
-          day.set({'hour': saidaH, 'minute': saidaM})
-          chegadaClienteRef = day.format('kk:mm');
+          saidaEmpresaRef = saidaEmpresa.format('kk:mm');
 
           const tempoVisitaH = tempo.format('hh');
           const tempoVisitaM = tempo.format('mm');
           
-          day.add(tempoVisitaH, 'h'); 
-          day.add(tempoVisitaM, 'm');
-          SaidaClienteRef = day.format('kk:mm');
+          chegadaCliente.add(tempoVisitaH, 'h'); 
+          chegadaCliente.add(tempoVisitaM, 'm');
+          SaidaClienteRef = chegadaCliente.format('kk:mm');
 
-          day.add(rotaTempo + 600, "seconds").format('hh:mm'); //Adiciona tempo de viagem volta
-          ChegadaEmpresaRef = day.format('kk:mm');
+          chegadaCliente.add(rotaTempo + 600, "seconds").format('hh:mm'); //Adiciona tempo de viagem volta
+          ChegadaEmpresaRef = chegadaCliente.format('kk:mm');
           tempoRotaRef = rotaTempo + 600;
-
+        
           console.log({
             dia: diaRef,
             saidaEmpresa: saidaEmpresaRef,
@@ -154,18 +149,18 @@ const CreateVisit = ({ returnSchedule, scheduleRef, membersRef, userRef}) => {
     }
 
   return (
-    <div className='modal-Visit'>
-       <div className='box-Visit animate__animated'>
-            <div className='box-Visit__close'>
+    <div className='modal-visit'>
+       <div className='box-visit'>
+            <div className='box-visit__close'>
                 <button onClick={returnSchedule} className='btn-close' />
             </div>
             <h4>Criar Visita</h4> 
-        <form className='form-Visit' onSubmit={handleSubmit(onSubmit)}>
-          <div className='form-Visit__double'>
-          <label className="form-Visit__label">
+        <form className='form-visit' onSubmit={handleSubmit(onSubmit)}>
+          <div className='form-visit__double'>
+          <label className="form-visit__label">
             <p>Dia</p>
               <input
-                className="form-Visit__text small"
+                className="form-visit__text small"
                 type="date"
                 placeholder="Digite o dia"
                 autoComplete="off"
@@ -173,10 +168,10 @@ const CreateVisit = ({ returnSchedule, scheduleRef, membersRef, userRef}) => {
                 required
               />
             </label>
-          <label className="form-Visit__label">
+          <label className="form-visit__label">
             <p>Cidade</p>
               <input
-                className="form-Visit__text small"
+                className="form-visit__text small"
                 onBlur={() => setCheck(true)}
                 placeholder="Digite a cidade"
                 ref={ref}
@@ -184,22 +179,22 @@ const CreateVisit = ({ returnSchedule, scheduleRef, membersRef, userRef}) => {
               />
             </label>
           </div>
-        <div className='form-Visit__double'>
-        <label className="form-Visit__label">
-          <p>Hórario de Saida</p>
+        <div className='form-visit__double'>
+        <label className="form-visit__label">
+          <p>Hórario Marcado</p>
             <input
-              className="form-Visit__text small"
+              className="form-visit__text small"
               type="time"
-              placeholder="Digite o hórario de saida"
+              placeholder="Digite o hórario marcado"
               autoComplete="off"
-              {...register("saida")}
+              {...register("chegada")}
               required
             />
           </label>
-        <label className="form-Visit__label">
+        <label className="form-visit__label">
           <p>Tempo de Visita</p>
             <input
-              className="form-Visit__text small"
+              className="form-visit__text small"
               type="time"
               placeholder="Digite o hórario de saida"
               autoComplete="off"
@@ -208,10 +203,10 @@ const CreateVisit = ({ returnSchedule, scheduleRef, membersRef, userRef}) => {
             />
           </label>
         </div>
-        <label className="form-Visit__label">
+        <label className="form-visit__label">
           <p>Consultora</p>
             <input
-              className="form-Visit__text"
+              className="form-visit__text"
               type="text"
               autoComplete="off"
               {...register("consultora", {
@@ -221,7 +216,7 @@ const CreateVisit = ({ returnSchedule, scheduleRef, membersRef, userRef}) => {
             />
           </label>
           
-        <div className="form-Visit__label margin-top">
+        <div className="form-visit__label margin-top">
           <p>Técnico</p>
             <div className='radio'>
             {tecs && tecs.map((tec) => (
@@ -231,7 +226,7 @@ const CreateVisit = ({ returnSchedule, scheduleRef, membersRef, userRef}) => {
                 ))}
             </div>
           </div>
-        <input className='form-Visit__btn' type="submit" value="CRIAR"/>
+        <input className='form-visit__btn' type="submit" value="CRIAR"/>
       </form> 
         </div>
 

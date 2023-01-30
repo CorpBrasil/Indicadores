@@ -6,7 +6,7 @@ import Header from '../../components/Header/Index';
 import { onSnapshot, collection } from "firebase/firestore";
 
 import './_style.scss';
-import CreateAdmin from '../../components/CreateAdmin/Index';
+import CreateAdmin from '../../components/Modal/CreateAdmin/Index';
 
 const PanelAdmin = ({ user }) => {
     const [members, setMembers] = useState();

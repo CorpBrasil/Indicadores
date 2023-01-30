@@ -2,11 +2,11 @@ import { setDoc, doc } from 'firebase/firestore';
 import React, { useState } from 'react'
 import { useForm } from "react-hook-form"; // cria formulário personalizado
 import Swal from "sweetalert2"; // cria alertas personalizado
-import { auth } from '../../firebase/database';
-import { dataBase } from '../../firebase/database';
+import { auth } from '../../../firebase/database';
+import { dataBase } from '../../../firebase/database';
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 
-import './_style.scss';
+import '../_modal.scss';
 import { useNavigate } from 'react-router-dom';
 
 const CreateAdmin = ({ returnAdmin, members }) => {
@@ -84,16 +84,16 @@ const CreateAdmin = ({ returnAdmin, members }) => {
     }
 
   return (
-    <div className='modal-createAdmin'>
-       <div className='box-createAdmin'>
-            <div>
+    <div className='modal-visit'>
+       <div className='box-visit'>
+            <div className='box-visit__close'>
                 <button onClick={returnAdmin} className='btn-close' />
             </div>
             <h4>Cadastrar novo Colaborador</h4> 
-        <form className='form-createAdmin' onSubmit={handleSubmit(onSubmit)}>
-        <label className="form-createAdmin__label">
+        <form className='form-visit' onSubmit={handleSubmit(onSubmit)}>
+        <label className="form-visit__label">
             <input
-              className="form-createAdmin__text"
+              className="form-visit__text"
               type="text"
               placeholder="Digite o nome"
               autoComplete="off"
@@ -102,9 +102,9 @@ const CreateAdmin = ({ returnAdmin, members }) => {
               minLength={3}
             />
           </label>
-        <label className="form-createAdmin__label">
+        <label className="form-visit__label">
             <input
-              className="form-createAdmin__text"
+              className="form-visit__text"
               type="email"
               placeholder="Digite o email"
               autoComplete="off"
@@ -112,10 +112,10 @@ const CreateAdmin = ({ returnAdmin, members }) => {
               required
             />
           </label>
-          <div className='form-createAdmin__double'>
-        <label className="form-createAdmin__label">
+          <div className='form-visit__double'>
+        <label className="form-visit__label">
             <input
-              className="form-createAdmin__text"
+              className="form-visit__text"
               type="text"
               placeholder="Digite a senha"
               autoComplete="off"
@@ -130,7 +130,7 @@ const CreateAdmin = ({ returnAdmin, members }) => {
           </select>
           </div>
           {cargo === 'Vendedor(a)' && 
-            <div className='form-createAdmin__color'>
+            <div className='form-visit__color'>
             <p>Escolha uma cor de destaque</p>
             <input
               type="color"
@@ -140,7 +140,7 @@ const CreateAdmin = ({ returnAdmin, members }) => {
             />
           </div>
           } 
-        <input className='form-createAdmin__btn' type="submit" value="CRIAR"/>
+        <input className='form-visit__btn' type="submit" value="CRIAR"/>
       </form> 
         </div> 
     </div>

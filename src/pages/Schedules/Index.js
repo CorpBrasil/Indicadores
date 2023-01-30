@@ -8,7 +8,7 @@ import Header from '../../components/Header/Index';
 import { doc, onSnapshot, collection, deleteDoc } from "firebase/firestore";
 
 import './_style.scss';
-import CreateSchedule from '../../components/CreateSchedule/Index';
+import CreateSchedule from '../../components/Modal/CreateSchedule/Index';
 import Swal from 'sweetalert2';
 
 const Schedules = () => {
@@ -48,7 +48,7 @@ const Schedules = () => {
     try {
       Swal.fire({
         title: "Infinit Energy Brasil",
-        html: `Você deseja deletar essa <b>Agenda?</b>`,
+        html: `Você deseja deletar essa <b>Agenda</b>?`,
         icon: "warning",
         showCancelButton: true,
         confirmButtonColor: "#F39200",

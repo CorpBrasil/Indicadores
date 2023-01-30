@@ -10,8 +10,8 @@ import { doc, onSnapshot, collection, query, orderBy, deleteDoc, updateDoc } fro
 
 import './_style.scss';
 
-import CreateVisit from '../../components/CreateVisit/Index';
-import EditVisit from '../../components/EditVisit/Index';
+import CreateVisit from '../../components/Modal/CreateVisit/Index';
+import EditVisit from '../../components/Modal/EditVisit/Index';
 
 const Schedule = () => {
     const { year } = useParams();
@@ -165,7 +165,7 @@ const Schedule = () => {
         <div className='box-schedule-visit'>
           {(userRef && userRef.cargo === 'Vendedor(a)') || user.email === 'admin@infinitenergy.com.br' ? 
             <div className='box-schedule-visit__add'>
-            <button onClick={() => setCreateVisit(true)}><span className='icon-visit'></span> Criar uma Visita</button>
+            <button onClick={() => setCreateVisit(true)}><span className='icon-visit'></span>Criar uma Visita</button>
           </div> : <></>
           }
           <div className='schedule-month'>
