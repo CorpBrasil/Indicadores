@@ -282,7 +282,7 @@ const Schedule = () => {
        </div>
       </div>       
     {createVisit && <CreateVisit returnSchedule={returnSchedule} scheduleRef={scheduleRef} membersRef={members} userRef={userRef} schedule={schedule}></CreateVisit>}
-    {editVisit.check && <EditVisit returnSchedule={returnSchedule} scheduleRef={editVisit.ref} visitRef={editVisit.info} membersRef={members}></EditVisit>}
+    {editVisit.check && <EditVisit returnSchedule={returnSchedule} scheduleRef={editVisit.ref} visitRef={editVisit.info} membersRef={members} schedule={schedule}></EditVisit>}
     </div>
 
   )

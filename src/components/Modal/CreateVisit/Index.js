@@ -20,7 +20,7 @@ const CreateVisit = ({ returnSchedule, scheduleRef, membersRef, userRef, schedul
   const [lng, setLng] = useState(0);
   const [check, setCheck] = useState(false);
   const [rotaTempo, setRotaTempo] = useState(undefined);
-  const [tempo, setTempo] = useState(undefined);
+  const [tempoTexto, setTempoTexto] = useState(undefined);
   const [city, setCity] = useState();
   const [ libraries ] = useState(['places']);
   const [ tecs, setTecs] = useState();
@@ -74,7 +74,7 @@ const CreateVisit = ({ returnSchedule, scheduleRef, membersRef, userRef, schedul
 
           diaRef = day.format('YYYY MM DD');
 
-          saidaEmpresa.subtract(rotaTempo + 600, "seconds").format('hh:mm'); // Pega o tempo que o tecnico vai precisar sair da empresa
+          saidaEmpresa.subtract(rotaTempo, "seconds").format('hh:mm'); // Pega o tempo que o tecnico vai precisar sair da empresa
           
           TempoVisita = userData.visita;
           saidaEmpresaRef = saidaEmpresa.format('kk:mm');
@@ -86,9 +86,9 @@ const CreateVisit = ({ returnSchedule, scheduleRef, membersRef, userRef, schedul
           chegadaCliente.add(tempoVisitaM, 'm');
           SaidaClienteRef = chegadaCliente.format('kk:mm');
 
-          chegadaCliente.add(rotaTempo + 600, "seconds").format('hh:mm'); //Adiciona tempo de viagem volta
+          chegadaCliente.add(rotaTempo, "seconds").format('hh:mm'); //Adiciona tempo de viagem volta
           ChegadaEmpresaRef = chegadaCliente.format('kk:mm');
-          tempoRotaRef = rotaTempo + 600;
+          tempoRotaRef = rotaTempo;
         
           console.log({
             dia: diaRef,
@@ -106,7 +106,7 @@ const CreateVisit = ({ returnSchedule, scheduleRef, membersRef, userRef, schedul
       const chegadaFormatada = moment(ChegadaEmpresaRef, 'hh:mm');
       const dataRef = schedule.filter(dia => dia.data === userData.dia);
 
-        //console.log(dataRef.length);
+        console.log(tempo);
         const check = [];
         let visitsFind = [];
         dataRef.map((ref) => {
@@ -119,7 +119,7 @@ const CreateVisit = ({ returnSchedule, scheduleRef, membersRef, userRef, schedul
             return dataRef;
           })
 
-          //console.log('>>', check, dataRef);
+          console.log('>>', check, dataRef);
           const visitsFindCount = dataRef.length - check.length;
 
           dataRef.map((a) => { //Percorre todos os arrays de 'dataRef' e compara se os arrays são iguais
@@ -167,6 +167,7 @@ const CreateVisit = ({ returnSchedule, scheduleRef, membersRef, userRef, schedul
             tecnicoUID: tecRefUID.uid,
             cidade: city,
             tempoRota: tempoRotaRef,
+            tempo: tempoTexto,
             data: userData.dia,
             uid: user.id,
             cor: userRef.cor,
@@ -222,7 +223,7 @@ const CreateVisit = ({ returnSchedule, scheduleRef, membersRef, userRef, schedul
                 ref={ref}
                 required
               />
-              {tempo && tempo && <p className='notice'>Tempo de rota: {tempo}</p>}
+              {tempoTexto && tempoTexto && <p className='notice'>Tempo de rota: {tempoTexto}</p>}
             </label>
           </div>
         <div className='form-visit__double'>
@@ -284,7 +285,7 @@ const CreateVisit = ({ returnSchedule, scheduleRef, membersRef, userRef, schedul
           <DistanceMatrixService
           options={{
            destinations: [{lat:lat, lng:lng}],
-           origins: [{lng:-47.7143335, lat:-23.0995635}],
+           origins: [{lng:-47.6973284, lat:-23.0881786}],
            travelMode: "DRIVING",
          }}
          callback = {(response, status) => {
@@ -292,7 +293,7 @@ const CreateVisit = ({ returnSchedule, scheduleRef, membersRef, userRef, schedul
               console.log(response)
               if(rotaTempo !== response?.rows[0].elements[0].duration.value) {
                 setRotaTempo(response?.rows[0].elements[0].duration.value);
-                setTempo(response?.rows[0].elements[0].duration.text);
+                setTempoTexto(response?.rows[0].elements[0].duration.text);
               }
             }
         }}

@@ -7,7 +7,7 @@ import 'moment/locale/pt-br';
 
 import '../_modal.scss';
 
-const EditVisit = ({ returnSchedule, scheduleRef, visitRef, membersRef}) => {
+const EditVisit = ({ returnSchedule, scheduleRef, visitRef, membersRef, schedule}) => {
   const [ tecs, setTecs] = useState();
   const {
     register,
@@ -41,17 +41,17 @@ const EditVisit = ({ returnSchedule, scheduleRef, visitRef, membersRef}) => {
 
     let tecRefUID = tecs.find(tec => tec.nome === userData.tecnico);
     try {
-      Swal.fire({
-        title: "Infinit Energy Brasil",
-        html: `Você deseja alterar a <b>Visita?</b>`,
-        icon: "question",
-        showCancelButton: true,
-        confirmButtonColor: "#F39200",
-        cancelButtonColor: "#d33",
-        confirmButtonText: "Sim",
-        cancelButtonText: "Não",
-      }).then(async (result) => {
-        if (result.isConfirmed) {
+      // Swal.fire({
+      //   title: "Infinit Energy Brasil",
+      //   html: `Você deseja alterar a <b>Visita?</b>`,
+      //   icon: "question",
+      //   showCancelButton: true,
+      //   confirmButtonColor: "#F39200",
+      //   cancelButtonColor: "#d33",
+      //   confirmButtonText: "Sim",
+      //   cancelButtonText: "Não",
+      // }).then(async (result) => {
+      //   if (result.isConfirmed) {
           let diaRef, saidaEmpresaRef, chegadaClienteRef, TempoVisita, SaidaClienteRef, ChegadaEmpresaRef, tempoRotaRef;
           const chegada = userData.chegada;
           moment.locale('pt-br');
@@ -94,37 +94,78 @@ const EditVisit = ({ returnSchedule, scheduleRef, visitRef, membersRef}) => {
             tecnico: userData.tecnico,
             cidade: visitRef.cidade,
             tempoRota: tempoRotaRef,
-
           })
 
-          await updateDoc(scheduleRef, {
-            dia: diaRef,
-            saidaEmpresa: saidaEmpresaRef,
-            chegadaCliente: chegadaClienteRef,
-            visita: TempoVisita,
-            saidaDoCliente: SaidaClienteRef,
-            chegadaEmpresa: ChegadaEmpresaRef,
-            consultora: userData.consultora,
-            tecnico: tecRefUID.nome,
-            tecnicoUID: tecRefUID.uid,
-            cidade: visitRef.cidade,
-            tempoRota: tempoRotaRef,
-            uid: visitRef.uid,
-            cor: visitRef.cor
-           })
-          Swal.fire({
-            title: "Infinit Energy Brasil",
-            html: `A Visita em <b>${visitRef.cidade}</b> foi alterada com sucesso.`,
-            icon: "success",
-            showConfirmButton: true,
-            confirmButtonColor: "#F39200"
-          }).then((result) => {
-            if (result.isConfirmed) {
-                return returnSchedule();
+          const saidaFormatada = moment(saidaEmpresaRef, 'hh:mm');
+      const chegadaFormatada = moment(ChegadaEmpresaRef, 'hh:mm');
+      const dataRef = schedule.filter(dia => dia.data === userData.dia && dia.chegadaCliente !== visitRef.chegadaCliente);
+
+        //console.log(dataRef.length);
+        const check = [];
+        let visitsFind = [];
+        dataRef.map((ref) => {
+          if(saidaFormatada < moment(ref.saidaEmpresa, 'hh:mm') && chegadaFormatada < moment(ref.saidaEmpresa, 'hh:mm')) {
+              check.push(ref);
+            } else {
+              if(saidaFormatada > moment(ref.chegadaEmpresa, 'hh:mm'))
+              check.push(ref);
             }
+            return dataRef;
           })
-        }
-      })
+
+          console.log('>>', check, dataRef);
+          const visitsFindCount = dataRef.length - check.length;
+
+          dataRef.map((a) => { //Percorre todos os arrays de 'dataRef' e compara se os arrays são iguais
+            if(check.includes(a) === false) {
+              visitsFind.push(a)
+            }
+            return visitsFind;
+          })
+          console.log(visitsFind);
+          let c = 1;
+
+          if(visitsFindCount > 0) {
+            const visits = visitsFind.map((e) => (
+              `Visita <b>` + c++ + '</b> - Saida: <b>' + e.saidaEmpresa) + '</b> Chegada: <b>' + e.chegadaEmpresa + '</b></br>');
+            Swal.fire({
+              title: "Infinit Energy Brasil",
+              html: `Foram encontrado(s) <b>${visitsFindCount}</b> visita(s) marcada(s) nesse periodo.</br></br>` +
+              visits,
+              icon: "error",
+              showConfirmButton: true,
+              confirmButtonColor: "#F39200"
+            })
+          }
+
+        //   await updateDoc(scheduleRef, {
+        //     dia: diaRef,
+        //     saidaEmpresa: saidaEmpresaRef,
+        //     chegadaCliente: chegadaClienteRef,
+        //     visita: TempoVisita,
+        //     saidaDoCliente: SaidaClienteRef,
+        //     chegadaEmpresa: ChegadaEmpresaRef,
+        //     consultora: userData.consultora,
+        //     tecnico: tecRefUID.nome,
+        //     tecnicoUID: tecRefUID.uid,
+        //     cidade: visitRef.cidade,
+        //     tempoRota: tempoRotaRef,
+        //     uid: visitRef.uid,
+        //     cor: visitRef.cor
+        //    })
+        //   Swal.fire({
+        //     title: "Infinit Energy Brasil",
+        //     html: `A Visita em <b>${visitRef.cidade}</b> foi alterada com sucesso.`,
+        //     icon: "success",
+        //     showConfirmButton: true,
+        //     confirmButtonColor: "#F39200"
+        //   }).then((result) => {
+        //     if (result.isConfirmed) {
+        //         return returnSchedule();
+        //     }
+        //   })
+        // }
+      // })
     } catch (error) {
       console.log(error)
     } 
@@ -158,6 +199,7 @@ const EditVisit = ({ returnSchedule, scheduleRef, visitRef, membersRef}) => {
                 {...register("cidade")}
                 disabled
               />
+              {visitRef.tempo && visitRef.tempo && <p className='notice'>Tempo de rota: {visitRef.tempo}</p>}
             </label>
           </div>
         <div className='form-visit__double'>
