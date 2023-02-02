@@ -60,10 +60,14 @@
       }
 
       &__label {
-        height: 4.5em;
         display: flex;
         flex-direction: column;
         margin: 0.4rem 0;
+
+        .notice {
+          font-size: 0.8rem;
+          font-weight: bold;
+        }
       }
 
       p {

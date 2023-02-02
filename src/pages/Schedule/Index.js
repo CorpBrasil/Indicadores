@@ -6,7 +6,7 @@ import { dataBase } from '../../firebase/database';
 import Header from '../../components/Header/Index';
 import useAuth from '../../hooks/useAuth';
 
-import { doc, onSnapshot, collection, query, orderBy, deleteDoc, updateDoc } from "firebase/firestore";
+import { addDoc, doc, onSnapshot, collection, query, orderBy, deleteDoc, updateDoc } from "firebase/firestore";
 
 import './_style.scss';
 
@@ -152,6 +152,32 @@ const Schedule = () => {
     }
   }
 
+  const createLunch = async (ref) => {
+    const dateNow = moment();
+    const saidaRef = moment(dateNow).format('kk:mm')
+    const diaRef = moment(dateNow).format('YYYY MM DD')
+    const chegadaRef = moment(dateNow).add(60, 'm').format('kk:mm');
+    
+    await addDoc(scheduleRef, {
+      dia: diaRef,
+      saidaEmpresa: saidaRef,
+      chegadaCliente: '',
+      visita: '',
+      saidaDoCliente: '',
+      chegadaEmpresa: chegadaRef,
+      consultora: 'Almoço Téc.',
+      tecnico: userRef.nome,
+      tecnicoUID: user.id,
+      cidade: '',
+      tempoRota: '',
+      data: '',
+      uid: user.id,
+      cor: "#111111",
+      confirmar: false
+     })
+
+  }
+
   console.log(userRef);
 
 
@@ -165,7 +191,12 @@ const Schedule = () => {
         <div className='box-schedule-visit'>
           {(userRef && userRef.cargo === 'Vendedor(a)') || user.email === 'admin@infinitenergy.com.br' ? 
             <div className='box-schedule-visit__add'>
-            <button onClick={() => setCreateVisit(true)}><span className='icon-visit'></span>Criar uma Visita</button>
+            <button className='visit' onClick={() => setCreateVisit(true)}><span className='icon-visit'></span>Criar uma Visita</button>
+          </div> : <></>
+          }
+          {(userRef && userRef.cargo === 'Técnico') || user.email === 'admin@infinitenergy.com.br' ? 
+            <div className='box-schedule-visit__add'>
+            <button className='lunch' onClick={() => createLunch(userRef)}><span className='icon-visit'></span>Confirmar Almoço</button>
           </div> : <></>
           }
           <div className='schedule-month'>
@@ -220,7 +251,7 @@ const Schedule = () => {
                   <th>{info.tecnico}</th>
 
                   <th>
-                    {info.uid === user.id || user.email === 'admin@infinitenergy.com.br' ?
+                    {info.confirmar === false && (info.uid === user.id || user.email === 'admin@infinitenergy.com.br') ?
                       <>
                         <button className='btn-edit' onClick={() => setEditVisit({ check: true, info: info, ref: doc(dataBase, "Agendas", year, month, info.id) })}></button>
                         <button className='btn-delete' onClick={() => deleteVisit(info)}></button>
@@ -250,7 +281,7 @@ const Schedule = () => {
           </div>
        </div>
       </div>       
-    {createVisit && <CreateVisit returnSchedule={returnSchedule} scheduleRef={scheduleRef} membersRef={members} userRef={userRef}></CreateVisit>}
+    {createVisit && <CreateVisit returnSchedule={returnSchedule} scheduleRef={scheduleRef} membersRef={members} userRef={userRef} schedule={schedule}></CreateVisit>}
     {editVisit.check && <EditVisit returnSchedule={returnSchedule} scheduleRef={editVisit.ref} visitRef={editVisit.info} membersRef={members}></EditVisit>}
     </div>
 

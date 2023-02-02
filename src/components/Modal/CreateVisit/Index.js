@@ -14,12 +14,13 @@ import { DistanceMatrixService, GoogleMap, useLoadScript } from '@react-google-m
 
 import '../_modal.scss';
 
-const CreateVisit = ({ returnSchedule, scheduleRef, membersRef, userRef}) => {
+const CreateVisit = ({ returnSchedule, scheduleRef, membersRef, userRef, schedule}) => {
   const { user } = useAuth();
   const [lat, setLat] = useState(0);
   const [lng, setLng] = useState(0);
   const [check, setCheck] = useState(false);
   const [rotaTempo, setRotaTempo] = useState(undefined);
+  const [tempo, setTempo] = useState(undefined);
   const [city, setCity] = useState();
   const [ libraries ] = useState(['places']);
   const [ tecs, setTecs] = useState();
@@ -60,17 +61,6 @@ const CreateVisit = ({ returnSchedule, scheduleRef, membersRef, userRef}) => {
 
     try {
       let tecRefUID = tecs.find(tec => tec.nome === userData.tecnico)
-      Swal.fire({
-        title: "Infinit Energy Brasil",
-        html: `Você deseja cadastrar uma nova <b>Visita?</b>`,
-        icon: "question",
-        showCancelButton: true,
-        confirmButtonColor: "#F39200",
-        cancelButtonColor: "#d33",
-        confirmButtonText: "Sim",
-        cancelButtonText: "Não",
-      }).then(async (result) => {
-        if (result.isConfirmed) {
           let diaRef, saidaEmpresaRef, chegadaClienteRef, TempoVisita, SaidaClienteRef, ChegadaEmpresaRef, tempoRotaRef;
           const chegada = userData.chegada;
           moment.locale('pt-br');
@@ -112,6 +102,59 @@ const CreateVisit = ({ returnSchedule, scheduleRef, membersRef, userRef}) => {
             cidade: city
           })
 
+      const saidaFormatada = moment(saidaEmpresaRef, 'hh:mm');
+      const chegadaFormatada = moment(ChegadaEmpresaRef, 'hh:mm');
+      const dataRef = schedule.filter(dia => dia.data === userData.dia);
+
+        //console.log(dataRef.length);
+        const check = [];
+        let visitsFind = [];
+        dataRef.map((ref) => {
+          if(saidaFormatada < moment(ref.saidaEmpresa, 'hh:mm') && chegadaFormatada < moment(ref.saidaEmpresa, 'hh:mm')) {
+              check.push(ref);
+            } else {
+              if(saidaFormatada > moment(ref.chegadaEmpresa, 'hh:mm'))
+              check.push(ref);
+            }
+            return dataRef;
+          })
+
+          //console.log('>>', check, dataRef);
+          const visitsFindCount = dataRef.length - check.length;
+
+          dataRef.map((a) => { //Percorre todos os arrays de 'dataRef' e compara se os arrays são iguais
+            if(check.includes(a) === false) {
+              visitsFind.push(a)
+            }
+            return visitsFind;
+          })
+          console.log(visitsFind);
+          let c = 1;
+
+          if(visitsFindCount > 0) {
+            const visits = visitsFind.map((e) => (
+              `Visita <b>` + c++ + '</b> - Saida: <b>' + e.saidaEmpresa) + '</b> Chegada: <b>' + e.chegadaEmpresa + '</b></br>');
+            Swal.fire({
+              title: "Infinit Energy Brasil",
+              html: `Foram encontrado(s) <b>${visitsFindCount}</b> visita(s) marcada(s) nesse periodo.</br></br>` +
+              visits,
+              icon: "error",
+              showConfirmButton: true,
+              confirmButtonColor: "#F39200"
+            })
+          } else {
+            Swal.fire({
+        title: "Infinit Energy Brasil",
+        html: `Você deseja cadastrar uma nova <b>Visita?</b>`,
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonColor: "#F39200",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Sim",
+        cancelButtonText: "Não",
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+
           await addDoc(scheduleRef, {
             dia: diaRef,
             saidaEmpresa: saidaEmpresaRef,
@@ -129,6 +172,7 @@ const CreateVisit = ({ returnSchedule, scheduleRef, membersRef, userRef}) => {
             cor: userRef.cor,
             confirmar: false
            })
+
           Swal.fire({
             title: "Infinit Energy Brasil",
             html: `A Visita em <b>${city}</b> foi cadastrada com sucesso.`,
@@ -142,11 +186,12 @@ const CreateVisit = ({ returnSchedule, scheduleRef, membersRef, userRef}) => {
             }
           })
         }
-      })
+          })
+        }
     } catch (error) {
       console.log(error)
     } 
-    }
+  }
 
   return (
     <div className='modal-visit'>
@@ -177,6 +222,7 @@ const CreateVisit = ({ returnSchedule, scheduleRef, membersRef, userRef}) => {
                 ref={ref}
                 required
               />
+              {tempo && tempo && <p className='notice'>Tempo de rota: {tempo}</p>}
             </label>
           </div>
         <div className='form-visit__double'>
@@ -221,7 +267,7 @@ const CreateVisit = ({ returnSchedule, scheduleRef, membersRef, userRef}) => {
             <div className='radio'>
             {tecs && tecs.map((tec) => (
               <div key={tec.id}>
-                <input {...register("tecnico")} id={tec.id} type="radio" value={tec.nome} required /><label htmlFor={tec.id}>{tec.nome}</label>
+                <input {...register("tecnico")} id={tec.id} type="radio" value={tec.nome} /><label htmlFor={tec.id}>{tec.nome}</label>
               </div>
                 ))}
             </div>
@@ -246,6 +292,7 @@ const CreateVisit = ({ returnSchedule, scheduleRef, membersRef, userRef}) => {
               console.log(response)
               if(rotaTempo !== response?.rows[0].elements[0].duration.value) {
                 setRotaTempo(response?.rows[0].elements[0].duration.value);
+                setTempo(response?.rows[0].elements[0].duration.text);
               }
             }
         }}
