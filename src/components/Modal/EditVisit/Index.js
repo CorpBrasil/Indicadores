@@ -136,36 +136,47 @@ const EditVisit = ({ returnSchedule, scheduleRef, visitRef, membersRef, schedule
               showConfirmButton: true,
               confirmButtonColor: "#F39200"
             })
-          }
-
-        //   await updateDoc(scheduleRef, {
-        //     dia: diaRef,
-        //     saidaEmpresa: saidaEmpresaRef,
-        //     chegadaCliente: chegadaClienteRef,
-        //     visita: TempoVisita,
-        //     saidaDoCliente: SaidaClienteRef,
-        //     chegadaEmpresa: ChegadaEmpresaRef,
-        //     consultora: userData.consultora,
-        //     tecnico: tecRefUID.nome,
-        //     tecnicoUID: tecRefUID.uid,
-        //     cidade: visitRef.cidade,
-        //     tempoRota: tempoRotaRef,
-        //     uid: visitRef.uid,
-        //     cor: visitRef.cor
-        //    })
-        //   Swal.fire({
-        //     title: "Infinit Energy Brasil",
-        //     html: `A Visita em <b>${visitRef.cidade}</b> foi alterada com sucesso.`,
-        //     icon: "success",
-        //     showConfirmButton: true,
-        //     confirmButtonColor: "#F39200"
-        //   }).then((result) => {
-        //     if (result.isConfirmed) {
-        //         return returnSchedule();
-        //     }
-        //   })
-        // }
-      // })
+          } else {
+            Swal.fire({
+        title: "Infinit Energy Brasil",
+        html: `Você deseja cadastrar uma nova <b>Visita?</b>`,
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonColor: "#F39200",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Sim",
+        cancelButtonText: "Não",
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          await updateDoc(scheduleRef, {
+            dia: diaRef,
+            saidaEmpresa: saidaEmpresaRef,
+            chegadaCliente: chegadaClienteRef,
+            visita: TempoVisita,
+            saidaDoCliente: SaidaClienteRef,
+            chegadaEmpresa: ChegadaEmpresaRef,
+            consultora: userData.consultora,
+            tecnico: tecRefUID.nome,
+            tecnicoUID: tecRefUID.uid,
+            cidade: visitRef.cidade,
+            tempoRota: tempoRotaRef,
+            uid: visitRef.uid,
+            cor: visitRef.cor
+           })
+          Swal.fire({
+            title: "Infinit Energy Brasil",
+            html: `A Visita em <b>${visitRef.cidade}</b> foi alterada com sucesso.`,
+            icon: "success",
+            showConfirmButton: true,
+            confirmButtonColor: "#F39200"
+          }).then((result) => {
+            if (result.isConfirmed) {
+                return returnSchedule();
+            }
+          })
+        }
+      })
+    }
     } catch (error) {
       console.log(error)
     } 
