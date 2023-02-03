@@ -14,7 +14,7 @@ import { DistanceMatrixService, GoogleMap, useLoadScript } from '@react-google-m
 
 import '../_modal.scss';
 
-const CreateVisit = ({ returnSchedule, scheduleRef, membersRef, userRef, schedule}) => {
+const CreateVisit = ({ returnSchedule, scheduleRef, membersRef, userRef, schedule, monthNumber}) => {
   const { user } = useAuth();
   const [lat, setLat] = useState(0);
   const [lng, setLng] = useState(0);
@@ -24,6 +24,7 @@ const CreateVisit = ({ returnSchedule, scheduleRef, membersRef, userRef, schedul
   const [city, setCity] = useState();
   const [ libraries ] = useState(['places']);
   const [ tecs, setTecs] = useState();
+
   const {
     register,
     handleSubmit
@@ -208,6 +209,8 @@ const CreateVisit = ({ returnSchedule, scheduleRef, membersRef, userRef, schedul
               <input
                 className="form-visit__text small"
                 type="date"
+                min={monthNumber && monthNumber.min}
+                max={monthNumber && monthNumber.max}
                 placeholder="Digite o dia"
                 autoComplete="off"
                 {...register("dia")}

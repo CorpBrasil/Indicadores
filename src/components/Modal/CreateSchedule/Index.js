@@ -12,7 +12,7 @@ const CreateSchedule = ({ returnSchedule, schedules }) => {
     handleSubmit,
   } = useForm();
 
-  const months = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro']
+  const months = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12']
 
   const onSubmit = (userData) => {
     console.log(schedules.length);

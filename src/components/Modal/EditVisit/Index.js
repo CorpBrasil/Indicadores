@@ -1,13 +1,14 @@
-import { updateDoc } from 'firebase/firestore';
+import { updateDoc, collection } from 'firebase/firestore';
 import { useLayoutEffect, useState, useEffect } from 'react'
 import { useForm } from "react-hook-form"; // cria formulário personalizado
 import Swal from "sweetalert2"; // cria alertas personalizado
 import * as moment from 'moment';
 import 'moment/locale/pt-br';
 
+import { dataBase } from '../../../firebase/database';
 import '../_modal.scss';
 
-const EditVisit = ({ returnSchedule, scheduleRef, visitRef, membersRef, schedule}) => {
+const EditVisit = ({ returnSchedule, scheduleRef, visitRef, membersRef, schedule, month, year, monthNumber}) => {
   const [ tecs, setTecs] = useState();
   const {
     register,
@@ -41,17 +42,6 @@ const EditVisit = ({ returnSchedule, scheduleRef, visitRef, membersRef, schedule
 
     let tecRefUID = tecs.find(tec => tec.nome === userData.tecnico);
     try {
-      // Swal.fire({
-      //   title: "Infinit Energy Brasil",
-      //   html: `Você deseja alterar a <b>Visita?</b>`,
-      //   icon: "question",
-      //   showCancelButton: true,
-      //   confirmButtonColor: "#F39200",
-      //   cancelButtonColor: "#d33",
-      //   confirmButtonText: "Sim",
-      //   cancelButtonText: "Não",
-      // }).then(async (result) => {
-      //   if (result.isConfirmed) {
           let diaRef, saidaEmpresaRef, chegadaClienteRef, TempoVisita, SaidaClienteRef, ChegadaEmpresaRef, tempoRotaRef;
           const chegada = userData.chegada;
           moment.locale('pt-br');
@@ -148,21 +138,24 @@ const EditVisit = ({ returnSchedule, scheduleRef, visitRef, membersRef, schedule
         cancelButtonText: "Não",
       }).then(async (result) => {
         if (result.isConfirmed) {
-          await updateDoc(scheduleRef, {
-            dia: diaRef,
-            saidaEmpresa: saidaEmpresaRef,
-            chegadaCliente: chegadaClienteRef,
-            visita: TempoVisita,
-            saidaDoCliente: SaidaClienteRef,
-            chegadaEmpresa: ChegadaEmpresaRef,
-            consultora: userData.consultora,
-            tecnico: tecRefUID.nome,
-            tecnicoUID: tecRefUID.uid,
-            cidade: visitRef.cidade,
-            tempoRota: tempoRotaRef,
-            uid: visitRef.uid,
-            cor: visitRef.cor
-           })
+          const newMonth = moment(userData.dia).format('MM').toString();
+          if(month === newMonth) {
+            await updateDoc(collection(dataBase, "Agendas", year, newMonth), {
+              dia: diaRef,
+              saidaEmpresa: saidaEmpresaRef,
+              chegadaCliente: chegadaClienteRef,
+              visita: TempoVisita,
+              saidaDoCliente: SaidaClienteRef,
+              chegadaEmpresa: ChegadaEmpresaRef,
+              consultora: userData.consultora,
+              tecnico: tecRefUID.nome,
+              tecnicoUID: tecRefUID.uid,
+              cidade: visitRef.cidade,
+              tempoRota: tempoRotaRef,
+              uid: visitRef.uid,
+              cor: visitRef.cor
+             })
+          }
           Swal.fire({
             title: "Infinit Energy Brasil",
             html: `A Visita em <b>${visitRef.cidade}</b> foi alterada com sucesso.`,
@@ -198,6 +191,8 @@ const EditVisit = ({ returnSchedule, scheduleRef, visitRef, membersRef, schedule
                 type="date"
                 placeholder="Digite o dia"
                 autoComplete="off"
+                min={monthNumber && monthNumber.min}
+                max={monthNumber && monthNumber.max}
                 {...register("dia")}
                 required
               />
