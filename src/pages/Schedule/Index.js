@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import moment from "moment";
 import Swal from "sweetalert2";
 import { useParams } from "react-router-dom";
@@ -95,7 +95,7 @@ const Schedule = ({ month }) => {
     }
 
     findMonth();
-  },[monthSelect])
+  },[monthSelect, year])
 
   const returnSchedule = () => {
     setCreateVisit(false);
