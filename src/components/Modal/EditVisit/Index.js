@@ -1,4 +1,4 @@
-import { updateDoc, collection } from 'firebase/firestore';
+import { updateDoc, collection, doc, addDoc, deleteDoc } from 'firebase/firestore';
 import { useLayoutEffect, useState, useEffect } from 'react'
 import { useForm } from "react-hook-form"; // cria formulário personalizado
 import Swal from "sweetalert2"; // cria alertas personalizado
@@ -140,7 +140,7 @@ const EditVisit = ({ returnSchedule, scheduleRef, visitRef, membersRef, schedule
         if (result.isConfirmed) {
           const newMonth = moment(userData.dia).format('MM').toString();
           if(month === newMonth) {
-            await updateDoc(collection(dataBase, "Agendas", year, newMonth), {
+            await updateDoc(doc(dataBase, "Agendas", year, newMonth, visitRef.id), {
               dia: diaRef,
               saidaEmpresa: saidaEmpresaRef,
               chegadaCliente: chegadaClienteRef,
@@ -153,8 +153,27 @@ const EditVisit = ({ returnSchedule, scheduleRef, visitRef, membersRef, schedule
               cidade: visitRef.cidade,
               tempoRota: tempoRotaRef,
               uid: visitRef.uid,
-              cor: visitRef.cor
+              cor: visitRef.cor,
              })
+          } else {
+            await addDoc(collection(dataBase, "Agendas", year, newMonth), {
+              dia: diaRef,
+              saidaEmpresa: saidaEmpresaRef,
+              chegadaCliente: chegadaClienteRef,
+              visita: TempoVisita,
+              saidaDoCliente: SaidaClienteRef,
+              chegadaEmpresa: ChegadaEmpresaRef,
+              consultora: userData.consultora,
+              tecnico: tecRefUID.nome,
+              tecnicoUID: tecRefUID.uid,
+              cidade: visitRef.cidade,
+              tempoRota: tempoRotaRef,
+              tempo: visitRef.tempo,
+              uid: visitRef.uid,
+              cor: visitRef.cor,
+              confirmar: false
+             })
+             await deleteDoc(doc(dataBase, "Agendas", year, month, visitRef.id));
           }
           Swal.fire({
             title: "Infinit Energy Brasil",
@@ -191,8 +210,8 @@ const EditVisit = ({ returnSchedule, scheduleRef, visitRef, membersRef, schedule
                 type="date"
                 placeholder="Digite o dia"
                 autoComplete="off"
-                min={monthNumber && monthNumber.min}
-                max={monthNumber && monthNumber.max}
+                min='2023-01-01'
+                max='2023-12-31'
                 {...register("dia")}
                 required
               />

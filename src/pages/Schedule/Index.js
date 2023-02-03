@@ -23,21 +23,22 @@ import CreateVisit from "../../components/Modal/CreateVisit/Index";
 import EditVisit from "../../components/Modal/EditVisit/Index";
 
 const Schedule = ({ month }) => {
+  const data = new Date()
   const { year } = useParams();
   const { user } = useAuth();
   const [schedule, setSchedule] = useState();
   const [members, setMembers] = useState();
   const [userRef, setUserRef] = useState();
+  const [monthSelect, setMonthSelect] = useState(String(data.getMonth() + 1).padStart(2, '0'));
   const [editVisit, setEditVisit] = useState({ check: false });
-  const [monthSelect, setMonthSelect] = useState(month);
   const [createVisit, setCreateVisit] = useState(false);
   const [scheduleRef, setScheduleRef] = useState();
-  const schedulesCollectionRef = collection(dataBase, "Agendas", year, monthSelect);
   const membersCollectionRef = collection(dataBase, "Membros");
   const [ monthNumber, setMonthNumber] = useState();
 
   useEffect(
     () => {
+      const schedulesCollectionRef = collection(dataBase, "Agendas", year, monthSelect);
       const fetchData = async () => {
         const q = query(schedulesCollectionRef, orderBy("dia"));
         onSnapshot(await q, (schedule) => {
@@ -51,7 +52,7 @@ const Schedule = ({ month }) => {
       fetchData();
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [month]
+    [monthSelect]
   );
 
   useEffect(
@@ -80,6 +81,8 @@ const Schedule = ({ month }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [members]
   );
+
+    console.log(monthSelect)
 
   useEffect(() => {
     const findMonth = () => {
@@ -114,7 +117,7 @@ const Schedule = ({ month }) => {
         cancelButtonText: "Não",
       }).then(async (result) => {
         if (result.isConfirmed) {
-          await deleteDoc(doc(dataBase, "Agendas", year, month, visit.id));
+          await deleteDoc(doc(dataBase, "Agendas", year, monthSelect, visit.id));
           Swal.fire({
             title: "Infinit Energy Brasil",
             html: `A Visita em <b>${visit.cidade}</b> foi deletada com sucesso.`,
@@ -129,7 +132,7 @@ const Schedule = ({ month }) => {
 
   const confirmVisit = async (ref, type) => {
     console.log(type, ref);
-    const visitRef = doc(dataBase, "Agendas", year, month, ref.id);
+    const visitRef = doc(dataBase, "Agendas", year, monthSelect, ref.id);
 
     if (type === "confirm") {
       Swal.fire({
@@ -326,7 +329,7 @@ const Schedule = ({ month }) => {
                                       dataBase,
                                       "Agendas",
                                       year,
-                                      month,
+                                      monthSelect,
                                       info.id
                                     ),
                                   })

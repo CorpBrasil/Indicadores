@@ -9,9 +9,7 @@ import Schedule from './pages/Schedule/Index';
 import { useEffect, useState } from 'react';
 
 function App() {
-  const data = new Date()
   const { user } = useAuth();
-  const [month] = useState(String(data.getMonth() + 1).padStart(2, '0')); // Pega o numero do mes atual
   console.log(user)
 
   return (
@@ -23,7 +21,7 @@ function App() {
             {user && user.email === "admin@infinitenergy.com.br" &&
         <Route exact path="/admin" element={<PanelAdmin user={user} />} />
        }
-            <Route path="/agenda/:year" element={<Schedule month={month}/>} />
+            <Route path="/agenda/:year" element={<Schedule/>} />
           </Route>
           <Route exact path="/login" element={<Login />} />
         </Routes>
