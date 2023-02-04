@@ -1,4 +1,13 @@
-import { updateDoc, collection, doc, addDoc, deleteDoc } from 'firebase/firestore';
+import {
+  addDoc,
+  doc,
+  onSnapshot,
+  collection,
+  query,
+  orderBy,
+  deleteDoc,
+  updateDoc,
+} from "firebase/firestore";
 import { useLayoutEffect, useState, useEffect } from 'react'
 import { useForm } from "react-hook-form"; // cria formulário personalizado
 import Swal from "sweetalert2"; // cria alertas personalizado
@@ -8,7 +17,7 @@ import 'moment/locale/pt-br';
 import { dataBase } from '../../../firebase/database';
 import '../_modal.scss';
 
-const EditVisit = ({ returnSchedule, scheduleRef, visitRef, membersRef, schedule, month, year, monthNumber}) => {
+const EditVisit = ({ returnSchedule, visitRef, membersRef, schedule, month, year}) => {
   const [ tecs, setTecs] = useState();
   const {
     register,
@@ -87,8 +96,8 @@ const EditVisit = ({ returnSchedule, scheduleRef, visitRef, membersRef, schedule
           })
 
           const saidaFormatada = moment(saidaEmpresaRef, 'hh:mm');
-      const chegadaFormatada = moment(ChegadaEmpresaRef, 'hh:mm');
-      const dataRef = schedule.filter(dia => dia.data === userData.dia && dia.chegadaCliente !== visitRef.chegadaCliente);
+          const chegadaFormatada = moment(ChegadaEmpresaRef, 'hh:mm');
+          const dataRef = schedule.filter(dia => dia.data === userData.dia && dia.chegadaCliente !== visitRef.chegadaCliente);
 
         //console.log(dataRef.length);
         const check = [];

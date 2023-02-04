@@ -22,23 +22,30 @@ import "./_style.scss";
 import CreateVisit from "../../components/Modal/CreateVisit/Index";
 import EditVisit from "../../components/Modal/EditVisit/Index";
 
-const Schedule = ({ month }) => {
-  const data = new Date()
+const Schedule = () => {
+  const data = new Date();
   const { year } = useParams();
   const { user } = useAuth();
   const [schedule, setSchedule] = useState();
   const [members, setMembers] = useState();
   const [userRef, setUserRef] = useState();
-  const [monthSelect, setMonthSelect] = useState(String(data.getMonth() + 1).padStart(2, '0'));
+  const [monthSelect, setMonthSelect] = useState(
+    '01'
+  );
   const [editVisit, setEditVisit] = useState({ check: false });
   const [createVisit, setCreateVisit] = useState(false);
   const [scheduleRef, setScheduleRef] = useState();
   const membersCollectionRef = collection(dataBase, "Membros");
-  const [ monthNumber, setMonthNumber] = useState();
+  const [monthNumber, setMonthNumber] = useState();
 
   useEffect(
     () => {
-      const schedulesCollectionRef = collection(dataBase, "Agendas", year, monthSelect);
+      const schedulesCollectionRef = collection(
+        dataBase,
+        "Agendas",
+        year,
+        monthSelect
+      );
       const fetchData = async () => {
         const q = query(schedulesCollectionRef, orderBy("dia"));
         onSnapshot(await q, (schedule) => {
@@ -82,20 +89,22 @@ const Schedule = ({ month }) => {
     [members]
   );
 
-    console.log(monthSelect)
+  console.log(monthSelect);
 
   useEffect(() => {
     const findMonth = () => {
-        const ano = year.toString();
-        const dia = moment(ano + "-" + monthSelect, "YYYY-MM").daysInMonth().toString();
-        setMonthNumber({
-          min: ano+"-"+monthSelect+'-01',
-          max: ano+"-"+monthSelect+'-'+dia
-        });
-    }
+      const ano = year.toString();
+      const dia = moment(ano + "-" + monthSelect, "YYYY-MM")
+        .daysInMonth()
+        .toString();
+      setMonthNumber({
+        min: ano + "-" + monthSelect + "-01",
+        max: ano + "-" + monthSelect + "-" + dia,
+      });
+    };
 
     findMonth();
-  },[monthSelect, year])
+  }, [monthSelect, year]);
 
   const returnSchedule = () => {
     setCreateVisit(false);
@@ -117,7 +126,9 @@ const Schedule = ({ month }) => {
         cancelButtonText: "Não",
       }).then(async (result) => {
         if (result.isConfirmed) {
-          await deleteDoc(doc(dataBase, "Agendas", year, monthSelect, visit.id));
+          await deleteDoc(
+            doc(dataBase, "Agendas", year, monthSelect, visit.id)
+          );
           Swal.fire({
             title: "Infinit Energy Brasil",
             html: `A Visita em <b>${visit.cidade}</b> foi deletada com sucesso.`,
@@ -129,6 +140,8 @@ const Schedule = ({ month }) => {
       });
     } catch {}
   };
+
+  const sheduleUpdate = () => {};
 
   const confirmVisit = async (ref, type) => {
     console.log(type, ref);
@@ -243,7 +256,7 @@ const Schedule = ({ month }) => {
             <></>
           )}
           <div className="schedule-month">
-             <select
+            <select
               value={monthSelect}
               className="schedule-month__select"
               name="month"
@@ -394,10 +407,9 @@ const Schedule = ({ month }) => {
           scheduleRef={editVisit.ref}
           visitRef={editVisit.info}
           membersRef={members}
-          schedule={schedule}
+          //schedule={schedule}
           month={monthSelect}
           year={year}
-          monthNumber={monthNumber}
         ></EditVisit>
       )}
     </div>
