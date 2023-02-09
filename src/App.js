@@ -6,7 +6,6 @@ import PanelAdmin from './pages/PanelAdmin/Index';
 import useAuth from './hooks/useAuth';
 import PrivateRoute from './components/PrivateRoute';
 import Schedule from './pages/Schedule/Index';
-import { useEffect, useState } from 'react';
 
 function App() {
   const { user } = useAuth();
