@@ -127,7 +127,6 @@ const Schedule = () => {
   };
 
   const filterSchedule = (data, tec) => {
-    console.log(data)
     if(data) {
       setDayVisits(
           schedule.filter(
@@ -319,7 +318,7 @@ const Schedule = () => {
           </div>
           }
           <div className="container-table">
-            <table className="table-visit">
+          {dayVisits && dayVisits.length > 0 && <table className="table-visit">
               <thead>
                 <tr>
                   <th>Dia</th>
@@ -335,8 +334,7 @@ const Schedule = () => {
                 </tr>
               </thead>
               <tbody>
-                {schedule && (dayVisits === undefined)  &&
-                  schedule.map((info) => (
+                  {dayVisits.map((info) => (
                     <>
                       <tr
                         className={info.confirmar ? "table-confirm" : "table"}
@@ -428,8 +426,26 @@ const Schedule = () => {
                       </tr>
                     </>
                   ))}
-                {schedule && dayVisits &&
-                  dayVisits.map((info) => (
+              </tbody>
+            </table>}
+            <table className="table-visit">
+              <thead>
+                <tr>
+                  <th>Dia</th>
+                  <th>Cidade</th>
+                  <th>Hórario de Saida</th>
+                  <th>Chegada no Cliente</th>
+                  <th>Tempo de Visita</th>
+                  <th>Saída no Cliente</th>
+                  <th>Chegada na Empresa</th>
+                  <th>Consultora</th>
+                  <th>Técnico</th>
+                  <th>Ação</th>
+                </tr>
+              </thead>
+              <tbody>
+                {schedule &&
+                  schedule.map((info) => (
                     <>
                       <tr
                         className={info.confirmar ? "table-confirm" : "table"}
