@@ -7,6 +7,7 @@ import Header from "../../components/Header/Index";
 import useAuth from "../../hooks/useAuth";
 
 import {
+  addDoc,
   doc,
   onSnapshot,
   collection,
@@ -28,13 +29,12 @@ const Schedule = () => {
   const [schedule, setSchedule] = useState();
   const [members, setMembers] = useState();
   const [userRef, setUserRef] = useState();
-  const [tecs, setTecs] = useState();
   const [monthSelect, setMonthSelect] = useState(
     String(data.getMonth() + 1).padStart(2, "0")
   );
   const [editVisit, setEditVisit] = useState({ check: false });
   const [createVisit, setCreateVisit] = useState(false);
-  const [dayVisits, setDayVisits] = useState(undefined);
+  const [dayVisits, setDayVisits] = useState();
   const [scheduleRef, setScheduleRef] = useState();
   const membersCollectionRef = collection(dataBase, "Membros");
   const [monthNumber, setMonthNumber] = useState();
@@ -55,7 +55,6 @@ const Schedule = () => {
             schedule.docs.map((doc) => ({ ...doc.data(), id: doc.id }))
           ); // puxa a coleção 'Chats' para o state
           setScheduleRef(schedulesCollectionRef);
-          //setDayVisits(schedule.docs.map((doc) => ({ ...doc.data(), id: doc.id })))
         });
       };
       fetchData();
@@ -78,23 +77,11 @@ const Schedule = () => {
     []
   );
 
-    useEffect(() => {
-    if(dayVisits) {
-      setDayVisits(dayVisits.sort(function(a, b) {
-        if(a.saidaEmpresa < b.saidaEmpresa) return -1;
-        if(a.saidaEmpresa > b.saidaEmpresa) return 1;
-        return 0;
-      }))
-      console.log(dayVisits)
-    }
-  },[dayVisits])
-
   useEffect(
     () => {
       const fetchData = async () => {
         if (members) {
           setUserRef(members.find((doc) => doc.uid === user.id));
-          setTecs(members.filter((member) => member.cargo === "Técnico"));
         }
       };
       fetchData();
@@ -121,24 +108,17 @@ const Schedule = () => {
   }, [monthSelect, year]);
 
   const returnSchedule = () => {
-    setCreateVisit(false);
+    //setCreateVisit(false);
     setEditVisit(false);
-    setDayVisits(undefined);
   };
 
-  const filterSchedule = (data, tec) => {
+  const filterSchedule = (data) => {
     console.log(data)
-    if(data) {
-      setDayVisits(
-          schedule.filter(
-            (dia) => dia.data === data && dia.tecnico === tec
-          )
-          );
-    } else {
-      setDayVisits(undefined);
-      console.log(dayVisits)
-      console.log(data)
-    }
+    setDayVisits(
+        schedule.filter(
+          (dia) => dia.data === data
+        )
+        );
   }
 
   console.log(schedule);
@@ -228,42 +208,42 @@ const Schedule = () => {
     }
   };
 
-  // const createLunch = async (ref) => {
-  //   const dateNow = moment();
-  //   const saidaRef = moment(dateNow).format("kk:mm");
-  //   const diaRef = moment(dateNow).format("YYYY MM DD");
-  //   const chegadaRef = moment(dateNow).add(60, "m").format("kk:mm");
+  const createLunch = async (ref) => {
+    const dateNow = moment();
+    const saidaRef = moment(dateNow).format("kk:mm");
+    const diaRef = moment(dateNow).format("YYYY MM DD");
+    const chegadaRef = moment(dateNow).add(60, "m").format("kk:mm");
 
-  //   await addDoc(scheduleRef, {
-  //     dia: diaRef,
-  //     saidaEmpresa: saidaRef,
-  //     chegadaCliente: "",
-  //     visita: "",
-  //     saidaDoCliente: "",
-  //     chegadaEmpresa: chegadaRef,
-  //     consultora: "Almoço Téc.",
-  //     tecnico: userRef.nome,
-  //     tecnicoUID: user.id,
-  //     cidade: "",
-  //     tempoRota: "",
-  //     data: "",
-  //     uid: user.id,
-  //     cor: "#111111",
-  //     confirmar: false,
-  //   });
-  // };
+    await addDoc(scheduleRef, {
+      dia: diaRef,
+      saidaEmpresa: saidaRef,
+      chegadaCliente: "",
+      visita: "",
+      saidaDoCliente: "",
+      chegadaEmpresa: chegadaRef,
+      consultora: "Almoço Téc.",
+      tecnico: userRef.nome,
+      tecnicoUID: user.id,
+      cidade: "",
+      tempoRota: "",
+      data: "",
+      uid: user.id,
+      cor: "#111111",
+      confirmar: false,
+    });
+  };
 
   console.log(userRef);
 
   return (
-    <div className="container-schedule">
+    <div className="container-schedule" style={createVisit === true ? {overflow: 'hidden'} : {}}>
       <Header user={user}></Header>
       <div className="title-schedule">
         <h2>Visita Técnica - Agenda {year} </h2>
       </div>
       <div className="content-schedule-visit">
         <div className="box-schedule-visit">
-          {(userRef && userRef.cargo === "Vendedor(a)") ||
+          {/* {(userRef && userRef.cargo === "Vendedor(a)") ||
           user.email === "admin@infinitenergy.com.br" ? (
             <div className="box-schedule-visit__add">
               <button className="visit" onClick={() => setCreateVisit(true)}>
@@ -273,7 +253,7 @@ const Schedule = () => {
           ) : (
             <></>
           )}
-          {/* {(userRef && userRef.cargo === "Técnico") ||
+          {(userRef && userRef.cargo === "Técnico") ||
           user.email === "admin@infinitenergy.com.br" ? (
             <div className="box-schedule-visit__add">
               <button className="lunch" onClick={() => createLunch(userRef)}>
@@ -283,20 +263,18 @@ const Schedule = () => {
           ) : (
             <></>
           )} */}
-          {schedule && createVisit && (    
+          {schedule && (
         <CreateVisit
-          returnSchedule={returnSchedule}
+          //returnSchedule={returnSchedule}
           filterSchedule={filterSchedule}
           scheduleRef={scheduleRef}
           membersRef={members}
-          tecs={tecs}
           userRef={userRef}
           schedule={schedule}
           monthNumber={monthNumber}
         ></CreateVisit>
       )}
-          {dayVisits === undefined && 
-            <div className="schedule-month">
+          <div className="schedule-month">
             <select
               value={monthSelect}
               className="schedule-month__select"
@@ -317,7 +295,6 @@ const Schedule = () => {
               <option value="12">Dezembro</option>
             </select>
           </div>
-          }
           <div className="container-table">
             <table className="table-visit">
               <thead>
@@ -335,101 +312,8 @@ const Schedule = () => {
                 </tr>
               </thead>
               <tbody>
-                {schedule && (dayVisits === undefined)  &&
+                {schedule &&
                   schedule.map((info) => (
-                    <>
-                      <tr
-                        className={info.confirmar ? "table-confirm" : "table"}
-                        key={info.id}
-                      >
-                        <th className="bold">
-                          {moment(new Date(info.dia)).format("D")}
-                        </th>
-                        <th>{info.cidade}</th>
-                        <th className="bold bg-important">
-                          {info.saidaEmpresa}
-                        </th>
-                        <th>{info.chegadaCliente}</th>
-                        <th>{info.visita}</th>
-                        <th>{info.saidaDoCliente}</th>
-                        <th className="bold bg-important">
-                          {info.chegadaEmpresa}
-                        </th>
-                        <th
-                          style={
-                            info.cor && {
-                              backgroundColor: info.cor,
-                              border: `1px solid ${info.cor}`,
-                              borderTop: "none",
-                              color: "#fff",
-                            }
-                          }
-                        >
-                          {info.consultora}
-                        </th>
-                        <th>{info.tecnico}</th>
-
-                        <th>
-                          {info.confirmar === false &&
-                          (info.uid === user.id ||
-                            user.email === "admin@infinitenergy.com.br") ? (
-                            <>
-                              <button
-                                className="btn-edit"
-                                onClick={() =>
-                                  setEditVisit({
-                                    check: true,
-                                    info: info,
-                                    ref: doc(
-                                      dataBase,
-                                      "Agendas",
-                                      year,
-                                      monthSelect,
-                                      info.id
-                                    ),
-                                  })
-                                }
-                              ></button>
-                              <button
-                                className="btn-delete"
-                                onClick={() => deleteVisit(info)}
-                              ></button>
-                            </>
-                          ) : (
-                            <></>
-                          )}
-
-                          {info.confirmar === false &&
-                          (info.tecnicoUID === user.id ||
-                            user.email === "admin@infinitenergy.com.br") ? (
-                            <>
-                              <button
-                                className="btn-confirm"
-                                onClick={() => confirmVisit(info, "confirm")}
-                              ></button>
-                            </>
-                          ) : (
-                            <></>
-                          )}
-
-                          {info.confirmar === true &&
-                          (info.tecnicoUID === user.id ||
-                            user.email === "admin@infinitenergy.com.br") ? (
-                            <>
-                              <button
-                                className="btn-cancel"
-                                onClick={() => confirmVisit(info, "cancel")}
-                              ></button>
-                            </>
-                          ) : (
-                            <></>
-                          )}
-                        </th>
-                      </tr>
-                    </>
-                  ))}
-                {schedule && dayVisits &&
-                  dayVisits.map((info) => (
                     <>
                       <tr
                         className={info.confirmar ? "table-confirm" : "table"}

@@ -6,6 +6,7 @@ import * as moment from "moment";
 import "moment/locale/pt-br";
 
 import useAuth from "../../../hooks/useAuth";
+import "animate.css";
 
 import { usePlacesWidget } from "react-google-autocomplete";
 import {
@@ -14,14 +15,12 @@ import {
   useLoadScript,
 } from "@react-google-maps/api";
 
-import "./style.scss";
+import "../_modal.scss";
 
 const CreateVisit = ({
   returnSchedule,
-  filterSchedule,
   scheduleRef,
   membersRef,
-  tecs,
   userRef,
   schedule,
   monthNumber,
@@ -40,42 +39,46 @@ const CreateVisit = ({
   const [saidaTexto, setSaidaTexto] = useState(undefined);
   const [chegadaTexto, setChegadaTexto] = useState(undefined);
   const [dataTexto, setDataTexto] = useState(undefined);
-  const [tecnicoTexto, setTecnicoTexto] = useState(tecs[0].nome);
+  const [tecnicoTexto, setTecnicoTexto] = useState(undefined);
 
   const [city, setCity] = useState();
   const [libraries] = useState(["places"]);
-  //const [tecs, setTecs] = useState();
-  //const [dayVisits, setDayVisits] = useState();
+  const [tecs, setTecs] = useState();
+  const [dayVisits, setDayVisits] = useState();
 
   const { register, handleSubmit } = useForm();
   
   useEffect(() => {
+    const find = () => {
+      //setTecs(membersRef.filter((member) => member.cargo === "Técnico"));
+      setDayVisits(
+        schedule.filter(
+          (dia) => dia.data === dataTexto && dia.tecnico === tecnicoTexto
+        )
+        );
+    };
+
+    find();
+  }, [membersRef, dataTexto, tecnicoTexto ,schedule]);
+
+  useEffect(() => {
+    const find = () => {
+      setTecs(membersRef.filter((member) => member.cargo === "Técnico"));
+    };
+
+    find();
+  }, []);
+
+  useEffect(() => {
     if(dataTexto) {
-      filterSchedule(dataTexto, tecnicoTexto)
-    } else {
-      filterSchedule()
+      setDayVisits(dayVisits.sort(function(a, b) {
+        if(a.saidaEmpresa < b.saidaEmpresa) return -1;
+        if(a.saidaEmpresa > b.saidaEmpresa) return 1;
+        return 0;
+      }))
+      console.log('oi')
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dataTexto, tecnicoTexto]);
-
-  // useEffect(() => {
-  //   const find = () => {
-  //     setTecs(membersRef.filter((member) => member.cargo === "Técnico"));
-  //   };
-
-  //   find();
-  // }, []);
-
-  // useEffect(() => {
-  //   if(dataTexto) {
-  //     setDayVisits(dayVisits.sort(function(a, b) {
-  //       if(a.saidaEmpresa < b.saidaEmpresa) return -1;
-  //       if(a.saidaEmpresa > b.saidaEmpresa) return 1;
-  //       return 0;
-  //     }))
-  //     console.log('oi')
-  //   }
-  // },[dayVisits, dataTexto])
+  },[dayVisits, dataTexto])
 
   useEffect(() => {
     console.log(visitaTexto);
@@ -124,7 +127,7 @@ const CreateVisit = ({
 
   const onSubmit = async (userData) => {
     try {
-      let tecRefUID = tecs.find((tec) => tec.nome === tecnicoTexto);
+      let tecRefUID = tecs.find((tec) => tec.nome === userData.tecnico);
       let diaRef,
         saidaEmpresaRef,
         chegadaClienteRef,
@@ -168,7 +171,7 @@ const CreateVisit = ({
         saidaDoCliente: SaidaClienteRef,
         chegadaEmpresa: ChegadaEmpresaRef,
         consultora: userData.consultora,
-        tecnico: tecnicoTexto,
+        tecnico: userData.tecnico,
         cidade: city,
       });
 
@@ -307,7 +310,7 @@ const CreateVisit = ({
               cidade: city,
               tempoRota: tempoRotaRef,
               tempo: tempoTexto,
-              data: dataTexto,
+              data: userData.dia,
               uid: user.id,
               cor: userRef.cor,
               confirmar: false,
@@ -336,7 +339,7 @@ const CreateVisit = ({
                       tecnicoUID: tecRefUID.uid,
                       cidade: "",
                       tempoRota: "",
-                      data: dataTexto,
+                      data: userData.dia,
                       uid: user.id,
                       cor: "#111111",
                       confirmar: false,
@@ -354,14 +357,14 @@ const CreateVisit = ({
                       tecnicoUID: tecRefUID.uid,
                       cidade: "",
                       tempoRota: "",
-                      data: dataTexto,
+                      data: userData.dia,
                       uid: user.id,
                       cor: "#111111",
                       confirmar: false,
                     });
                   }
                 }
-                //setCheck(false);
+                setCheck(false);
                 return returnSchedule();
               }
             });
@@ -374,67 +377,74 @@ const CreateVisit = ({
   };
 
   return (
-    <div ref={chegadaFormatadaTec} className="create-visit">
-      <div className="create-visit__box">
-        <div className="create-visit__close">
+    <div ref={chegadaFormatadaTec} className="modal-visit">
+      <div className="box-visit">
+        <div className="box-visit__close">
           <button onClick={returnSchedule} className="btn-close" />
         </div>
         <h4>Criar Visita</h4>
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <div className="create-visit__container">
-            <label className="label">
+        <form className="form-visit" onSubmit={handleSubmit(onSubmit)}>
+          <div>
+          <div className="form-visit__double">
+            <label className="form-visit__label">
               <p>Dia</p>
               <input
-                className="label__input"
+                className="form-visit__text small"
                 type="date"
                 min={monthNumber && monthNumber.min}
                 max={monthNumber && monthNumber.max}
                 onChange={(e) => setDataTexto(e.target.value)}
                 placeholder="Digite o dia"
                 autoComplete="off"
+                //{...register("dia")}
                 required
               />
             </label>
-            <label className="label">
+            <label className="form-visit__label">
               <p>Cidade</p>
               <input
-                className="label__input"
+                className="form-visit__text small"
                 placeholder="Digite a cidade"
                 ref={ref}
                 required
               />
               {tempoTexto && tempoTexto && (
-                <p className="notice">Tempo da rota: {tempoTexto}</p>
+                <p className="notice">Tempo de rota: {tempoTexto}</p>
               )}
             </label>
-            <label className="label">
+          </div>
+          <div className="form-visit__double">
+            <label className="form-visit__label">
               <p>Hórario Marcado</p>
               <input
-                className="label__input time"
+                className="form-visit__text small"
                 type="time"
                 placeholder="Digite o hórario marcado"
                 autoComplete="off"
                 onChange={(e) => setHorarioTexto(e.target.value)}
+                //{...register("chegada")}
                 required
               />
             </label>
-            <label className="label">
+            <label className="form-visit__label">
               <p>Tempo de Visita</p>
               <input
-                className="label__input time"
+                className="form-visit__text small"
                 type="time"
                 placeholder="Digite o hórario de saida"
                 min="00:00"
                 max="03:00"
                 onChange={(e) => setVisitaTexto(e.target.value)}
                 autoComplete="off"
+                //{...register("visita")}
                 required
               />
             </label>
-          <label className="label">
+          </div>
+          <label className="form-visit__label">
             <p>Consultora</p>
             <input
-              className="label__input"
+              className="form-visit__text"
               type="text"
               autoComplete="off"
               {...register("consultora", {
@@ -444,24 +454,27 @@ const CreateVisit = ({
             />
           </label>
 
-          <div className="label margin-top">
+          <div className="form-visit__label margin-top">
             <p>Técnico</p>
             <div className="radio">
-            <select
-              value={tecnicoTexto}
-              className="label__select"
-              name="tec"
-              onChange={(e) => setTecnicoTexto(e.target.value)}>
-                {tecs &&
-                tecs.map((tec, index) => (
-                  <option key={index} value={tec.nome}>{tec.nome}</option>
+              {tecs &&
+                tecs.map((tec) => (
+                  <div key={tec.id}>
+                    <input
+                      {...register("tecnico")}
+                      onClick={(e) => setTecnicoTexto(e.target.value)}
+                      id={tec.id}
+                      type="radio"
+                      value={tec.nome}
+                    />
+                    <label htmlFor={tec.id}>{tec.nome}</label>
+                  </div>
                 ))}
-            </select>
             </div>
           </div>
-          </div>
+          <div className="form-visit__double">
           {chegadaTexto && saidaTexto && (
-            <div className="create-visit__info prev">
+            <div className="form-visit__info prev">
               <span className="">Previsão de Visita</span>
               <p className="notice">
                 Saindo da Empresa: <b>{saidaTexto}</b>
@@ -471,7 +484,22 @@ const CreateVisit = ({
               </p>
             </div>
           )}
-          <input className="create-visit__btn" type="submit" value="CRIAR" />
+          {dataTexto && tecnicoTexto && (
+            <div className="form-visit__info visits">
+              <span className="">Visitas já criadas - <b>{moment(dataTexto).format('DD/MM/YYYY')}</b></span>
+              {dayVisits && dayVisits.map((visit, index) => (
+                <p key={index} className="notice">
+                {index + 1} - <b>{visit.saidaEmpresa} : {visit.chegadaEmpresa}</b>
+              </p>
+              ))}
+              {/* <p className="notice">
+                1 - <b>{saidaTexto} : {chegadaTexto}</b>
+              </p> */}
+            </div>
+          )}
+          </div>
+          <input className="form-visit__btn" type="submit" value="CRIAR" />
+          </div>
         </form>
       </div>
 

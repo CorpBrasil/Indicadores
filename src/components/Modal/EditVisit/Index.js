@@ -97,16 +97,15 @@ const EditVisit = ({ returnSchedule, visitRef, membersRef, schedule, month, year
 
           const saidaFormatada = moment(saidaEmpresaRef, 'hh:mm');
           const chegadaFormatada = moment(ChegadaEmpresaRef, 'hh:mm');
-          const dataRef = schedule.filter(dia => dia.data === userData.dia && dia.chegadaCliente !== visitRef.chegadaCliente);
+          const dataRef = schedule.filter(dia => dia.data === userData.dia && dia.chegadaEmpresa !== visitRef.chegadaEmpresa && dia.tecnicoUID === visitRef.tecnicoUID);
 
-        //console.log(dataRef.length);
         const check = [];
         let visitsFind = [];
         dataRef.map((ref) => {
-          if(saidaFormatada < moment(ref.saidaEmpresa, 'hh:mm') && chegadaFormatada < moment(ref.saidaEmpresa, 'hh:mm')) {
+          if(saidaFormatada <= moment(ref.saidaEmpresa, 'hh:mm') && chegadaFormatada <= moment(ref.saidaEmpresa, 'hh:mm')) {
               check.push(ref);
             } else {
-              if(saidaFormatada > moment(ref.chegadaEmpresa, 'hh:mm'))
+              if(saidaFormatada >= moment(ref.chegadaEmpresa, 'hh:mm'))
               check.push(ref);
             }
             return dataRef;

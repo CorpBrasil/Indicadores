@@ -1,7 +1,7 @@
 @import "../../styles/mixins.scss";
 
 .modal-visit {
-  position: fixed;
+  position: absolute;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -11,12 +11,13 @@
   right: 0;
   bottom: 0;
   background: rgb(0 0 0 / 70%);
+  overflow: auto;
 
   .box-visit {
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: 550px;
+    max-width: 550px;
     background-color: #fff;
     border-radius: 5px;
     padding: 1rem;
@@ -92,6 +93,34 @@
 
     }
 
+    &__info{
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      margin: 1rem 0;
+      padding: 1rem;
+      border-radius: 5px;
+      border: 1px solid;
+      width: 40%;
+
+      span {
+        margin-bottom: 1rem;
+      }
+
+    }
+
+    .prev {
+      background-color: #fff3cd;
+      color: #856404;
+      border-color: #ffeeba;
+    }
+
+    .visits {
+      color: #0c5460;
+      background-color: #d1ecf1;
+      border-color: #bee5eb;
+    }
+    
     &__color {
       display: flex;
       align-items: center;

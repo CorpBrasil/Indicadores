@@ -1,0 +1,126 @@
+@import '../../../styles/mixins.scss';
+
+.create-visit {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+
+    &__box {
+        width: 96%;
+        border-radius: 5px;
+        box-shadow: 0 4px 4px rgb(0 0 0 / 25%);
+        background-color: #fff;
+
+        h4 {
+            font-size: 1.5rem;
+            background-color: #006633;
+            padding-bottom: 1.5rem;
+            color: #fff;
+        }
+
+    }
+    
+    &__close {
+        display: flex;
+        justify-content: flex-end;
+        width: 100%;
+        background-color: #006633;
+        border-radius: 5px 5px 0 0;
+  
+        .btn-close {
+          width: 34px;
+          height: 34px;
+          background: url(../../../images/icons/CloseW.svg) 50% no-repeat;
+          background-size: 1rem;
+          border: none;
+        }
+      }
+
+    &__container {
+        margin: 1rem 0;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 1rem;
+
+        .label {
+            width: 20%;
+            @include responsive(0, 1024px) {
+                width: 45%;
+            }
+
+            &__input {
+                margin: 1rem 0;
+                width: 80%;
+                padding: 1rem;
+                border-radius: 5px;
+                background-color: #eee;
+                border: none;
+                transition: cubic-bezier(0.075, 0.82, 0.165, 1) 0.1s;
+                text-align: center;
+        
+                &:disabled {
+                  color: #000;
+                  background-color: #d1d1d1;
+                }
+        
+                &:focus {
+                  border-bottom: 2px solid #f39200;
+                }
+        
+            }
+
+            .time {
+                padding: 0.9rem;
+            }
+
+            &__select {
+                width: 90%;
+                margin: 1rem 0;
+                padding: 1rem;
+                border: none;
+                border-radius: 5px;
+                color: #60666d;
+                font-size: 1rem;
+                appearance: none;
+                background: url(../../../images/icons/Arrow.svg) #eee 90% no-repeat;
+                background-size: 1rem;
+                text-align: center;
+                text-transform: capitalize;
+                transition: cubic-bezier(0.075, 0.82, 0.165, 1) 0.3s;
+                
+                &:focus,
+                &:hover {
+            outline: none;
+          }
+            }
+        }
+    }
+
+    &__info{
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        margin: 2rem auto;
+        padding: 1rem;
+        border-radius: 5px;
+        border: 1px solid;
+        width: 40%;
+        background-color: #fff3cd;
+        color: #856404;
+        border-color: #ffeeba;
+        @include responsive(0, 1024px) {
+            width: 83%;
+        }
+  
+        span {
+          margin-bottom: 1rem;
+        }
+  
+      }
+
+    &__btn {
+        margin-bottom: 1.5rem;
+        @include btnForm(#fff, #006633, 40%);
+    }
+}
