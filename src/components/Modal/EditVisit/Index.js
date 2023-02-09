@@ -5,7 +5,7 @@ import {
   deleteDoc,
   updateDoc,
 } from "firebase/firestore";
-import { useLayoutEffect, useState, useEffect } from 'react'
+import { useLayoutEffect, useState, useEffect, useRef } from 'react'
 import { useForm } from "react-hook-form"; // cria formulário personalizado
 import Swal from "sweetalert2"; // cria alertas personalizado
 import * as moment from 'moment';
@@ -14,8 +14,20 @@ import 'moment/locale/pt-br';
 import { dataBase } from '../../../firebase/database';
 import '../_modal.scss';
 
-const EditVisit = ({ returnSchedule, visitRef, membersRef, schedule, month, year}) => {
-  const [ tecs, setTecs] = useState();
+const EditVisit = ({ returnSchedule, filterSchedule, tecs, visitRef, membersRef, schedule, monthNumber, year}) => {
+  const chegadaFormatadaTec = useRef();
+  const saidaFormatadaTec = useRef();
+
+  const [rotaTempo, setRotaTempo] = useState(visitRef.tempoRota);
+  const [tempoTexto, setTempoTexto] = useState(visitRef.tempo);
+  const [visitaTexto, setVisitaTexto] = useState(visitRef.visita);
+  const [horarioTexto, setHorarioTexto] = useState(visitRef.chegadaCliente);
+  const [saidaTexto, setSaidaTexto] = useState(visitRef.saidaEmpresa);
+  const [chegadaTexto, setChegadaTexto] = useState(visitRef.chegadaEmpresa);
+  const [dataTexto, setDataTexto] = useState(moment(new Date(visitRef.dia)).format('YYYY-MM-DD'));
+  const [tecnicoTexto, setTecnicoTexto] = useState(visitRef.tecnico);
+  const [city, setCity] = useState(visitRef.cidade);
+
   const {
     register,
     handleSubmit,
@@ -26,112 +38,198 @@ const EditVisit = ({ returnSchedule, visitRef, membersRef, schedule, month, year
     // faz a solicitação do servidor assíncrono e preenche o formulário
     setTimeout(() => {
       reset({
-        dia: moment(new Date(visitRef.dia)).format('YYYY-MM-DD'),
-        cidade: visitRef.cidade,
-        chegada: visitRef.chegadaCliente,
-        visita: visitRef.visita,
-        tecnico: visitRef.tecnico,
         consultora: visitRef.consultora,
       });
     }, 0);
   }, [reset, visitRef]);
 
   useEffect(() => {
-    const find= () => {
-      setTecs(membersRef.filter(member => member.cargo === 'Técnico'));
-    }
+    console.log(visitaTexto);
+    if (horarioTexto && visitaTexto) {
+      moment.locale("pt-br");
 
-    find();
-  },[membersRef])
+      const saidaEmpresa = moment(horarioTexto, "hh:mm"); //Horario de chegada
+      const chegadaCliente = moment(horarioTexto, "hh:mm"); //Horario de chegada
+      const visita = moment(visitaTexto, "hh:mm");
+
+      saidaEmpresa.subtract(rotaTempo, "seconds").format("hh:mm"); // Pega o tempo que o tecnico vai precisar sair da empresa
+
+      //console.log(infoTexto)
+      setSaidaTexto(saidaEmpresa.format("kk:mm"));
+
+      const tempoVisitaH = visita.format("hh");
+      const tempoVisitaM = visita.format("mm");
+
+      chegadaCliente.add(tempoVisitaH, "h");
+      chegadaCliente.add(tempoVisitaM, "m");
+      chegadaCliente.add(rotaTempo, "seconds").format("hh:mm"); //Adiciona tempo de viagem volta
+      setChegadaTexto(chegadaCliente.format("kk:mm"));
+    }
+  }, [horarioTexto, visitaTexto, chegadaTexto, saidaTexto, rotaTempo]);
 
   const onSubmit = async (userData) => {
 
     let tecRefUID = tecs.find(tec => tec.nome === userData.tecnico);
     try {
-          let diaRef, saidaEmpresaRef, chegadaClienteRef, TempoVisita, SaidaClienteRef, ChegadaEmpresaRef, tempoRotaRef;
-          const chegada = userData.chegada;
-          moment.locale('pt-br');
-          console.log(moment.locale())
-          const tempo = moment(userData.visita, 'hh:mm');
-          chegadaClienteRef = chegada;
+      let tecRefUID = tecs.find((tec) => tec.nome === tecnicoTexto);
+      let diaRef,
+        saidaEmpresaRef,
+        chegadaClienteRef,
+        TempoVisita,
+        SaidaClienteRef,
+        ChegadaEmpresaRef,
+        tempoRotaRef;
+      const chegada = horarioTexto;
+      moment.locale("pt-br");
+      console.log(moment.locale());
+      const tempo = moment(visitaTexto, "hh:mm");
+      chegadaClienteRef = chegada;
 
-          const saidaEmpresa = moment(chegada, 'hh:mm'); //Horario de chegada 
-          const chegadaCliente = moment(chegada, 'hh:mm'); //Horario de chegada 
-          const day = moment(userData.dia); // Pega o dia escolhido
+      const saidaEmpresa = moment(chegada, "hh:mm"); //Horario de chegada
+      const chegadaCliente = moment(chegada, "hh:mm"); //Horario de chegada
+      const day = moment(dataTexto); // Pega o dia escolhido
 
-          diaRef = day.format('YYYY MM DD');
+      diaRef = day.format("YYYY MM DD");
 
-          saidaEmpresa.subtract(visitRef.tempoRota, "seconds").format('hh:mm'); // Pega o tempo que o tecnico vai precisar sair da empresa
-          
-          TempoVisita = userData.visita;
-          saidaEmpresaRef = saidaEmpresa.format('kk:mm');
+      saidaEmpresa.subtract(rotaTempo, "seconds").format("hh:mm"); // Pega o tempo que o tecnico vai precisar sair da empresa
 
-          // day.add((visitRef.tempoRota * 2), "seconds").format('hh:mm'); // Adiciona o tempo de viagem ida
+      TempoVisita = visitaTexto;
+      saidaEmpresaRef = saidaEmpresa.format("kk:mm");
 
-          const tempoVisitaH = tempo.format('hh');
-          const tempoVisitaM = tempo.format('mm');
-          
-          chegadaCliente.add(tempoVisitaH, 'h'); 
-          chegadaCliente.add(tempoVisitaM, 'm');
-          SaidaClienteRef = chegadaCliente.format('kk:mm');
+      const tempoVisitaH = tempo.format("hh");
+      const tempoVisitaM = tempo.format("mm");
 
-          chegadaCliente.add(visitRef.tempoRota, "seconds").format('hh:mm'); //Adiciona tempo de viagem volta
-          ChegadaEmpresaRef = chegadaCliente.format('kk:mm');
-          tempoRotaRef = visitRef.tempoRota;
+      chegadaCliente.add(tempoVisitaH, "h");
+      chegadaCliente.add(tempoVisitaM, "m");
+      SaidaClienteRef = chegadaCliente.format("kk:mm");
 
-          console.log({
-            dia: diaRef,
-            saidaEmpresa: saidaEmpresaRef,
-            chegadaCliente: chegadaClienteRef,
-            visita: TempoVisita,
-            saidaDoCliente: SaidaClienteRef,
-            chegadaEmpresa: ChegadaEmpresaRef,
-            consultora: userData.consultora,
-            tecnico: userData.tecnico,
-            cidade: visitRef.cidade,
-            tempoRota: tempoRotaRef,
-          })
+      chegadaCliente.add(rotaTempo, "seconds").format("hh:mm"); //Adiciona tempo de viagem volta
+      ChegadaEmpresaRef = chegadaCliente.format("kk:mm");
+      tempoRotaRef = rotaTempo;
 
-          const saidaFormatada = moment(saidaEmpresaRef, 'hh:mm');
-          const chegadaFormatada = moment(ChegadaEmpresaRef, 'hh:mm');
-          const dataRef = schedule.filter(dia => dia.data === userData.dia && dia.chegadaEmpresa !== visitRef.chegadaEmpresa && dia.tecnicoUID === visitRef.tecnicoUID);
+      console.log({
+        dia: diaRef,
+        saidaEmpresa: saidaEmpresaRef,
+        chegadaCliente: chegadaClienteRef,
+        visita: TempoVisita,
+        saidaDoCliente: SaidaClienteRef,
+        chegadaEmpresa: ChegadaEmpresaRef,
+        consultora: userData.consultora,
+        tecnico: tecnicoTexto,
+        cidade: city,
+      });
 
-        const check = [];
-        let visitsFind = [];
+      const dataRef = schedule.filter(
+        (dia) => dia.data === dataTexto && dia.chegadaEmpresa !== visitRef.chegadaEmpresa && dia.tecnicoUID === visitRef.tecnicoUID
+      );
+      const lunch = schedule.filter(
+        (dia) =>
+          dia.data === dataTexto &&
+          dia.consultora === "Almoço Téc." &&
+          dia.tecnico === tecnicoTexto
+      );
+      const saidaFormatada = moment(saidaEmpresaRef, "hh:mm");
+      const chegadaFormatada = moment(ChegadaEmpresaRef, "hh:mm");
+
+      console.log(saidaFormatada);
+      const check = [];
+      let visitsFind = [];
+
+      //Almoço
+      if (lunch.length < 1 || lunch === undefined) {
+        if (
+          chegadaFormatada > moment("10:59", "hh:mm") &&
+          chegadaFormatada < moment("14:01", "hh:mm")
+        ) {
+          chegadaFormatadaTec.current = chegadaFormatada.add(1, "h");
+          saidaFormatadaTec.current = null; // UseRef não recebe renderização. emtão o valor antigo fica associado ainda
+          console.log(chegadaFormatadaTec.current.format("kk:mm"));
+        } else if (
+          saidaFormatada > moment("10:59", "hh:mm") &&
+          saidaFormatada < moment("14:01", "hh:mm")
+        ) {
+          saidaFormatadaTec.current = saidaFormatada.subtract(1, "h");
+          chegadaFormatadaTec.current = null;
+          console.log(saidaFormatadaTec.current);
+        }
+
         dataRef.map((ref) => {
-          if(saidaFormatada <= moment(ref.saidaEmpresa, 'hh:mm') && chegadaFormatada <= moment(ref.saidaEmpresa, 'hh:mm')) {
-              check.push(ref);
-            } else {
-              if(saidaFormatada >= moment(ref.chegadaEmpresa, 'hh:mm'))
-              check.push(ref);
-            }
-            return dataRef;
-          })
-
-          console.log('>>', check, dataRef);
-          const visitsFindCount = dataRef.length - check.length;
-
-          dataRef.map((a) => { //Percorre todos os arrays de 'dataRef' e compara se os arrays são iguais
-            if(check.includes(a) === false) {
-              visitsFind.push(a)
-            }
-            return visitsFind;
-          })
-          console.log(visitsFind);
-          let c = 1;
-
-          if(visitsFindCount > 0) {
-            const visits = visitsFind.map((e) => (
-              `Visita <b>` + c++ + '</b> - Saida: <b>' + e.saidaEmpresa) + '</b> Chegada: <b>' + e.chegadaEmpresa + '</b></br>');
-            Swal.fire({
-              title: "Infinit Energy Brasil",
-              html: `Foram encontrado(s) <b>${visitsFindCount}</b> visita(s) marcada(s) nesse periodo.</br></br>` +
-              visits,
-              icon: "error",
-              showConfirmButton: true,
-              confirmButtonColor: "#F39200"
-            })
+          if (
+            saidaFormatada < moment(ref.saidaEmpresa, "hh:mm") &&
+            chegadaFormatadaTec.current < moment(ref.saidaEmpresa, "hh:mm")
+          ) {
+            check.push(ref);
           } else {
+            if (saidaFormatada > moment(ref.chegadaEmpresa, "hh:mm"))
+              check.push(ref);
+          }
+          return dataRef;
+        });
+      } else {
+        dataRef.map((ref) => {
+          console.log("eae");
+          if (
+            saidaFormatada < moment(ref.saidaEmpresa, "hh:mm") &&
+            chegadaFormatada < moment(ref.saidaEmpresa, "hh:mm")
+          ) {
+            check.push(ref);
+          } else {
+            if (saidaFormatada > moment(ref.chegadaEmpresa, "hh:mm"))
+              check.push(ref);
+          }
+          return dataRef;
+        });
+      }
+
+      console.log(chegadaFormatadaTec.current, saidaFormatadaTec.current);
+
+      // dataRef.map((ref) => {
+      //   console.log('eae')
+      //   if(saidaFormatada < moment(ref.saidaEmpresa, 'hh:mm') && chegadaFormatada < moment(ref.saidaEmpresa, 'hh:mm')) {
+      //       check.push(ref);
+      //     } else {
+      //       if(saidaFormatada > moment(ref.chegadaEmpresa, 'hh:mm'))
+      //       check.push(ref);
+      //     }
+      //     return dataRef;
+      //   })
+
+      console.log(">>", check, dataRef);
+      console.log(lunch.length);
+      const visitsFindCount = dataRef.length - check.length;
+      console.log(visitsFindCount);
+
+      dataRef.map((a) => {
+        //Percorre todos os arrays de 'dataRef' e compara se os arrays são iguais
+        if (check.includes(a) === false) {
+          visitsFind.push(a);
+        }
+        return visitsFind;
+      });
+      console.log(visitsFind);
+      let c = 1;
+
+      if (visitsFindCount < 0 || visitsFindCount > 0) {
+        const visits = visitsFind.map(
+          (e) =>
+            `Visita <b>` +
+            c++ +
+            "</b> - Saida: <b>" +
+            e.saidaEmpresa +
+            "</b> Chegada: <b>" +
+            e.chegadaEmpresa +
+            "</b></br>"
+        );
+        Swal.fire({
+          title: "Infinit Energy Brasil",
+          html:
+            `Foram encontrado(s) <b>${visitsFindCount}</b> visita(s) marcada(s) nesse periodo.</br></br>` +
+            visits,
+          icon: "error",
+          showConfirmButton: true,
+          confirmButtonColor: "#F39200",
+        });
+      } else {
             Swal.fire({
         title: "Infinit Energy Brasil",
         html: `Você deseja cadastrar uma nova <b>Visita?</b>`,
@@ -143,9 +241,7 @@ const EditVisit = ({ returnSchedule, visitRef, membersRef, schedule, month, year
         cancelButtonText: "Não",
       }).then(async (result) => {
         if (result.isConfirmed) {
-          const newMonth = moment(userData.dia).format('MM').toString();
-          if(month === newMonth) {
-            await updateDoc(doc(dataBase, "Agendas", year, newMonth, visitRef.id), {
+            await updateDoc(doc(dataBase, "Agendas", year, monthNumber, visitRef.id), {
               dia: diaRef,
               saidaEmpresa: saidaEmpresaRef,
               chegadaCliente: chegadaClienteRef,
@@ -160,26 +256,6 @@ const EditVisit = ({ returnSchedule, visitRef, membersRef, schedule, month, year
               uid: visitRef.uid,
               cor: visitRef.cor,
              })
-          } else {
-            await addDoc(collection(dataBase, "Agendas", year, newMonth), {
-              dia: diaRef,
-              saidaEmpresa: saidaEmpresaRef,
-              chegadaCliente: chegadaClienteRef,
-              visita: TempoVisita,
-              saidaDoCliente: SaidaClienteRef,
-              chegadaEmpresa: ChegadaEmpresaRef,
-              consultora: userData.consultora,
-              tecnico: tecRefUID.nome,
-              tecnicoUID: tecRefUID.uid,
-              cidade: visitRef.cidade,
-              tempoRota: tempoRotaRef,
-              tempo: visitRef.tempo,
-              uid: visitRef.uid,
-              cor: visitRef.cor,
-              confirmar: false
-             })
-             await deleteDoc(doc(dataBase, "Agendas", year, month, visitRef.id));
-          }
           Swal.fire({
             title: "Infinit Energy Brasil",
             html: `A Visita em <b>${visitRef.cidade}</b> foi alterada com sucesso.`,
@@ -200,86 +276,107 @@ const EditVisit = ({ returnSchedule, visitRef, membersRef, schedule, month, year
     }
 
   return (
-    <div className='modal-visit'>
-       <div className='box-visit'>
-            <div className='box-visit__close'>
-                <button onClick={returnSchedule} className='btn-close' />
-            </div>
-            <h4>Editar Visita</h4> 
-        <form className='form-visit' onSubmit={handleSubmit(onSubmit)}>
-          <div className='form-visit__double'>
-          <label className="form-visit__label">
-            <p>Dia</p>
+    <div className="create-visit">
+      <div className="create-visit__box">
+        <div className="create-visit__close">
+          <button onClick={returnSchedule} className="btn-close" />
+        </div>
+        <h4>Editar Visita</h4>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <div className="create-visit__container">
+            <label className="label">
+              <p>Dia</p>
               <input
-                className="form-visit__text small"
+                value={dataTexto}
+                className="label__input"
                 type="date"
+                min={monthNumber && monthNumber.min}
+                max={monthNumber && monthNumber.max}
+                onChange={(e) => setDataTexto(e.target.value)}
                 placeholder="Digite o dia"
                 autoComplete="off"
-                min='2023-01-01'
-                max='2023-12-31'
-                {...register("dia")}
                 required
               />
             </label>
-          <label className="form-visit__label">
-            <p>Cidade</p>
+            <label className="label">
+              <p>Cidade</p>
               <input
-                className="form-visit__text small"
+                className="label__input"
                 placeholder="Digite a cidade"
-                {...register("cidade")}
+                value={city}
                 disabled
               />
-              {visitRef.tempo && visitRef.tempo && <p className='notice'>Tempo de rota: {visitRef.tempo}</p>}
+              {tempoTexto && tempoTexto && (
+                <p className="notice">Tempo da rota: {tempoTexto}</p>
+              )}
             </label>
-          </div>
-        <div className='form-visit__double'>
-        <label className="form-visit__label">
-          <p>Hórario Marcado</p>
+            <label className="label">
+              <p>Hórario Marcado</p>
+              <input
+                className="label__input time"
+                type="time"
+                placeholder="Digite o hórario marcado"
+                autoComplete="off"
+                value={horarioTexto}
+                onChange={(e) => setHorarioTexto(e.target.value)}
+                required
+              />
+            </label>
+            <label className="label">
+              <p>Tempo de Visita</p>
+              <input
+                value={visitaTexto}
+                className="label__input time"
+                type="time"
+                placeholder="Digite o hórario de saida"
+                min="00:00"
+                max="03:00"
+                onChange={(e) => setVisitaTexto(e.target.value)}
+                autoComplete="off"
+                required
+              />
+            </label>
+          <label className="label">
+            <p>Consultora</p>
             <input
-              className="form-visit__text small"
-              type="time"
-              placeholder="Digite o hórario marcado"
-              autoComplete="off"
-              {...register("chegada")}
-              required
-            />
-          </label>
-        <label className="form-visit__label">
-          <p>Tempo de Visita</p>
-            <input
-              className="form-visit__text small"
-              type="time"
-              placeholder="Digite o hórario de saida"
-              autoComplete="off"
-              {...register("visita")}
-              required
-            />
-          </label>
-        </div>
-        <label className="form-visit__label">
-          <p>Consultora</p>
-            <input
-              className="form-visit__text"
+              className="label__input"
               type="text"
               autoComplete="off"
               {...register("consultora")}
               disabled
             />
           </label>
-          <div className="margin-top">
-          <p>Técnico</p>
-            <div className='radio'>
-            {tecs && tecs.map((tec) => (
-                  <div key={tec.id}>
-                    <input {...register("tecnico")} id={tec.id} type="radio" value={tec.nome} required /><label htmlFor={tec.id}>{tec.nome}</label>
-                  </div>
+
+          <div className="label margin-top">
+            <p>Técnico</p>
+            <div className="radio">
+            <select
+              value={tecnicoTexto}
+              className="label__select"
+              name="tec"
+              onChange={(e) => setTecnicoTexto(e.target.value)}>
+                {tecs &&
+                tecs.map((tec, index) => (
+                  <option key={index} value={tec.nome}>{tec.nome}</option>
                 ))}
+            </select>
             </div>
           </div>
-        <input className='form-visit__btn' type="submit" value="ALTERAR"/>
-      </form> 
-        </div>
-
+          </div>
+          {chegadaTexto && saidaTexto && (
+            <div className="create-visit__info prev">
+              <span className="">Previsão de Visita</span>
+              <p className="notice">
+                Saindo da Empresa: <b>{saidaTexto}</b>
+              </p>
+              <p className="notice">
+                Chegando na Empresa: <b>{chegadaTexto}</b>
+              </p>
+            </div>
+          )}
+          <input className="create-visit__btn" type="submit" value="CRIAR" />
+        </form>
+      </div>
     </div>
   )
 }

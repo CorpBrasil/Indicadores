@@ -374,7 +374,7 @@ const CreateVisit = ({
   };
 
   return (
-    <div ref={chegadaFormatadaTec} className="create-visit">
+    <div className="create-visit">
       <div className="create-visit__box">
         <div className="create-visit__close">
           <button onClick={returnSchedule} className="btn-close" />

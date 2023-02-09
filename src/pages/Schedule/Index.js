@@ -294,6 +294,19 @@ const Schedule = () => {
           monthNumber={monthNumber}
         ></CreateVisit>
       )}
+      {editVisit.check && (
+        <EditVisit
+          returnSchedule={returnSchedule}
+          filterSchedule={filterSchedule}
+          tecs={tecs}
+          scheduleRef={editVisit.ref}
+          visitRef={editVisit.info}
+          membersRef={members}
+          schedule={schedule}
+          monthNumber={monthNumber}
+          year={year}
+        ></EditVisit>
+      )}
           {dayVisits === undefined && 
             <div className="schedule-month">
             <select
@@ -542,17 +555,6 @@ const Schedule = () => {
           </div>
         </div>
       </div>
-      {editVisit.check && (
-        <EditVisit
-          returnSchedule={returnSchedule}
-          scheduleRef={editVisit.ref}
-          visitRef={editVisit.info}
-          membersRef={members}
-          schedule={schedule}
-          month={monthSelect}
-          year={year}
-        ></EditVisit>
-      )}
     </div>
   );
 };
