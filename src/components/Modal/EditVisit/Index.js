@@ -1,9 +1,5 @@
 import {
-  addDoc,
-  doc,
-  collection,
-  deleteDoc,
-  updateDoc,
+  updateDoc
 } from "firebase/firestore";
 import { useLayoutEffect, useState, useEffect, useRef } from 'react'
 import { useForm } from "react-hook-form"; // cria formulário personalizado
@@ -11,22 +7,21 @@ import Swal from "sweetalert2"; // cria alertas personalizado
 import * as moment from 'moment';
 import 'moment/locale/pt-br';
 
-import { dataBase } from '../../../firebase/database';
 import '../_modal.scss';
 
-const EditVisit = ({ returnSchedule, filterSchedule, tecs, visitRef, membersRef, schedule, monthNumber, year}) => {
+const EditVisit = ({ returnSchedule, filterSchedule, tecs, visitRef, scheduleRef, schedule, monthNumber, year}) => {
   const chegadaFormatadaTec = useRef();
   const saidaFormatadaTec = useRef();
 
-  const [rotaTempo, setRotaTempo] = useState(visitRef.tempoRota);
-  const [tempoTexto, setTempoTexto] = useState(visitRef.tempo);
-  const [visitaTexto, setVisitaTexto] = useState(visitRef.visita);
-  const [horarioTexto, setHorarioTexto] = useState(visitRef.chegadaCliente);
-  const [saidaTexto, setSaidaTexto] = useState(visitRef.saidaEmpresa);
-  const [chegadaTexto, setChegadaTexto] = useState(visitRef.chegadaEmpresa);
-  const [dataTexto, setDataTexto] = useState(moment(new Date(visitRef.dia)).format('YYYY-MM-DD'));
-  const [tecnicoTexto, setTecnicoTexto] = useState(visitRef.tecnico);
-  const [city, setCity] = useState(visitRef.cidade);
+  const [rotaTempo, setRotaTempo] = useState()
+  const [tempoTexto, setTempoTexto] = useState()
+  const [visitaTexto, setVisitaTexto] = useState();
+  const [horarioTexto, setHorarioTexto] = useState()
+  const [saidaTexto, setSaidaTexto] = useState()
+  const [chegadaTexto, setChegadaTexto] = useState()
+  const [dataTexto, setDataTexto] = useState()
+  const [tecnicoTexto, setTecnicoTexto] = useState()
+  const [city, setCity] = useState();
 
   const {
     register,
@@ -40,8 +35,26 @@ const EditVisit = ({ returnSchedule, filterSchedule, tecs, visitRef, membersRef,
       reset({
         consultora: visitRef.consultora,
       });
+      setRotaTempo(visitRef.tempoRota);
+      setTempoTexto(visitRef.tempo);
+      setVisitaTexto(visitRef.visita);
+      setHorarioTexto(visitRef.chegadaCliente);
+      setSaidaTexto(visitRef.saidaEmpresa);
+      setChegadaTexto(visitRef.chegadaEmpresa);
+      setDataTexto(moment(new Date(visitRef.dia)).format('YYYY-MM-DD'));
+      setTecnicoTexto(visitRef.tecnico);
+      setCity(visitRef.cidade);
     }, 0);
   }, [reset, visitRef]);
+
+  useEffect(() => {
+    if(dataTexto) {
+      filterSchedule(dataTexto, tecnicoTexto)
+    } else {
+      filterSchedule()
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dataTexto, tecnicoTexto]);
 
   useEffect(() => {
     console.log(visitaTexto);
@@ -52,7 +65,7 @@ const EditVisit = ({ returnSchedule, filterSchedule, tecs, visitRef, membersRef,
       const chegadaCliente = moment(horarioTexto, "hh:mm"); //Horario de chegada
       const visita = moment(visitaTexto, "hh:mm");
 
-      saidaEmpresa.subtract(rotaTempo, "seconds").format("hh:mm"); // Pega o tempo que o tecnico vai precisar sair da empresa
+      saidaEmpresa.subtract(rotaTempo, "seconds") // Pega o tempo que o tecnico vai precisar sair da empresa
 
       //console.log(infoTexto)
       setSaidaTexto(saidaEmpresa.format("kk:mm"));
@@ -62,14 +75,13 @@ const EditVisit = ({ returnSchedule, filterSchedule, tecs, visitRef, membersRef,
 
       chegadaCliente.add(tempoVisitaH, "h");
       chegadaCliente.add(tempoVisitaM, "m");
-      chegadaCliente.add(rotaTempo, "seconds").format("hh:mm"); //Adiciona tempo de viagem volta
+      chegadaCliente.add(rotaTempo, "seconds") //Adiciona tempo de viagem volta
       setChegadaTexto(chegadaCliente.format("kk:mm"));
     }
   }, [horarioTexto, visitaTexto, chegadaTexto, saidaTexto, rotaTempo]);
 
   const onSubmit = async (userData) => {
 
-    let tecRefUID = tecs.find(tec => tec.nome === userData.tecnico);
     try {
       let tecRefUID = tecs.find((tec) => tec.nome === tecnicoTexto);
       let diaRef,
@@ -232,7 +244,7 @@ const EditVisit = ({ returnSchedule, filterSchedule, tecs, visitRef, membersRef,
       } else {
             Swal.fire({
         title: "Infinit Energy Brasil",
-        html: `Você deseja cadastrar uma nova <b>Visita?</b>`,
+        html: `Você deseja alterar essa <b>Visita?</b>`,
         icon: "question",
         showCancelButton: true,
         confirmButtonColor: "#F39200",
@@ -241,7 +253,8 @@ const EditVisit = ({ returnSchedule, filterSchedule, tecs, visitRef, membersRef,
         cancelButtonText: "Não",
       }).then(async (result) => {
         if (result.isConfirmed) {
-            await updateDoc(doc(dataBase, "Agendas", year, monthNumber, visitRef.id), {
+          console.log(year, monthNumber);
+            await updateDoc(scheduleRef, {
               dia: diaRef,
               saidaEmpresa: saidaEmpresaRef,
               chegadaCliente: chegadaClienteRef,

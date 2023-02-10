@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import moment from "moment";
 import Swal from "sweetalert2";
 import { useParams } from "react-router-dom";
@@ -25,6 +25,8 @@ const Schedule = () => {
   const data = new Date();
   const { year } = useParams();
   const { user } = useAuth();
+
+  const boxVisitRef = useRef();
   const [schedule, setSchedule] = useState();
   const [members, setMembers] = useState();
   const [userRef, setUserRef] = useState();
@@ -120,9 +122,13 @@ const Schedule = () => {
     findMonth();
   }, [monthSelect, year]);
 
+  const handleBoxVisitRef = () => {
+    boxVisitRef.current.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'start' });
+  }
+
   const returnSchedule = () => {
     setCreateVisit(false);
-    setEditVisit(false);
+    setEditVisit({check:false});
     setDayVisits(undefined);
   };
 
@@ -262,10 +268,38 @@ const Schedule = () => {
       </div>
       <div className="content-schedule-visit">
         <div className="box-schedule-visit">
-          {(userRef && userRef.cargo === "Vendedor(a)") ||
+        <div ref={boxVisitRef}>
+          {(schedule && createVisit && editVisit.check === false) ? (    
+        <CreateVisit
+          returnSchedule={returnSchedule}
+          filterSchedule={filterSchedule}
+          scheduleRef={scheduleRef}
+          membersRef={members}
+          tecs={tecs}
+          userRef={userRef}
+          schedule={schedule}
+          monthNumber={monthNumber}
+        ></CreateVisit>) : (
+          <></>
+        )}
+      {editVisit.check && (
+        <EditVisit
+          returnSchedule={returnSchedule}
+          filterSchedule={filterSchedule}
+          tecs={tecs}
+          scheduleRef={editVisit.ref}
+          visitRef={editVisit.info}
+          membersRef={members}
+          schedule={schedule}
+          monthNumber={monthNumber}
+          year={year}
+        ></EditVisit>
+      )}
+          </div>
+          {(userRef && userRef.cargo === "Vendedor(a)" && editVisit.check === false && !createVisit) ||
           user.email === "admin@infinitenergy.com.br" ? (
             <div className="box-schedule-visit__add">
-              <button className="visit" onClick={() => setCreateVisit(true)}>
+              <button className="visit" onClick={ () => {setCreateVisit(true); return handleBoxVisitRef()}}>
                 <span className="icon-visit"></span>Criar uma Visita
               </button>
             </div>
@@ -282,31 +316,6 @@ const Schedule = () => {
           ) : (
             <></>
           )} */}
-          {schedule && createVisit && (    
-        <CreateVisit
-          returnSchedule={returnSchedule}
-          filterSchedule={filterSchedule}
-          scheduleRef={scheduleRef}
-          membersRef={members}
-          tecs={tecs}
-          userRef={userRef}
-          schedule={schedule}
-          monthNumber={monthNumber}
-        ></CreateVisit>
-      )}
-      {editVisit.check && (
-        <EditVisit
-          returnSchedule={returnSchedule}
-          filterSchedule={filterSchedule}
-          tecs={tecs}
-          scheduleRef={editVisit.ref}
-          visitRef={editVisit.info}
-          membersRef={members}
-          schedule={schedule}
-          monthNumber={monthNumber}
-          year={year}
-        ></EditVisit>
-      )}
           {dayVisits === undefined && 
             <div className="schedule-month">
             <select
@@ -388,7 +397,7 @@ const Schedule = () => {
                               <button
                                 className="btn-edit"
                                 onClick={() =>
-                                  setEditVisit({
+                                  {setEditVisit({
                                     check: true,
                                     info: info,
                                     ref: doc(
@@ -399,6 +408,7 @@ const Schedule = () => {
                                       info.id
                                     ),
                                   })
+                                  return handleBoxVisitRef()}
                                 }
                               ></button>
                               <button
@@ -499,7 +509,7 @@ const Schedule = () => {
                               <button
                                 className="btn-edit"
                                 onClick={() =>
-                                  setEditVisit({
+                                  {setEditVisit({
                                     check: true,
                                     info: info,
                                     ref: doc(
@@ -510,6 +520,7 @@ const Schedule = () => {
                                       info.id
                                     ),
                                   })
+                                return handleBoxVisitRef()}
                                 }
                               ></button>
                               <button
