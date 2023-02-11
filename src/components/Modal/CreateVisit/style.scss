@@ -88,6 +88,12 @@
                 text-align: center;
                 text-transform: capitalize;
                 transition: cubic-bezier(0.075, 0.82, 0.165, 1) 0.3s;
+
+                &:disabled {
+                  color: #000;
+                  background-color: #d1d1d1;
+                  opacity: 1;
+                }
                 
                 &:focus,
                 &:hover {
