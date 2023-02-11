@@ -49,6 +49,7 @@ const EditVisit = ({ returnSchedule, filterSchedule, tecs, visitRef, scheduleRef
         setHorarioTexto(visitRef.chegadaEmpresa);
       }
     }, 0);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visitRef]);
 
   useEffect(() => {
@@ -390,6 +391,7 @@ const EditVisit = ({ returnSchedule, filterSchedule, tecs, visitRef, scheduleRef
           <div className="label margin-top">
             <p>Técnico</p>
             <div className="radio">
+            {visitRef.consultora === 'Almoço Téc.' ?
             <select
               value={tecnicoTexto}
               className="label__select"
@@ -400,7 +402,18 @@ const EditVisit = ({ returnSchedule, filterSchedule, tecs, visitRef, scheduleRef
                 tecs.map((tec, index) => (
                   <option key={index} value={tec.nome}>{tec.nome}</option>
                 ))}
-            </select>
+            </select> : 
+            <select
+            value={tecnicoTexto}
+            className="label__select"
+            name="tec"
+            required
+            onChange={(e) => setTecnicoTexto(e.target.value)}>
+              {tecs &&
+              tecs.map((tec, index) => (
+                <option key={index} value={tec.nome}>{tec.nome}</option>
+              ))}
+          </select>}
             </div>
           </div>
           </div>
