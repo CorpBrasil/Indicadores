@@ -327,7 +327,7 @@ const CreateVisit = ({
                       dia: diaRef,
                       saidaEmpresa: ChegadaEmpresaRef,
                       chegadaCliente: "",
-                      visita: "",
+                      visita: "01:00",
                       saidaDoCliente: "",
                       chegadaEmpresa:
                         chegadaFormatadaTec.current.format("kk:mm"),
@@ -374,14 +374,14 @@ const CreateVisit = ({
   };
 
   return (
-    <div className="create-visit">
-      <div className="create-visit__box">
-        <div className="create-visit__close">
+    <div className="createAndEdit-visit">
+      <div className="createAndEdit-visit__box">
+        <div className="createAndEdit-visit__close">
           <button onClick={returnSchedule} className="btn-close" />
         </div>
         <h4>Criar Visita</h4>
         <form onSubmit={handleSubmit(onSubmit)}>
-          <div className="create-visit__container">
+          <div className="createAndEdit-visit__container">
             <label className="label">
               <p>Dia</p>
               <input
@@ -461,7 +461,7 @@ const CreateVisit = ({
           </div>
           </div>
           {chegadaTexto && saidaTexto && (
-            <div className="create-visit__info prev">
+            <div className="createAndEdit-visit__info prev">
               <span className="">Previsão de Visita</span>
               <p className="notice">
                 Saindo da Empresa: <b>{saidaTexto}</b>
@@ -471,7 +471,7 @@ const CreateVisit = ({
               </p>
             </div>
           )}
-          <input className="create-visit__btn" type="submit" value="CRIAR" />
+          <input className="createAndEdit-visit__btn" type="submit" value="CRIAR" />
         </form>
       </div>
 

@@ -38,14 +38,18 @@ const EditVisit = ({ returnSchedule, filterSchedule, tecs, visitRef, scheduleRef
       setRotaTempo(visitRef.tempoRota);
       setTempoTexto(visitRef.tempo);
       setVisitaTexto(visitRef.visita);
-      setHorarioTexto(visitRef.chegadaCliente);
       setSaidaTexto(visitRef.saidaEmpresa);
       setChegadaTexto(visitRef.chegadaEmpresa);
       setDataTexto(moment(new Date(visitRef.dia)).format('YYYY-MM-DD'));
       setTecnicoTexto(visitRef.tecnico);
       setCity(visitRef.cidade);
+      if(visitRef.consultora === 'Almoço Téc.') {
+        setHorarioTexto(visitRef.saidaEmpresa);
+      } else {
+        setHorarioTexto(visitRef.chegadaEmpresa);
+      }
     }, 0);
-  }, [reset, visitRef]);
+  }, [visitRef]);
 
   useEffect(() => {
     if(dataTexto) {
@@ -289,16 +293,28 @@ const EditVisit = ({ returnSchedule, filterSchedule, tecs, visitRef, scheduleRef
     }
 
   return (
-    <div className="create-visit">
-      <div className="create-visit__box">
-        <div className="create-visit__close">
+    <div className="createAndEdit-visit">
+      <div className="createAndEdit-visit__box">
+        <div className="createAndEdit-visit__close">
           <button onClick={returnSchedule} className="btn-close" />
         </div>
         <h4>Editar Visita</h4>
         <form onSubmit={handleSubmit(onSubmit)}>
-          <div className="create-visit__container">
+          <div className="createAndEdit-visit__container">
             <label className="label">
               <p>Dia</p>
+              {visitRef.consultora === 'Almoço Téc.' ?
+              <input
+                value={dataTexto}
+                className="label__input"
+                type="date"
+                min={monthNumber && monthNumber.min}
+                max={monthNumber && monthNumber.max}
+                onChange={(e) => setDataTexto(e.target.value)}
+                placeholder="Digite o dia"
+                autoComplete="off"
+                disabled
+              /> :
               <input
                 value={dataTexto}
                 className="label__input"
@@ -310,6 +326,7 @@ const EditVisit = ({ returnSchedule, filterSchedule, tecs, visitRef, scheduleRef
                 autoComplete="off"
                 required
               />
+            }
             </label>
             <label className="label">
               <p>Cidade</p>
@@ -337,7 +354,7 @@ const EditVisit = ({ returnSchedule, filterSchedule, tecs, visitRef, scheduleRef
             </label>
             <label className="label">
               <p>Tempo de Visita</p>
-              <input
+              {visitRef.consultora === 'Almoço Téc.' ? <input
                 value={visitaTexto}
                 className="label__input time"
                 type="time"
@@ -346,8 +363,18 @@ const EditVisit = ({ returnSchedule, filterSchedule, tecs, visitRef, scheduleRef
                 max="03:00"
                 onChange={(e) => setVisitaTexto(e.target.value)}
                 autoComplete="off"
-                required
-              />
+                disabled
+              /> : <input
+              value={visitaTexto}
+              className="label__input time"
+              type="time"
+              placeholder="Digite o hórario de saida"
+              min="00:00"
+              max="03:00"
+              onChange={(e) => setVisitaTexto(e.target.value)}
+              autoComplete="off"
+              required
+            />}
             </label>
           <label className="label">
             <p>Consultora</p>
@@ -367,6 +394,7 @@ const EditVisit = ({ returnSchedule, filterSchedule, tecs, visitRef, scheduleRef
               value={tecnicoTexto}
               className="label__select"
               name="tec"
+              disabled
               onChange={(e) => setTecnicoTexto(e.target.value)}>
                 {tecs &&
                 tecs.map((tec, index) => (
@@ -377,7 +405,7 @@ const EditVisit = ({ returnSchedule, filterSchedule, tecs, visitRef, scheduleRef
           </div>
           </div>
           {chegadaTexto && saidaTexto && (
-            <div className="create-visit__info prev">
+            <div className="createAndEdit-visit__info prev">
               <span className="">Previsão de Visita</span>
               <p className="notice">
                 Saindo da Empresa: <b>{saidaTexto}</b>
@@ -387,7 +415,7 @@ const EditVisit = ({ returnSchedule, filterSchedule, tecs, visitRef, scheduleRef
               </p>
             </div>
           )}
-          <input className="create-visit__btn" type="submit" value="CRIAR" />
+          <input className="createAndEdit-visit__btn" type="submit" value="CRIAR" />
         </form>
       </div>
     </div>
