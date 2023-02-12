@@ -93,6 +93,7 @@ useEffect(() => {
       }))
       console.log(dayVisits)
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   },[schedule])
 
   useEffect(
