@@ -54,7 +54,9 @@ const Schedule = () => {
         onSnapshot(await q, (schedule) => {
           // Atualiza os dados em tempo real
           setSchedule(
-            schedule.docs.map((doc) => ({ ...doc.data(), id: doc.id }))
+            schedule.docs.map((doc) => (
+              { ...doc.data(), id: doc.id }
+              ))
           ); // puxa a coleção 'Chats' para o state
           setScheduleRef(schedulesCollectionRef);
           //setDayVisits(schedule.docs.map((doc) => ({ ...doc.data(), id: doc.id })))
@@ -80,16 +82,18 @@ const Schedule = () => {
     []
   );
 
-    useEffect(() => {
-    if(dayVisits) {
-      setDayVisits(dayVisits.sort(function(a, b) {
-        if(a.saidaEmpresa < b.saidaEmpresa) return -1;
-        if(a.saidaEmpresa > b.saidaEmpresa) return 1;
+useEffect(() => {
+    if(schedule) {
+      setSchedule(schedule.sort(function(a, b) {
+        if(a.data === b.data) {
+          if(a.saidaEmpresa < b.saidaEmpresa) return -1;
+          if(a.saidaEmpresa > b.saidaEmpresa) return 1;
+        }
         return 0;
       }))
       console.log(dayVisits)
     }
-  },[dayVisits])
+  },[schedule])
 
   useEffect(
     () => {
