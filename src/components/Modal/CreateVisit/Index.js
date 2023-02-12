@@ -322,7 +322,7 @@ const CreateVisit = ({
             }).then(async (result) => {
               if (result.isConfirmed) {
                 if (lunch.length === 0) {
-                  if (saidaFormatadaTec === null) {
+                  if (saidaFormatadaTec.current === null) {
                     await addDoc(scheduleRef, {
                       dia: diaRef,
                       saidaEmpresa: ChegadaEmpresaRef,
