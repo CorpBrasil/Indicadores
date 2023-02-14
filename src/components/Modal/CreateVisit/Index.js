@@ -321,6 +321,7 @@ const CreateVisit = ({
                       saidaEmpresa: ChegadaEmpresaRef,
                       chegadaCliente: "",
                       visita: "01:00",
+                      visitaNumero: 3600,
                       saidaDoCliente: "",
                       chegadaEmpresa:
                         chegadaFormatadaTec.current.format("kk:mm"),
@@ -339,7 +340,8 @@ const CreateVisit = ({
                       dia: diaRef,
                       saidaEmpresa: saidaFormatadaTec.current.format("kk:mm"),
                       chegadaCliente: "",
-                      visita: "",
+                      visita: "01:00",
+                      visitaNumero: 3600,
                       saidaDoCliente: "",
                       chegadaEmpresa: saidaEmpresaRef,
                       consultora: "Almoço Téc.",

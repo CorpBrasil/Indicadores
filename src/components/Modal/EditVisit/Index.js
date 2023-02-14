@@ -354,7 +354,7 @@ const EditVisit = ({ returnSchedule, filterSchedule, tecs, visitRef, scheduleRef
               <p>Tempo de Visita</p>
               {visitRef.consultora === 'Almoço Téc.' ?
               <select
-              value={visitaNumero}
+              value={3600}
               className="label__select"
               name="tec"
               disabled
