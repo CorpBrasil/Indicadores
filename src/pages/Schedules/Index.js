@@ -73,7 +73,7 @@ const Schedules = () => {
   }
 
   return (
-    <div className='container-schedule'>
+    <div className='container-schedules'>
       <Header user={user}></Header>
       <div className='title-schedule'>
         <h2>Agendas</h2>

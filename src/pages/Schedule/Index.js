@@ -169,6 +169,9 @@ useEffect(() => {
           await deleteDoc(
             doc(dataBase, "Agendas", year, monthSelect, visit.id)
           );
+          setCreateVisit(false);
+          setEditVisit({check:false});
+          setDayVisits(undefined);
           Swal.fire({
             title: "Infinit Energy Brasil",
             html: `A Visita em <b>${visit.cidade}</b> foi deletada com sucesso.`,

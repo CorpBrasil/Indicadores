@@ -35,12 +35,14 @@ const CreateVisit = ({
 
   const [rotaTempo, setRotaTempo] = useState(undefined);
   const [tempoTexto, setTempoTexto] = useState(undefined);
-  const [visitaTexto, setVisitaTexto] = useState(undefined);
+  const [visitaNumero, setVisitaNumero] = useState(1800);
+  const [saidaCliente, setSaidaCliente] = useState();
   const [horarioTexto, setHorarioTexto] = useState(undefined);
   const [saidaTexto, setSaidaTexto] = useState(undefined);
   const [chegadaTexto, setChegadaTexto] = useState(undefined);
   const [dataTexto, setDataTexto] = useState(undefined);
   const [tecnicoTexto, setTecnicoTexto] = useState(tecs[0].nome);
+  const [hoursLimit, setHoursLimit] = useState(false);
 
   const [city, setCity] = useState();
   const [libraries] = useState(["places"]);
@@ -78,28 +80,24 @@ const CreateVisit = ({
   // },[dayVisits, dataTexto])
 
   useEffect(() => {
-    console.log(visitaTexto);
-    if (horarioTexto && visitaTexto) {
+    console.log(visitaNumero);
+    if (horarioTexto && visitaNumero) {
       moment.locale("pt-br");
 
       const saidaEmpresa = moment(horarioTexto, "hh:mm"); //Horario de chegada
       const chegadaCliente = moment(horarioTexto, "hh:mm"); //Horario de chegada
-      const visita = moment(visitaTexto, "hh:mm");
 
       saidaEmpresa.subtract(rotaTempo, "seconds").format("hh:mm"); // Pega o tempo que o tecnico vai precisar sair da empresa
 
-      //console.log(infoTexto)
       setSaidaTexto(saidaEmpresa.format("kk:mm"));
 
-      const tempoVisitaH = visita.format("hh");
-      const tempoVisitaM = visita.format("mm");
-
-      chegadaCliente.add(tempoVisitaH, "h");
-      chegadaCliente.add(tempoVisitaM, "m");
+      chegadaCliente.add(visitaNumero, "seconds").format("hh:mm"); //Adiciona tempo de viagem volta
+      setSaidaCliente(chegadaCliente.format("kk:mm"));
       chegadaCliente.add(rotaTempo, "seconds").format("hh:mm"); //Adiciona tempo de viagem volta
+      console.log(chegadaCliente)
       setChegadaTexto(chegadaCliente.format("kk:mm"));
     }
-  }, [horarioTexto, visitaTexto, chegadaTexto, saidaTexto, rotaTempo]);
+  }, [horarioTexto, visitaNumero, chegadaTexto, saidaTexto, rotaTempo]);
 
   const { isLoaded } = useLoadScript({
     id: "google-map-script",
@@ -124,7 +122,7 @@ const CreateVisit = ({
 
   const onSubmit = async (userData) => {
     try {
-      let tecRefUID = tecs.find((tec) => tec.nome === tecnicoTexto);
+      let tecRefUID = tecs.find((tec) => tec.nome === tecnicoTexto); // Procura os tecnicos que vem da pagina 'Schedule'
       let diaRef,
         saidaEmpresaRef,
         chegadaClienteRef,
@@ -135,29 +133,23 @@ const CreateVisit = ({
       const chegada = horarioTexto;
       moment.locale("pt-br");
       console.log(moment.locale());
-      const tempo = moment(visitaTexto, "hh:mm");
+      const tempo = moment('00:00', "HH:mm");
       chegadaClienteRef = chegada;
 
-      const saidaEmpresa = moment(chegada, "hh:mm"); //Horario de chegada
       const chegadaCliente = moment(chegada, "hh:mm"); //Horario de chegada
       const day = moment(dataTexto); // Pega o dia escolhido
 
       diaRef = day.format("YYYY MM DD");
 
-      saidaEmpresa.subtract(rotaTempo, "seconds").format("hh:mm"); // Pega o tempo que o tecnico vai precisar sair da empresa
+      TempoVisita = tempo.add(visitaNumero, 'seconds').format('HH:mm');
 
-      TempoVisita = visitaTexto;
-      saidaEmpresaRef = saidaEmpresa.format("kk:mm");
+      saidaEmpresaRef = saidaTexto;
 
-      const tempoVisitaH = tempo.format("hh");
-      const tempoVisitaM = tempo.format("mm");
-
-      chegadaCliente.add(tempoVisitaH, "h");
-      chegadaCliente.add(tempoVisitaM, "m");
-      SaidaClienteRef = chegadaCliente.format("kk:mm");
+      SaidaClienteRef = saidaCliente;
 
       chegadaCliente.add(rotaTempo, "seconds").format("hh:mm"); //Adiciona tempo de viagem volta
-      ChegadaEmpresaRef = chegadaCliente.format("kk:mm");
+      chegadaCliente.add(rotaTempo, "seconds").format("hh:mm"); //Adiciona tempo de viagem volta
+      ChegadaEmpresaRef = chegadaTexto;
       tempoRotaRef = rotaTempo;
 
       console.log({
@@ -299,6 +291,7 @@ const CreateVisit = ({
               saidaEmpresa: saidaEmpresaRef,
               chegadaCliente: chegadaClienteRef,
               visita: TempoVisita,
+              visitaNumero: visitaNumero,
               saidaDoCliente: SaidaClienteRef,
               chegadaEmpresa: ChegadaEmpresaRef,
               consultora: userData.consultora,
@@ -413,23 +406,26 @@ const CreateVisit = ({
                 className="label__input time"
                 type="time"
                 placeholder="Digite o hórario marcado"
-                autoComplete="off"
+                min="07:00"
+                max="18:00"
+                onBlur={(e) => moment(e.target.value, 'hh:mm') < moment('07:00', 'hh:mm') || moment(e.target.value, 'hh:mm') > moment('18:00', 'hh:mm') ? setHoursLimit(true) : setHoursLimit(false)}
                 onChange={(e) => setHorarioTexto(e.target.value)}
                 required
               />
+              {hoursLimit && <p className="notice red">Limite de hórario: 07:00 - 18:00</p>}
             </label>
             <label className="label">
               <p>Tempo de Visita</p>
-              <input
-                className="label__input time"
-                type="time"
-                placeholder="Digite o hórario de saida"
-                min="00:00"
-                max="03:00"
-                onChange={(e) => setVisitaTexto(e.target.value)}
-                autoComplete="off"
-                required
-              />
+              <select
+              value={visitaNumero}
+              className="label__select"
+              name="tec"
+              onChange={(e) => setVisitaNumero(e.target.value)}>
+                  <option value={1800}>00:30</option>
+                  <option value={3600}>01:00</option>
+                  <option value={5400}>01:30</option>
+                  <option value={7200}>02:00</option>
+            </select>
             </label>
           <label className="label">
             <p>Consultora</p>
@@ -446,7 +442,6 @@ const CreateVisit = ({
 
           <div className="label margin-top">
             <p>Técnico</p>
-            <div className="radio">
             <select
               value={tecnicoTexto}
               className="label__select"
@@ -457,7 +452,6 @@ const CreateVisit = ({
                   <option key={index} value={tec.nome}>{tec.nome}</option>
                 ))}
             </select>
-            </div>
           </div>
           </div>
           {chegadaTexto && saidaTexto && (

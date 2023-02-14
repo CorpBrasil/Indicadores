@@ -70,12 +70,22 @@
         
             }
 
+            .notice {
+              font-size: 0.9rem;
+              position: relative;
+              bottom: 0.8rem;
+            }
+
+            .red {
+              color: red;
+            }
+
             .time {
                 padding: 0.9rem;
             }
 
             &__select {
-                width: 100%;
+                width: 90%;
                 margin: 1rem 0;
                 padding: 1rem;
                 border: none;

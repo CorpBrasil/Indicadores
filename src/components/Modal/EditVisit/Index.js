@@ -15,13 +15,15 @@ const EditVisit = ({ returnSchedule, filterSchedule, tecs, visitRef, scheduleRef
 
   const [rotaTempo, setRotaTempo] = useState()
   const [tempoTexto, setTempoTexto] = useState()
-  const [visitaTexto, setVisitaTexto] = useState();
+  const [visitaNumero, setVisitaNumero] = useState(1800);
+  const [saidaCliente, setSaidaCliente] = useState();
   const [horarioTexto, setHorarioTexto] = useState()
   const [saidaTexto, setSaidaTexto] = useState()
   const [chegadaTexto, setChegadaTexto] = useState()
   const [dataTexto, setDataTexto] = useState()
   const [tecnicoTexto, setTecnicoTexto] = useState()
   const [city, setCity] = useState();
+  const [hoursLimit, setHoursLimit] = useState(false);
 
   const {
     register,
@@ -37,7 +39,7 @@ const EditVisit = ({ returnSchedule, filterSchedule, tecs, visitRef, scheduleRef
       });
       setRotaTempo(visitRef.tempoRota);
       setTempoTexto(visitRef.tempo);
-      setVisitaTexto(visitRef.visita);
+      setVisitaNumero(visitRef.visitaNumero);
       setSaidaTexto(visitRef.saidaEmpresa);
       setChegadaTexto(visitRef.chegadaEmpresa);
       setDataTexto(moment(new Date(visitRef.dia)).format('YYYY-MM-DD'));
@@ -46,7 +48,7 @@ const EditVisit = ({ returnSchedule, filterSchedule, tecs, visitRef, scheduleRef
       if(visitRef.consultora === 'Almoço Téc.') {
         setHorarioTexto(visitRef.saidaEmpresa);
       } else {
-        setHorarioTexto(visitRef.chegadaEmpresa);
+        setHorarioTexto(visitRef.chegadaCliente);
       }
     }, 0);
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -62,28 +64,24 @@ const EditVisit = ({ returnSchedule, filterSchedule, tecs, visitRef, scheduleRef
   }, [dataTexto, tecnicoTexto]);
 
   useEffect(() => {
-    console.log(visitaTexto);
-    if (horarioTexto && visitaTexto) {
+    console.log(visitaNumero);
+    if (horarioTexto && visitaNumero) {
       moment.locale("pt-br");
 
       const saidaEmpresa = moment(horarioTexto, "hh:mm"); //Horario de chegada
       const chegadaCliente = moment(horarioTexto, "hh:mm"); //Horario de chegada
-      const visita = moment(visitaTexto, "hh:mm");
 
-      saidaEmpresa.subtract(rotaTempo, "seconds") // Pega o tempo que o tecnico vai precisar sair da empresa
+      saidaEmpresa.subtract(rotaTempo, "seconds").format("hh:mm"); // Pega o tempo que o tecnico vai precisar sair da empresa
 
-      //console.log(infoTexto)
       setSaidaTexto(saidaEmpresa.format("kk:mm"));
 
-      const tempoVisitaH = visita.format("hh");
-      const tempoVisitaM = visita.format("mm");
-
-      chegadaCliente.add(tempoVisitaH, "h");
-      chegadaCliente.add(tempoVisitaM, "m");
-      chegadaCliente.add(rotaTempo, "seconds") //Adiciona tempo de viagem volta
+      chegadaCliente.add(visitaNumero, "seconds").format("hh:mm"); //Adiciona tempo de viagem volta
+      setSaidaCliente(chegadaCliente.format("kk:mm"));
+      chegadaCliente.add(rotaTempo, "seconds").format("hh:mm"); //Adiciona tempo de viagem volta
+      console.log(chegadaCliente)
       setChegadaTexto(chegadaCliente.format("kk:mm"));
     }
-  }, [horarioTexto, visitaTexto, chegadaTexto, saidaTexto, rotaTempo]);
+  }, [horarioTexto, visitaNumero, chegadaTexto, saidaTexto, rotaTempo]);
 
   const onSubmit = async (userData) => {
 
@@ -96,33 +94,27 @@ const EditVisit = ({ returnSchedule, filterSchedule, tecs, visitRef, scheduleRef
         SaidaClienteRef,
         ChegadaEmpresaRef,
         tempoRotaRef;
-      const chegada = horarioTexto;
-      moment.locale("pt-br");
-      console.log(moment.locale());
-      const tempo = moment(visitaTexto, "hh:mm");
-      chegadaClienteRef = chegada;
-
-      const saidaEmpresa = moment(chegada, "hh:mm"); //Horario de chegada
-      const chegadaCliente = moment(chegada, "hh:mm"); //Horario de chegada
-      const day = moment(dataTexto); // Pega o dia escolhido
-
-      diaRef = day.format("YYYY MM DD");
-
-      saidaEmpresa.subtract(rotaTempo, "seconds").format("hh:mm"); // Pega o tempo que o tecnico vai precisar sair da empresa
-
-      TempoVisita = visitaTexto;
-      saidaEmpresaRef = saidaEmpresa.format("kk:mm");
-
-      const tempoVisitaH = tempo.format("hh");
-      const tempoVisitaM = tempo.format("mm");
-
-      chegadaCliente.add(tempoVisitaH, "h");
-      chegadaCliente.add(tempoVisitaM, "m");
-      SaidaClienteRef = chegadaCliente.format("kk:mm");
-
-      chegadaCliente.add(rotaTempo, "seconds").format("hh:mm"); //Adiciona tempo de viagem volta
-      ChegadaEmpresaRef = chegadaCliente.format("kk:mm");
-      tempoRotaRef = rotaTempo;
+        const chegada = horarioTexto;
+        moment.locale("pt-br");
+        console.log(moment.locale());
+        const tempo = moment('00:00', "HH:mm");
+        chegadaClienteRef = chegada;
+  
+        const chegadaCliente = moment(chegada, "hh:mm"); //Horario de chegada
+        const day = moment(dataTexto); // Pega o dia escolhido
+  
+        diaRef = day.format("YYYY MM DD");
+  
+        TempoVisita = tempo.add(visitaNumero, 'seconds').format('HH:mm');
+  
+        saidaEmpresaRef = saidaTexto;
+  
+        SaidaClienteRef = saidaCliente;
+  
+        chegadaCliente.add(rotaTempo, "seconds").format("hh:mm"); //Adiciona tempo de viagem volta
+        chegadaCliente.add(rotaTempo, "seconds").format("hh:mm"); //Adiciona tempo de viagem volta
+        ChegadaEmpresaRef = chegadaTexto;
+        tempoRotaRef = rotaTempo;
 
       console.log({
         dia: diaRef,
@@ -149,6 +141,7 @@ const EditVisit = ({ returnSchedule, filterSchedule, tecs, visitRef, scheduleRef
       const chegadaFormatada = moment(ChegadaEmpresaRef, "hh:mm");
 
       console.log(saidaFormatada);
+      console.log(chegadaFormatada);
       const check = [];
       let visitsFind = [];
 
@@ -264,6 +257,7 @@ const EditVisit = ({ returnSchedule, filterSchedule, tecs, visitRef, scheduleRef
               saidaEmpresa: saidaEmpresaRef,
               chegadaCliente: chegadaClienteRef,
               visita: TempoVisita,
+              visitaNumero: visitaNumero,
               saidaDoCliente: SaidaClienteRef,
               chegadaEmpresa: ChegadaEmpresaRef,
               consultora: userData.consultora,
@@ -346,36 +340,40 @@ const EditVisit = ({ returnSchedule, filterSchedule, tecs, visitRef, scheduleRef
               <input
                 className="label__input time"
                 type="time"
-                placeholder="Digite o hórario marcado"
-                autoComplete="off"
                 value={horarioTexto}
+                placeholder="Digite o hórario marcado"
+                min="07:00"
+                max="18:00"
+                onBlur={(e) => moment(e.target.value, 'hh:mm') < moment('07:00', 'hh:mm') || moment(e.target.value, 'hh:mm') > moment('18:00', 'hh:mm') ? setHoursLimit(true) : setHoursLimit(false)}
                 onChange={(e) => setHorarioTexto(e.target.value)}
                 required
               />
+              {hoursLimit && <p className="notice red">Limite de hórario: 07:00 - 18:00</p>}
             </label>
             <label className="label">
               <p>Tempo de Visita</p>
-              {visitRef.consultora === 'Almoço Téc.' ? <input
-                value={visitaTexto}
-                className="label__input time"
-                type="time"
-                placeholder="Digite o hórario de saida"
-                min="00:00"
-                max="03:00"
-                onChange={(e) => setVisitaTexto(e.target.value)}
-                autoComplete="off"
-                disabled
-              /> : <input
-              value={visitaTexto}
-              className="label__input time"
-              type="time"
-              placeholder="Digite o hórario de saida"
-              min="00:00"
-              max="03:00"
-              onChange={(e) => setVisitaTexto(e.target.value)}
-              autoComplete="off"
-              required
-            />}
+              {visitRef.consultora === 'Almoço Téc.' ?
+              <select
+              value={visitaNumero}
+              className="label__select"
+              name="tec"
+              disabled
+              onChange={(e) => setVisitaNumero(e.target.value)}>
+                  <option value={1800}>00:30</option>
+                  <option value={3600}>01:00</option>
+                  <option value={5400}>01:30</option>
+                  <option value={7200}>02:00</option>
+            </select> : <select
+              value={visitaNumero}
+              className="label__select"
+              name="tec"
+              onChange={(e) => setVisitaNumero(e.target.value)}>
+                  <option value={1800}>00:30</option>
+                  <option value={3600}>01:00</option>
+                  <option value={5400}>01:30</option>
+                  <option value={7200}>02:00</option>
+            </select>
+            }
             </label>
           <label className="label">
             <p>Consultora</p>
