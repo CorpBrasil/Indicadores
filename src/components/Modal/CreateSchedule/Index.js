@@ -74,8 +74,8 @@ const CreateSchedule = ({ returnSchedule, schedules }) => {
 
   return (
     <div className='modal-visit'>
-       <div className='box-visit'>
-            <div className='box-visit__close'>
+       <div className='modal-box-visit'>
+            <div className='modal-box-visit__close'>
                 <button onClick={returnSchedule} className='btn-close' />
             </div>
             <h4>Criar nova Agenda</h4> 

@@ -85,8 +85,8 @@ const CreateAdmin = ({ returnAdmin, members }) => {
 
   return (
     <div className='modal-visit'>
-       <div className='box-visit'>
-            <div className='box-visit__close'>
+       <div className='modal-box-visit'>
+            <div className='modal-box-visit__close'>
                 <button onClick={returnAdmin} className='btn-close' />
             </div>
             <h4>Cadastrar novo Colaborador</h4> 
