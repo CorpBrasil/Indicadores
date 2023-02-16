@@ -37,7 +37,6 @@ const Schedule = () => {
     String(data.getMonth() + 1).padStart(2, "0")
   );
   const [editVisit, setEditVisit] = useState({ check: false });
-  const [createVisit, setCreateVisit] = useState(false);
   const [box, setBox] = useState();
   const [createVisitGroup, setCreateVisitGroup] = useState({ check: false });
   const [dayVisits, setDayVisits] = useState(undefined);
@@ -177,9 +176,7 @@ useEffect(() => {
                 visitaConjunta: false
               })
             }
-          setCreateVisit(false);
-          setEditVisit({check:false});
-          setCreateVisitGroup({check:false});
+          setBox();
           setDayVisits(undefined);
           Swal.fire({
             title: "Infinit Energy Brasil",
