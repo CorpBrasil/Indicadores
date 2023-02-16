@@ -30,6 +30,7 @@ const Schedule = () => {
 
   const boxVisitRef = useRef();
   const [schedule, setSchedule] = useState();
+  const [scheduleNew, setScheduleNew] = useState();
   const [members, setMembers] = useState();
   const [userRef, setUserRef] = useState();
   const [tecs, setTecs] = useState();
@@ -86,18 +87,17 @@ const Schedule = () => {
   );
 
 useEffect(() => {
-    if(schedule) {
-      setSchedule(schedule.sort(function(a, b) {
+    if(schedule && monthSelect) {
+      setScheduleNew(schedule.sort(function(a, b) { // Força a renderizaram da tabela ordenada
         if(a.data === b.data) {
           if(a.saidaEmpresa < b.saidaEmpresa) return -1;
           if(a.saidaEmpresa > b.saidaEmpresa) return 1;
         }
         return 0;
       }))
-      console.log(dayVisits)
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  },[schedule])
+    console.log(scheduleNew);
+  },[monthSelect, schedule, scheduleNew])
 
   useEffect(
     () => {
@@ -558,14 +558,11 @@ useEffect(() => {
                     <>
                       <tr
                         className={
-                          info.confirmar ? "table-confirm" : "table" &&
-                          info.visitaConjunta ? "border-top" : "table" &&
-                          info.idRef ? "border-bottom" : "table"
-                        }
+                          info.confirmar ? "table-confirm" : "table"}
                         key={info.id}
                       >
                           {info.visitaConjunta ? 
-                          <td></td> : 
+                          <td className="group"></td> : 
                           <td><button
                                 className="btn-add"
                                 onClick={ () => {setBox("group"); setCreateVisitGroup({check: true, info: info, ref: doc(
