@@ -4,10 +4,12 @@ import { useForm } from "react-hook-form"; // cria formulário personalizado
 import Swal from "sweetalert2"; // cria alertas personalizado
 import * as moment from 'moment';
 import 'moment/locale/pt-br';
+import useAuth from "../../../hooks/useAuth";
 
 import '../style.scss';
 
-const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, visitRef, scheduleRef, scheduleVisitRef, schedule, monthNumber, year}) => {
+const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visitRef, scheduleRef, scheduleVisitRef, schedule, monthNumber, year}) => {
+  const { user } = useAuth();
   const chegadaFormatadaTec = useRef();
   const saidaFormatadaTec = useRef();
 
@@ -35,7 +37,7 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, visitRef, sche
     // faz a solicitação do servidor assíncrono e preenche o formulário
     setTimeout(() => {
       reset({
-        consultora: visitRef.consultora,
+        consultora: userRef.nome,
       });
       setRotaTempo(visitRef.tempoRota);
       setTempoTexto(visitRef.tempo);
@@ -230,7 +232,7 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, visitRef, sche
       } else {
             Swal.fire({
         title: "Infinit Energy Brasil",
-        html: `Você deseja alterar essa <b>Visita?</b>`,
+        html: `Você deseja criar uma <b>Visita Conjunta?</b>`,
         icon: "question",
         showCancelButton: true,
         confirmButtonColor: "#F39200",
@@ -247,7 +249,6 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, visitRef, sche
               // visita: TempoVisita,
               // visitaNumero: visitaNumero,
               // saidaDoCliente: SaidaClienteRef,
-              chegadaEmpresa: ChegadaEmpresaRef,
               visitaConjunta: true,
               // consultora: userData.consultora,
               // tecnico: tecRefUID.nome,
@@ -265,6 +266,7 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, visitRef, sche
               visitaNumero: visitaNumero,
               saidaDoCliente: SaidaClienteRef,
               chegadaEmpresa: ChegadaEmpresaRef,
+              chegadaEmpresaRef: visitRef.chegadaEmpresa,
               consultora: userData.consultora,
               tecnico: tecRefUID.nome,
               tecnicoUID: tecRefUID.uid,
@@ -272,14 +274,14 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, visitRef, sche
               tempoRota: tempoRotaRef,
               tempo: tempoTexto,
               data: dataTexto,
-              uid: visitRef.uid,
+              uid: user.id,
               idRef: visitRef.id,
-              cor: visitRef.cor,
+              cor: userRef.cor,
               confirmar: false,
             });
           Swal.fire({
             title: "Infinit Energy Brasil",
-            html: `A Visita em <b>${visitRef.cidade}</b> foi alterada com sucesso.`,
+            html: `A Visita Conjunta <b>${visitRef.cidade}</b> foi criada com sucesso.`,
             icon: "success",
             showConfirmButton: true,
             confirmButtonColor: "#F39200"

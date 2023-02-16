@@ -38,6 +38,7 @@ const Schedule = () => {
   );
   const [editVisit, setEditVisit] = useState({ check: false });
   const [createVisit, setCreateVisit] = useState(false);
+  const [box, setBox] = useState();
   const [createVisitGroup, setCreateVisitGroup] = useState({ check: false });
   const [dayVisits, setDayVisits] = useState(undefined);
   const [scheduleRef, setScheduleRef] = useState();
@@ -135,9 +136,7 @@ useEffect(() => {
   }
 
   const returnSchedule = () => {
-    setCreateVisit(false);
-    setEditVisit({check:false});
-    setCreateVisitGroup({check:false});
+    setBox();
     setDayVisits(undefined);
   };
 
@@ -172,7 +171,12 @@ useEffect(() => {
         if (result.isConfirmed) {
           await deleteDoc(
             doc(dataBase, "Agendas", year, monthSelect, visit.id)
-          );
+            );
+            if(visit.idRef) {
+              await updateDoc(doc(dataBase, "Agendas", year, monthSelect, visit.idRef), {
+                visitaConjunta: false
+              })
+            }
           setCreateVisit(false);
           setEditVisit({check:false});
           setCreateVisitGroup({check:false});
@@ -246,6 +250,10 @@ useEffect(() => {
     }
   };
 
+  const changeBox = (type) => {
+    setBox(type)
+  }
+
   // const createLunch = async (ref) => {
   //   const dateNow = moment();
   //   const saidaRef = moment(dateNow).format("kk:mm");
@@ -282,7 +290,45 @@ useEffect(() => {
       <div className="content-schedule-visit">
         <div className="box-schedule-visit">
         <div ref={boxVisitRef}>
-          {(schedule && createVisit && editVisit.check === false) ? (    
+        {(box === 'create' && <CreateVisit
+            returnSchedule={returnSchedule}
+            filterSchedule={filterSchedule}
+            scheduleRef={scheduleRef}
+            membersRef={members}
+            tecs={tecs}
+            userRef={userRef}
+            schedule={schedule}
+            monthNumber={monthNumber}
+          />)// Chama o componente 'Create'
+        || (box === "edit" &&
+            <EditVisit
+            returnSchedule={returnSchedule}
+            filterSchedule={filterSchedule}
+            tecs={tecs}
+            scheduleRef={editVisit.ref}
+            visitRef={editVisit.info}
+            membersRef={members}
+            schedule={schedule}
+            monthNumber={monthNumber}
+            year={year}
+          />) // Chama o componente 'Edit'
+        || (box === "group" &&
+            <CreateVisitGroup
+            returnSchedule={returnSchedule}
+            filterSchedule={filterSchedule}
+            tecs={tecs}
+            userRef={userRef}
+            scheduleRef={scheduleRef}
+            scheduleVisitRef={createVisitGroup.ref}
+            visitRef={createVisitGroup.info}
+            membersRef={members}
+            schedule={schedule}
+            monthNumber={monthNumber}
+            year={year}
+          />) // Chama o componente 'Group'
+        }
+
+          {/* {(schedule && createVisit && editVisit.check === false) ? (    
         <CreateVisit
           returnSchedule={returnSchedule}
           filterSchedule={filterSchedule}
@@ -300,6 +346,7 @@ useEffect(() => {
           returnSchedule={returnSchedule}
           filterSchedule={filterSchedule}
           tecs={tecs}
+          userRef={userRef}
           scheduleRef={scheduleRef}
           scheduleVisitRef={createVisitGroup.ref}
           visitRef={createVisitGroup.info}
@@ -322,12 +369,12 @@ useEffect(() => {
           monthNumber={monthNumber}
           year={year}
         ></EditVisit>
-      )}
+      )} */}
           </div>
-          {(userRef && userRef.cargo === "Vendedor(a)" && editVisit.check === false && !createVisit) ||
+          {(userRef && userRef.cargo === "Vendedor(a)" && !box) ||
           user.email === "admin@infinitenergy.com.br" ? (
             <div className="box-schedule-visit__add">
-              <button className="visit" onClick={ () => {setCreateVisit(true); return handleBoxVisitRef()}}>
+              <button className="visit" onClick={ () => {changeBox("create"); return handleBoxVisitRef()}}>
                 <span className="icon-visit"></span>Criar uma Visita
               </button>
             </div>
@@ -391,10 +438,10 @@ useEffect(() => {
                         className={info.confirmar ? "table-confirm" : "table"}
                         key={info.id}
                       >
-                        <th>
+                        <td>
                           <button
                                 className="btn-add"
-                                onClick={ () => {setCreateVisitGroup({check: true, info: info, ref: doc(
+                                onClick={ () => {setBox("group"); setCreateVisitGroup({info: info, ref: doc(
                                   dataBase,
                                   "Agendas",
                                   year,
@@ -402,21 +449,21 @@ useEffect(() => {
                                   info.id
                                 )}); return handleBoxVisitRef()}}
                               ></button>
-                        </th>
-                        <th className="bold">
+                        </td>
+                        <td className="bold">
                           {moment(new Date(info.dia)).format("D")}
-                        </th>
-                        <th>{info.cidade}</th>
-                        <th className="bold bg-important">
+                        </td>
+                        <td>{info.cidade}</td>
+                        <td className="bold bg-important">
                           {info.saidaEmpresa}
-                        </th>
-                        <th>{info.chegadaCliente}</th>
-                        <th>{info.visita}</th>
-                        <th>{info.saidaDoCliente}</th>
-                        <th className="bold bg-important">
+                        </td>
+                        <td>{info.chegadaCliente}</td>
+                        <td>{info.visita}</td>
+                        <td>{info.saidaDoCliente}</td>
+                        <td className="bold bg-important">
                           {info.chegadaEmpresa}
-                        </th>
-                        <th
+                        </td>
+                        <td
                           style={
                             info.cor && {
                               backgroundColor: info.cor,
@@ -427,10 +474,10 @@ useEffect(() => {
                           }
                         >
                           {info.consultora}
-                        </th>
-                        <th>{info.tecnico}</th>
+                        </td>
+                        <td>{info.tecnico}</td>
 
-                        <th>
+                        <td>
                           {info.confirmar === false &&
                           (info.uid === user.id ||
                             user.email === "admin@infinitenergy.com.br") ? (
@@ -438,8 +485,8 @@ useEffect(() => {
                               <button
                                 className="btn-edit"
                                 onClick={() =>
-                                  {setEditVisit({
-                                    check: true,
+                                  {setBox("edit");
+                                    setEditVisit({
                                     info: info,
                                     ref: doc(
                                       dataBase,
@@ -486,7 +533,7 @@ useEffect(() => {
                           ) : (
                             <></>
                           )}
-                        </th>
+                        </td>
                       </tr>
                     </>
                   ))}
@@ -524,7 +571,7 @@ useEffect(() => {
                           <td></td> : 
                           <td><button
                                 className="btn-add"
-                                onClick={ () => {setCreateVisitGroup({check: true, info: info, ref: doc(
+                                onClick={ () => {setBox("group"); setCreateVisitGroup({check: true, info: info, ref: doc(
                                   dataBase,
                                   "Agendas",
                                   year,
@@ -568,8 +615,8 @@ useEffect(() => {
                               <button
                                 className="btn-edit"
                                 onClick={() =>
-                                  {setEditVisit({
-                                    check: true,
+                                  {setBox("edit");
+                                    setEditVisit({
                                     info: info,
                                     ref: doc(
                                       dataBase,
