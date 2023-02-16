@@ -18,8 +18,10 @@ import {
 
 import "./_style.scss";
 
-import CreateVisit from "../../components/Modal/CreateVisit/Index";
-import EditVisit from "../../components/Modal/EditVisit/Index";
+// import CreateVisit from "../../components/Modal/Create/Index";
+import EditVisit from "../../components/Box/Edit/Index";
+import CreateVisit from "../../components/Box/Create/Index"
+import CreateVisitGroup from "../../components/Box/Group/Index"
 
 const Schedule = () => {
   const data = new Date();
@@ -36,6 +38,7 @@ const Schedule = () => {
   );
   const [editVisit, setEditVisit] = useState({ check: false });
   const [createVisit, setCreateVisit] = useState(false);
+  const [createVisitGroup, setCreateVisitGroup] = useState({ check: false });
   const [dayVisits, setDayVisits] = useState(undefined);
   const [scheduleRef, setScheduleRef] = useState();
   const membersCollectionRef = collection(dataBase, "Membros");
@@ -134,6 +137,7 @@ useEffect(() => {
   const returnSchedule = () => {
     setCreateVisit(false);
     setEditVisit({check:false});
+    setCreateVisitGroup({check:false});
     setDayVisits(undefined);
   };
 
@@ -171,6 +175,7 @@ useEffect(() => {
           );
           setCreateVisit(false);
           setEditVisit({check:false});
+          setCreateVisitGroup({check:false});
           setDayVisits(undefined);
           Swal.fire({
             title: "Infinit Energy Brasil",
@@ -290,6 +295,21 @@ useEffect(() => {
         ></CreateVisit>) : (
           <></>
         )}
+        {createVisitGroup.check &&
+        (<CreateVisitGroup
+          returnSchedule={returnSchedule}
+          filterSchedule={filterSchedule}
+          tecs={tecs}
+          scheduleRef={scheduleRef}
+          scheduleVisitRef={createVisitGroup.ref}
+          visitRef={createVisitGroup.info}
+          membersRef={members}
+          schedule={schedule}
+          monthNumber={monthNumber}
+          year={year}
+        ></CreateVisitGroup>
+        )}
+
       {editVisit.check && (
         <EditVisit
           returnSchedule={returnSchedule}
@@ -351,6 +371,7 @@ useEffect(() => {
           {dayVisits && dayVisits.length > 0 && <table className="table-visit">
               <thead>
                 <tr>
+                  <th>V.C</th>
                   <th>Dia</th>
                   <th>Cidade</th>
                   <th>Hórario de Saida</th>
@@ -370,6 +391,18 @@ useEffect(() => {
                         className={info.confirmar ? "table-confirm" : "table"}
                         key={info.id}
                       >
+                        <th>
+                          <button
+                                className="btn-add"
+                                onClick={ () => {setCreateVisitGroup({check: true, info: info, ref: doc(
+                                  dataBase,
+                                  "Agendas",
+                                  year,
+                                  monthSelect,
+                                  info.id
+                                )}); return handleBoxVisitRef()}}
+                              ></button>
+                        </th>
                         <th className="bold">
                           {moment(new Date(info.dia)).format("D")}
                         </th>
@@ -414,7 +447,7 @@ useEffect(() => {
                                       year,
                                       monthSelect,
                                       info.id
-                                    ),
+                                    )
                                   })
                                   return handleBoxVisitRef()}
                                 }
@@ -462,6 +495,7 @@ useEffect(() => {
             <table className="table-visit">
               <thead>
                 <tr>
+                  <th>V.C</th>
                   <th>Dia</th>
                   <th>Cidade</th>
                   <th>Hórario de Saida</th>
@@ -479,23 +513,40 @@ useEffect(() => {
                   schedule.map((info) => (
                     <>
                       <tr
-                        className={info.confirmar ? "table-confirm" : "table"}
+                        className={
+                          info.confirmar ? "table-confirm" : "table" &&
+                          info.visitaConjunta ? "border-top" : "table" &&
+                          info.idRef ? "border-bottom" : "table"
+                        }
                         key={info.id}
                       >
-                        <th className="bold">
+                          {info.visitaConjunta ? 
+                          <td></td> : 
+                          <td><button
+                                className="btn-add"
+                                onClick={ () => {setCreateVisitGroup({check: true, info: info, ref: doc(
+                                  dataBase,
+                                  "Agendas",
+                                  year,
+                                  monthSelect,
+                                  info.id
+                                )}); return handleBoxVisitRef()}}
+                              ></button></td>
+                          }
+                        <td className="bold">
                           {moment(new Date(info.dia)).format("D")}
-                        </th>
-                        <th>{info.cidade}</th>
-                        <th className="bold bg-important">
+                        </td>
+                        <td>{info.cidade}</td>
+                        <td className="bold bg-important">
                           {info.saidaEmpresa}
-                        </th>
-                        <th>{info.chegadaCliente}</th>
-                        <th>{info.visita}</th>
-                        <th>{info.saidaDoCliente}</th>
-                        <th className="bold bg-important">
+                        </td>
+                        <td>{info.chegadaCliente}</td>
+                        <td>{info.visita}</td>
+                        <td>{info.saidaDoCliente}</td>
+                        <td className="bold bg-important">
                           {info.chegadaEmpresa}
-                        </th>
-                        <th
+                        </td>
+                        <td
                           style={
                             info.cor && {
                               backgroundColor: info.cor,
@@ -506,10 +557,10 @@ useEffect(() => {
                           }
                         >
                           {info.consultora}
-                        </th>
-                        <th>{info.tecnico}</th>
+                        </td>
+                        <td>{info.tecnico}</td>
 
-                        <th>
+                        <td>
                           {info.confirmar === false &&
                           (info.uid === user.id ||
                             user.email === "admin@infinitenergy.com.br") ? (
@@ -565,7 +616,7 @@ useEffect(() => {
                           ) : (
                             <></>
                           )}
-                        </th>
+                        </td>
                       </tr>
                     </>
                   ))}

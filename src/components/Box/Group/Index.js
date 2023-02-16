@@ -1,15 +1,13 @@
-import {
-  updateDoc
-} from "firebase/firestore";
+import { updateDoc, addDoc } from "firebase/firestore";
 import { useLayoutEffect, useState, useEffect, useRef } from 'react'
 import { useForm } from "react-hook-form"; // cria formulário personalizado
 import Swal from "sweetalert2"; // cria alertas personalizado
 import * as moment from 'moment';
 import 'moment/locale/pt-br';
 
-import '../_modal.scss';
+import '../style.scss';
 
-const EditVisit = ({ returnSchedule, filterSchedule, tecs, visitRef, scheduleRef, schedule, monthNumber, year}) => {
+const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, visitRef, scheduleRef, scheduleVisitRef, schedule, monthNumber, year}) => {
   const chegadaFormatadaTec = useRef();
   const saidaFormatadaTec = useRef();
 
@@ -31,6 +29,8 @@ const EditVisit = ({ returnSchedule, filterSchedule, tecs, visitRef, scheduleRef
     reset
   } = useForm();
 
+  console.log(visitRef)
+
   useLayoutEffect(() => {
     // faz a solicitação do servidor assíncrono e preenche o formulário
     setTimeout(() => {
@@ -39,17 +39,17 @@ const EditVisit = ({ returnSchedule, filterSchedule, tecs, visitRef, scheduleRef
       });
       setRotaTempo(visitRef.tempoRota);
       setTempoTexto(visitRef.tempo);
-      setVisitaNumero(visitRef.visitaNumero);
-      setSaidaTexto(visitRef.saidaEmpresa);
+      setSaidaTexto(visitRef.saidaDoCliente);
       setChegadaTexto(visitRef.chegadaEmpresa);
       setDataTexto(moment(new Date(visitRef.dia)).format('YYYY-MM-DD'));
       setTecnicoTexto(visitRef.tecnico);
       setCity(visitRef.cidade);
       if(visitRef.consultora === 'Almoço Téc.') {
-        setHorarioTexto(visitRef.saidaEmpresa);
+        setHorarioTexto(moment(visitRef.chegadaEmpresa, "hh:mm").add(900, 'seconds').format('kk:mm'));
       } else {
-        setHorarioTexto(visitRef.chegadaCliente);
+        setHorarioTexto(moment(visitRef.saidaDoCliente, "hh:mm").add(900, 'seconds').format('kk:mm'));
       }
+      //setHorarioTexto(moment(visitRef.saidaDoCliente, "hh:mm").add(600, 'seconds').format('kk:mm'));
     }, 0);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visitRef]);
@@ -71,7 +71,7 @@ const EditVisit = ({ returnSchedule, filterSchedule, tecs, visitRef, scheduleRef
       const saidaEmpresa = moment(horarioTexto, "hh:mm"); //Horario de chegada
       const chegadaCliente = moment(horarioTexto, "hh:mm"); //Horario de chegada
 
-      saidaEmpresa.subtract(rotaTempo, "seconds").format("hh:mm"); // Pega o tempo que o tecnico vai precisar sair da empresa
+      saidaEmpresa.subtract(900, "seconds").format("hh:mm"); // Pega o tempo que o tecnico vai precisar sair da empresa
 
       setSaidaTexto(saidaEmpresa.format("kk:mm"));
 
@@ -165,12 +165,12 @@ const EditVisit = ({ returnSchedule, filterSchedule, tecs, visitRef, scheduleRef
 
         dataRef.map((ref) => {
           if (
-            saidaFormatada < moment(ref.saidaEmpresa, "hh:mm") &&
-            chegadaFormatadaTec.current < moment(ref.saidaEmpresa, "hh:mm")
+            saidaFormatada <= moment(ref.saidaEmpresa, "hh:mm") &&
+            chegadaFormatadaTec.current <= moment(ref.saidaEmpresa, "hh:mm")
           ) {
             check.push(ref);
           } else {
-            if (saidaFormatada > moment(ref.chegadaEmpresa, "hh:mm"))
+            if (saidaFormatada >= moment(ref.chegadaEmpresa, "hh:mm"))
               check.push(ref);
           }
           return dataRef;
@@ -179,12 +179,12 @@ const EditVisit = ({ returnSchedule, filterSchedule, tecs, visitRef, scheduleRef
         dataRef.map((ref) => {
           console.log("eae");
           if (
-            saidaFormatada < moment(ref.saidaEmpresa, "hh:mm") &&
-            chegadaFormatada < moment(ref.saidaEmpresa, "hh:mm")
+            saidaFormatada <= moment(ref.saidaEmpresa, "hh:mm") &&
+            chegadaFormatada <= moment(ref.saidaEmpresa, "hh:mm")
           ) {
             check.push(ref);
           } else {
-            if (saidaFormatada > moment(ref.chegadaEmpresa, "hh:mm"))
+            if (saidaFormatada >= moment(ref.chegadaEmpresa, "hh:mm"))
               check.push(ref);
           }
           return dataRef;
@@ -192,18 +192,6 @@ const EditVisit = ({ returnSchedule, filterSchedule, tecs, visitRef, scheduleRef
       }
 
       console.log(chegadaFormatadaTec.current, saidaFormatadaTec.current);
-
-      // dataRef.map((ref) => {
-      //   console.log('eae')
-      //   if(saidaFormatada < moment(ref.saidaEmpresa, 'hh:mm') && chegadaFormatada < moment(ref.saidaEmpresa, 'hh:mm')) {
-      //       check.push(ref);
-      //     } else {
-      //       if(saidaFormatada > moment(ref.chegadaEmpresa, 'hh:mm'))
-      //       check.push(ref);
-      //     }
-      //     return dataRef;
-      //   })
-
       console.log(">>", check, dataRef);
       console.log(lunch.length);
       const visitsFindCount = dataRef.length - check.length;
@@ -252,7 +240,24 @@ const EditVisit = ({ returnSchedule, filterSchedule, tecs, visitRef, scheduleRef
       }).then(async (result) => {
         if (result.isConfirmed) {
           console.log(year, monthNumber);
-            await updateDoc(scheduleRef, {
+            await updateDoc(scheduleVisitRef, {
+              // dia: diaRef,
+              // saidaEmpresa: saidaEmpresaRef,
+              // chegadaCliente: chegadaClienteRef,
+              // visita: TempoVisita,
+              // visitaNumero: visitaNumero,
+              // saidaDoCliente: SaidaClienteRef,
+              chegadaEmpresa: ChegadaEmpresaRef,
+              visitaConjunta: true,
+              // consultora: userData.consultora,
+              // tecnico: tecRefUID.nome,
+              // tecnicoUID: tecRefUID.uid,
+              // cidade: visitRef.cidade,
+              // tempoRota: tempoRotaRef,
+              // uid: visitRef.uid,
+              // cor: visitRef.cor,
+             })
+             await addDoc(scheduleRef, {
               dia: diaRef,
               saidaEmpresa: saidaEmpresaRef,
               chegadaCliente: chegadaClienteRef,
@@ -265,9 +270,13 @@ const EditVisit = ({ returnSchedule, filterSchedule, tecs, visitRef, scheduleRef
               tecnicoUID: tecRefUID.uid,
               cidade: visitRef.cidade,
               tempoRota: tempoRotaRef,
+              tempo: tempoTexto,
+              data: dataTexto,
               uid: visitRef.uid,
+              idRef: visitRef.id,
               cor: visitRef.cor,
-             })
+              confirmar: false,
+            });
           Swal.fire({
             title: "Infinit Energy Brasil",
             html: `A Visita em <b>${visitRef.cidade}</b> foi alterada com sucesso.`,
@@ -288,17 +297,16 @@ const EditVisit = ({ returnSchedule, filterSchedule, tecs, visitRef, scheduleRef
     }
 
   return (
-    <div className="createAndEdit-visit">
-      <div className="createAndEdit-visit__box">
-        <div className="createAndEdit-visit__close">
+    <div className="box-visit">
+      <div className="box-visit__box">
+        <div className="box-visit__close">
           <button onClick={returnSchedule} className="btn-close" />
         </div>
-        <h4>Editar Visita</h4>
+        <h4>Criar Visita Conjunta</h4>
         <form onSubmit={handleSubmit(onSubmit)}>
-          <div className="createAndEdit-visit__container">
+          <div className="box-visit__container">
             <label className="label">
               <p>Dia</p>
-              {visitRef.consultora === 'Almoço Téc.' ?
               <input
                 value={dataTexto}
                 className="label__input"
@@ -309,19 +317,7 @@ const EditVisit = ({ returnSchedule, filterSchedule, tecs, visitRef, scheduleRef
                 placeholder="Digite o dia"
                 autoComplete="off"
                 disabled
-              /> :
-              <input
-                value={dataTexto}
-                className="label__input"
-                type="date"
-                min={monthNumber && monthNumber.min}
-                max={monthNumber && monthNumber.max}
-                onChange={(e) => setDataTexto(e.target.value)}
-                placeholder="Digite o dia"
-                autoComplete="off"
-                required
-              />
-            }
+              /> 
             </label>
             <label className="label">
               <p>Cidade</p>
@@ -346,24 +342,13 @@ const EditVisit = ({ returnSchedule, filterSchedule, tecs, visitRef, scheduleRef
                 max="18:00"
                 onBlur={(e) => moment(e.target.value, 'hh:mm') < moment('07:00', 'hh:mm') || moment(e.target.value, 'hh:mm') > moment('18:00', 'hh:mm') ? setHoursLimit(true) : setHoursLimit(false)}
                 onChange={(e) => setHorarioTexto(e.target.value)}
-                required
+                disabled
               />
               {hoursLimit && <p className="notice red">Limite de hórario: 07:00 - 18:00</p>}
             </label>
             <label className="label">
               <p>Tempo de Visita</p>
-              {visitRef.consultora === 'Almoço Téc.' ?
               <select
-              value={3600}
-              className="label__select"
-              name="tec"
-              disabled
-              onChange={(e) => setVisitaNumero(e.target.value)}>
-                  <option value={1800}>00:30</option>
-                  <option value={3600}>01:00</option>
-                  <option value={5400}>01:30</option>
-                  <option value={7200}>02:00</option>
-            </select> : <select
               value={visitaNumero}
               className="label__select"
               name="tec"
@@ -373,7 +358,6 @@ const EditVisit = ({ returnSchedule, filterSchedule, tecs, visitRef, scheduleRef
                   <option value={5400}>01:30</option>
                   <option value={7200}>02:00</option>
             </select>
-            }
             </label>
           <label className="label">
             <p>Consultora</p>
@@ -389,7 +373,6 @@ const EditVisit = ({ returnSchedule, filterSchedule, tecs, visitRef, scheduleRef
           <div className="label margin-top">
             <p>Técnico</p>
             <div className="radio">
-            {visitRef.consultora === 'Almoço Téc.' ?
             <select
               value={tecnicoTexto}
               className="label__select"
@@ -400,33 +383,22 @@ const EditVisit = ({ returnSchedule, filterSchedule, tecs, visitRef, scheduleRef
                 tecs.map((tec, index) => (
                   <option key={index} value={tec.nome}>{tec.nome}</option>
                 ))}
-            </select> : 
-            <select
-            value={tecnicoTexto}
-            className="label__select"
-            name="tec"
-            required
-            onChange={(e) => setTecnicoTexto(e.target.value)}>
-              {tecs &&
-              tecs.map((tec, index) => (
-                <option key={index} value={tec.nome}>{tec.nome}</option>
-              ))}
-          </select>}
+            </select>
             </div>
           </div>
           </div>
-          {chegadaTexto && saidaTexto && (
-            <div className="createAndEdit-visit__info prev">
+          {chegadaTexto && horarioTexto && (
+            <div className="box-visit__info prev">
               <span className="">Previsão de Visita</span>
-              <p className="notice">
+              {/* <p className="notice">
                 Saindo da Empresa: <b>{saidaTexto}</b>
-              </p>
+              </p> */}
               <p className="notice">
                 Chegando na Empresa: <b>{chegadaTexto}</b>
               </p>
             </div>
           )}
-          <input className="createAndEdit-visit__btn" type="submit" value="CRIAR" />
+          <input className="box-visit__btn" type="submit" value="CRIAR" />
         </form>
       </div>
     </div>
@@ -434,4 +406,4 @@ const EditVisit = ({ returnSchedule, filterSchedule, tecs, visitRef, scheduleRef
 }
 
 
-export default EditVisit
+export default CreateVisitGroup

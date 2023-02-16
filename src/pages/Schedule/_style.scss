@@ -119,16 +119,25 @@
           color: #fff;
           border-right: none;
 
-          th {
+          th, td {
             padding: 1rem;
           }
         }
 
         tbody {
           background-color: #fff;
+          border-bottom: 1px solid;
           
           .table {
             opacity: 1;
+          }
+
+          .border-top {
+            border-top: solid #000;
+          }
+
+          .border-bottom {
+            border-bottom: solid #000;
           }
 
           .visited {
@@ -141,7 +150,7 @@
           }
 
           .table-confirm {
-            th {
+            td {
               &:nth-child(-n + 9) {
                 opacity: 0.3;
                 background-color: #fff;
@@ -151,7 +160,7 @@
             }
           }
 
-          th {
+          td {
             font-weight: 100;
             height: 40px;
             max-height: 40px;
@@ -159,13 +168,13 @@
             border-right: none;
             border-top: none;
 
-            &:last-child {
+            &:last-child, &:first-child {
               display: flex;
               border: none;
               padding: 0;
             }
 
-            &:nth-child(9n) {
+            &:nth-child(10n) {
               border-right: 1px solid #ccc;
             }
 
@@ -184,6 +193,10 @@
 
               &-cancel {
                 @include btnTable("../../images/icons/CloseW.svg", #474747);
+              }
+
+              &-add {
+                @include btnTable("../../images/icons/Add.svg", #f39200, 100%);
               }
             }
           }

@@ -1,6 +1,6 @@
-@import '../../../styles/mixins.scss';
+@import '../../styles/mixins.scss';
 
-.createAndEdit-visit {
+.box-visit {
     width: 100%;
     display: flex;
     justify-content: center;
@@ -30,7 +30,7 @@
         .btn-close {
           width: 34px;
           height: 34px;
-          background: url(../../../images/icons/CloseW.svg) 50% no-repeat;
+          background: url(../../images/icons/CloseW.svg) 50% no-repeat;
           background-size: 1rem;
           border: none;
         }
@@ -93,7 +93,7 @@
                 color: #60666d;
                 font-size: 1rem;
                 appearance: none;
-                background: url(../../../images/icons/Arrow.svg) #eee 90% no-repeat;
+                background: url(../../images/icons/Arrow.svg) #eee 90% no-repeat;
                 background-size: 1rem;
                 text-align: center;
                 text-transform: capitalize;
