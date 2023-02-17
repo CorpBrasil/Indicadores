@@ -173,6 +173,7 @@ useEffect(() => {
             );
             if(visit.idRef) {
               await updateDoc(doc(dataBase, "Agendas", year, monthSelect, visit.idRef), {
+                chegadaEmpresa: visit.chegadaEmpresaRef,
                 visitaConjunta: false
               })
             }
@@ -435,18 +436,18 @@ useEffect(() => {
                         className={info.confirmar ? "table-confirm" : "table"}
                         key={info.id}
                       >
-                        <td>
-                          <button
+                        {info.consultora === 'Almoço Téc.' && <td className="lunch"></td>}
+                        {info.visitaConjunta && <td className="group"></td>}
+                        {!info.visitaConjunta && info.consultora !== 'Almoço Téc.' && <td><button
                                 className="btn-add"
-                                onClick={ () => {setBox("group"); setCreateVisitGroup({info: info, ref: doc(
+                                onClick={ () => {setBox("group"); setCreateVisitGroup({check: true, info: info, ref: doc(
                                   dataBase,
                                   "Agendas",
                                   year,
                                   monthSelect,
                                   info.id
                                 )}); return handleBoxVisitRef()}}
-                              ></button>
-                        </td>
+                              ></button></td>}
                         <td className="bold">
                           {moment(new Date(info.dia)).format("D")}
                         </td>
@@ -561,9 +562,9 @@ useEffect(() => {
                           info.confirmar ? "table-confirm" : "table"}
                         key={info.id}
                       >
-                          {info.visitaConjunta ? 
-                          <td className="group"></td> : 
-                          <td><button
+                        {info.consultora === 'Almoço Téc.' && <td className="lunch"></td>}
+                        {info.visitaConjunta && <td className="group"></td>}
+                        {!info.visitaConjunta && info.consultora !== 'Almoço Téc.' && <td><button
                                 className="btn-add"
                                 onClick={ () => {setBox("group"); setCreateVisitGroup({check: true, info: info, ref: doc(
                                   dataBase,
@@ -572,8 +573,7 @@ useEffect(() => {
                                   monthSelect,
                                   info.id
                                 )}); return handleBoxVisitRef()}}
-                              ></button></td>
-                          }
+                              ></button></td>}
                         <td className="bold">
                           {moment(new Date(info.dia)).format("D")}
                         </td>

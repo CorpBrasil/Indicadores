@@ -249,6 +249,7 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
               // visita: TempoVisita,
               // visitaNumero: visitaNumero,
               // saidaDoCliente: SaidaClienteRef,
+              chegadaEmpresa: saidaEmpresaRef,
               visitaConjunta: true,
               // consultora: userData.consultora,
               // tecnico: tecRefUID.nome,
