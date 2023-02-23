@@ -6,11 +6,14 @@ import Header from '../../components/Header/Index';
 import { onSnapshot, collection } from "firebase/firestore";
 
 import './_style.scss';
-import CreateAdmin from '../../components/Modal/CreateAdmin/Index';
+import CreateAdmin from '../../components/Modal/Admin/Create/Index';
+import EditAdmin from '../../components/Modal/Admin/Edit/Index';
 
 const PanelAdmin = ({ user }) => {
     const [members, setMembers] = useState();
+    const [memberRef, setMemberRef] = useState();
     const [createAdmin, setCreateAdmin] = useState(undefined);
+    const [editAdmin, setEditAdmin] = useState(undefined);
     const [schedules, setSchedules] = useState();
     const membersCollectionRef = collection(dataBase, "Membros");
     const schedulesCollectionRef = collection(dataBase, "Agendas");
@@ -52,6 +55,7 @@ const PanelAdmin = ({ user }) => {
 
   const returnAdmin = () => {
     setCreateAdmin(false);
+    setEditAdmin(false);
   }
 
   return (
@@ -74,15 +78,19 @@ const PanelAdmin = ({ user }) => {
                 <th>Email</th>
                 <th>Senha</th>
                 <th>Cargo</th>
+                <th>Carro</th>
+                <th>Ação</th>
               </tr>
               </thead>
               <tbody>
               {members && members.map((member, index) => (
             <tr key={index}>
-              <th>{member.nome}</th>
-              <th>{member.email}</th>
-              <th>{member.senha}</th>
-              <th>{member.cargo}</th>
+              <td>{member.nome}</td>
+              <td>{member.email}</td>
+              <td>{member.senha}</td>
+              <td>{member.cargo}</td>
+              <td>{member.carro}</td>
+              <td>{member.carro && <button onClick={() => {setMemberRef(member); return setEditAdmin(true)} } className="btn-edit"></button>}</td>
               </tr>
               ))}
               </tbody>
@@ -92,6 +100,7 @@ const PanelAdmin = ({ user }) => {
        </div>
       </div>
        {createAdmin && <CreateAdmin returnAdmin={returnAdmin} members={members}></CreateAdmin>}
+       {editAdmin && <EditAdmin returnAdmin={returnAdmin} memberRef={memberRef}></EditAdmin>}
     </div>
 
   )

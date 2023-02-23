@@ -36,6 +36,7 @@ const EditVisit = ({ returnSchedule, filterSchedule, tecs, visitRef, scheduleRef
     setTimeout(() => {
       reset({
         consultora: visitRef.consultora,
+        cliente: visitRef.cliente
       });
       setRotaTempo(visitRef.tempoRota);
       setTempoTexto(visitRef.tempo);
@@ -264,6 +265,7 @@ const EditVisit = ({ returnSchedule, filterSchedule, tecs, visitRef, scheduleRef
               tecnico: tecRefUID.nome,
               tecnicoUID: tecRefUID.uid,
               cidade: visitRef.cidade,
+              cliente: userData.cliente,
               tempoRota: tempoRotaRef,
               uid: visitRef.uid,
               cor: visitRef.cor,
@@ -323,18 +325,26 @@ const EditVisit = ({ returnSchedule, filterSchedule, tecs, visitRef, scheduleRef
               />
             }
             </label>
-            <label className="label">
-              <p>Cidade</p>
-              <input
-                className="label__input"
-                placeholder="Digite a cidade"
-                value={city}
-                disabled
-              />
-              {tempoTexto && tempoTexto && (
-                <p className="notice">Tempo da rota: {tempoTexto}</p>
-              )}
-            </label>
+            {visitRef.consultora !== 'Almoço Téc.' && 
+            <><label className="label">
+                <p>Cidade</p>
+                <input
+                  className="label__input"
+                  placeholder="Digite a cidade"
+                  value={city}
+                  disabled />
+                {tempoTexto && tempoTexto && (
+                  <p className="notice">Tempo da rota: {tempoTexto}</p>
+                )}
+              </label><label className="label">
+                  <p>Cliente</p>
+                  <input
+                    className="label__input"
+                    placeholder="Digite a cidade"
+                    {...register("cliente")}
+                    required />
+                </label></>
+            }
             <label className="label">
               <p>Hórario Marcado</p>
               <input

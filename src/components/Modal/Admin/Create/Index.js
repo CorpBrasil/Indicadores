@@ -2,11 +2,11 @@ import { setDoc, doc } from 'firebase/firestore';
 import React, { useState } from 'react'
 import { useForm } from "react-hook-form"; // cria formulário personalizado
 import Swal from "sweetalert2"; // cria alertas personalizado
-import { auth } from '../../../firebase/database';
-import { dataBase } from '../../../firebase/database';
+import { auth } from '../../../../firebase/database';
+import { dataBase } from '../../../../firebase/database';
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 
-import '../_modal.scss';
+import '../../_modal.scss';
 import { useNavigate } from 'react-router-dom';
 
 const CreateAdmin = ({ returnAdmin, members }) => {
@@ -129,7 +129,7 @@ const CreateAdmin = ({ returnAdmin, members }) => {
             <option value="Técnico">Técnico</option>
           </select>
           </div>
-          {cargo === 'Vendedor(a)' && 
+          {cargo === 'Vendedor(a)' ? 
             <div className='form-visit__color'>
             <p>Escolha uma cor de destaque</p>
             <input
@@ -138,8 +138,18 @@ const CreateAdmin = ({ returnAdmin, members }) => {
               {...register("cor")}
               required
             />
-          </div>
-          } 
+          </div> : <label className="form-visit__label">
+            <input
+              className="form-visit__text"
+              type="number"
+              placeholder="Digite o número do carro"
+              autoComplete="off"
+              onInput={(e) => e.target.value = e.target.value.slice(0, 3)}
+              {...register("carro")}
+              required
+            />
+          </label>
+          }  
         <input className='form-visit__btn' type="submit" value="CRIAR"/>
       </form> 
         </div> 

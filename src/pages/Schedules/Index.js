@@ -14,22 +14,33 @@ import Swal from 'sweetalert2';
 const Schedules = () => {
     const { user } = useAuth();
     const [schedules, setSchedules] = useState();
+    const [financeSchedules, setFinanceSchedules] = useState();
     const navigate = useNavigate(); //chamado do hook
     const [createSchedule, setCreateSchedule] = useState(undefined);
     const schedulesCollectionRef = collection(dataBase, "Agendas");
+    const FinanceSchedulesCollectionRef = collection(dataBase, "Financeiro");
 
     useEffect(() => {
         if(collection) { 
             // const q = query(membersCollectionRef); // Pega aos chats pela ordem descrescente do 'Created'
-            const unsub = onSnapshot(schedulesCollectionRef, (schedules) => { // Atualiza os dados em tempo real
-              let documents = [];
+            const unsub = () => {
+              onSnapshot(schedulesCollectionRef, (schedules) => { // Atualiza os dados em tempo real
+              let docSchedule = [];
               schedules.forEach(doc => {
-                documents.push({ ...doc.data(), id: doc.id })
+                docSchedule.push({ ...doc.data(), id: doc.id })
               })
-              setSchedules(documents); // puxa a coleção 'Chats' para o state
+              setSchedules(docSchedule); // puxa a coleção 'Agendas' para o state
             });
-            
-            return unsub;
+
+              onSnapshot(FinanceSchedulesCollectionRef, (schedules) => { // Atualiza os dados em tempo real
+              let docFinance = [];
+              schedules.forEach(doc => {
+                docFinance.push({ ...doc.data(), id: doc.id })
+              })
+              setFinanceSchedules(docFinance); // puxa a coleção 'Agendas' para o state
+          })
+        }
+            unsub();
           };
     
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -40,8 +51,8 @@ const Schedules = () => {
     console.log('oi')
   }
 
-  const goToSchedule = (year) => {
-    navigate("/agenda/" + year);
+  const goToSchedule = (type, year) => {
+      navigate(type + year);
   }
 
   const deleteSchedule = async (id) => {
@@ -58,6 +69,7 @@ const Schedules = () => {
       }).then(async (result) => {
         if (result.isConfirmed) {
           await deleteDoc(doc(dataBase, "Agendas", id));
+          await deleteDoc(doc(dataBase, "Financeiro", id));
           Swal.fire({
             title: "Infinit Energy Brasil",
             html: `A Agenda <b>${id}</b> foi deletada com sucesso.`,
@@ -87,9 +99,10 @@ const Schedules = () => {
                 <button onClick={() => deleteSchedule(schedule.id)}></button>
               </div>
               }
-              <div className='schedule__content' onClick={() => goToSchedule(schedule.id)}>
+              <div className='schedule__content' onClick={() => goToSchedule('/agenda/', schedule.id)}>
               <div className='schedule__text'>
                 <p>Agenda</p>
+                <p>Visita</p>
                 <p>{schedule.id}</p>
               </div>
               <div className='schedule__icon'></div>
@@ -98,11 +111,27 @@ const Schedules = () => {
           ))}
        </div>
        {user.email === "admin@infinitenergy.com.br" &&
-       <div className='add-schedule'>
-          <button onClick={() => setCreateSchedule(true)} className='add-schedule__btn'></button>
-      </div>
-       }
-       
+        <><div className='box-schedule'>
+            {financeSchedules && financeSchedules.map((schedule, index) => (
+              <li key={index} className='schedule'>
+                {user.email === "admin@infinitenergy.com.br" &&
+                  <div className='schedule__button'>
+                    <button onClick={() => deleteSchedule(schedule.id)}></button>
+                  </div>}
+                <div className='schedule__content' onClick={() => goToSchedule('/financeiro/', schedule.id)}>
+                  <div className='schedule__text'>
+                    <p>Agenda</p>
+                    <p>Financeiro</p>
+                    <p>{schedule.id}</p>
+                  </div>
+                  <div className='schedule__icon'></div>
+                </div>
+              </li>
+            ))}
+          </div><div className='add-schedule'>
+              <button onClick={() => setCreateSchedule(true)} className='add-schedule__btn'></button>
+            </div></>
+      }  
       </div>
       {createSchedule && <CreateSchedule returnSchedule={returnSchedule} schedules={schedules}></CreateSchedule>}
       

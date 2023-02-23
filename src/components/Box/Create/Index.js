@@ -298,6 +298,7 @@ const CreateVisit = ({
               tecnico: tecRefUID.nome,
               tecnicoUID: tecRefUID.uid,
               cidade: city,
+              cliente: userData.cliente,
               tempoRota: tempoRotaRef,
               tempo: tempoTexto,
               data: dataTexto,
@@ -404,6 +405,17 @@ const CreateVisit = ({
                 <p className="notice">Tempo da rota: {tempoTexto}</p>
               )}
             </label>
+            <label className="label">
+            <p>Cliente</p>
+            <input
+              className="label__input"
+              type="text"
+              placeholder="Digite o nome do Cliente"
+              autoComplete="off"
+              {...register("cliente")}
+              required
+            />
+          </label>
             <label className="label">
               <p>Hórario Marcado</p>
               <input

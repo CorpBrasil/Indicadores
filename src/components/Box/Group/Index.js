@@ -243,21 +243,8 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
         if (result.isConfirmed) {
           console.log(year, monthNumber);
             await updateDoc(scheduleVisitRef, {
-              // dia: diaRef,
-              // saidaEmpresa: saidaEmpresaRef,
-              // chegadaCliente: chegadaClienteRef,
-              // visita: TempoVisita,
-              // visitaNumero: visitaNumero,
-              // saidaDoCliente: SaidaClienteRef,
               chegadaEmpresa: saidaEmpresaRef,
               visitaConjunta: true,
-              // consultora: userData.consultora,
-              // tecnico: tecRefUID.nome,
-              // tecnicoUID: tecRefUID.uid,
-              // cidade: visitRef.cidade,
-              // tempoRota: tempoRotaRef,
-              // uid: visitRef.uid,
-              // cor: visitRef.cor,
              })
              await addDoc(scheduleRef, {
               dia: diaRef,
@@ -272,6 +259,7 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
               tecnico: tecRefUID.nome,
               tecnicoUID: tecRefUID.uid,
               cidade: visitRef.cidade,
+              cliente: userData.cliente,
               tempoRota: tempoRotaRef,
               tempo: tempoTexto,
               data: dataTexto,
@@ -335,6 +323,15 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
               )}
             </label>
             <label className="label">
+              <p>Cliente</p>
+              <input
+                className="label__input"
+                placeholder="Digite o nome do Cliente"
+                {...register("cliente")}
+                required
+              />
+            </label>
+            <label className="label">
               <p>Hórario Marcado</p>
               <input
                 className="label__input time"
@@ -393,9 +390,6 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
           {chegadaTexto && horarioTexto && (
             <div className="box-visit__info prev">
               <span className="">Previsão de Visita</span>
-              {/* <p className="notice">
-                Saindo da Empresa: <b>{saidaTexto}</b>
-              </p> */}
               <p className="notice">
                 Chegando na Empresa: <b>{chegadaTexto}</b>
               </p>

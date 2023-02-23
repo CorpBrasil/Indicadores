@@ -6,6 +6,7 @@ import PanelAdmin from './pages/PanelAdmin/Index';
 import useAuth from './hooks/useAuth';
 import PrivateRoute from './components/PrivateRoute';
 import Schedule from './pages/Schedule/Index';
+import Finance from './pages/Finance/Index';
 
 function App() {
   const { user } = useAuth();
@@ -18,7 +19,10 @@ function App() {
           <Route exact element={<PrivateRoute />}>
             <Route exact path="/" element={<Schedules />} />
             {user && user.email === "admin@infinitenergy.com.br" &&
-        <Route exact path="/admin" element={<PanelAdmin user={user} />} />
+            <Route exact path="/admin" element={<PanelAdmin user={user} />} />
+       }
+          {user && user.email === "admin@infinitenergy.com.br" &&
+            <Route exact path="/financeiro/:year" element={<Finance />} />
        }
             <Route path="/agenda/:year" element={<Schedule/>} />
           </Route>

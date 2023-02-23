@@ -6,6 +6,12 @@
  }
 }
 
+@media print {
+  .schedule-month, .box-schedule-visit, .print {
+    display: none;
+  }
+}
+
 .container-schedule {
   display: flex;
   flex-direction: column;
@@ -142,7 +148,7 @@
 
           .table-confirm {
             td {
-              &:nth-child(-n + 9) {
+              &:nth-child(-n + 10) {
                 opacity: 0.3;
                 background-color: #fff;
                 border-color: #ccc !important;
@@ -165,7 +171,7 @@
               padding: 0;
             }
 
-            &:nth-child(10n) {
+            &:nth-child(11n) {
               border-right: 1px solid #ccc;
             }
 
@@ -191,18 +197,115 @@
               }
             }
           }
+        }
+      }
 
-          .bold {
-            font-weight: 600;
+      // ===================== Financeiro ======================= //
+      .bg-total {
+        background-color: #000;
+        color: #fff;
+        
+        td {
+          font-weight: 600!important;
+        }
+      }
+
+      .container-info {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 2rem;
+      }
+
+      .table-center {
+        margin: auto;
+      }
+
+      .end {
+        thead {
+          background-color: #000!important;
+          border: 1px solid #000!important;
+        }
+
+        tbody {
+          border-right: 1px solid #ccc;
+
+          td {
+            background-color: #e2e2e2;
+            font-weight: 600!important;
           }
 
-          .bg-important {
-            border: 1px solid #006633;
-            background-color: #b7e1cd;
+          tr {
+            &:last-child {
+              td {
+                background-color: #000;
+              }
+            }
           }
         }
       }
+
+      .table-finance {
+        border-collapse: collapse;
+
+        thead {
+          border: 1px solid #006633;
+          background-color: #006633;
+          height: 3rem;
+          color: #fff;
+          border-right: none;
+  
+          th, td {
+            padding: 1rem;
+          }
+        }
+
+         tbody {
+           td {
+             font-weight: 100;
+             height: 40px;
+             max-height: 40px;
+             border: 1px solid #ccc;
+             border-right: none;
+             border-top: none;
+             padding: 0 0.5rem;
+           }
+         }
+
+        }
+
+        .last {
+         tbody {
+           td {
+             border-right: 1px solid #ccc;
+           }
+         }
+        }
+
+        .print {
+          max-width: 350px;
+          margin: 2rem auto;
+
+          .btn {
+            &-print {
+              @include btnForm(#fff, #f39200, 100%);
+            }
+          }
+        }
+    // ======================================================== //
     }
+
+    .bold {
+      font-weight: 600!important;
+    }
+
+    .bg-important {
+      background-color: #d9ead3!important;
+    }
+
+    .bg-important-2 {
+      background-color: #f4cccc!important;
+    }
+
   }
 }
 .group {

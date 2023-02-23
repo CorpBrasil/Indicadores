@@ -12,7 +12,7 @@ const CreateSchedule = ({ returnSchedule, schedules }) => {
     handleSubmit,
   } = useForm();
 
-  const months = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12']
+  const months = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
 
   const onSubmit = (userData) => {
     console.log(schedules.length);
@@ -42,11 +42,17 @@ const CreateSchedule = ({ returnSchedule, schedules }) => {
               // const docRef = doc(dataBase, "chats", userData.ano);
               // const colRef = collection(docRef, 'Janeiro');
               await setDoc(doc(dataBase, "Agendas", userData.ano), {ano:userData.ano})
+              await setDoc(doc(dataBase, "Financeiro", userData.ano), {ano:userData.ano})
               // await addDoc(collection(docRef, 'Janeiro'), {ano:userData.ano});
               const scheduleRefYear = doc(dataBase, "Agendas", userData.ano);
+              const financeScheduleRefYear = doc(dataBase, "Financeiro", userData.ano);
                 for (let value of months) {
                   const colScheduleRef = collection(scheduleRefYear, value);
+                  const colScheduleRefFinance = collection(financeScheduleRefYear, value);
                   await addDoc(colScheduleRef, {
+                    mes: value,
+                  })
+                  await addDoc(colScheduleRefFinance, {
                     mes: value,
                   })
                 }

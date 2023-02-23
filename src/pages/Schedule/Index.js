@@ -14,6 +14,7 @@ import {
   orderBy,
   deleteDoc,
   updateDoc,
+  setDoc,
 } from "firebase/firestore";
 
 import "./_style.scss";
@@ -193,7 +194,11 @@ useEffect(() => {
 
   const confirmVisit = async (ref, type) => {
     console.log(type, ref);
+    const tecRef = tecs.find((tec) => tec.uid === ref.tecnicoUID);
+    console.log(tecRef)
     const visitRef = doc(dataBase, "Agendas", year, monthSelect, ref.id);
+    const financeCol = collection(dataBase, "Financeiro", year, monthSelect);
+    const financeRef = doc(financeCol, ref.id);
 
     if (type === "confirm") {
       Swal.fire({
@@ -207,16 +212,28 @@ useEffect(() => {
         cancelButtonText: "Não",
       }).then(async (result) => {
         if (result.isConfirmed) {
+          await updateDoc(visitRef, {
+            //Atualizar dados sem sobrescrever os existentes
+            confirmar: true,
+          });
+          await setDoc(financeRef, {
+            data: ref.data,
+            dia: ref.dia,
+            cidade: ref.cidade,
+            cliente: ref.cliente,
+            horario: ref.chegadaCliente,
+            consultora: ref.consultora,
+            cor: ref.cor,
+            tecnico: ref.tecnico,
+            tecnicoUID: ref.tecnicoUID,
+            carro: tecRef.carro
+          });
           Swal.fire({
             title: "Infinit Energy Brasil",
             html: `A Visita em <b>${ref.cidade}</b> foi confirmada com sucesso.`,
             icon: "success",
             showConfirmButton: true,
             confirmButtonColor: "#F39200",
-          });
-          await updateDoc(visitRef, {
-            //Atualizar dados sem sobrescrever os existentes
-            confirmar: true,
           });
         }
       });
@@ -243,6 +260,7 @@ useEffect(() => {
             //Atualizar dados sem sobrescrever os existentes
             confirmar: false,
           });
+          await deleteDoc(financeRef);
         }
       });
     }
@@ -251,31 +269,6 @@ useEffect(() => {
   const changeBox = (type) => {
     setBox(type)
   }
-
-  // const createLunch = async (ref) => {
-  //   const dateNow = moment();
-  //   const saidaRef = moment(dateNow).format("kk:mm");
-  //   const diaRef = moment(dateNow).format("YYYY MM DD");
-  //   const chegadaRef = moment(dateNow).add(60, "m").format("kk:mm");
-
-  //   await addDoc(scheduleRef, {
-  //     dia: diaRef,
-  //     saidaEmpresa: saidaRef,
-  //     chegadaCliente: "",
-  //     visita: "",
-  //     saidaDoCliente: "",
-  //     chegadaEmpresa: chegadaRef,
-  //     consultora: "Almoço Téc.",
-  //     tecnico: userRef.nome,
-  //     tecnicoUID: user.id,
-  //     cidade: "",
-  //     tempoRota: "",
-  //     data: "",
-  //     uid: user.id,
-  //     cor: "#111111",
-  //     confirmar: false,
-  //   });
-  // };
 
   console.log(userRef);
 
@@ -326,48 +319,6 @@ useEffect(() => {
           />) // Chama o componente 'Group'
         }
 
-          {/* {(schedule && createVisit && editVisit.check === false) ? (    
-        <CreateVisit
-          returnSchedule={returnSchedule}
-          filterSchedule={filterSchedule}
-          scheduleRef={scheduleRef}
-          membersRef={members}
-          tecs={tecs}
-          userRef={userRef}
-          schedule={schedule}
-          monthNumber={monthNumber}
-        ></CreateVisit>) : (
-          <></>
-        )}
-        {createVisitGroup.check &&
-        (<CreateVisitGroup
-          returnSchedule={returnSchedule}
-          filterSchedule={filterSchedule}
-          tecs={tecs}
-          userRef={userRef}
-          scheduleRef={scheduleRef}
-          scheduleVisitRef={createVisitGroup.ref}
-          visitRef={createVisitGroup.info}
-          membersRef={members}
-          schedule={schedule}
-          monthNumber={monthNumber}
-          year={year}
-        ></CreateVisitGroup>
-        )}
-
-      {editVisit.check && (
-        <EditVisit
-          returnSchedule={returnSchedule}
-          filterSchedule={filterSchedule}
-          tecs={tecs}
-          scheduleRef={editVisit.ref}
-          visitRef={editVisit.info}
-          membersRef={members}
-          schedule={schedule}
-          monthNumber={monthNumber}
-          year={year}
-        ></EditVisit>
-      )} */}
           </div>
           {(userRef && userRef.cargo === "Vendedor(a)" && !box) ||
           user.email === "admin@infinitenergy.com.br" ? (
@@ -419,6 +370,7 @@ useEffect(() => {
                   <th>V.C</th>
                   <th>Dia</th>
                   <th>Cidade</th>
+                  <th>Cliente</th>
                   <th>Hórario de Saida</th>
                   <th>Chegada no Cliente</th>
                   <th>Tempo de Visita</th>
@@ -452,12 +404,13 @@ useEffect(() => {
                           {moment(new Date(info.dia)).format("D")}
                         </td>
                         <td>{info.cidade}</td>
+                        <td>{info.cliente}</td>
                         <td className="bold bg-important">
                           {info.saidaEmpresa}
                         </td>
                         <td>{info.chegadaCliente}</td>
                         <td>{info.visita}</td>
-                        <td>{info.saidaDoCliente}</td>
+                        <td className={info.consultora !== "Almoço Téc." ? "bg-important-2" : null}>{info.saidaDoCliente}</td>
                         <td className="bold bg-important">
                           {info.chegadaEmpresa}
                         </td>
@@ -474,7 +427,6 @@ useEffect(() => {
                           {info.consultora}
                         </td>
                         <td>{info.tecnico}</td>
-
                         <td>
                           {info.confirmar === false &&
                           (info.uid === user.id ||
@@ -506,7 +458,7 @@ useEffect(() => {
                             <></>
                           )}
 
-                          {info.confirmar === false &&
+                          {info.confirmar === false && info.consultora !== 'Almoço Téc.' &&
                           (info.tecnicoUID === user.id ||
                             user.email === "admin@infinitenergy.com.br") ? (
                             <>
@@ -543,6 +495,7 @@ useEffect(() => {
                   <th>V.C</th>
                   <th>Dia</th>
                   <th>Cidade</th>
+                  <th>Cliente</th>
                   <th>Hórario de Saida</th>
                   <th>Chegada no Cliente</th>
                   <th>Tempo de Visita</th>
@@ -578,12 +531,13 @@ useEffect(() => {
                           {moment(new Date(info.dia)).format("D")}
                         </td>
                         <td>{info.cidade}</td>
+                        <td>{info.cliente}</td>
                         <td className="bold bg-important">
                           {info.saidaEmpresa}
                         </td>
                         <td>{info.chegadaCliente}</td>
                         <td>{info.visita}</td>
-                        <td>{info.saidaDoCliente}</td>
+                        <td className={info.consultora !== "Almoço Téc." ? "bg-important-2" : null}>{info.saidaDoCliente}</td>
                         <td className="bold bg-important">
                           {info.chegadaEmpresa}
                         </td>
@@ -632,7 +586,7 @@ useEffect(() => {
                             <></>
                           )}
 
-                          {info.confirmar === false &&
+                          {info.confirmar === false && info.consultora !== 'Almoço Téc.' &&
                           (info.tecnicoUID === user.id ||
                             user.email === "admin@infinitenergy.com.br") ? (
                             <>
