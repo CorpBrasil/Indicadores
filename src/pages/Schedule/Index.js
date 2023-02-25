@@ -510,9 +510,33 @@ useEffect(() => {
                         <td>{info.tecnico}</td>
                         <td className="observation">{info.observacao}</td>
                         <td className="action">
-                          {info.confirmar === false &&
-                          (info.uid === user.id ||
-                            user.email === "admin@infinitenergy.com.br") ? (
+                          {(info.confirmar === false && info.groupRef &&
+                          info.uid === user.id) ? (
+                            <>
+                              <button
+                                className="btn-edit"
+                                onClick={() =>
+                                  {setBox("edit");
+                                    setEditVisit({
+                                    info: info,
+                                    ref: doc(
+                                      dataBase,
+                                      "Agendas",
+                                      year,
+                                      monthSelect,
+                                      info.id
+                                    ),
+                                  })
+                                return handleBoxVisitRef()}
+                                }
+                              ></button>
+                            </>
+                          ) : (
+                            <></>
+                          )}
+                          {(info.confirmar === false && !info.groupRef &&
+                          info.uid === user.id) ||
+                            user.email === "admin@infinitenergy.com.br" ? (
                             <>
                               <button
                                 className="btn-edit"

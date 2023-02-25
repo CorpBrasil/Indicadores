@@ -291,7 +291,7 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
             });
           } else {
             await updateDoc(scheduleVisitRef, {
-              chegadaEmpresa: saidaCliente,
+              chegadaEmpresa: saidaEmpresaRef,
               groupRef: 'depois',
               visitaConjunta: true,
              })
