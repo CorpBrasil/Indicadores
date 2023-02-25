@@ -1,7 +1,7 @@
 @import "../../styles/mixins.scss";
 
 @media (max-width: 930px) {
- .table-visit {
+ .table-visit, .table-finance{
   overflow-x: auto;
  }
 }
@@ -148,7 +148,7 @@
 
           .table-confirm {
             td {
-              &:nth-child(-n + 10) {
+              &:nth-child(-n + 12) {
                 opacity: 0.3;
                 background-color: #fff;
                 border-color: #ccc !important;
@@ -165,13 +165,13 @@
             border-right: none;
             border-top: none;
 
-            &:last-child, &:first-child {
+            &:first-child {
               display: flex;
               border: none!important;
               padding: 0;
             }
 
-            &:nth-child(11n) {
+            &:nth-child(12n) {
               border-right: 1px solid #ccc;
             }
 
@@ -212,12 +212,15 @@
 
       .container-info {
         display: flex;
+        min-width: 610px;
+        max-width: 610px;
         justify-content: center;
-        margin-bottom: 2rem;
+        margin: 2rem auto;
       }
 
       .table-center {
         margin: auto;
+        min-width: 700px;
       }
 
       .end {
@@ -308,11 +311,30 @@
 
   }
 }
-.group {
+
+.action {
+  display: flex;
+  border: none!important;
+  padding: 0;
+}
+
+.observation {
+  max-width: 7rem;
+  white-space: nowrap; // Impede que a linha de texto seja quebrada
+  padding: 0 0.5rem;
+  overflow-x: auto;
+}
+
+.group-top {
+  background: url("../../images/icons/ArrowTable.svg") center no-repeat;
+  background-size: 0.7rem;
+  transform: rotate(180deg);
+}
+
+.group-bottom {
   background: url("../../images/icons/ArrowTable.svg") center no-repeat;
   background-size: 0.7rem;
 }
-
 
 .lunch {
   background: url("../../images/icons/Lunch.svg") center no-repeat;

@@ -1,4 +1,3 @@
-import './App.css';
 import { BrowserRouter, Routes, Route } from "react-router-dom"; // Cria rotas de páginas
 import Login from './pages/Login/Index';
 import Schedules from './pages/Schedules/Index';

@@ -1,6 +1,24 @@
+/* Scroll bar */
+
 * {
   margin: 0;
   padding: 0;
+  // scrollbar-width: thin;
+  // scrollbar-color: #000 #fff;
+
+  // &::-webkit-scrollbar {
+  //   width: 20px;
+  // }
+
+  // &::-webkit-scrollbar-track {
+  //   background: #fff;
+  // }
+
+  // *::-webkit-scrollbar-thumb {
+  //   background-color: #000;
+  //   border-radius: 10px;
+  //   border: 5px solid #fff;
+  // }
 }
 
 body {
@@ -8,6 +26,7 @@ body {
   font-family: "Roboto";
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  text-align: center;
 }
 
 code {
@@ -33,8 +52,14 @@ input:focus {
   margin-top: 0.2rem;
 }
 
+.border-none {
+  border: none!important;
+}
+
 input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
+
+

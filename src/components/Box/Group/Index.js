@@ -13,6 +13,7 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
   const chegadaFormatadaTec = useRef();
   const saidaFormatadaTec = useRef();
 
+  const [checkRef, setCheckRef] = useState(false)
   const [rotaTempo, setRotaTempo] = useState()
   const [tempoTexto, setTempoTexto] = useState()
   const [visitaNumero, setVisitaNumero] = useState(1800);
@@ -46,8 +47,8 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
       setDataTexto(moment(new Date(visitRef.dia)).format('YYYY-MM-DD'));
       setTecnicoTexto(visitRef.tecnico);
       setCity(visitRef.cidade);
-      if(visitRef.consultora === 'Almoço Téc.') {
-        setHorarioTexto(moment(visitRef.chegadaEmpresa, "hh:mm").add(900, 'seconds').format('kk:mm'));
+      if(schedule.find((ref) => ref.saidaEmpresa === visitRef.chegadaEmpresa)) {
+        setHorarioTexto(moment(visitRef.chegadaCliente, "hh:mm").subtract(900 + visitaNumero, 'seconds').format('kk:mm'));
       } else {
         setHorarioTexto(moment(visitRef.saidaDoCliente, "hh:mm").add(900, 'seconds').format('kk:mm'));
       }
@@ -66,24 +67,43 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
   }, [dataTexto, tecnicoTexto]);
 
   useEffect(() => {
-    console.log(visitaNumero);
-    if (horarioTexto && visitaNumero) {
-      moment.locale("pt-br");
 
-      const saidaEmpresa = moment(horarioTexto, "hh:mm"); //Horario de chegada
-      const chegadaCliente = moment(horarioTexto, "hh:mm"); //Horario de chegada
-
-      saidaEmpresa.subtract(900, "seconds").format("hh:mm"); // Pega o tempo que o tecnico vai precisar sair da empresa
-
-      setSaidaTexto(saidaEmpresa.format("kk:mm"));
-
-      chegadaCliente.add(visitaNumero, "seconds").format("hh:mm"); //Adiciona tempo de viagem volta
-      setSaidaCliente(chegadaCliente.format("kk:mm"));
-      chegadaCliente.add(rotaTempo, "seconds").format("hh:mm"); //Adiciona tempo de viagem volta
-      console.log(chegadaCliente)
-      setChegadaTexto(chegadaCliente.format("kk:mm"));
+    if(schedule.find((ref) => ref.saidaEmpresa === visitRef.chegadaEmpresa) && visitaNumero) {
+      setHorarioTexto(moment(visitRef.chegadaCliente, "hh:mm").subtract(Number(visitaNumero) + 900, 'seconds').format('kk:mm'));
+      setCheckRef(true);
     }
-  }, [horarioTexto, visitaNumero, chegadaTexto, saidaTexto, rotaTempo]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  },[visitaNumero, schedule])
+
+  useEffect(() => {
+    moment.locale("pt-br");
+    if(schedule.find((ref) => ref.saidaEmpresa === visitRef.chegadaEmpresa)) {
+
+        const saidaEmpresa = moment(horarioTexto, "hh:mm"); //Horario de chegada
+        const chegadaCliente = moment(horarioTexto, "hh:mm"); //Horario de chegada
+  
+        saidaEmpresa.subtract(rotaTempo, "seconds").format("hh:mm"); // Pega o tempo que o tecnico vai precisar sair da empresa
+        setSaidaTexto(saidaEmpresa.format("kk:mm"));
+        chegadaCliente.add(Number(visitaNumero), "seconds").format("hh:mm"); //Adiciona tempo de viagem volta
+        setSaidaCliente(chegadaCliente.format("kk:mm"));
+        chegadaCliente.add(900, "seconds").format("hh:mm"); //Adiciona tempo de viagem volta
+        console.log(chegadaCliente)
+        setChegadaTexto(chegadaCliente.format("kk:mm"));
+    } 
+    else {
+        const saidaEmpresa = moment(horarioTexto, "hh:mm"); //Horario de chegada
+        const chegadaCliente = moment(horarioTexto, "hh:mm"); //Horario de chegada
+  
+        saidaEmpresa.subtract(900, "seconds").format("hh:mm"); // Pega o tempo que o tecnico vai precisar sair da empresa
+        setSaidaTexto(saidaEmpresa.format("kk:mm"));
+        chegadaCliente.add(visitaNumero, "seconds").format("hh:mm"); //Adiciona tempo de viagem volta
+        setSaidaCliente(chegadaCliente.format("kk:mm"));
+        chegadaCliente.add(rotaTempo, "seconds").format("hh:mm"); //Adiciona tempo de viagem volta
+        console.log(chegadaCliente)
+        setChegadaTexto(chegadaCliente.format("kk:mm"));
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [horarioTexto, visitaNumero, chegadaTexto, saidaTexto, rotaTempo, schedule]);
 
   const onSubmit = async (userData) => {
 
@@ -142,8 +162,6 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
       const saidaFormatada = moment(saidaEmpresaRef, "hh:mm");
       const chegadaFormatada = moment(ChegadaEmpresaRef, "hh:mm");
 
-      console.log(saidaFormatada);
-      console.log(chegadaFormatada);
       const check = [];
       let visitsFind = [];
 
@@ -241,9 +259,40 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
         cancelButtonText: "Não",
       }).then(async (result) => {
         if (result.isConfirmed) {
-          console.log(year, monthNumber);
+          if(checkRef) { // Verifica se existe uma referencia de visita abaixo da visita a ser criada
+            await updateDoc(scheduleVisitRef, { // PAREEEEEEIIII AQUI
+              saidaEmpresa: saidaCliente,
+              groupRef: 'antes',
+              visitaConjunta: true,
+             })
+             await addDoc(scheduleRef, {
+              dia: diaRef,
+              saidaEmpresa: saidaEmpresaRef,
+              chegadaCliente: chegadaClienteRef,
+              visita: TempoVisita,
+              visitaNumero: visitaNumero,
+              saidaDoCliente: SaidaClienteRef,
+              chegadaEmpresa: saidaCliente,
+              saidaEmpresaRef: visitRef.saidaEmpresa,
+              consultora: userData.consultora,
+              tecnico: tecRefUID.nome,
+              tecnicoUID: tecRefUID.uid,
+              cidade: visitRef.cidade,
+              cliente: userData.cliente,
+              observacao: userData.observacao,
+              tempoRota: tempoRotaRef,
+              tempo: tempoTexto,
+              data: dataTexto,
+              uid: user.id,
+              idRef: visitRef.id,
+              group: 'antes',
+              cor: userRef.cor,
+              confirmar: false,
+            });
+          } else {
             await updateDoc(scheduleVisitRef, {
-              chegadaEmpresa: saidaEmpresaRef,
+              chegadaEmpresa: saidaCliente,
+              groupRef: 'depois',
               visitaConjunta: true,
              })
              await addDoc(scheduleRef, {
@@ -260,14 +309,17 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
               tecnicoUID: tecRefUID.uid,
               cidade: visitRef.cidade,
               cliente: userData.cliente,
+              observacao: userData.observacao,
               tempoRota: tempoRotaRef,
               tempo: tempoTexto,
               data: dataTexto,
               uid: user.id,
               idRef: visitRef.id,
+              group: 'depois',
               cor: userRef.cor,
               confirmar: false,
             });
+          }
           Swal.fire({
             title: "Infinit Energy Brasil",
             html: `A Visita Conjunta <b>${visitRef.cidade}</b> foi criada com sucesso.`,
@@ -297,7 +349,7 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="box-visit__container">
             <label className="label">
-              <p>Dia</p>
+              <p>Dia *</p>
               <input
                 value={dataTexto}
                 className="label__input"
@@ -311,7 +363,7 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
               /> 
             </label>
             <label className="label">
-              <p>Cidade</p>
+              <p>Cidade *</p>
               <input
                 className="label__input"
                 placeholder="Digite a cidade"
@@ -323,7 +375,7 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
               )}
             </label>
             <label className="label">
-              <p>Cliente</p>
+              <p>Cliente *</p>
               <input
                 className="label__input"
                 placeholder="Digite o nome do Cliente"
@@ -332,7 +384,7 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
               />
             </label>
             <label className="label">
-              <p>Hórario Marcado</p>
+              <p>Hórario Marcado *</p>
               <input
                 className="label__input time"
                 type="time"
@@ -347,7 +399,7 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
               {hoursLimit && <p className="notice red">Limite de hórario: 07:00 - 18:00</p>}
             </label>
             <label className="label">
-              <p>Tempo de Visita</p>
+              <p>Tempo de Visita *</p>
               <select
               value={visitaNumero}
               className="label__select"
@@ -360,7 +412,7 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
             </select>
             </label>
           <label className="label">
-            <p>Consultora</p>
+            <p>Consultora *</p>
             <input
               className="label__input"
               type="text"
@@ -371,7 +423,7 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
           </label>
 
           <div className="label margin-top">
-            <p>Técnico</p>
+            <p>Técnico *</p>
             <div className="radio">
             <select
               value={tecnicoTexto}
@@ -386,15 +438,28 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
             </select>
             </div>
           </div>
+          <label className="label">
+            <p>Observação</p>
+            <input
+              className="label__input"
+              type="text"
+              placeholder="Digite uma observação"
+              autoComplete="off"
+              {...register("observacao")}
+            />
+          </label>
           </div>
-          {chegadaTexto && horarioTexto && (
+          {chegadaTexto && horarioTexto && 
             <div className="box-visit__info prev">
               <span className="">Previsão de Visita</span>
+              <p className="notice">
+                Saindo da Empresa: <b>{saidaTexto}</b>
+              </p>
               <p className="notice">
                 Chegando na Empresa: <b>{chegadaTexto}</b>
               </p>
             </div>
-          )}
+          }
           <input className="box-visit__btn" type="submit" value="CRIAR" />
         </form>
       </div>

@@ -299,6 +299,7 @@ const CreateVisit = ({
               tecnicoUID: tecRefUID.uid,
               cidade: city,
               cliente: userData.cliente,
+              observacao: userData.observacao,
               tempoRota: tempoRotaRef,
               tempo: tempoTexto,
               data: dataTexto,
@@ -332,6 +333,8 @@ const CreateVisit = ({
                       cidade: '',
                       tempoRota: '',
                       tempo: '',
+                      cliente: '',
+                      observacao: '',
                       data: dataTexto,
                       uid: user.id,
                       cor: "#111111",
@@ -343,7 +346,7 @@ const CreateVisit = ({
                       saidaEmpresa: saidaFormatadaTec.current.format("kk:mm"),
                       chegadaCliente: "",
                       visita: "01:00",
-                      visitaNumero: 3600,
+                      visitaNumero: '',
                       saidaDoCliente: "",
                       chegadaEmpresa: saidaEmpresaRef,
                       consultora: "Almoço Téc.",
@@ -352,6 +355,8 @@ const CreateVisit = ({
                       cidade: '',
                       tempoRota: '',
                       tempo: '',
+                      cliente: '',
+                      observacao: '',
                       data: dataTexto,
                       uid: user.id,
                       cor: "#111111",
@@ -381,7 +386,7 @@ const CreateVisit = ({
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="box-visit__container">
             <label className="label">
-              <p>Dia</p>
+              <p>Dia *</p>
               <input
                 className="label__input"
                 type="date"
@@ -394,7 +399,7 @@ const CreateVisit = ({
               />
             </label>
             <label className="label">
-              <p>Cidade</p>
+              <p>Cidade  *</p>
               <input
                 className="label__input"
                 placeholder="Digite a cidade"
@@ -406,7 +411,7 @@ const CreateVisit = ({
               )}
             </label>
             <label className="label">
-            <p>Cliente</p>
+            <p>Cliente  *</p>
             <input
               className="label__input"
               type="text"
@@ -417,7 +422,7 @@ const CreateVisit = ({
             />
           </label>
             <label className="label">
-              <p>Hórario Marcado</p>
+              <p>Hórario Marcado  *</p>
               <input
                 className="label__input time"
                 type="time"
@@ -431,7 +436,7 @@ const CreateVisit = ({
               {hoursLimit && <p className="notice red">Limite de hórario: 07:00 - 18:00</p>}
             </label>
             <label className="label">
-              <p>Tempo de Visita</p>
+              <p>Tempo de Visita  *</p>
               <select
               value={visitaNumero}
               className="label__select"
@@ -444,7 +449,7 @@ const CreateVisit = ({
             </select>
             </label>
           <label className="label">
-            <p>Consultora</p>
+            <p>Consultora  *</p>
             <input
               className="label__input"
               type="text"
@@ -455,9 +460,8 @@ const CreateVisit = ({
               disabled
             />
           </label>
-
           <div className="label margin-top">
-            <p>Técnico</p>
+            <p>Técnico  *</p>
             <select
               value={tecnicoTexto}
               className="label__select"
@@ -469,6 +473,16 @@ const CreateVisit = ({
                 ))}
             </select>
           </div>
+          <label className="label">
+            <p>Observação</p>
+            <input
+              className="label__input"
+              type="text"
+              placeholder="Digite uma observação"
+              autoComplete="off"
+              {...register("observacao")}
+            />
+          </label>
           </div>
           {chegadaTexto && saidaTexto && (
             <div className="box-visit__info prev">

@@ -231,7 +231,7 @@ useEffect(() => {
                     </tr>
                   </tbody>
                 </table>
-            </div>        
+                </div>        
             <div>
             </div>
             <table className="table-finance table-center last">
