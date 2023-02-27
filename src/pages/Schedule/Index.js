@@ -435,11 +435,10 @@ useEffect(() => {
                 </tr>
               </thead>
               <tbody>
-                  {dayVisits.map((info) => (
-                    <>
+                  {dayVisits.map((info, index) => (
                       <tr
                         className={info.confirmar ? "table-confirm" : "table"}
-                        key={info.id}
+                        key={index}
                       >
                         {info.consultora === 'Almoço Téc.' && <td className="lunch"></td>}
                         {info.visitaConjunta && info.groupRef === 'antes' && info.confirmar === false && <td className="group-top"></td>}
@@ -475,7 +474,6 @@ useEffect(() => {
                         <td>{info.tecnico}</td>
                         <td className="observation">{info.observacao}</td>
                       </tr>
-                    </>
                   ))}
               </tbody>
             </table>}
@@ -500,25 +498,17 @@ useEffect(() => {
               </thead>
               <tbody>
                 {schedule &&
-                  schedule.map((info) => (
-                    <>
+                  schedule.map((info, index) => (
                       <tr
                         className={
                           info.confirmar ? "table-confirm" : "table"}
-                        key={info.id}
+                        key={index}
                       >
                         {info.consultora === 'Almoço Téc.' && <td className="lunch"></td>}
                         {info.visitaConjunta && info.groupRef === 'antes' && info.confirmar === false && <td className="group-top"></td>}
                         {info.visitaConjunta && info.groupRef === 'depois' && info.confirmar === false && <td className="group-bottom"></td>}
                         {(!info.visitaConjunta && info.consultora !== 'Almoço Téc.' && info.confirmar === false) || (info.groupRef === '' && info.confirmar === false) ? <td><button
                                 className="btn-add"
-                                // onClick={ () => {setBox("group"); setCreateVisitGroup({check: true, info: info, ref: doc(
-                                //   dataBase,
-                                //   "Agendas",
-                                //   year,
-                                //   monthSelect,
-                                //   info.id
-                                // )}); return handleBoxVisitRef()}}
                                 onClick={() => createVisitGroupChoice(info)}
                               ></button></td> : <></>}
                         {info.confirmar === true && <td></td>}
@@ -540,8 +530,9 @@ useEffect(() => {
                           style={
                             info.cor && {
                               backgroundColor: info.cor,
-                              border: `1px solid ${info.cor}`,
-                              borderTop: "none",
+                              borderBottom: `1px solid ${info.cor}`,
+                              borderRight: `1px solid ${info.cor}`,
+                              borderLeft: `1px solid ${info.cor}`,
                               color: "#fff",
                             }
                           }
@@ -632,7 +623,6 @@ useEffect(() => {
                           )}
                         </td>
                       </tr>
-                    </>
                   ))}
               </tbody>
             </table>

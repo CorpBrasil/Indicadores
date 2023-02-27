@@ -15,7 +15,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 export const dataBase = getFirestore(app);
 //export const auth = getAuth(app);
-export const auth = initializeAuth(app, {
+export const auth = initializeAuth(app, { // Melhora a perfomance
  persistence: [
     indexedDBLocalPersistence,
     browserLocalPersistence,
