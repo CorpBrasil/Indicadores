@@ -282,7 +282,46 @@ useEffect(() => {
     setBox(type)
   }
 
-  console.log(userRef);
+  const createVisitGroupChoice = (ref) => {
+    Swal.fire({
+      title: "Infinit Energy Brasil",
+      html: `Você deseja criar a visita conjunta <b>antes</b> ou <b>depois</b> da visita escolhida? </br></br>
+      <b>Atenção: Verifique se já existe alguma visita criada proxima a visita escolhida.</b>`,
+      icon: "question",
+      showDenyButton: true,
+      showCloseButton: true,
+      confirmButtonColor: "#F39200",
+      confirmButtonText: "Antes",
+      denyButtonText: `Depois`,
+    }).then((result) => {
+      /* Read more about isConfirmed, isDenied below */
+      if (result.isConfirmed) {
+        setTimeout(() => {
+          setCreateVisitGroup({check: true, type: 'antes', info: ref, ref: doc(
+            dataBase,
+            "Agendas",
+            year,
+            monthSelect,
+            ref.id
+            )}); 
+            setBox("group"); 
+            return handleBoxVisitRef()
+        }, 400);
+      } else if (result.isDenied) {
+        setTimeout(() => {
+            setCreateVisitGroup({check: true, type: 'depois', info: ref, ref: doc(
+              dataBase,
+              "Agendas",
+              year,
+              monthSelect,
+              ref.id
+              )}); 
+              setBox("group"); 
+              return handleBoxVisitRef()
+          }, 400);
+      }
+    })
+  }
 
   return (
     <div className="container-schedule">
@@ -329,6 +368,7 @@ useEffect(() => {
             schedule={schedule}
             monthNumber={monthNumber}
             year={year}
+            type={createVisitGroup.type}
           />) // Chama o componente 'Group'
         }
 
@@ -472,13 +512,14 @@ useEffect(() => {
                         {info.visitaConjunta && info.groupRef === 'depois' && info.confirmar === false && <td className="group-bottom"></td>}
                         {(!info.visitaConjunta && info.consultora !== 'Almoço Téc.' && info.confirmar === false) || (info.groupRef === '' && info.confirmar === false) ? <td><button
                                 className="btn-add"
-                                onClick={ () => {setBox("group"); setCreateVisitGroup({check: true, info: info, ref: doc(
-                                  dataBase,
-                                  "Agendas",
-                                  year,
-                                  monthSelect,
-                                  info.id
-                                )}); return handleBoxVisitRef()}}
+                                // onClick={ () => {setBox("group"); setCreateVisitGroup({check: true, info: info, ref: doc(
+                                //   dataBase,
+                                //   "Agendas",
+                                //   year,
+                                //   monthSelect,
+                                //   info.id
+                                // )}); return handleBoxVisitRef()}}
+                                onClick={() => createVisitGroupChoice(info)}
                               ></button></td> : <></>}
                         {info.confirmar === true && <td></td>}
                         <td className="bold">

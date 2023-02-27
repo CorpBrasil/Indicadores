@@ -298,6 +298,8 @@ const CreateVisit = ({
               tecnico: tecRefUID.nome,
               tecnicoUID: tecRefUID.uid,
               cidade: city,
+              lat: lat,
+              lng: lng,
               cliente: userData.cliente,
               observacao: userData.observacao,
               tempoRota: tempoRotaRef,

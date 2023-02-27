@@ -5,30 +5,16 @@ import Swal from "sweetalert2"; // cria alertas personalizado
 import * as moment from 'moment';
 import 'moment/locale/pt-br';
 import useAuth from "../../../hooks/useAuth";
-import { usePlacesWidget } from "react-google-autocomplete";
-import {
-  DistanceMatrixService,
-  GoogleMap,
-  useLoadScript,
-} from "@react-google-maps/api";
 
 import '../style.scss';
 
-const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visitRef, scheduleRef, scheduleVisitRef, schedule, monthNumber, type}) => {
+const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visitRef, scheduleRef, scheduleVisitRef, schedule, monthNumber, year}) => {
   const { user } = useAuth();
   const chegadaFormatadaTec = useRef();
   const saidaFormatadaTec = useRef();
-  const [lat, setLat] = useState(0);
-  const [lng, setLng] = useState(0);
-  const [lat2, setLat2] = useState(0);
-  const [lng2, setLng2] = useState(0);
-  const [latRef, setLatRef] = useState(0);
-  const [lngRef, setLngRef] = useState(0);
-  //const [checkRef, setCheckRef] = useState(false)
-  const [check1, setCheck1] = useState(false);
-  const [check2, setCheck2] = useState(false);
-  const [rotaTempo1, setRotaTempo1] = useState();
-  const [rotaTempo2, setRotaTempo2] = useState();
+
+  const [checkRef, setCheckRef] = useState(false)
+  const [rotaTempo, setRotaTempo] = useState()
   const [tempoTexto, setTempoTexto] = useState()
   const [visitaNumero, setVisitaNumero] = useState(1800);
   const [saidaCliente, setSaidaCliente] = useState();
@@ -39,7 +25,6 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
   const [tecnicoTexto, setTecnicoTexto] = useState()
   const [city, setCity] = useState();
   const [hoursLimit, setHoursLimit] = useState(false);
-  const [libraries] = useState(["places"]);
 
   const {
     register,
@@ -49,52 +34,23 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
 
   console.log(visitRef)
 
-  const { isLoaded } = useLoadScript({
-    id: "google-map-script",
-    googleMapsApiKey: "AIzaSyD1WsJJhTpdhTIVLxxXCgdlV8iYfmOeiC4",
-    libraries,
-  });
-
-  const { ref } = usePlacesWidget({
-    apiKey: "AIzaSyD1WsJJhTpdhTIVLxxXCgdlV8iYfmOeiC4",
-    onPlaceSelected: (place) => {
-      setCity(place.address_components[0].long_name);
-      setLat(place.geometry?.location?.lat());
-      setLng(place.geometry?.location?.lng());
-      setCheck1(true); // Habilita o serviço de calculo de distancia do google
-      //console.log(place);
-    },
-    options: {
-      types: ["(regions)"],
-      componentRestrictions: { country: "br" },
-    },
-  });
-
   useLayoutEffect(() => {
     // faz a solicitação do servidor assíncrono e preenche o formulário
     setTimeout(() => {
       reset({
         consultora: userRef.nome,
       });
-      setRotaTempo1(visitRef.tempoRota);
-      //setTempoTexto(visitRef.tempo);
+      setRotaTempo(visitRef.tempoRota);
+      setTempoTexto(visitRef.tempo);
       setSaidaTexto(visitRef.saidaDoCliente);
       setChegadaTexto(visitRef.chegadaEmpresa);
       setDataTexto(moment(new Date(visitRef.dia)).format('YYYY-MM-DD'));
       setTecnicoTexto(visitRef.tecnico);
       setCity(visitRef.cidade);
-      if(type === 'antes') {
-        //setHorarioTexto(moment(visitRef.chegadaCliente, "hh:mm").subtract(900 + visitaNumero, 'seconds').format('kk:mm'));
-        setLatRef(-23.0881786);
-        setLngRef(-47.6973284);
-        setLat2(visitRef.lat);
-        setLng2(visitRef.lng);
+      if(schedule.find((ref) => ref.saidaEmpresa === visitRef.chegadaEmpresa)) {
+        setHorarioTexto(moment(visitRef.chegadaCliente, "hh:mm").subtract(900 + visitaNumero, 'seconds').format('kk:mm'));
       } else {
-        setLatRef(visitRef.lat);
-        setLngRef(visitRef.lng);
-        setLat2(-23.0881786);
-        setLng2(-47.6973284);
-        setHorarioTexto(moment(visitRef.saidaDoCliente, "hh:mm").add(rotaTempo1, 'seconds').format('kk:mm'));
+        setHorarioTexto(moment(visitRef.saidaDoCliente, "hh:mm").add(900, 'seconds').format('kk:mm'));
       }
       //setHorarioTexto(moment(visitRef.saidaDoCliente, "hh:mm").add(600, 'seconds').format('kk:mm'));
     }, 0);
@@ -112,30 +68,25 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
 
   useEffect(() => {
 
-    if((type === 'antes' && visitaNumero) || (type === 'antes' && city)) {
-      setHorarioTexto(moment(visitRef.chegadaCliente, "hh:mm").subtract(Number(visitaNumero) + rotaTempo2, 'seconds').format('kk:mm'));
-      //setCheckRef(true);
+    if(schedule.find((ref) => ref.saidaEmpresa === visitRef.chegadaEmpresa) && visitaNumero) {
+      setHorarioTexto(moment(visitRef.chegadaCliente, "hh:mm").subtract(Number(visitaNumero) + 900, 'seconds').format('kk:mm'));
+      setCheckRef(true);
     }
-    if((type === 'depois' && visitaNumero) || (type === 'depois' && rotaTempo1)) {
-      setHorarioTexto(moment(visitRef.saidaDoCliente, "hh:mm").add(rotaTempo1, 'seconds').format('kk:mm'));
-      //setCheckRef(true);
-    }
-    
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  },[visitaNumero, rotaTempo1, city, rotaTempo2, schedule])
+  },[visitaNumero, schedule])
 
   useEffect(() => {
     moment.locale("pt-br");
-    if(type === 'antes') {
+    if(schedule.find((ref) => ref.saidaEmpresa === visitRef.chegadaEmpresa)) {
 
         const saidaEmpresa = moment(horarioTexto, "hh:mm"); //Horario de chegada
         const chegadaCliente = moment(horarioTexto, "hh:mm"); //Horario de chegada
   
-        saidaEmpresa.subtract(rotaTempo1, "seconds").format("hh:mm"); // Pega o tempo que o tecnico vai precisar sair da empresa
+        saidaEmpresa.subtract(rotaTempo, "seconds").format("hh:mm"); // Pega o tempo que o tecnico vai precisar sair da empresa
         setSaidaTexto(saidaEmpresa.format("kk:mm"));
         chegadaCliente.add(Number(visitaNumero), "seconds").format("hh:mm"); //Adiciona tempo de viagem volta
         setSaidaCliente(chegadaCliente.format("kk:mm"));
-        chegadaCliente.add(rotaTempo2, "seconds").format("hh:mm"); //Adiciona tempo de viagem volta
+        chegadaCliente.add(900, "seconds").format("hh:mm"); //Adiciona tempo de viagem volta
         console.log(chegadaCliente)
         setChegadaTexto(chegadaCliente.format("kk:mm"));
     } 
@@ -143,16 +94,16 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
         const saidaEmpresa = moment(horarioTexto, "hh:mm"); //Horario de chegada
         const chegadaCliente = moment(horarioTexto, "hh:mm"); //Horario de chegada
   
-        saidaEmpresa.subtract(rotaTempo1, "seconds").format("hh:mm"); // Pega o tempo que o tecnico vai precisar sair da empresa
+        saidaEmpresa.subtract(900, "seconds").format("hh:mm"); // Pega o tempo que o tecnico vai precisar sair da empresa
         setSaidaTexto(saidaEmpresa.format("kk:mm"));
         chegadaCliente.add(visitaNumero, "seconds").format("hh:mm"); //Adiciona tempo de viagem volta
         setSaidaCliente(chegadaCliente.format("kk:mm"));
-        chegadaCliente.add(rotaTempo2, "seconds").format("hh:mm"); //Adiciona tempo de viagem volta
-        console.log(saidaCliente)
+        chegadaCliente.add(rotaTempo, "seconds").format("hh:mm"); //Adiciona tempo de viagem volta
+        console.log(chegadaCliente)
         setChegadaTexto(chegadaCliente.format("kk:mm"));
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [horarioTexto, visitaNumero, chegadaTexto, saidaTexto, rotaTempo1, city, schedule]);
+  }, [horarioTexto, visitaNumero, chegadaTexto, saidaTexto, rotaTempo, schedule]);
 
   const onSubmit = async (userData) => {
 
@@ -163,8 +114,8 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
         chegadaClienteRef,
         TempoVisita,
         SaidaClienteRef,
-        ChegadaEmpresaRef;
-        //tempoRotaRef;
+        ChegadaEmpresaRef,
+        tempoRotaRef;
         const chegada = horarioTexto;
         moment.locale("pt-br");
         console.log(moment.locale());
@@ -182,10 +133,10 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
   
         SaidaClienteRef = saidaCliente;
   
-        chegadaCliente.add(rotaTempo1, "seconds").format("hh:mm"); //Adiciona tempo de viagem volta
-        chegadaCliente.add(rotaTempo1, "seconds").format("hh:mm"); //Adiciona tempo de viagem volta
+        chegadaCliente.add(rotaTempo, "seconds").format("hh:mm"); //Adiciona tempo de viagem volta
+        chegadaCliente.add(rotaTempo, "seconds").format("hh:mm"); //Adiciona tempo de viagem volta
         ChegadaEmpresaRef = chegadaTexto;
-        //tempoRotaRef = rotaTempo1;
+        tempoRotaRef = rotaTempo;
 
       console.log({
         dia: diaRef,
@@ -308,7 +259,7 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
         cancelButtonText: "Não",
       }).then(async (result) => {
         if (result.isConfirmed) {
-          if(type === 'antes') { // Verifica se existe uma referencia de visita abaixo da visita a ser criada
+          if(checkRef) { // Verifica se existe uma referencia de visita abaixo da visita a ser criada
             await updateDoc(scheduleVisitRef, {
               saidaEmpresa: saidaCliente,
               groupRef: 'antes',
@@ -326,13 +277,11 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
               consultora: userData.consultora,
               tecnico: tecRefUID.nome,
               tecnicoUID: tecRefUID.uid,
-              cidade: city,
+              cidade: visitRef.cidade,
               cliente: userData.cliente,
               observacao: userData.observacao,
-              tempoRota: rotaTempo1,
+              tempoRota: tempoRotaRef,
               tempo: tempoTexto,
-              lng: lng,
-              lat: lat,
               data: dataTexto,
               uid: user.id,
               idRef: visitRef.id,
@@ -358,13 +307,11 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
               consultora: userData.consultora,
               tecnico: tecRefUID.nome,
               tecnicoUID: tecRefUID.uid,
-              cidade: city,
+              cidade: visitRef.cidade,
               cliente: userData.cliente,
               observacao: userData.observacao,
-              tempoRota: rotaTempo1,
+              tempoRota: tempoRotaRef,
               tempo: tempoTexto,
-              lng: lng,
-              lat: lat,
               data: dataTexto,
               uid: user.id,
               idRef: visitRef.id,
@@ -391,9 +338,6 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
       console.log(error)
     } 
     }
-
-    console.log(rotaTempo1);
-    console.log(rotaTempo2);
 
   return (
     <div className="box-visit">
@@ -423,8 +367,8 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
               <input
                 className="label__input"
                 placeholder="Digite a cidade"
-                //value={city}
-                ref={ref}
+                value={city}
+                disabled
               />
               {tempoTexto && tempoTexto && (
                 <p className="notice">Tempo da rota: {tempoTexto}</p>
@@ -519,64 +463,6 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
           <input className="box-visit__btn" type="submit" value="CRIAR" />
         </form>
       </div>
-
-      {isLoaded && check1 === true ? (
-        <GoogleMap zoom={10} center={{ lat: latRef, lng: lngRef }}>
-          <DistanceMatrixService
-            options={{
-              destinations: [{ lat: lat, lng: lng }],
-              origins: [{ lng: lngRef, lat: latRef }],
-              travelMode: "DRIVING",
-            }}
-            callback={(response, status) => {
-              if (status === "OK") {
-                console.log(response);
-                if (
-                  rotaTempo1 === undefined || rotaTempo1 !== response?.rows[0].elements[0].duration.value
-                  ) {
-                    if(response?.rows[0].elements[0].duration.value < 60) {
-                      setRotaTempo1(900);
-                      setTempoTexto('15 minutos');
-                    } else {
-                      setRotaTempo1(response?.rows[0].elements[0].duration.value);
-                      setTempoTexto(response?.rows[0].elements[0].duration.text);
-                    }
-                  setCheck1(false);
-                  setCheck2(true);
-                }
-              }
-            }}
-          />
-        </GoogleMap>
-      ) : (
-        <></>
-      )}
-      {isLoaded && check2 === true ? (
-        <GoogleMap zoom={10} center={{ lat: latRef, lng: lngRef }}>
-          <DistanceMatrixService
-            options={{
-              destinations: [{ lat: lat, lng: lng }],
-              origins: [{ lng: lng2, lat: lat2 }],
-              travelMode: "DRIVING",
-            }}
-            callback={(response, status) => {
-              if (status === "OK") {
-                console.log(response);
-                if (
-                  rotaTempo2 === undefined || rotaTempo2 !== response?.rows[0].elements[0].duration.value
-                  ) {
-                      setRotaTempo2(response?.rows[0].elements[0].duration.value);
-                      //setTempoTexto2(response?.rows[0].elements[0].duration.text);
-                  setCheck2(false);
-                }
-              }
-            }}
-          />
-        </GoogleMap>
-      ) : (
-        <></>
-      )}
-
     </div>
   )
 }
