@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react'
 import { dataBase } from '../../firebase/database';
-
 import Header from '../../components/Header/Index';
-
 import { onSnapshot, collection } from "firebase/firestore";
 
+// Css
+import 'cooltipz-css';
 import './_style.scss';
+
+// Components
 import CreateAdmin from '../../components/Modal/Admin/Create/Index';
 import EditAdmin from '../../components/Modal/Admin/Edit/Index';
 
@@ -78,7 +80,7 @@ const PanelAdmin = ({ user }) => {
                 <th>Email</th>
                 <th>Senha</th>
                 <th>Cargo</th>
-                <th>Carro</th>
+                <th>Veiculo</th>
                 <th>Ação</th>
               </tr>
               </thead>
@@ -90,7 +92,7 @@ const PanelAdmin = ({ user }) => {
               <td>{member.senha}</td>
               <td>{member.cargo}</td>
               <td>{member.carro}</td>
-              <td>{member.carro && <button onClick={() => {setMemberRef(member); return setEditAdmin(true)} } className="btn-edit"></button>}</td>
+              <td>{member.carro && <button onClick={() => {setMemberRef(member); return setEditAdmin(true)} } className="btn-edit" aria-label="Editar Veiculo" data-cooltipz-dir="left"></button>}</td>
               </tr>
               ))}
               </tbody>

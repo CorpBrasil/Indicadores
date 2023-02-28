@@ -17,12 +17,13 @@ import {
   setDoc,
 } from "firebase/firestore";
 
+import 'cooltipz-css';
 import "./_style.scss";
 
 // import CreateVisit from "../../components/Modal/Create/Index";
 import EditVisit from "../../components/Box/Edit/Index";
-import CreateVisit from "../../components/Box/Create/Index"
-import CreateVisitGroup from "../../components/Box/Group/Index"
+import CreateVisit from "../../components/Box/Create/Index";
+import CreateVisitGroup from "../../components/Box/Group/Index";
 
 const Schedule = () => {
   const data = new Date();
@@ -59,9 +60,7 @@ const Schedule = () => {
         onSnapshot(await q, (schedule) => {
           // Atualiza os dados em tempo real
           setSchedule(
-            schedule.docs.map((doc) => (
-              { ...doc.data(), id: doc.id }
-              ))
+            schedule.docs.map((doc) => ({ ...doc.data(), id: doc.id }))
           ); // puxa a coleção 'Chats' para o state
           setScheduleRef(schedulesCollectionRef);
           //setDayVisits(schedule.docs.map((doc) => ({ ...doc.data(), id: doc.id })))
@@ -88,22 +87,24 @@ const Schedule = () => {
   );
 
   useEffect(() => {
-        setDayVisits(dayVisits);
-  },
-[dayVisits]);
+    setDayVisits(dayVisits);
+  }, [dayVisits]);
 
-useEffect(() => {
-    if(schedule && monthSelect) {
-      setScheduleNew(schedule.sort(function(a, b) { // Força a renderizaram da tabela ordenada
-        if(a.data === b.data) {
-          if(a.saidaEmpresa < b.saidaEmpresa) return -1;
-          if(a.saidaEmpresa > b.saidaEmpresa) return 1;
-        }
-        return 0;
-      }))
+  useEffect(() => {
+    if (schedule && monthSelect) {
+      setScheduleNew(
+        schedule.sort(function (a, b) {
+          // Força a renderizaram da tabela ordenada
+          if (a.data === b.data) {
+            if (a.saidaEmpresa < b.saidaEmpresa) return -1;
+            if (a.saidaEmpresa > b.saidaEmpresa) return 1;
+          }
+          return 0;
+        })
+      );
     }
     console.log(scheduleNew);
-  },[monthSelect, schedule, scheduleNew])
+  }, [monthSelect, schedule, scheduleNew]);
 
   useEffect(
     () => {
@@ -137,8 +138,12 @@ useEffect(() => {
   }, [monthSelect, year]);
 
   const handleBoxVisitRef = () => {
-    boxVisitRef.current.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'start' });
-  }
+    boxVisitRef.current.scrollIntoView({
+      behavior: "smooth",
+      inline: "center",
+      block: "start",
+    });
+  };
 
   const returnSchedule = () => {
     setBox();
@@ -146,18 +151,16 @@ useEffect(() => {
   };
 
   const filterSchedule = (data, tec) => {
-    if(data) {
+    if (data) {
       setDayVisits(
-          schedule.filter(
-            (dia) => dia.data === data && dia.tecnico === tec
-          )
-          );
+        schedule.filter((dia) => dia.data === data && dia.tecnico === tec)
+      );
     } else {
       setDayVisits(undefined);
-      console.log(dayVisits)
-      console.log(data)
+      console.log(dayVisits);
+      console.log(data);
     }
-  }
+  };
 
   console.log(schedule);
 
@@ -176,20 +179,26 @@ useEffect(() => {
         if (result.isConfirmed) {
           await deleteDoc(
             doc(dataBase, "Agendas", year, monthSelect, visit.id)
-            );
-            if(visit.idRef && visit.group === 'depois') {
-              await updateDoc(doc(dataBase, "Agendas", year, monthSelect, visit.idRef), {
+          );
+          if (visit.idRef && visit.group === "depois") {
+            await updateDoc(
+              doc(dataBase, "Agendas", year, monthSelect, visit.idRef),
+              {
                 chegadaEmpresa: visit.chegadaEmpresaRef,
                 visitaConjunta: false,
-                groupRef: ''
-              })
-            } else {
-              await updateDoc(doc(dataBase, "Agendas", year, monthSelect, visit.idRef), {
+                groupRef: "",
+              }
+            );
+          } else {
+            await updateDoc(
+              doc(dataBase, "Agendas", year, monthSelect, visit.idRef),
+              {
                 saidaEmpresa: visit.saidaEmpresaRef,
-                groupRef: '',
+                groupRef: "",
                 visitaConjunta: false,
-              })
-            }
+              }
+            );
+          }
           setBox();
           setDayVisits(undefined);
           Swal.fire({
@@ -207,7 +216,7 @@ useEffect(() => {
   const confirmVisit = async (ref, type) => {
     console.log(type, ref);
     const tecRef = tecs.find((tec) => tec.uid === ref.tecnicoUID);
-    console.log(tecRef)
+    console.log(tecRef);
     const visitRef = doc(dataBase, "Agendas", year, monthSelect, ref.id);
     const financeCol = collection(dataBase, "Financeiro", year, monthSelect);
     const financeRef = doc(financeCol, ref.id);
@@ -238,7 +247,7 @@ useEffect(() => {
             cor: ref.cor,
             tecnico: ref.tecnico,
             tecnicoUID: ref.tecnicoUID,
-            carro: tecRef.carro
+            carro: tecRef.carro,
           });
           Swal.fire({
             title: "Infinit Energy Brasil",
@@ -279,8 +288,8 @@ useEffect(() => {
   };
 
   const changeBox = (type) => {
-    setBox(type)
-  }
+    setBox(type);
+  };
 
   const createVisitGroupChoice = (ref) => {
     Swal.fire({
@@ -297,31 +306,32 @@ useEffect(() => {
       /* Read more about isConfirmed, isDenied below */
       if (result.isConfirmed) {
         setTimeout(() => {
-          setCreateVisitGroup({check: true, type: 'antes', info: ref, ref: doc(
-            dataBase,
-            "Agendas",
-            year,
-            monthSelect,
-            ref.id
-            )}); 
-            setBox("group"); 
-            return handleBoxVisitRef()
+          setCreateVisitGroup({
+            check: true,
+            type: "antes",
+            info: ref,
+            ref: doc(dataBase, "Agendas", year, monthSelect, ref.id),
+          });
+          setBox("group");
+          return handleBoxVisitRef();
         }, 400);
       } else if (result.isDenied) {
         setTimeout(() => {
-            setCreateVisitGroup({check: true, type: 'depois', info: ref, ref: doc(
-              dataBase,
-              "Agendas",
-              year,
-              monthSelect,
-              ref.id
-              )}); 
-              setBox("group"); 
-              return handleBoxVisitRef()
-          }, 400);
+          setCreateVisitGroup({
+            check: true,
+            type: "depois",
+            info: ref,
+            ref: doc(dataBase, "Agendas", year, monthSelect, ref.id),
+          });
+          setBox("group");
+          return handleBoxVisitRef();
+        }, 400);
       }
-    })
-  }
+    });
+  };
+
+  // ToolTips
+
 
   return (
     <div className="container-schedule">
@@ -331,52 +341,62 @@ useEffect(() => {
       </div>
       <div className="content-schedule-visit">
         <div className="box-schedule-visit">
-        <div ref={boxVisitRef}>
-        {(box === 'create' && <CreateVisit
-            returnSchedule={returnSchedule}
-            filterSchedule={filterSchedule}
-            scheduleRef={scheduleRef}
-            membersRef={members}
-            tecs={tecs}
-            userRef={userRef}
-            schedule={schedule}
-            monthNumber={monthNumber}
-          />)// Chama o componente 'Create'
-        || (box === "edit" &&
-            <EditVisit
-            returnSchedule={returnSchedule}
-            filterSchedule={filterSchedule}
-            tecs={tecs}
-            scheduleRef={scheduleRef}
-            scheduleRefUID={editVisit.ref}
-            visitRef={editVisit.info}
-            membersRef={members}
-            schedule={schedule}
-            monthNumber={monthNumber}
-            year={year}
-          />) // Chama o componente 'Edit'
-        || (box === "group" &&
-            <CreateVisitGroup
-            returnSchedule={returnSchedule}
-            filterSchedule={filterSchedule}
-            tecs={tecs}
-            userRef={userRef}
-            scheduleRef={scheduleRef}
-            scheduleVisitRef={createVisitGroup.ref}
-            visitRef={createVisitGroup.info}
-            membersRef={members}
-            schedule={schedule}
-            monthNumber={monthNumber}
-            year={year}
-            type={createVisitGroup.type}
-          />) // Chama o componente 'Group'
-        }
-
+          <div ref={boxVisitRef}>
+            {
+              (box === "create" && (
+                <CreateVisit
+                  returnSchedule={returnSchedule}
+                  filterSchedule={filterSchedule}
+                  scheduleRef={scheduleRef}
+                  membersRef={members}
+                  tecs={tecs}
+                  userRef={userRef}
+                  schedule={schedule}
+                  monthNumber={monthNumber}
+                />
+              )) || // Chama o componente 'Create'
+                (box === "edit" && (
+                  <EditVisit
+                    returnSchedule={returnSchedule}
+                    filterSchedule={filterSchedule}
+                    tecs={tecs}
+                    scheduleRef={scheduleRef}
+                    scheduleRefUID={editVisit.ref}
+                    visitRef={editVisit.info}
+                    membersRef={members}
+                    schedule={schedule}
+                    monthNumber={monthNumber}
+                    year={year}
+                  />
+                )) || // Chama o componente 'Edit'
+                (box === "group" && (
+                  <CreateVisitGroup
+                    returnSchedule={returnSchedule}
+                    filterSchedule={filterSchedule}
+                    tecs={tecs}
+                    userRef={userRef}
+                    scheduleRef={scheduleRef}
+                    scheduleVisitRef={createVisitGroup.ref}
+                    visitRef={createVisitGroup.info}
+                    membersRef={members}
+                    schedule={schedule}
+                    monthNumber={monthNumber}
+                    year={year}
+                    type={createVisitGroup.type}
+                  />
+                )) // Chama o componente 'Group'
+            }
           </div>
           {(userRef && userRef.cargo === "Vendedor(a)" && !box) ||
           user.email === "admin@infinitenergy.com.br" ? (
             <div className="box-schedule-visit__add">
-              <button className="visit" onClick={ () => {changeBox("create"); return handleBoxVisitRef()}}>
+              <button
+                className="visit"
+                onClick={() => {
+                  changeBox("create");
+                  return handleBoxVisitRef();
+                }}
+              >
                 <span className="icon-visit"></span>Criar uma Visita
               </button>
             </div>
@@ -393,57 +413,167 @@ useEffect(() => {
           ) : (
             <></>
           )} */}
-          {dayVisits === undefined && 
+          {dayVisits === undefined && (
             <div className="schedule-month">
-            <select
-              value={monthSelect}
-              className="schedule-month__select"
-              name="month"
-              onChange={(e) => setMonthSelect(e.target.value)}
-            >
-              <option value="01">Janeiro</option>
-              <option value="02">Fevereiro</option>
-              <option value="03">Março</option>
-              <option value="04">Abril</option>
-              <option value="05">Maio</option>
-              <option value="06">Junho</option>
-              <option value="07">Julho</option>
-              <option value="08">Agosto</option>
-              <option value="09">Setembro</option>
-              <option value="10">Outubro</option>
-              <option value="11">Novembro</option>
-              <option value="12">Dezembro</option>
-            </select>
-          </div>
-          }
+              <select
+                value={monthSelect}
+                className="schedule-month__select"
+                name="month"
+                onChange={(e) => setMonthSelect(e.target.value)}
+              >
+                <option value="01">Janeiro</option>
+                <option value="02">Fevereiro</option>
+                <option value="03">Março</option>
+                <option value="04">Abril</option>
+                <option value="05">Maio</option>
+                <option value="06">Junho</option>
+                <option value="07">Julho</option>
+                <option value="08">Agosto</option>
+                <option value="09">Setembro</option>
+                <option value="10">Outubro</option>
+                <option value="11">Novembro</option>
+                <option value="12">Dezembro</option>
+              </select>
+            </div>
+          )}
           <div className="container-table">
-          {dayVisits && dayVisits.length > 0 && <table className="table-visit">
-              <thead>
-                <tr>
-                  <th>V.C</th>
-                  <th>Dia</th>
-                  <th>Cidade</th>
-                  <th>Cliente</th>
-                  <th>Hórario de Saida</th>
-                  <th>Chegada no Cliente</th>
-                  <th>Tempo de Visita</th>
-                  <th>Saída no Cliente</th>
-                  <th>Chegada na Empresa</th>
-                  <th>Consultora</th>
-                  <th>Técnico</th>
-                  <th>Observação</th>
-                </tr>
-              </thead>
-              <tbody>
+            {dayVisits && dayVisits.length > 0 && (
+              <table className="table-visit">
+                <thead>
+                  <tr>
+                    <th>V.C</th>
+                    <th>Dia</th>
+                    <th>Cidade</th>
+                    <th>Cliente</th>
+                    <th>Hórario de Saida</th>
+                    <th>Chegada no Cliente</th>
+                    <th>Tempo de Visita</th>
+                    <th>Saída no Cliente</th>
+                    <th>Chegada na Empresa</th>
+                    <th>Consultora</th>
+                    <th>Técnico</th>
+                    <th>Observação</th>
+                  </tr>
+                </thead>
+                <tbody>
                   {dayVisits.map((info, index) => (
+                    <tr
+                      className={info.confirmar ? "table-confirm" : "table"}
+                      key={index}
+                    >
+                      {info.consultora === "Almoço Téc." && (
+                        <td className="lunch"></td>
+                      )}
+                      {info.visitaConjunta &&
+                        info.groupRef === "antes" &&
+                        info.confirmar === false && (
+                          <td className="group-top"></td>
+                        )}
+                      {info.visitaConjunta &&
+                        info.groupRef === "depois" &&
+                        info.confirmar === false && (
+                          <td className="group-bottom"></td>
+                        )}
+                      {!info.visitaConjunta &&
+                        info.consultora !== "Almoço Téc." &&
+                        info.confirmar === false && <td></td>}
+                      {info.confirmar === true && <td></td>}
+                      <td className="bold">
+                        {moment(new Date(info.dia)).format("D")}
+                      </td>
+                      <td>{info.cidade}</td>
+                      <td>{info.cliente}</td>
+                      <td className="bold bg-important">{info.saidaEmpresa}</td>
+                      <td>{info.chegadaCliente}</td>
+                      <td>{info.visita}</td>
+                      <td
+                        className={
+                          info.consultora !== "Almoço Téc."
+                            ? "bg-important-2"
+                            : null
+                        }
+                      >
+                        {info.saidaDoCliente}
+                      </td>
+                      <td className="bold bg-important">
+                        {info.chegadaEmpresa}
+                      </td>
+                      <td
+                        style={
+                          info.cor && {
+                            backgroundColor: info.cor,
+                            border: `1px solid ${info.cor}`,
+                            borderTop: "none",
+                            color: "#fff",
+                          }
+                        }
+                      >
+                        {info.consultora}
+                      </td>
+                      <td>{info.tecnico}</td>
+                      <td className="observation">{info.observacao}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+            {schedule && schedule.length > 0 && (
+              <table className="table-visit">
+                <thead>
+                  <tr>
+                    <th>V.C</th>
+                    <th>Dia</th>
+                    <th>Cidade</th>
+                    <th>Cliente</th>
+                    <th>Hórario de Saida</th>
+                    <th>Chegada no Cliente</th>
+                    <th>Tempo de Visita</th>
+                    <th>Saída no Cliente</th>
+                    <th>Chegada na Empresa</th>
+                    <th>Consultora</th>
+                    <th>Técnico</th>
+                    <th>Observação</th>
+                    <th>Ação</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {schedule &&
+                    schedule.map((info, index) => (
                       <tr
                         className={info.confirmar ? "table-confirm" : "table"}
                         key={index}
                       >
-                        {info.consultora === 'Almoço Téc.' && <td className="lunch"></td>}
-                        {info.visitaConjunta && info.groupRef === 'antes' && info.confirmar === false && <td className="group-top"></td>}
-                        {info.visitaConjunta && info.groupRef === 'depois' && info.confirmar === false && <td className="group-bottom"></td>}
-                        {!info.visitaConjunta && info.consultora !== 'Almoço Téc.' && info.confirmar === false && <td></td>}
+                        {info.consultora === "Almoço Téc." && (
+                          <td className="lunch cursor-help" aria-label="Almoço" 
+                          data-cooltipz-dir="right"></td>
+                        )}
+                        {info.visitaConjunta &&
+                          info.groupRef === "antes" &&
+                          info.confirmar === false && (
+                            <td className="group-top cursor-help" aria-label="Visita Conjunta" 
+                            data-cooltipz-dir="right"></td>
+                          )}
+                        {info.visitaConjunta &&
+                          info.groupRef === "depois" &&
+                          info.confirmar === false && (
+                            <td className="group-bottom" aria-label="Visita Conjunta" 
+                            data-cooltipz-dir="right"></td>
+                          )}
+                        {(!info.visitaConjunta &&
+                          info.consultora !== "Almoço Téc." &&
+                          info.confirmar === false) ||
+                        (info.groupRef === "" && info.confirmar === false) ? (
+                          <td aria-label="Criar Visita Conjunta" 
+                          data-cooltipz-dir="right">
+                            <button
+                              className="btn-add"
+                              onClick={() => createVisitGroupChoice(info)}
+                            >
+                            </button>
+                          </td>
+                        ) : (
+                          <></>
+                        )}
                         {info.confirmar === true && <td></td>}
                         <td className="bold">
                           {moment(new Date(info.dia)).format("D")}
@@ -455,74 +585,15 @@ useEffect(() => {
                         </td>
                         <td>{info.chegadaCliente}</td>
                         <td>{info.visita}</td>
-                        <td className={info.consultora !== "Almoço Téc." ? "bg-important-2" : null}>{info.saidaDoCliente}</td>
-                        <td className="bold bg-important">
-                          {info.chegadaEmpresa}
-                        </td>
                         <td
-                          style={
-                            info.cor && {
-                              backgroundColor: info.cor,
-                              border: `1px solid ${info.cor}`,
-                              borderTop: "none",
-                              color: "#fff",
-                            }
+                          className={
+                            info.consultora !== "Almoço Téc."
+                              ? "bg-important-2"
+                              : null
                           }
                         >
-                          {info.consultora}
+                          {info.saidaDoCliente}
                         </td>
-                        <td>{info.tecnico}</td>
-                        <td className="observation">{info.observacao}</td>
-                      </tr>
-                  ))}
-              </tbody>
-            </table>}
-            {schedule && schedule.length > 0 && 
-            <table className="table-visit">
-              <thead>
-                <tr>
-                  <th>V.C</th>
-                  <th>Dia</th>
-                  <th>Cidade</th>
-                  <th>Cliente</th>
-                  <th>Hórario de Saida</th>
-                  <th>Chegada no Cliente</th>
-                  <th>Tempo de Visita</th>
-                  <th>Saída no Cliente</th>
-                  <th>Chegada na Empresa</th>
-                  <th>Consultora</th>
-                  <th>Técnico</th>
-                  <th>Observação</th>
-                  <th>Ação</th>
-                </tr>
-              </thead>
-              <tbody>
-                {schedule &&
-                  schedule.map((info, index) => (
-                      <tr
-                        className={
-                          info.confirmar ? "table-confirm" : "table"}
-                        key={index}
-                      >
-                        {info.consultora === 'Almoço Téc.' && <td className="lunch"></td>}
-                        {info.visitaConjunta && info.groupRef === 'antes' && info.confirmar === false && <td className="group-top"></td>}
-                        {info.visitaConjunta && info.groupRef === 'depois' && info.confirmar === false && <td className="group-bottom"></td>}
-                        {(!info.visitaConjunta && info.consultora !== 'Almoço Téc.' && info.confirmar === false) || (info.groupRef === '' && info.confirmar === false) ? <td><button
-                                className="btn-add"
-                                onClick={() => createVisitGroupChoice(info)}
-                              ></button></td> : <></>}
-                        {info.confirmar === true && <td></td>}
-                        <td className="bold">
-                          {moment(new Date(info.dia)).format("D")}
-                        </td>
-                        <td>{info.cidade}</td>
-                        <td>{info.cliente}</td>
-                        <td className="bold bg-important">
-                          {info.saidaEmpresa}
-                        </td>
-                        <td>{info.chegadaCliente}</td>
-                        <td>{info.visita}</td>
-                        <td className={info.consultora !== "Almoço Téc." ? "bg-important-2" : null}>{info.saidaDoCliente}</td>
                         <td className="bold bg-important">
                           {info.chegadaEmpresa}
                         </td>
@@ -542,14 +613,18 @@ useEffect(() => {
                         <td>{info.tecnico}</td>
                         <td className="observation">{info.observacao}</td>
                         <td className="action">
-                          {(info.confirmar === false && info.groupRef &&
-                          info.uid === user.id) ? (
+                          {info.confirmar === false &&
+                          info.groupRef &&
+                          info.uid === user.id ? (
                             <>
+                            <div aria-label="Editar Visita" 
+                              data-cooltipz-dir="left">
                               <button
                                 className="btn-edit"
-                                onClick={() =>
-                                  {setBox("edit");
-                                    setEditVisit({
+                                id="edit-visit"
+                                onClick={() => {
+                                  setBox("edit");
+                                  setEditVisit({
                                     info: info,
                                     ref: doc(
                                       dataBase,
@@ -558,23 +633,28 @@ useEffect(() => {
                                       monthSelect,
                                       info.id
                                     ),
-                                  })
-                                return handleBoxVisitRef()}
-                                }
+                                  });
+                                  return handleBoxVisitRef();
+                                }}
                               ></button>
+                              </div>
                             </>
                           ) : (
                             <></>
                           )}
-                          {(info.confirmar === false && !info.groupRef &&
-                          info.uid === user.id) ||
-                            user.email === "admin@infinitenergy.com.br" ? (
+                          {(info.confirmar === false &&
+                            !info.groupRef &&
+                            info.uid === user.id) ||
+                          user.email === "admin@infinitenergy.com.br" ? (
                             <>
+                            <div aria-label="Editar Visita" 
+                              data-cooltipz-dir="left">
                               <button
                                 className="btn-edit"
-                                onClick={() =>
-                                  {setBox("edit");
-                                    setEditVisit({
+                                id="edit-visit"
+                                onClick={() => {
+                                  setBox("edit");
+                                  setEditVisit({
                                     info: info,
                                     ref: doc(
                                       dataBase,
@@ -583,27 +663,36 @@ useEffect(() => {
                                       monthSelect,
                                       info.id
                                     ),
-                                  })
-                                return handleBoxVisitRef()}
-                                }
+                                  });
+                                  return handleBoxVisitRef();
+                                }}
                               ></button>
+                              </div>
+                              <div aria-label="Excluir Visita" 
+                              data-cooltipz-dir="left">
                               <button
                                 className="btn-delete"
+                                id="edit-visit"
                                 onClick={() => deleteVisit(info)}
                               ></button>
+                              </div>
                             </>
                           ) : (
                             <></>
                           )}
 
-                          {info.confirmar === false && info.consultora !== 'Almoço Téc.' &&
+                          {info.confirmar === false &&
+                          info.consultora !== "Almoço Téc." &&
                           (info.tecnicoUID === user.id ||
                             user.email === "admin@infinitenergy.com.br") ? (
                             <>
+                            <div aria-label="Confirmar Visita" 
+                              data-cooltipz-dir="left">
                               <button
                                 className="btn-confirm"
                                 onClick={() => confirmVisit(info, "confirm")}
                               ></button>
+                              </div>
                             </>
                           ) : (
                             <></>
@@ -613,20 +702,23 @@ useEffect(() => {
                           (info.tecnicoUID === user.id ||
                             user.email === "admin@infinitenergy.com.br") ? (
                             <>
+                            <div aria-label="Cancelar Visita" 
+                              data-cooltipz-dir="left">
                               <button
                                 className="btn-cancel"
                                 onClick={() => confirmVisit(info, "cancel")}
                               ></button>
+                              </div>
                             </>
                           ) : (
                             <></>
                           )}
                         </td>
                       </tr>
-                  ))}
-              </tbody>
-            </table>
-          }
+                    ))}
+                </tbody>
+              </table>
+            )}
           </div>
         </div>
       </div>

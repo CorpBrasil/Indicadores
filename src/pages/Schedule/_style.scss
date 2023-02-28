@@ -109,6 +109,7 @@
       .container-table {
         width: 100%;
         overflow-x: auto;
+        z-index: 0;
       }
       .table-visit {
         border-collapse: collapse;
@@ -326,9 +327,8 @@
 }
 
 .group-top {
-  background: url("../../images/icons/ArrowTable.svg") center no-repeat;
+  background: url("../../images/icons/ArrowTableTop.svg") center no-repeat;
   background-size: 0.7rem;
-  transform: rotate(180deg);
 }
 
 .group-bottom {
