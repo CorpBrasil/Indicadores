@@ -177,7 +177,8 @@ const CreateVisit = ({
       const chegadaFormatada = moment(ChegadaEmpresaRef, "hh:mm");
 
       console.log(saidaFormatada);
-      const check = [];
+      console.log(chegadaFormatada);
+      let check = [];
       let visitsFind = [];
 
       //Almoço
@@ -308,6 +309,7 @@ const CreateVisit = ({
               uid: user.id,
               cor: userRef.cor,
               confirmar: false,
+              tipo: 'Visita',
             });
 
             Swal.fire({
@@ -323,16 +325,18 @@ const CreateVisit = ({
                     await addDoc(scheduleRef, {
                       dia: diaRef,
                       saidaEmpresa: ChegadaEmpresaRef,
-                      chegadaCliente: "",
+                      chegadaCliente: ChegadaEmpresaRef,
                       visita: "01:00",
-                      visitaNumero: '',
-                      saidaDoCliente: "",
+                      visitaNumero: 3600,
+                      saidaDoCliente: chegadaFormatadaTec.current.format("kk:mm"),
                       chegadaEmpresa:
                         chegadaFormatadaTec.current.format("kk:mm"),
                       consultora: "Almoço Téc.",
                       tecnico: tecRefUID.nome,
                       tecnicoUID: tecRefUID.uid,
                       cidade: '',
+                      lat: -23.0881786,
+                      lng: -47.6973284,
                       tempoRota: '',
                       tempo: '',
                       cliente: '',
@@ -341,20 +345,23 @@ const CreateVisit = ({
                       uid: user.id,
                       cor: "#111111",
                       confirmar: false,
+                      tipo: "Almoço"
                     });
                   } else {
                     await addDoc(scheduleRef, {
                       dia: diaRef,
                       saidaEmpresa: saidaFormatadaTec.current.format("kk:mm"),
-                      chegadaCliente: "",
+                      chegadaCliente: saidaFormatadaTec.current.format("kk:mm"),
                       visita: "01:00",
-                      visitaNumero: '',
-                      saidaDoCliente: "",
+                      visitaNumero: 3600,
+                      saidaDoCliente: saidaEmpresaRef,
                       chegadaEmpresa: saidaEmpresaRef,
                       consultora: "Almoço Téc.",
                       tecnico: tecRefUID.nome,
                       tecnicoUID: tecRefUID.uid,
                       cidade: '',
+                      lat: -23.0881786,
+                      lng: -47.6973284,
                       tempoRota: '',
                       tempo: '',
                       cliente: '',
@@ -363,6 +370,7 @@ const CreateVisit = ({
                       uid: user.id,
                       cor: "#111111",
                       confirmar: false,
+                      tipo: "Almoço"
                     });
                   }
                 }

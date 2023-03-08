@@ -128,6 +128,10 @@
           th, td {
             padding: 1rem;
           }
+
+          .icons {
+            width: 0.5rem;
+          }
         }
 
         tbody {
@@ -160,8 +164,8 @@
 
           td {
             font-weight: 100;
-            height: 40px;
-            max-height: 40px;
+            height: 30px;
+            max-height: 30px;
             border: 1px solid #ccc;
             border-right: none;
             border-top: none;
@@ -195,9 +199,12 @@
 
               &-add {
                 @include btnTable("../../images/icons/Add.svg", #f39200, 100%);
+                border: 1px solid #f39200!important;
+                top: 1px;
               }
             }
           }
+          
         }
       }
 
@@ -326,17 +333,17 @@
   overflow-x: auto;
 }
 
-.group-top {
-  background: url("../../images/icons/ArrowTableTop.svg") center no-repeat;
-  background-size: 0.7rem;
+.visit-icon {
+  background: url("../../images/icons/VisitB.svg") center no-repeat;
+  background-size: 1rem;
 }
 
-.group-bottom {
-  background: url("../../images/icons/ArrowTable.svg") center no-repeat;
-  background-size: 0.7rem;
+.group-icon {
+  background: url("../../images/icons/VisitGroup.png") center no-repeat;
+  background-size: 1.5rem;
 }
 
-.lunch {
+.lunch-icon {
   background: url("../../images/icons/Lunch.svg") center no-repeat;
   background-size: 1rem;
 }

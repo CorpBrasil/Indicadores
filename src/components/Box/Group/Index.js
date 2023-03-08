@@ -29,7 +29,8 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
   const [check2, setCheck2] = useState(false);
   const [rotaTempo1, setRotaTempo1] = useState();
   const [rotaTempo2, setRotaTempo2] = useState();
-  const [tempoTexto, setTempoTexto] = useState()
+  const [tempoTexto1, setTempoTexto1] = useState()
+  const [tempoTexto2, setTempoTexto2] = useState()
   const [visitaNumero, setVisitaNumero] = useState(1800);
   const [saidaCliente, setSaidaCliente] = useState();
   const [horarioTexto, setHorarioTexto] = useState()
@@ -76,15 +77,12 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
       reset({
         consultora: userRef.nome,
       });
-      setRotaTempo1(visitRef.tempoRota);
-      //setTempoTexto(visitRef.tempo);
       setSaidaTexto(visitRef.saidaDoCliente);
       setChegadaTexto(visitRef.chegadaEmpresa);
       setDataTexto(moment(new Date(visitRef.dia)).format('YYYY-MM-DD'));
       setTecnicoTexto(visitRef.tecnico);
       setCity(visitRef.cidade);
       if(type === 'antes') {
-        //setHorarioTexto(moment(visitRef.chegadaCliente, "hh:mm").subtract(900 + visitaNumero, 'seconds').format('kk:mm'));
         setLatRef(-23.0881786);
         setLngRef(-47.6973284);
         setLat2(visitRef.lat);
@@ -112,7 +110,7 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
 
   useEffect(() => {
 
-    if((type === 'antes' && visitaNumero) || (type === 'antes' && city)) {
+    if((type === 'antes' && visitaNumero) || (type === 'antes' && rotaTempo2)) {
       setHorarioTexto(moment(visitRef.chegadaCliente, "hh:mm").subtract(Number(visitaNumero) + rotaTempo2, 'seconds').format('kk:mm'));
       //setCheckRef(true);
     }
@@ -126,33 +124,26 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
 
   useEffect(() => {
     moment.locale("pt-br");
+    const saidaEmpresa = moment(horarioTexto, "hh:mm"); //Horario de chegada
+    const chegadaCliente = moment(horarioTexto, "hh:mm"); //Horario de chegada
     if(type === 'antes') {
-
-        const saidaEmpresa = moment(horarioTexto, "hh:mm"); //Horario de chegada
-        const chegadaCliente = moment(horarioTexto, "hh:mm"); //Horario de chegada
-  
         saidaEmpresa.subtract(rotaTempo1, "seconds").format("hh:mm"); // Pega o tempo que o tecnico vai precisar sair da empresa
         setSaidaTexto(saidaEmpresa.format("kk:mm"));
         chegadaCliente.add(Number(visitaNumero), "seconds").format("hh:mm"); //Adiciona tempo de viagem volta
         setSaidaCliente(chegadaCliente.format("kk:mm"));
         chegadaCliente.add(rotaTempo2, "seconds").format("hh:mm"); //Adiciona tempo de viagem volta
-        console.log(chegadaCliente)
         setChegadaTexto(chegadaCliente.format("kk:mm"));
     } 
-    else {
-        const saidaEmpresa = moment(horarioTexto, "hh:mm"); //Horario de chegada
-        const chegadaCliente = moment(horarioTexto, "hh:mm"); //Horario de chegada
-  
+    if(type === 'depois') {
         saidaEmpresa.subtract(rotaTempo1, "seconds").format("hh:mm"); // Pega o tempo que o tecnico vai precisar sair da empresa
         setSaidaTexto(saidaEmpresa.format("kk:mm"));
-        chegadaCliente.add(visitaNumero, "seconds").format("hh:mm"); //Adiciona tempo de viagem volta
+        chegadaCliente.add(Number(visitaNumero), "seconds").format("hh:mm"); //Adiciona tempo de viagem volta
         setSaidaCliente(chegadaCliente.format("kk:mm"));
         chegadaCliente.add(rotaTempo2, "seconds").format("hh:mm"); //Adiciona tempo de viagem volta
-        console.log(saidaCliente)
         setChegadaTexto(chegadaCliente.format("kk:mm"));
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [horarioTexto, visitaNumero, chegadaTexto, saidaTexto, rotaTempo1, city, schedule]);
+  }, [horarioTexto, visitaNumero, chegadaTexto, saidaTexto, rotaTempo1, rotaTempo2, city, schedule]);
 
   const onSubmit = async (userData) => {
 
@@ -163,6 +154,7 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
         chegadaClienteRef,
         TempoVisita,
         SaidaClienteRef,
+        SaidaClienteRef2,
         ChegadaEmpresaRef;
         //tempoRotaRef;
         const chegada = horarioTexto;
@@ -182,22 +174,10 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
   
         SaidaClienteRef = saidaCliente;
   
-        chegadaCliente.add(rotaTempo1, "seconds").format("hh:mm"); //Adiciona tempo de viagem volta
-        chegadaCliente.add(rotaTempo1, "seconds").format("hh:mm"); //Adiciona tempo de viagem volta
+        //chegadaCliente.add(rotaTempo1, "seconds").format("hh:mm"); //Adiciona tempo de viagem volta
+        //chegadaCliente.add(rotaTempo1, "seconds").format("hh:mm"); //Adiciona tempo de viagem volta
         ChegadaEmpresaRef = chegadaTexto;
         //tempoRotaRef = rotaTempo1;
-
-      console.log({
-        dia: diaRef,
-        saidaEmpresa: saidaEmpresaRef,
-        chegadaCliente: chegadaClienteRef,
-        visita: TempoVisita,
-        saidaDoCliente: SaidaClienteRef,
-        chegadaEmpresa: ChegadaEmpresaRef,
-        consultora: userData.consultora,
-        tecnico: tecnicoTexto,
-        cidade: city,
-      });
 
       const dataRef = schedule.filter(
         (dia) => dia.data === dataTexto && dia.chegadaEmpresa !== visitRef.chegadaEmpresa && dia.tecnicoUID === visitRef.tecnicoUID
@@ -274,8 +254,37 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
         return visitsFind;
       });
       console.log(visitsFind);
-      let c = 1;
 
+      console.log({
+        dia: diaRef,
+              saidaEmpresa: saidaEmpresaRef,
+              chegadaCliente: chegadaClienteRef,
+              visita: TempoVisita,
+              visitaNumero: visitaNumero,
+              saidaDoCliente: SaidaClienteRef,
+              chegadaEmpresa: saidaCliente,
+              saidaEmpresaRef: visitRef.saidaEmpresa,
+              consultora: userData.consultora,
+              tecnico: tecRefUID.nome,
+              tecnicoUID: tecRefUID.uid,
+              cidade: city,
+              cliente: userData.cliente,
+              observacao: userData.observacao,
+              tempoRota: rotaTempo1,
+              tempo: tempoTexto1,
+              tempoRotaConjunta: rotaTempo2,
+              tempoConjunta: tempoTexto2,
+              lng: lng,
+              lat: lat,
+              data: dataTexto,
+              uid: user.id,
+              idRef: visitRef.id,
+              group: 'antes',
+              cor: userRef.cor,
+              confirmar: false,
+      });
+
+      let c = 1;
       if (visitsFindCount < 0 || visitsFindCount > 0) {
         const visits = visitsFind.map(
           (e) =>
@@ -309,11 +318,20 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
       }).then(async (result) => {
         if (result.isConfirmed) {
           if(type === 'antes') { // Verifica se existe uma referencia de visita abaixo da visita a ser criada
-            await updateDoc(scheduleVisitRef, {
-              saidaEmpresa: saidaCliente,
-              groupRef: 'antes',
-              visitaConjunta: true,
-             })
+            if(visitRef.consultora === "Almoço Téc.") {
+              SaidaClienteRef2 = visitRef.saidaEmpresa;
+            } else {
+              await updateDoc(scheduleVisitRef, {
+                saidaEmpresa: saidaCliente,
+                tempoRotaConjunta: rotaTempo2,
+                tempoConjunta: tempoTexto2,
+                groupRef: 'antes',
+                visitaConjunta: true,
+                tipo: "Visita Conjunta"
+               })
+               SaidaClienteRef2 = SaidaClienteRef;
+            }
+
              await addDoc(scheduleRef, {
               dia: diaRef,
               saidaEmpresa: saidaEmpresaRef,
@@ -321,7 +339,8 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
               visita: TempoVisita,
               visitaNumero: visitaNumero,
               saidaDoCliente: SaidaClienteRef,
-              chegadaEmpresa: saidaCliente,
+              chegadaEmpresa: SaidaClienteRef2,
+              chegadaEmpresaRef: visitRef.chegadaEmpresa,
               saidaEmpresaRef: visitRef.saidaEmpresa,
               consultora: userData.consultora,
               tecnico: tecRefUID.nome,
@@ -330,7 +349,9 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
               cliente: userData.cliente,
               observacao: userData.observacao,
               tempoRota: rotaTempo1,
-              tempo: tempoTexto,
+              tempo: tempoTexto1,
+              tempoRotaConjunta: rotaTempo2,
+              tempoConjunta: tempoTexto2,
               lng: lng,
               lat: lat,
               data: dataTexto,
@@ -339,16 +360,22 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
               group: 'antes',
               cor: userRef.cor,
               confirmar: false,
+              tipo: "Visita Conjunta"
             });
           } else {
-            await updateDoc(scheduleVisitRef, {
-              chegadaEmpresa: saidaEmpresaRef,
-              groupRef: 'depois',
-              visitaConjunta: true,
-             })
+            if(visitRef.consultora !== "Almoço Téc.") {
+              await updateDoc(scheduleVisitRef, {
+                chegadaEmpresa: saidaEmpresaRef,
+                groupRef: 'depois',
+                visitaConjunta: true,
+                tipo: "Visita Conjunta"
+               })
+            } 
+        
              await addDoc(scheduleRef, {
               dia: diaRef,
               saidaEmpresa: saidaEmpresaRef,
+              saidaEmpresaRef: visitRef.saidaEmpresa,
               chegadaCliente: chegadaClienteRef,
               visita: TempoVisita,
               visitaNumero: visitaNumero,
@@ -361,16 +388,21 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
               cidade: city,
               cliente: userData.cliente,
               observacao: userData.observacao,
-              tempoRota: rotaTempo1,
-              tempo: tempoTexto,
+              tempoRota: rotaTempo2,
+              tempo: tempoTexto2,
+              tempoRotaConjunta: rotaTempo1,
+              tempoConjunta: tempoTexto1,
               lng: lng,
               lat: lat,
+              lngRef: lng2,
+              latRef: lat2,
               data: dataTexto,
               uid: user.id,
               idRef: visitRef.id,
               group: 'depois',
               cor: userRef.cor,
               confirmar: false,
+              tipo: "Visita Conjunta"
             });
           }
           Swal.fire({
@@ -392,7 +424,7 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
     } 
     }
 
-    console.log(rotaTempo1);
+    console.log(rotaTempo1, tempoTexto1);
     console.log(rotaTempo2);
 
   return (
@@ -426,8 +458,8 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
                 //value={city}
                 ref={ref}
               />
-              {tempoTexto && tempoTexto && (
-                <p className="notice">Tempo da rota: {tempoTexto}</p>
+              {tempoTexto1 && tempoTexto2 && (
+                <p className="notice">Tempo da rota: {tempoTexto1}</p>
               )}
             </label>
             <label className="label">
@@ -521,7 +553,7 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
       </div>
 
       {isLoaded && check1 === true ? (
-        <GoogleMap zoom={10} center={{ lat: latRef, lng: lngRef }}>
+        <GoogleMap zoom={10} center={{ lat: lat, lng: lng }}>
           <DistanceMatrixService
             options={{
               destinations: [{ lat: lat, lng: lng }],
@@ -536,13 +568,14 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
                   ) {
                     if(response?.rows[0].elements[0].duration.value < 60) {
                       setRotaTempo1(900);
-                      setTempoTexto('15 minutos');
+                      setTempoTexto1('15 minutos');
                     } else {
                       setRotaTempo1(response?.rows[0].elements[0].duration.value);
-                      setTempoTexto(response?.rows[0].elements[0].duration.text);
+                      setTempoTexto1(response?.rows[0].elements[0].duration.text);
                     }
-                  setCheck1(false);
-                  setCheck2(true);
+                    console.log(response?.rows[0].elements[0].duration.text)
+                    setCheck2(true);
+                    setCheck1(false);
                 }
               }
             }}
@@ -552,11 +585,11 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
         <></>
       )}
       {isLoaded && check2 === true ? (
-        <GoogleMap zoom={10} center={{ lat: latRef, lng: lngRef }}>
+        <GoogleMap zoom={10} center={{ lat: lat, lng: lng }}>
           <DistanceMatrixService
             options={{
-              destinations: [{ lat: lat, lng: lng }],
-              origins: [{ lng: lng2, lat: lat2 }],
+              destinations: [{ lat: lat, lng: lng }], // Boituva
+              origins: [{ lng: lng2, lat: lat2 }], // Boituva
               travelMode: "DRIVING",
             }}
             callback={(response, status) => {
@@ -565,9 +598,15 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
                 if (
                   rotaTempo2 === undefined || rotaTempo2 !== response?.rows[0].elements[0].duration.value
                   ) {
+                    if(response?.rows[0].elements[0].duration.value < 60) {
+                      setRotaTempo2(900);
+                      setTempoTexto2('15 minutos');
+                    } else {
                       setRotaTempo2(response?.rows[0].elements[0].duration.value);
-                      //setTempoTexto2(response?.rows[0].elements[0].duration.text);
-                  setCheck2(false);
+                      setTempoTexto2(response?.rows[0].elements[0].duration.text);
+                    }
+                      console.log(response?.rows[0].elements[0].duration.value);
+                      setCheck2(false);
                 }
               }
             }}

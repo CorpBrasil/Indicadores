@@ -177,28 +177,76 @@ const Schedule = () => {
         cancelButtonText: "Não",
       }).then(async (result) => {
         if (result.isConfirmed) {
+          const visitsAntes = schedule.filter(ref => (ref.data === visit.data && ref.chegadaEmpresa === visit.saidaEmpresa  && ref.consultora !== 'Almoço Téc.'));
+          const visitsDepois = schedule.filter(ref => (ref.data === visit.data && ref.saidaEmpresa === visit.chegadaEmpresa && ref.consultora !== 'Almoço Téc.'));
+          console.log(visitsAntes, visitsDepois);
+          if(visitsAntes) {
+            visitsAntes.map(async (ref) => {
+              if(ref.cidade === visit.cidade) {
+                if(ref.idRef) {
+                  await updateDoc(doc(dataBase, "Agendas", year, monthSelect, ref.idRef),
+                              {
+                                chegadaEmpresa: ref.chegadaEmpresaRef,
+                                groupRef: "",
+                                group: "",
+                                visitaConjunta: false,
+                                tipo: "Visita"
+                              })
+                }
+                await deleteDoc(
+                  doc(dataBase, "Agendas", year, monthSelect, ref.id)
+                );
+              } else {
+                await updateDoc(doc(dataBase, "Agendas", year, monthSelect, ref.id),
+                            {
+                              chegadaEmpresa: moment(ref.chegadaEmpresa, "hh:mm").add(ref.tempoRota, 'seconds').format('kk:mm'),
+                              groupRef: "",
+                              group: "",
+                              visitaConjunta: false,
+                              tipo: "Visita"
+                            })
+              }
+                console.log(ref.chegadaEmpresa ,moment(ref.chegadaEmpresa, "hh:mm").add(ref.tempoRota, 'seconds').format('kk:mm'))
+          })
+          }
+          if (visitsDepois) {
+            visitsDepois.map(async (ref) => {
+             const visitNext =  schedule.filter(next => (next.data === ref.data && next.saidaEmpresa === ref.chegadaEmpresa && ref.consultora !== 'Almoço Téc.'));
+              if(ref.cidade === visit.cidade) {
+                if(visitNext) {
+                  await updateDoc(doc(dataBase, "Agendas", year, monthSelect, ref.idRef),
+                              {
+                                saidaEmpresa: ref.saidaEmpresaRef,
+                                groupRef: "",
+                                group: "",
+                                visitaConjunta: false,
+                                tipo: "Visita"
+                              })
+                }
+               await deleteDoc(
+                doc(dataBase, "Agendas", year, monthSelect, ref.id)
+              );
+              } else {
+                console.log('cidade diferente')
+
+                await updateDoc(doc(dataBase, "Agendas", year, monthSelect, ref.id),
+                          {
+                            saidaEmpresa: moment(ref.chegadaCliente, "hh:mm").subtract(ref.tempoRota, 'seconds').format('kk:mm'),
+                            groupRef: "",
+                            group: "",
+                            visitaConjunta: false,
+                            tipo: "Visita"
+                          })
+              }
+              
+              console.log(ref.saidaEmpresa ,moment(ref.chegadaCliente, "hh:mm").subtract(ref.tempoRota, 'seconds').format('kk:mm'))
+            })
+
+          }
+          console.log(visitsAntes, visitsDepois)
           await deleteDoc(
             doc(dataBase, "Agendas", year, monthSelect, visit.id)
           );
-          if (visit.idRef && visit.group === "depois") {
-            await updateDoc(
-              doc(dataBase, "Agendas", year, monthSelect, visit.idRef),
-              {
-                chegadaEmpresa: visit.chegadaEmpresaRef,
-                visitaConjunta: false,
-                groupRef: "",
-              }
-            );
-          } else {
-            await updateDoc(
-              doc(dataBase, "Agendas", year, monthSelect, visit.idRef),
-              {
-                saidaEmpresa: visit.saidaEmpresaRef,
-                groupRef: "",
-                visitaConjunta: false,
-              }
-            );
-          }
           setBox();
           setDayVisits(undefined);
           Swal.fire({
@@ -366,6 +414,7 @@ const Schedule = () => {
                     membersRef={members}
                     schedule={schedule}
                     monthNumber={monthNumber}
+                    monthSelect={monthSelect}
                     year={year}
                   />
                 )) || // Chama o componente 'Edit'
@@ -481,10 +530,12 @@ const Schedule = () => {
                       <td className="bold">
                         {moment(new Date(info.dia)).format("D")}
                       </td>
-                      <td>{info.cidade}</td>
+                      <td className="no-wrap">{info.cidade}</td>
                       <td>{info.cliente}</td>
                       <td className="bold bg-important">{info.saidaEmpresa}</td>
-                      <td>{info.chegadaCliente}</td>
+                      {info.consultora !== "Almoço Téc." ?
+                        <td></td> : <td>{info.chegadaCliente}</td>
+                      }
                       <td>{info.visita}</td>
                       <td
                         className={
@@ -521,6 +572,7 @@ const Schedule = () => {
               <table className="table-visit">
                 <thead>
                   <tr>
+                    <th className="icons"></th>
                     <th>V.C</th>
                     <th>Dia</th>
                     <th>Cidade</th>
@@ -543,26 +595,16 @@ const Schedule = () => {
                         className={info.confirmar ? "table-confirm" : "table"}
                         key={index}
                       >
-                        {info.consultora === "Almoço Téc." && (
-                          <td className="lunch cursor-help" aria-label="Almoço" 
-                          data-cooltipz-dir="right"></td>
-                        )}
-                        {info.visitaConjunta &&
-                          info.groupRef === "antes" &&
-                          info.confirmar === false && (
-                            <td className="group-top cursor-help" aria-label="Visita Conjunta" 
-                            data-cooltipz-dir="right"></td>
-                          )}
-                        {info.visitaConjunta &&
-                          info.groupRef === "depois" &&
-                          info.confirmar === false && (
-                            <td className="group-bottom" aria-label="Visita Conjunta" 
-                            data-cooltipz-dir="right"></td>
-                          )}
-                        {(!info.visitaConjunta &&
-                          info.consultora !== "Almoço Téc." &&
-                          info.confirmar === false) ||
-                        (info.groupRef === "" && info.confirmar === false) ? (
+                        {(info.tipo === "Visita" &&
+                        (<td className="visit-icon cursor-help" aria-label="Visita" 
+                        data-cooltipz-dir="right"></td>)) ||
+                        (info.tipo === "Visita Conjunta" &&
+                        (<td className="group-icon cursor-help" aria-label="Visita Conjunta" 
+                        data-cooltipz-dir="right"></td>)) || 
+                        (info.tipo === "Almoço" &&
+                        (<td className="lunch-icon cursor-help" aria-label="Almoço" 
+                        data-cooltipz-dir="right"></td>))}
+                        {info.confirmar === false ? (
                           <td aria-label="Criar Visita Conjunta" 
                           data-cooltipz-dir="right">
                             <button
@@ -578,22 +620,22 @@ const Schedule = () => {
                         <td className="bold">
                           {moment(new Date(info.dia)).format("D")}
                         </td>
-                        <td>{info.cidade}</td>
+                        <td className="no-wrap">{info.cidade}</td>
                         <td>{info.cliente}</td>
                         <td className="bold bg-important">
                           {info.saidaEmpresa}
                         </td>
-                        <td>{info.chegadaCliente}</td>
+                        {info.consultora === "Almoço Téc." ?
+                        <td></td> : <td>{info.chegadaCliente}</td>
+                        }
                         <td>{info.visita}</td>
-                        <td
-                          className={
-                            info.consultora !== "Almoço Téc."
-                              ? "bg-important-2"
-                              : null
-                          }
-                        >
-                          {info.saidaDoCliente}
-                        </td>
+                        {info.consultora === "Almoço Téc." ?
+                        <td></td> : <td className={
+                          info.consultora !== "Almoço Téc."
+                            ? "bg-important-2"
+                            : null
+                        }>{info.saidaDoCliente}</td>
+                        }
                         <td className="bold bg-important">
                           {info.chegadaEmpresa}
                         </td>
@@ -613,39 +655,11 @@ const Schedule = () => {
                         <td>{info.tecnico}</td>
                         <td className="observation">{info.observacao}</td>
                         <td className="action">
-                          {info.confirmar === false &&
-                          info.groupRef &&
-                          info.uid === user.id ? (
-                            <>
-                            <div aria-label="Editar Visita" 
-                              data-cooltipz-dir="left">
-                              <button
-                                className="btn-edit"
-                                id="edit-visit"
-                                onClick={() => {
-                                  setBox("edit");
-                                  setEditVisit({
-                                    info: info,
-                                    ref: doc(
-                                      dataBase,
-                                      "Agendas",
-                                      year,
-                                      monthSelect,
-                                      info.id
-                                    ),
-                                  });
-                                  return handleBoxVisitRef();
-                                }}
-                              ></button>
-                              </div>
-                            </>
-                          ) : (
-                            <></>
-                          )}
+                          
                           {(info.confirmar === false &&
-                            !info.groupRef &&
                             info.uid === user.id) ||
-                          user.email === "admin@infinitenergy.com.br" ? (
+                          user.email === "admin@infinitenergy.com.br" ||
+                            info.consultora === "Almoço Téc." ? (
                             <>
                             <div aria-label="Editar Visita" 
                               data-cooltipz-dir="left">

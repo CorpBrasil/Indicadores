@@ -74,3 +74,8 @@ input:disabled {
 .cursor-help {
   cursor: help!important;
 }
+
+.no-wrap {
+  white-space: nowrap;
+  padding: 0 0.5rem;
+}
