@@ -163,7 +163,7 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
         const tempo = moment('00:00', "HH:mm");
         chegadaClienteRef = chegada;
   
-        const chegadaCliente = moment(chegada, "hh:mm"); //Horario de chegada
+        //const chegadaCliente = moment(chegada, "hh:mm"); //Horario de chegada
         const day = moment(dataTexto); // Pega o dia escolhido
   
         diaRef = day.format("YYYY MM DD");
