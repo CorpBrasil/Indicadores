@@ -65,8 +65,17 @@
             display: block;
             width: 1.5rem;
             height: 2rem;
-            background: url(../../images/icons/Visit.svg) no-repeat;
+            background: url(../../images/icons/Visit.svg) no-repeat center;
             background-size: 1.5rem;
+          }
+
+          .icon-lunch {
+            display: block;
+            width: 1.5rem;
+            height: 2rem;
+            background: url(../../images/icons/Lunch.svg) no-repeat center;
+            background-size: 1.5rem;
+            filter: invert(100%);
           }
         }
 
@@ -346,4 +355,8 @@
 .lunch-icon {
   background: url("../../images/icons/Lunch.svg") center no-repeat;
   background-size: 1rem;
+}
+
+.invert-color {
+  filter: invert(100%);
 }

@@ -162,7 +162,10 @@ const Schedule = () => {
     }
   };
 
-  console.log(schedule);
+  const visitsFind = (type, visit) => {
+    if (type === 'antes')  return schedule.filter(ref => (ref.data === visit.data && ref.chegadaEmpresa === visit.saidaEmpresa  && ref.consultora !== 'Almoço Téc.' && ref.tipo === "Visita Conjunta"))
+    if (type === 'depois') return schedule.filter(ref => (ref.data === visit.data && ref.saidaEmpresa === visit.chegadaEmpresa && ref.consultora !== 'Almoço Téc.' && ref.tipo === "Visita Conjunta"))
+  }
 
   const deleteVisit = async (visit) => {
     try {
@@ -177,29 +180,31 @@ const Schedule = () => {
         cancelButtonText: "Não",
       }).then(async (result) => {
         if (result.isConfirmed) {
-          const visitsAntes = schedule.filter(ref => (ref.data === visit.data && ref.chegadaEmpresa === visit.saidaEmpresa  && ref.consultora !== 'Almoço Téc.'));
-          const visitsDepois = schedule.filter(ref => (ref.data === visit.data && ref.saidaEmpresa === visit.chegadaEmpresa && ref.consultora !== 'Almoço Téc.'));
-          console.log(visitsAntes, visitsDepois);
-          if(visitsAntes) {
+          const visitsAntes = visitsFind('antes', visit);
+          const visitsDepois = visitsFind('depois', visit);
+          if(visitsAntes.length > 0) {
             visitsAntes.map(async (ref) => {
+              const visitBefore =  schedule.filter(before => (before.data === ref.data && before.chegadaEmpresa === ref.saidaEmpresa && ref.consultora !== 'Almoço Téc.' && before.tipo === "Visita Conjunta"));
               if(ref.cidade === visit.cidade) {
-                if(ref.idRef) {
-                  await updateDoc(doc(dataBase, "Agendas", year, monthSelect, ref.idRef),
-                              {
-                                chegadaEmpresa: ref.chegadaEmpresaRef,
-                                groupRef: "",
-                                group: "",
-                                visitaConjunta: false,
-                                tipo: "Visita"
+                if(visitBefore) {
+                  visitBefore.map(async (ref) => {
+                    await updateDoc(doc(dataBase, "Agendas", year, monthSelect, ref.id),
+                                {
+                                  chegadaEmpresa: moment(ref.saidaDoCliente, "hh:mm").add(ref.tempoRota, 'seconds').format('kk:mm'),
+                                  groupRef: "",
+                                  group: "",
+                                  visitaConjunta: false,
+                                  tipo: "Visita"
+                                })
                               })
-                }
+                  }
                 await deleteDoc(
                   doc(dataBase, "Agendas", year, monthSelect, ref.id)
                 );
               } else {
                 await updateDoc(doc(dataBase, "Agendas", year, monthSelect, ref.id),
                             {
-                              chegadaEmpresa: moment(ref.chegadaEmpresa, "hh:mm").add(ref.tempoRota, 'seconds').format('kk:mm'),
+                              chegadaEmpresa: moment(ref.saidaDoCliente, "hh:mm").add(ref.tempoRota, 'seconds').format('kk:mm'),
                               groupRef: "",
                               group: "",
                               visitaConjunta: false,
@@ -209,20 +214,22 @@ const Schedule = () => {
                 console.log(ref.chegadaEmpresa ,moment(ref.chegadaEmpresa, "hh:mm").add(ref.tempoRota, 'seconds').format('kk:mm'))
           })
           }
-          if (visitsDepois) {
+          if (visitsDepois.length > 0) {
             visitsDepois.map(async (ref) => {
-             const visitNext =  schedule.filter(next => (next.data === ref.data && next.saidaEmpresa === ref.chegadaEmpresa && ref.consultora !== 'Almoço Téc.'));
+             const visitNext =  schedule.filter(next => (next.data === ref.data && next.saidaEmpresa === ref.chegadaEmpresa && ref.consultora !== 'Almoço Téc.' && next.tipo === "Visita Conjunta"));
               if(ref.cidade === visit.cidade) {
                 if(visitNext) {
-                  await updateDoc(doc(dataBase, "Agendas", year, monthSelect, ref.idRef),
-                              {
-                                saidaEmpresa: ref.saidaEmpresaRef,
-                                groupRef: "",
-                                group: "",
-                                visitaConjunta: false,
-                                tipo: "Visita"
+                  visitNext.map(async (ref) => {
+                    await updateDoc(doc(dataBase, "Agendas", year, monthSelect, ref.id),
+                                {
+                                  saidaEmpresa: moment(ref.chegadaCliente, "hh:mm").subtract(ref.tempoRota, 'seconds').format('kk:mm'),
+                                  groupRef: "",
+                                  group: "",
+                                  visitaConjunta: false,
+                                  tipo: "Visita"
+                                })
                               })
-                }
+                  }
                await deleteDoc(
                 doc(dataBase, "Agendas", year, monthSelect, ref.id)
               );
@@ -353,17 +360,37 @@ const Schedule = () => {
     }).then((result) => {
       /* Read more about isConfirmed, isDenied below */
       if (result.isConfirmed) {
-        setTimeout(() => {
-          setCreateVisitGroup({
-            check: true,
-            type: "antes",
-            info: ref,
-            ref: doc(dataBase, "Agendas", year, monthSelect, ref.id),
+        if(visitsFind('antes', ref).length > 0) {
+          console.log(visitsFind('antes', ref))
+          Swal.fire({
+            title: "Infinit Energy Brasil",
+            html: `Já existe uma <b>Visita Conjunta</b> criada acima dessa visita.`,
+            icon: "warning",
+            showConfirmButton: true,
+            confirmButtonColor: "#F39200",
           });
-          setBox("group");
-          return handleBoxVisitRef();
-        }, 400);
+        } else {
+          setTimeout(() => {
+            setCreateVisitGroup({
+              check: true,
+              type: "antes",
+              info: ref,
+              ref: doc(dataBase, "Agendas", year, monthSelect, ref.id),
+            });
+            setBox("group");
+            return handleBoxVisitRef();
+          }, 400);
+        }
       } else if (result.isDenied) {
+        if(visitsFind('depois', ref).length > 0) {
+          Swal.fire({
+            title: "Infinit Energy Brasil",
+            html: `Já existe uma <b>Visita Conjunta</b> criada abaixo dessa visita.`,
+            icon: "warning",
+            showConfirmButton: true,
+            confirmButtonColor: "#F39200",
+          });
+        } else {
         setTimeout(() => {
           setCreateVisitGroup({
             check: true,
@@ -374,6 +401,7 @@ const Schedule = () => {
           setBox("group");
           return handleBoxVisitRef();
         }, 400);
+      }
       }
     });
   };
@@ -401,6 +429,19 @@ const Schedule = () => {
                   userRef={userRef}
                   schedule={schedule}
                   monthNumber={monthNumber}
+                />
+              )) || // Chama o componente 'Create'
+              (box === "create lunch" && (
+                <CreateVisit
+                  returnSchedule={returnSchedule}
+                  filterSchedule={filterSchedule}
+                  scheduleRef={scheduleRef}
+                  membersRef={members}
+                  tecs={tecs}
+                  userRef={userRef}
+                  schedule={schedule}
+                  monthNumber={monthNumber}
+                  type={'lunch'}
                 />
               )) || // Chama o componente 'Create'
                 (box === "edit" && (
@@ -447,6 +488,22 @@ const Schedule = () => {
                 }}
               >
                 <span className="icon-visit"></span>Criar uma Visita
+              </button>
+            </div>
+          ) : (
+            <></>
+          )}
+          {(userRef && userRef.cargo === "Vendedor(a)" && !box) ||
+          user.email === "admin@infinitenergy.com.br" ? (
+            <div className="box-schedule-visit__add">
+              <button
+                className="lunch"
+                onClick={() => {
+                  changeBox("create lunch");
+                  return handleBoxVisitRef();
+                }}
+              >
+                <span className="icon-lunch"></span>Criar Almoço
               </button>
             </div>
           ) : (

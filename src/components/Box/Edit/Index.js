@@ -233,9 +233,9 @@ const EditVisit = ({
         // cidade: city,
       });
 
-      // const dataRef = schedule.filter(
-      //   (dia) => dia.data === dataTexto && dia.tecnico === tecnicoTexto && dia.horarioTexto !== visitRef.horarioTexto
-      // );
+      const dataRef = schedule.filter(
+        (dia) => dia.data === dataTexto && dia.tecnico === tecnicoTexto && dia.chegadaCliente !== visitRef.chegadaCliente
+      );
 
       console.log(dataRef);
       const lunch = schedule.filter(
@@ -252,37 +252,6 @@ const EditVisit = ({
       let check = [];
       let visitsFind = [];
 
-      //Almoço
-      if (lunch.length < 1 || lunch === undefined) {
-        if (
-          chegadaFormatada > moment("10:59", "hh:mm") &&
-          chegadaFormatada < moment("14:01", "hh:mm")
-        ) {
-          chegadaFormatadaTec.current = chegadaFormatada.add(1, "h");
-          saidaFormatadaTec.current = null; // UseRef não recebe renderização. emtão o valor antigo fica associado ainda
-          console.log(chegadaFormatadaTec.current.format("kk:mm"));
-        } else if (
-          saidaFormatada > moment("10:59", "hh:mm") &&
-          saidaFormatada < moment("14:01", "hh:mm")
-        ) {
-          saidaFormatadaTec.current = saidaFormatada.subtract(1, "h");
-          chegadaFormatadaTec.current = null;
-          console.log(saidaFormatadaTec.current);
-        }
-
-        dataRef.map((ref) => {
-          if (
-            saidaFormatada <= moment(ref.saidaEmpresa, "hh:mm") &&
-            chegadaFormatadaTec.current <= moment(ref.saidaEmpresa, "hh:mm")
-          ) {
-            check.push(ref);
-          } else {
-            if (saidaFormatada >= moment(ref.chegadaEmpresa, "hh:mm"))
-              check.push(ref);
-          }
-          return dataRef;
-        });
-      } else {
         dataRef.map((ref) => {
           console.log("eae");
           if (
@@ -296,9 +265,7 @@ const EditVisit = ({
           }
           return dataRef;
         });
-      }
-
-      console.log(chegadaFormatadaTec.current, saidaFormatadaTec.current);
+      
 
       // dataRef.map((ref) => {
       //   console.log('eae')
@@ -359,110 +326,95 @@ const EditVisit = ({
         }).then(async (result) => {
           if (result.isConfirmed) {
             if (visitRef.data !== dataTexto) {
-              let visitsAntes,
-                visitsDepois = [];
-              visitsAntes = schedule.filter(
+            const visitsAntes = schedule.filter(
                 (ref) =>
                   ref.data === visitRef.data &&
                   ref.chegadaEmpresa === visitRef.saidaEmpresa &&
                   ref.tipo !== "Almoço"
               );
-              visitsDepois = schedule.filter(
+             const visitsDepois = schedule.filter(
                 (ref) =>
                   ref.data === visitRef.data &&
                   ref.saidaEmpresa === visitRef.chegadaEmpresa &&
                   ref.tipo !== "Almoço"
               );
               console.log(visitsAntes, visitsDepois);
-              if (visitsAntes) {
-                visitsAntes.map(async (ref) => {
-                  if (ref.cidade === visitRef.cidade) {
-                    if (ref.idRef) {
-                      await updateDoc(
-                        doc(dataBase, "Agendas", year, monthSelect, ref.idRef),
-                        {
-                          chegadaEmpresa: ref.chegadaEmpresaRef,
-                          groupRef: "",
-                          visitaConjunta: false,
-                          tipo: "Visita",
-                        }
-                      );
-                    }
-                    await deleteDoc(
-                      doc(dataBase, "Agendas", year, monthSelect, ref.id)
-                    );
-                    console.log("deletar");
-                  } else {
-                    await updateDoc(
-                      doc(dataBase, "Agendas", year, monthSelect, ref.id),
-                      {
-                        chegadaEmpresa: moment(ref.chegadaEmpresa, "hh:mm")
-                          .add(ref.tempoRota, "seconds")
-                          .format("kk:mm"),
-                        groupRef: "",
-                        visitaConjunta: false,
-                        tipo: "Visita",
-                      }
-                    );
+          if(visitsAntes.length > 0) {
+            visitsAntes.map(async (ref) => {
+              const visitBefore =  schedule.filter(before => (before.data === ref.data && before.chegadaEmpresa === ref.saidaEmpresa && ref.consultora !== 'Almoço Téc.' && before.tipo === "Visita Conjunta"));
+              if(ref.cidade === visitRef.cidade) {
+                if(visitBefore) {
+                  visitBefore.map(async (ref) => {
+                    await updateDoc(doc(dataBase, "Agendas", year, monthSelect, ref.id),
+                                {
+                                  chegadaEmpresa: moment(ref.saidaDoCliente, "hh:mm").add(ref.tempoRota, 'seconds').format('kk:mm'),
+                                  groupRef: "",
+                                  group: "",
+                                  visitaConjunta: false,
+                                  tipo: "Visita"
+                                })
+                              })
                   }
-                  console.log(
-                    ref.chegadaEmpresa,
-                    moment(ref.chegadaEmpresa, "hh:mm")
-                      .add(ref.tempoRota, "seconds")
-                      .format("kk:mm")
-                  );
-                });
+                await deleteDoc(
+                  doc(dataBase, "Agendas", year, monthSelect, ref.id)
+                );
+              } else {
+                await updateDoc(doc(dataBase, "Agendas", year, monthSelect, ref.id),
+                            {
+                              chegadaEmpresa: moment(ref.saidaDoCliente, "hh:mm").add(ref.tempoRota, 'seconds').format('kk:mm'),
+                              groupRef: "",
+                              group: "",
+                              visitaConjunta: false,
+                              tipo: "Visita"
+                            })
               }
-              if (visitsDepois) {
-                visitsDepois.map(async (ref) => {
-                  if (ref.cidade === visitRef.cidade) {
-                    if (ref.idRef) {
-                      await updateDoc(
-                        doc(dataBase, "Agendas", year, monthSelect, ref.idRef),
-                        {
-                          saidaEmpresa: ref.saidaEmpresaRef,
-                          groupRef: "",
-                          visitaConjunta: false,
-                          tipo: "Visita",
-                        }
-                      );
-                    }
-                    await deleteDoc(
-                      doc(dataBase, "Agendas", year, monthSelect, ref.id)
-                    );
-                  } else {
-                    await updateDoc(
-                      doc(dataBase, "Agendas", year, monthSelect, ref.id),
-                      {
-                        saidaEmpresa: moment(ref.chegadaCliente, "hh:mm")
-                          .subtract(ref.tempoRota, "seconds")
-                          .format("kk:mm"),
-                        groupRef: "",
-                        visitaConjunta: false,
-                        tipo: "Visita",
-                      }
-                    );
+                console.log(ref.chegadaEmpresa ,moment(ref.chegadaEmpresa, "hh:mm").add(ref.tempoRota, 'seconds').format('kk:mm'))
+          })
+          }
+          if (visitsDepois.length > 0) {
+            visitsDepois.map(async (ref) => {
+             const visitNext =  schedule.filter(next => (next.data === ref.data && next.saidaEmpresa === ref.chegadaEmpresa && ref.consultora !== 'Almoço Téc.' && next.tipo === "Visita Conjunta"));
+              if(ref.cidade === visitRef.cidade) {
+                if(visitNext) {
+                  visitNext.map(async (ref) => {
+                    await updateDoc(doc(dataBase, "Agendas", year, monthSelect, ref.id),
+                                {
+                                  saidaEmpresa: moment(ref.chegadaCliente, "hh:mm").subtract(ref.tempoRota, 'seconds').format('kk:mm'),
+                                  groupRef: "",
+                                  group: "",
+                                  visitaConjunta: false,
+                                  tipo: "Visita"
+                                })
+                              })
                   }
+               await deleteDoc(
+                doc(dataBase, "Agendas", year, monthSelect, ref.id)
+              );
+              } else {
 
-                  console.log(
-                    ref.saidaEmpresa,
-                    moment(ref.chegadaCliente, "hh:mm")
-                      .subtract(ref.tempoRota, "seconds")
-                      .format("kk:mm")
-                  );
-                });
+                await updateDoc(doc(dataBase, "Agendas", year, monthSelect, ref.id),
+                          {
+                            saidaEmpresa: moment(ref.chegadaCliente, "hh:mm").subtract(ref.tempoRota, 'seconds').format('kk:mm'),
+                            groupRef: "",
+                            group: "",
+                            visitaConjunta: false,
+                            tipo: "Visita"
+                          })
               }
-              console.log(visitsAntes, visitsDepois);
+              
+              console.log(ref.saidaEmpresa ,moment(ref.chegadaCliente, "hh:mm").subtract(ref.tempoRota, 'seconds').format('kk:mm'))
+            })
             }
+          }
 
             if (visitRef.consultora === "Almoço Téc.") {
               await updateDoc(scheduleRefUID, {
                 dia: diaRef,
                 saidaEmpresa: saidaEmpresaRef,
-                chegadaCliente: "",
+                chegadaCliente: saidaEmpresaRef,
                 visita: "01:00",
                 visitaNumero: 3600,
-                saidaDoCliente: "",
+                saidaDoCliente: ChegadaEmpresaRef,
                 chegadaEmpresa: ChegadaEmpresaRef,
                 consultora: "Almoço Téc.",
                 tecnico: tecRefUID.nome,
@@ -542,60 +494,6 @@ const EditVisit = ({
               confirmButtonColor: "#F39200",
             }).then(async (result) => {
               if (result.isConfirmed) {
-                if (lunch.length === 0) {
-                  if (saidaFormatadaTec.current === null) {
-                    await addDoc(scheduleRef, {
-                      dia: diaRef,
-                      saidaEmpresa: ChegadaEmpresaRef,
-                      chegadaCliente: ChegadaEmpresaRef,
-                      visita: "01:00",
-                      visitaNumero: 3600,
-                      saidaDoCliente: chegadaFormatadaTec.current.format("kk:mm"),
-                      chegadaEmpresa: 
-                        chegadaFormatadaTec.current.format("kk:mm"),
-                      consultora: "Almoço Téc.",
-                      tecnico: tecRefUID.nome,
-                      tecnicoUID: tecRefUID.uid,
-                      cidade: "",
-                      lat: -23.0881786,
-                      lng: -47.6973284,
-                      tempoRota: "",
-                      tempo: "",
-                      cliente: "",
-                      observacao: "",
-                      data: dataTexto,
-                      uid: visitRef.uid,
-                      cor: "#111111",
-                      confirmar: false,
-                      tipo: "Almoço",
-                    });
-                  } else {
-                    await addDoc(scheduleRef, {
-                      dia: diaRef,
-                      saidaEmpresa: saidaFormatadaTec.current.format("kk:mm"),
-                      chegadaCliente: saidaFormatadaTec.current.format("kk:mm"),
-                      visita: "01:00",
-                      visitaNumero: 3600,
-                      saidaDoCliente: saidaEmpresaRef,
-                      chegadaEmpresa: saidaEmpresaRef,
-                      consultora: "Almoço Téc.",
-                      tecnico: tecRefUID.nome,
-                      tecnicoUID: tecRefUID.uid,
-                      cidade: "",
-                      lat: -23.0881786,
-                      lng: -47.6973284,
-                      tempoRota: "",
-                      tempo: "",
-                      cliente: "",
-                      observacao: "",
-                      data: dataTexto,
-                      uid: visitRef.uid,
-                      cor: "#111111",
-                      confirmar: false,
-                      tipo: "Almoço",
-                    });
-                  }
-                }
                 return returnSchedule();
               }
             });
@@ -844,7 +742,7 @@ const EditVisit = ({
               </p>
             </div>
           )}
-          <input className="box-visit__btn" type="submit" value="CRIAR" />
+          <input className="box-visit__btn" type="submit" value="EDITAR" />
         </form>
       </div>
     </div>

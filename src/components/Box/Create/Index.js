@@ -25,14 +25,21 @@ const CreateVisit = ({
   userRef,
   schedule,
   monthNumber,
+  type
 }) => {
   const { user } = useAuth();
   const chegadaFormatadaTec = useRef();
   const saidaFormatadaTec = useRef();
+  let consultora;
+  if(type) {
+     consultora = 'Almoço Téc.';
+  } else {
+     consultora = user.name;
+  }
   const [lat, setLat] = useState(0);
   const [lng, setLng] = useState(0);
   const [check, setCheck] = useState(false);
-
+  const [checkInput, setCheckInput] = useState(false);
   const [rotaTempo, setRotaTempo] = useState(undefined);
   const [tempoTexto, setTempoTexto] = useState(undefined);
   const [visitaNumero, setVisitaNumero] = useState(1800);
@@ -60,13 +67,20 @@ const CreateVisit = ({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dataTexto, tecnicoTexto]);
 
-  // useEffect(() => {
-  //   const find = () => {
-  //     setTecs(membersRef.filter((member) => member.cargo === "Técnico"));
-  //   };
+  useEffect(() => {
+    const lunch = () => {
+      if(type) {
+        setCheckInput(true);
+        setVisitaNumero(3600);
+      }
+      console.log(consultora)
+    };
 
-  //   find();
-  // }, []);
+    lunch();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  console.log(checkInput)
 
   // useEffect(() => {
   //   if(dataTexto) {
@@ -182,7 +196,7 @@ const CreateVisit = ({
       let visitsFind = [];
 
       //Almoço
-      if (lunch.length < 1 || lunch === undefined) {
+      if ((lunch.length < 1 || lunch === undefined) && !checkInput) {
         if (
           chegadaFormatada > moment("10:59", "hh:mm") &&
           chegadaFormatada < moment("14:01", "hh:mm")
@@ -287,30 +301,57 @@ const CreateVisit = ({
           cancelButtonText: "Não",
         }).then(async (result) => {
           if (result.isConfirmed) {
-            await addDoc(scheduleRef, {
-              dia: diaRef,
-              saidaEmpresa: saidaEmpresaRef,
-              chegadaCliente: chegadaClienteRef,
-              visita: TempoVisita,
-              visitaNumero: visitaNumero,
-              saidaDoCliente: SaidaClienteRef,
-              chegadaEmpresa: ChegadaEmpresaRef,
-              consultora: userData.consultora,
-              tecnico: tecRefUID.nome,
-              tecnicoUID: tecRefUID.uid,
-              cidade: city,
-              lat: lat,
-              lng: lng,
-              cliente: userData.cliente,
-              observacao: userData.observacao,
-              tempoRota: tempoRotaRef,
-              tempo: tempoTexto,
-              data: dataTexto,
-              uid: user.id,
-              cor: userRef.cor,
-              confirmar: false,
-              tipo: 'Visita',
-            });
+            if(checkInput) {
+              await addDoc(scheduleRef, {
+                dia: diaRef,
+                saidaEmpresa: chegadaClienteRef,
+                chegadaCliente: chegadaClienteRef,
+                visita: "01:00",
+                visitaNumero: 3600,
+                saidaDoCliente: SaidaClienteRef,
+                chegadaEmpresa: SaidaClienteRef,
+                consultora: "Almoço Téc.",
+                tecnico: tecRefUID.nome,
+                tecnicoUID: tecRefUID.uid,
+                cidade: '',
+                lat: -23.0881786,
+                lng: -47.6973284,
+                tempoRota: '',
+                tempo: '',
+                cliente: '',
+                observacao: '',
+                data: dataTexto,
+                uid: user.id,
+                cor: "#111111",
+                confirmar: false,
+                tipo: "Almoço"
+              });
+            } else {
+              await addDoc(scheduleRef, {
+                dia: diaRef,
+                saidaEmpresa: saidaEmpresaRef,
+                chegadaCliente: chegadaClienteRef,
+                visita: TempoVisita,
+                visitaNumero: visitaNumero,
+                saidaDoCliente: SaidaClienteRef,
+                chegadaEmpresa: ChegadaEmpresaRef,
+                consultora: userData.consultora,
+                tecnico: tecRefUID.nome,
+                tecnicoUID: tecRefUID.uid,
+                cidade: city,
+                lat: lat,
+                lng: lng,
+                cliente: userData.cliente,
+                observacao: userData.observacao,
+                tempoRota: tempoRotaRef,
+                tempo: tempoTexto,
+                data: dataTexto,
+                uid: user.id,
+                cor: userRef.cor,
+                confirmar: false,
+                tipo: 'Visita',
+              });
+            }
 
             Swal.fire({
               title: "Infinit Energy Brasil",
@@ -320,7 +361,7 @@ const CreateVisit = ({
               confirmButtonColor: "#F39200",
             }).then(async (result) => {
               if (result.isConfirmed) {
-                if (lunch.length === 0) {
+                if (lunch.length === 0 && !checkInput) {
                   if (saidaFormatadaTec.current === null) {
                     await addDoc(scheduleRef, {
                       dia: diaRef,
@@ -392,7 +433,8 @@ const CreateVisit = ({
         <div className="box-visit__close">
           <button onClick={returnSchedule} className="btn-close" />
         </div>
-        <h4>Criar Visita</h4>
+        {checkInput ? <h4>Criar Almoço</h4> : <h4>Criar Visita</h4>}
+        
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="box-visit__container">
             <label className="label">
@@ -408,8 +450,9 @@ const CreateVisit = ({
                 required
               />
             </label>
-            <label className="label">
-              <p>Cidade  *</p>
+            {!checkInput &&
+              <label className="label">
+              <p>Cidade *</p>
               <input
                 className="label__input"
                 placeholder="Digite a cidade"
@@ -420,8 +463,10 @@ const CreateVisit = ({
                 <p className="notice">Tempo da rota: {tempoTexto}</p>
               )}
             </label>
+            }
+            {!checkInput && 
             <label className="label">
-            <p>Cliente  *</p>
+            <p>Cliente *</p>
             <input
               className="label__input"
               type="text"
@@ -431,6 +476,7 @@ const CreateVisit = ({
               required
             />
           </label>
+            }
             <label className="label">
               <p>Hórario Marcado  *</p>
               <input
@@ -446,17 +492,34 @@ const CreateVisit = ({
               {hoursLimit && <p className="notice red">Limite de hórario: 07:00 - 18:00</p>}
             </label>
             <label className="label">
-              <p>Tempo de Visita  *</p>
-              <select
-              value={visitaNumero}
-              className="label__select"
-              name="tec"
-              onChange={(e) => setVisitaNumero(e.target.value)}>
+              <p>Tempo de Visita *</p>
+              {checkInput ? (
+                <select
+                  value={visitaNumero}
+                  className="label__select"
+                  name="tec"
+                  disabled
+                  onChange={(e) => setVisitaNumero(e.target.value)}
+                >
                   <option value={1800}>00:30</option>
                   <option value={3600}>01:00</option>
                   <option value={5400}>01:30</option>
                   <option value={7200}>02:00</option>
-            </select>
+                </select>
+              ) : (
+                <select
+                  value={visitaNumero}
+                  className="label__select"
+                  name="tec"
+                  required
+                  onChange={(e) => setVisitaNumero(e.target.value)}
+                >
+                  <option value={1800}>00:30</option>
+                  <option value={3600}>01:00</option>
+                  <option value={5400}>01:30</option>
+                  <option value={7200}>02:00</option>
+                </select>
+              )}
             </label>
           <label className="label">
             <p>Consultora  *</p>
@@ -465,7 +528,7 @@ const CreateVisit = ({
               type="text"
               autoComplete="off"
               {...register("consultora", {
-                value: user.name,
+                value: consultora,
               })}
               disabled
             />
