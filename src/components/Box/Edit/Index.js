@@ -1,6 +1,6 @@
-import { deleteDoc, updateDoc, addDoc, doc } from "firebase/firestore";
+import { deleteDoc, updateDoc, doc } from "firebase/firestore";
 import { dataBase } from "../../../firebase/database";
-import { useLayoutEffect, useState, useEffect, useRef } from "react";
+import { useLayoutEffect, useState, useEffect } from "react";
 import { useForm } from "react-hook-form"; // cria formulário personalizado
 import Swal from "sweetalert2"; // cria alertas personalizado
 import * as moment from "moment";
@@ -20,8 +20,8 @@ const EditVisit = ({
   monthSelect,
   year,
 }) => {
-  const chegadaFormatadaTec = useRef();
-  const saidaFormatadaTec = useRef();
+  // const chegadaFormatadaTec = useRef();
+  // const saidaFormatadaTec = useRef();
 
   const [rotaTempo, setRotaTempo] = useState();
   const [tempoTexto, setTempoTexto] = useState();
@@ -73,13 +73,14 @@ const EditVisit = ({
       filterSchedule();
     }
 
+    // Muda o filtro de busca das visitas de acordo com o dia escolhido
     if (dataTexto === visitRef.data) {
       setDataRef(
         schedule.filter(
           (dia) =>
             dia.data === dataTexto &&
             dia.tecnico === tecnicoTexto &&
-            dia.horarioTexto !== visitRef.horarioTexto
+            dia.chegadaCliente !== visitRef.chegadaCliente
         )
       );
     } else {
@@ -90,6 +91,7 @@ const EditVisit = ({
       );
     }
 
+    // Atualiza o tempo de rota de acordo com o tipo de visita
     if (
       (dataTexto === visitRef.data && visitRef.visitaConjunta) ||
       (dataTexto === visitRef.data && visitRef.group)
@@ -233,9 +235,9 @@ const EditVisit = ({
         // cidade: city,
       });
 
-      const dataRef = schedule.filter(
-        (dia) => dia.data === dataTexto && dia.tecnico === tecnicoTexto && dia.chegadaCliente !== visitRef.chegadaCliente
-      );
+      // const dataRef = schedule.filter(
+      //   (dia) => dia.data === dataTexto && dia.tecnico === tecnicoTexto && dia.chegadaCliente !== visitRef.chegadaCliente
+      // );
 
       console.log(dataRef);
       const lunch = schedule.filter(

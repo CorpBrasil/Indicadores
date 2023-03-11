@@ -113,11 +113,13 @@ const CreateVisit = ({
     }
   }, [horarioTexto, visitaNumero, chegadaTexto, saidaTexto, rotaTempo]);
 
-  const { isLoaded } = useLoadScript({
+  let isLoaded;
+  window.onload = { isLoaded } = useLoadScript({
     id: "google-map-script",
     googleMapsApiKey: "AIzaSyD1WsJJhTpdhTIVLxxXCgdlV8iYfmOeiC4",
     libraries,
   });
+  
 
   const { ref } = usePlacesWidget({
     apiKey: "AIzaSyD1WsJJhTpdhTIVLxxXCgdlV8iYfmOeiC4",
@@ -201,6 +203,7 @@ const CreateVisit = ({
           chegadaFormatada > moment("10:59", "hh:mm") &&
           chegadaFormatada < moment("14:01", "hh:mm")
         ) {
+          //setHorarioAlmoco({chegada: chegadaFormatada.add(1, "h")})
           chegadaFormatadaTec.current = chegadaFormatada.add(1, "h");
           saidaFormatadaTec.current = null; // UseRef não recebe renderização. emtão o valor antigo fica associado ainda
           console.log(chegadaFormatadaTec.current.format("kk:mm"));
@@ -208,6 +211,7 @@ const CreateVisit = ({
           saidaFormatada > moment("10:59", "hh:mm") &&
           saidaFormatada < moment("14:01", "hh:mm")
         ) {
+          //setHorarioAlmoco({saida: saidaFormatada.subtract(1, "h")}) // Continua
           saidaFormatadaTec.current = saidaFormatada.subtract(1, "h");
           chegadaFormatadaTec.current = null;
           console.log(saidaFormatadaTec.current);
@@ -301,7 +305,8 @@ const CreateVisit = ({
           cancelButtonText: "Não",
         }).then(async (result) => {
           if (result.isConfirmed) {
-            if(checkInput) {
+            console.log(checkInput)
+            if(checkInput === true && lunch.length === 0) {
               await addDoc(scheduleRef, {
                 dia: diaRef,
                 saidaEmpresa: chegadaClienteRef,
@@ -327,7 +332,8 @@ const CreateVisit = ({
                 tipo: "Almoço"
               });
             } else {
-              await addDoc(scheduleRef, {
+              let almoco, chegadaEmpresaVisita, saidaAlmoco;
+              const visita = {
                 dia: diaRef,
                 saidaEmpresa: saidaEmpresaRef,
                 chegadaCliente: chegadaClienteRef,
@@ -350,82 +356,209 @@ const CreateVisit = ({
                 cor: userRef.cor,
                 confirmar: false,
                 tipo: 'Visita',
-              });
-            }
+              };
 
-            Swal.fire({
-              title: "Infinit Energy Brasil",
-              html: `A Visita em <b>${city}</b> foi cadastrada com sucesso.`,
-              icon: "success",
-              showConfirmButton: true,
-              confirmButtonColor: "#F39200",
-            }).then(async (result) => {
-              if (result.isConfirmed) {
-                if (lunch.length === 0 && !checkInput) {
-                  if (saidaFormatadaTec.current === null) {
-                    await addDoc(scheduleRef, {
-                      dia: diaRef,
-                      saidaEmpresa: ChegadaEmpresaRef,
-                      chegadaCliente: ChegadaEmpresaRef,
-                      visita: "01:00",
-                      visitaNumero: 3600,
-                      saidaDoCliente: chegadaFormatadaTec.current.format("kk:mm"),
-                      chegadaEmpresa:
-                        chegadaFormatadaTec.current.format("kk:mm"),
-                      consultora: "Almoço Téc.",
-                      tecnico: tecRefUID.nome,
-                      tecnicoUID: tecRefUID.uid,
-                      cidade: '',
-                      lat: -23.0881786,
-                      lng: -47.6973284,
-                      tempoRota: '',
-                      tempo: '',
-                      cliente: '',
-                      observacao: '',
-                      data: dataTexto,
-                      uid: user.id,
-                      cor: "#111111",
-                      confirmar: false,
-                      tipo: "Almoço"
-                    });
-                  } else {
-                    await addDoc(scheduleRef, {
-                      dia: diaRef,
-                      saidaEmpresa: saidaFormatadaTec.current.format("kk:mm"),
-                      chegadaCliente: saidaFormatadaTec.current.format("kk:mm"),
-                      visita: "01:00",
-                      visitaNumero: 3600,
-                      saidaDoCliente: saidaEmpresaRef,
-                      chegadaEmpresa: saidaEmpresaRef,
-                      consultora: "Almoço Téc.",
-                      tecnico: tecRefUID.nome,
-                      tecnicoUID: tecRefUID.uid,
-                      cidade: '',
-                      lat: -23.0881786,
-                      lng: -47.6973284,
-                      tempoRota: '',
-                      tempo: '',
-                      cliente: '',
-                      observacao: '',
-                      data: dataTexto,
-                      uid: user.id,
-                      cor: "#111111",
-                      confirmar: false,
-                      tipo: "Almoço"
-                    });
-                  }
+              const visitaConjunta = {
+                dia: diaRef,
+                saidaEmpresa: saidaEmpresaRef,
+                chegadaCliente: chegadaClienteRef,
+                visita: TempoVisita,
+                visitaNumero: visitaNumero,
+                saidaDoCliente: SaidaClienteRef,
+                chegadaEmpresa: SaidaClienteRef,
+                consultora: userData.consultora,
+                tecnico: tecRefUID.nome,
+                tecnicoUID: tecRefUID.uid,
+                groupRef: "depois",
+                cidade: city,
+                lat: lat,
+                lng: lng,
+                cliente: userData.cliente,
+                observacao: userData.observacao,
+                tempoRota: tempoRotaRef,
+                tempo: tempoTexto,
+                tempoRotaConjunta: tempoRotaRef,
+                tempoConjunta: tempoTexto,
+                data: dataTexto,
+                uid: user.id,
+                cor: userRef.cor,
+                confirmar: false,
+                visitaConjunta: true,
+                tipo: 'Visita Conjunta',
+              };
+
+              if (chegadaFormatadaTec.current && lunch.length === 0) {               
+                if(city !== 'Tietê') {
+                  Swal.fire({
+                    title: "Infinit Energy Brasil",
+                    html: `O horário de almoço do Técnico <b>${tecRefUID.nome}</b> irá ser criado automaticamente após a visita em <b>${city}</b>.<br/>` +
+                    `Você deseja que o almoço seja em <b>${city}</b> ou em <b>Tietê</b>?`,
+                    icon: "warning",
+                    showDenyButton: true,
+                    showCloseButton: true,
+                    confirmButtonColor: "#F39200",
+                    confirmButtonText: city,
+                    denyButtonText: `Tietê`,
+                  }).then(async (result) => {
+                    if (result.isConfirmed) {
+                      await addDoc(scheduleRef, {
+                        dia: diaRef,
+                        saidaEmpresa: SaidaClienteRef,
+                        chegadaCliente: SaidaClienteRef,
+                        visita: "01:00",
+                        visitaNumero: 3600,
+                        saidaDoCliente: moment(SaidaClienteRef, 'hh:mm').add(3600, 'seconds').format('kk:mm'),
+                        chegadaEmpresa: moment(SaidaClienteRef, 'hh:mm').add(3600, 'seconds').format('kk:mm'),
+                        consultora: "Almoço Téc.",
+                        tecnico: tecRefUID.nome,
+                        tecnicoUID: tecRefUID.uid,
+                        cidade: '',
+                        lat: lat,
+                        lng: lng,
+                        tempoRota: '',
+                        tempo: '',
+                        cliente: '',
+                        observacao: '',
+                        data: dataTexto,
+                        uid: user.id,
+                        cor: "#111111",
+                        confirmar: false,
+                        tipo: "Almoço"
+                      })
+                      createVisitDay(visitaConjunta)
+                      console.log(almoco, chegadaEmpresaVisita, saidaAlmoco);
+                } else {
+                  await addDoc(scheduleRef, {
+                    dia: diaRef,
+                    saidaEmpresa: ChegadaEmpresaRef,
+                    chegadaCliente: ChegadaEmpresaRef,
+                    visita: "01:00",
+                    visitaNumero: 3600,
+                    saidaDoCliente: moment(ChegadaEmpresaRef, 'hh:mm').add(3600, 'seconds').format('kk:mm'),
+                    chegadaEmpresa: moment(ChegadaEmpresaRef, 'hh:mm').add(3600, 'seconds').format('kk:mm'),
+                    consultora: "Almoço Téc.",
+                    tecnico: tecRefUID.nome,
+                    tecnicoUID: tecRefUID.uid,
+                    cidade: '',
+                    lat: -23.0881786,
+                    lng: -47.6973284,
+                    tempoRota: '',
+                    tempo: '',
+                    cliente: '',
+                    observacao: '',
+                    data: dataTexto,
+                    uid: user.id,
+                    cor: "#111111",
+                    confirmar: false,
+                    tipo: "Almoço"
+                  })
+                  createVisitDay(visita)
+                  console.log(almoco, chegadaEmpresaVisita, saidaAlmoco);
                 }
-                //setCheck(false);
-                return returnSchedule();
+                });
+              } else {
+                await addDoc(scheduleRef, {
+                  dia: diaRef,
+                  saidaEmpresa: ChegadaEmpresaRef,
+                  chegadaCliente: ChegadaEmpresaRef,
+                  visita: "01:00",
+                  visitaNumero: 3600,
+                  saidaDoCliente: moment(ChegadaEmpresaRef, 'hh:mm').add(3600, 'seconds').format('kk:mm'),
+                  chegadaEmpresa: moment(ChegadaEmpresaRef, 'hh:mm').add(3600, 'seconds').format('kk:mm'),
+                  consultora: "Almoço Téc.",
+                  tecnico: tecRefUID.nome,
+                  tecnicoUID: tecRefUID.uid,
+                  cidade: '',
+                  lat: -23.0881786,
+                  lng: -47.6973284,
+                  tempoRota: '',
+                  tempo: '',
+                  cliente: '',
+                  observacao: '',
+                  data: dataTexto,
+                  uid: user.id,
+                  cor: "#111111",
+                  confirmar: false,
+                  tipo: "Almoço"
+                })
+                createVisitDay(visita)
               }
-            });
+            } else if(saidaFormatadaTec.current && lunch.length === 0) {
+              await addDoc(scheduleRef, {
+                dia: diaRef,
+                saidaEmpresa: moment(saidaEmpresaRef, 'hh:mm').subtract(3600, 'seconds').format('kk:mm'),
+                chegadaCliente: moment(saidaEmpresaRef, 'hh:mm').subtract(3600, 'seconds').format('kk:mm'),
+                visita: "01:00",
+                visitaNumero: 3600,
+                saidaDoCliente: saidaEmpresaRef,
+                chegadaEmpresa: saidaEmpresaRef,
+                consultora: "Almoço Téc.",
+                tecnico: tecRefUID.nome,
+                tecnicoUID: tecRefUID.uid,
+                cidade: '',
+                lat: -23.0881786,
+                lng: -47.6973284,
+                tempoRota: '',
+                tempo: '',
+                cliente: '',
+                observacao: '',
+                data: dataTexto,
+                uid: user.id,
+                cor: "#111111",
+                confirmar: false,
+                tipo: "Almoço"
+              })
+              Swal.fire({
+                      title: "Infinit Energy Brasil",
+                      html: `O horário de almoço do Técnico <b>${tecRefUID.nome}</b> foi criado automaticamente antes a visita`,
+                      icon: "warning",
+                      showConfirmButton: true,
+                      confirmButtonColor: "#F39200",
+                    }).then(async (result) => {
+                      if (result.isConfirmed) {
+                        createVisitDay(visita)
+                      }
+                    })
+            } else {
+              createVisitDay(visita);
+            }
+            }
           }
         });
       }
     } catch (error) {
-      //console.log(error)
     }
   };
+
+  const createVisitDay = async (data) => {
+     await addDoc(scheduleRef, data);
+     Swal.fire({
+      title: "Infinit Energy Brasil",
+      html: `A visita em <b>${city}</b> foi criada com sucesso!`,
+      icon: "success",
+      showConfirmButton: true,
+      confirmButtonColor: "#F39200",
+    })
+    return returnSchedule();
+  }
+
+  const verifyLunch = () => {
+    const lunchDay = schedule.find((lunch) => lunch.data === dataTexto && lunch.tipo === "Almoço" && lunch.tecnico === tecnicoTexto)
+        if(lunchDay && type) {
+          Swal.fire({
+            title: "Infinit Energy Brasil",
+            icon: "warning",
+            html: `Já existe um horário de almoço do técnico <b>${tecnicoTexto}</b> criado nesse dia.<br/><br/>` + 
+            `Hórario: <b>${lunchDay.chegadaCliente} - ${lunchDay.saidaDoCliente}</b>`,
+            confirmButtonText: "Fechar",
+            confirmButtonColor: "#d33"  
+          }).then((result) => {
+            if(result.isConfirmed) {
+              setDataTexto('');
+            }
+          })
+        }
+  }
 
   return (
     <div className="box-visit">
@@ -442,6 +575,8 @@ const CreateVisit = ({
               <input
                 className="label__input"
                 type="date"
+                value={dataTexto}
+                onBlur={() => verifyLunch()}
                 min={monthNumber && monthNumber.min}
                 max={monthNumber && monthNumber.max}
                 onChange={(e) => setDataTexto(e.target.value)}
@@ -539,6 +674,7 @@ const CreateVisit = ({
               value={tecnicoTexto}
               className="label__select"
               name="tec"
+              onBlur={() => verifyLunch()}
               onChange={(e) => setTecnicoTexto(e.target.value)}>
                 {tecs &&
                 tecs.map((tec, index) => (

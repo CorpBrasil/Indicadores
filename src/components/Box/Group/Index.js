@@ -476,7 +476,7 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
               <input
                 className="label__input time"
                 type="time"
-                value={horarioTexto}
+                value={horarioTexto || ''}
                 placeholder="Digite o hórario marcado"
                 min="07:00"
                 max="18:00"
@@ -489,7 +489,7 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
             <label className="label">
               <p>Tempo de Visita *</p>
               <select
-              value={visitaNumero}
+              value={visitaNumero || ''}
               className="label__select"
               name="tec"
               onChange={(e) => setVisitaNumero(e.target.value)}>
@@ -514,7 +514,7 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
             <p>Técnico *</p>
             <div className="radio">
             <select
-              value={tecnicoTexto}
+              value={tecnicoTexto || ''}
               className="label__select"
               name="tec"
               disabled

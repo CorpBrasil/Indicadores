@@ -163,8 +163,8 @@ const Schedule = () => {
   };
 
   const visitsFind = (type, visit) => {
-    if (type === 'antes')  return schedule.filter(ref => (ref.data === visit.data && ref.chegadaEmpresa === visit.saidaEmpresa  && ref.consultora !== 'Almoço Téc.' && ref.tipo === "Visita Conjunta"))
-    if (type === 'depois') return schedule.filter(ref => (ref.data === visit.data && ref.saidaEmpresa === visit.chegadaEmpresa && ref.consultora !== 'Almoço Téc.' && ref.tipo === "Visita Conjunta"))
+    if (type === 'antes')  return schedule.filter(ref => (ref.data === visit.data && ref.chegadaEmpresa === visit.saidaEmpresa))
+    if (type === 'depois') return schedule.filter(ref => (ref.data === visit.data && ref.saidaEmpresa === visit.chegadaEmpresa))
   }
 
   const deleteVisit = async (visit) => {
@@ -254,8 +254,8 @@ const Schedule = () => {
           await deleteDoc(
             doc(dataBase, "Agendas", year, monthSelect, visit.id)
           );
-          setBox();
-          setDayVisits(undefined);
+          //setBox();
+          //setDayVisits(undefined);
           Swal.fire({
             title: "Infinit Energy Brasil",
             html: `A Visita em <b>${visit.cidade}</b> foi deletada com sucesso.`,
@@ -360,11 +360,18 @@ const Schedule = () => {
     }).then((result) => {
       /* Read more about isConfirmed, isDenied below */
       if (result.isConfirmed) {
-        if(visitsFind('antes', ref).length > 0) {
-          console.log(visitsFind('antes', ref))
+        let msg;
+        const antes = visitsFind('antes', ref);
+        if(antes.length > 0) {
+          if(antes[0].tipo === 'Almoço') {
+            msg = 'um <b>Almoço</b> criado';
+          } else {
+            msg = 'uma <b>Visita</b> criada';
+          }
           Swal.fire({
             title: "Infinit Energy Brasil",
-            html: `Já existe uma <b>Visita Conjunta</b> criada acima dessa visita.`,
+            html: `Já existe ${msg} acima dessa visita.<br/>` +
+            `<b>Exclua</b> ou <b>Altere</b> ${antes[0].tipo === 'Almoço' ? 'o <b>Almoço</b>' : 'a <b>Visita</b>'} para poder criar uma <b>Visita Conjunta</b>`,
             icon: "warning",
             showConfirmButton: true,
             confirmButtonColor: "#F39200",
@@ -382,10 +389,18 @@ const Schedule = () => {
           }, 400);
         }
       } else if (result.isDenied) {
-        if(visitsFind('depois', ref).length > 0) {
+        let msg;
+        const depois = visitsFind('depois', ref);
+        if(depois.length > 0) {
+          if(depois[0].tipo === 'Almoço') {
+            msg = 'um <b>Almoço</b> criado';
+          } else {
+            msg = 'uma <b>Visita</b> criada';
+          }
           Swal.fire({
             title: "Infinit Energy Brasil",
-            html: `Já existe uma <b>Visita Conjunta</b> criada abaixo dessa visita.`,
+            html: `Já existe ${msg} abaixo dessa visita.<br/>` +
+            `<b>Exclua</b> ou <b>Altere</b> ${depois[0].tipo === 'Almoço' ? 'o <b>Almoço</b>' : 'a <b>Visita</b>'} para poder criar uma <b>Visita Conjunta</b>`,
             icon: "warning",
             showConfirmButton: true,
             confirmButtonColor: "#F39200",
@@ -547,7 +562,7 @@ const Schedule = () => {
               <table className="table-visit">
                 <thead>
                   <tr>
-                    <th>V.C</th>
+                    <th className="icons"></th>
                     <th>Dia</th>
                     <th>Cidade</th>
                     <th>Cliente</th>
@@ -567,30 +582,22 @@ const Schedule = () => {
                       className={info.confirmar ? "table-confirm" : "table"}
                       key={index}
                     >
-                      {info.consultora === "Almoço Téc." && (
-                        <td className="lunch"></td>
-                      )}
-                      {info.visitaConjunta &&
-                        info.groupRef === "antes" &&
-                        info.confirmar === false && (
-                          <td className="group-top"></td>
-                        )}
-                      {info.visitaConjunta &&
-                        info.groupRef === "depois" &&
-                        info.confirmar === false && (
-                          <td className="group-bottom"></td>
-                        )}
-                      {!info.visitaConjunta &&
-                        info.consultora !== "Almoço Téc." &&
-                        info.confirmar === false && <td></td>}
-                      {info.confirmar === true && <td></td>}
+                      {(info.tipo === "Visita" &&
+                        (<td className="visit-icon cursor-help" aria-label="Visita" 
+                        data-cooltipz-dir="right"></td>)) ||
+                        (info.tipo === "Visita Conjunta" &&
+                        (<td className="group-icon cursor-help" aria-label="Visita Conjunta" 
+                        data-cooltipz-dir="right"></td>)) || 
+                        (info.tipo === "Almoço" &&
+                        (<td className="lunch-icon cursor-help" aria-label="Almoço" 
+                        data-cooltipz-dir="right"></td>))}
                       <td className="bold">
                         {moment(new Date(info.dia)).format("D")}
                       </td>
                       <td className="no-wrap">{info.cidade}</td>
                       <td>{info.cliente}</td>
                       <td className="bold bg-important">{info.saidaEmpresa}</td>
-                      {info.consultora !== "Almoço Téc." ?
+                      {info.tipo === "Almoço" ?
                         <td></td> : <td>{info.chegadaCliente}</td>
                       }
                       <td>{info.visita}</td>
@@ -610,8 +617,9 @@ const Schedule = () => {
                         style={
                           info.cor && {
                             backgroundColor: info.cor,
-                            border: `1px solid ${info.cor}`,
-                            borderTop: "none",
+                            borderBottom: `1px solid ${info.cor}`,
+                            borderRight: `1px solid ${info.cor}`,
+                            borderLeft: `1px solid ${info.cor}`,
                             color: "#fff",
                           }
                         }
@@ -678,11 +686,11 @@ const Schedule = () => {
                           {moment(new Date(info.dia)).format("D")}
                         </td>
                         <td className="no-wrap">{info.cidade}</td>
-                        <td>{info.cliente}</td>
+                        <td className="no-wrap">{info.cliente}</td>
                         <td className="bold bg-important">
                           {info.saidaEmpresa}
                         </td>
-                        {info.consultora === "Almoço Téc." ?
+                        {info.tipo === "Almoço" ?
                         <td></td> : <td>{info.chegadaCliente}</td>
                         }
                         <td>{info.visita}</td>
