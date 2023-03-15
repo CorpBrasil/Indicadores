@@ -20,10 +20,10 @@ import {
 import 'cooltipz-css';
 import "./_style.scss";
 
-// import CreateVisit from "../../components/Modal/Create/Index";
 import EditVisit from "../../components/Box/Edit/Index";
 import CreateVisit from "../../components/Box/Create/Index";
 import CreateVisitGroup from "../../components/Box/Group/Index";
+import { Users } from "../../data/Users";
 
 const Schedule = () => {
   const data = new Date();
@@ -254,8 +254,8 @@ const Schedule = () => {
           await deleteDoc(
             doc(dataBase, "Agendas", year, monthSelect, visit.id)
           );
-          //setBox();
-          //setDayVisits(undefined);
+          setBox();
+          setDayVisits(undefined);
           Swal.fire({
             title: "Infinit Energy Brasil",
             html: `A Visita em <b>${visit.cidade}</b> foi deletada com sucesso.`,
@@ -302,7 +302,7 @@ const Schedule = () => {
             cor: ref.cor,
             tecnico: ref.tecnico,
             tecnicoUID: ref.tecnicoUID,
-            carro: tecRef.carro,
+            veiculo: ref.veiculo,
           });
           Swal.fire({
             title: "Infinit Energy Brasil",
@@ -493,7 +493,7 @@ const Schedule = () => {
             }
           </div>
           {(userRef && userRef.cargo === "Vendedor(a)" && !box) ||
-          user.email === "admin@infinitenergy.com.br" ? (
+          user.email === Users[0].email ? (
             <div className="box-schedule-visit__add">
               <button
                 className="visit"
@@ -509,7 +509,7 @@ const Schedule = () => {
             <></>
           )}
           {(userRef && userRef.cargo === "Vendedor(a)" && !box) ||
-          user.email === "admin@infinitenergy.com.br" ? (
+          user.email === Users[0].email ? (
             <div className="box-schedule-visit__add">
               <button
                 className="lunch"
@@ -524,16 +524,6 @@ const Schedule = () => {
           ) : (
             <></>
           )}
-          {/* {(userRef && userRef.cargo === "Técnico") ||
-          user.email === "admin@infinitenergy.com.br" ? (
-            <div className="box-schedule-visit__add">
-              <button className="lunch" onClick={() => createLunch(userRef)}>
-                <span className="icon-visit"></span>Confirmar Almoço
-              </button>
-            </div>
-          ) : (
-            <></>
-          )} */}
           {dayVisits === undefined && (
             <div className="schedule-month">
               <select
@@ -559,79 +549,77 @@ const Schedule = () => {
           )}
           <div className="container-table">
             {dayVisits && dayVisits.length > 0 && (
-              <table className="table-visit">
-                <thead>
-                  <tr>
-                    <th className="icons"></th>
-                    <th>Dia</th>
-                    <th>Cidade</th>
-                    <th>Cliente</th>
-                    <th>Hórario de Saida</th>
-                    <th>Chegada no Cliente</th>
-                    <th>Tempo de Visita</th>
-                    <th>Saída no Cliente</th>
-                    <th>Chegada na Empresa</th>
-                    <th>Consultora</th>
-                    <th>Técnico</th>
-                    <th>Observação</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {dayVisits.map((info, index) => (
-                    <tr
-                      className={info.confirmar ? "table-confirm" : "table"}
-                      key={index}
-                    >
-                      {(info.tipo === "Visita" &&
-                        (<td className="visit-icon cursor-help" aria-label="Visita" 
-                        data-cooltipz-dir="right"></td>)) ||
-                        (info.tipo === "Visita Conjunta" &&
-                        (<td className="group-icon cursor-help" aria-label="Visita Conjunta" 
-                        data-cooltipz-dir="right"></td>)) || 
-                        (info.tipo === "Almoço" &&
-                        (<td className="lunch-icon cursor-help" aria-label="Almoço" 
-                        data-cooltipz-dir="right"></td>))}
-                      <td className="bold">
-                        {moment(new Date(info.dia)).format("D")}
-                      </td>
-                      <td className="no-wrap">{info.cidade}</td>
-                      <td>{info.cliente}</td>
-                      <td className="bold bg-important">{info.saidaEmpresa}</td>
-                      {info.tipo === "Almoço" ?
-                        <td></td> : <td>{info.chegadaCliente}</td>
-                      }
-                      <td>{info.visita}</td>
-                      <td
-                        className={
-                          info.consultora !== "Almoço Téc."
-                            ? "bg-important-2"
-                            : null
-                        }
+              <><div>
+                <h2>Visitas do Dia {moment(new Date(dayVisits[0].dia)).format("D")}</h2>
+              </div><table className="table-visit">
+                  <thead>
+                    <tr>
+                      <th className="icons"></th>
+                      <th>Dia</th>
+                      <th>Cidade</th>
+                      <th>Cliente</th>
+                      <th>Hórario de Saida</th>
+                      <th>Chegada no Cliente</th>
+                      <th>Tempo de Visita</th>
+                      <th>Saída no Cliente</th>
+                      <th>Chegada na Empresa</th>
+                      <th>Consultora</th>
+                      <th>Técnico</th>
+                      <th>Observação</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {dayVisits.map((info, index) => (
+                      <tr
+                        className={info.confirmar ? "table-confirm" : "table"}
+                        key={index}
                       >
-                        {info.saidaDoCliente}
-                      </td>
-                      <td className="bold bg-important">
-                        {info.chegadaEmpresa}
-                      </td>
-                      <td
-                        style={
-                          info.cor && {
+                        {(info.tipo === "Visita" &&
+                          (<td className="visit-icon cursor-help" aria-label="Visita"
+                            data-cooltipz-dir="right"></td>)) ||
+                          (info.tipo === "Visita Conjunta" &&
+                            (<td className="group-icon cursor-help" aria-label="Visita Conjunta"
+                              data-cooltipz-dir="right"></td>)) ||
+                          (info.tipo === "Almoço" &&
+                            (<td className="lunch-icon cursor-help" aria-label="Almoço"
+                              data-cooltipz-dir="right"></td>))}
+                        <td className="bold">
+                          {moment(new Date(info.dia)).format("D")}
+                        </td>
+                        <td className="no-wrap">{info.cidade}</td>
+                        <td>{info.cliente}</td>
+                        <td className="bold bg-important">{info.saidaEmpresa}</td>
+                        {info.tipo === "Almoço" ?
+                          <td></td> : <td>{info.chegadaCliente}</td>}
+                        <td>{info.visita}</td>
+                        <td
+                          className={info.consultora !== "Almoço Téc."
+                            ? "bg-important-2"
+                            : null}
+                        >
+                          {info.saidaDoCliente}
+                        </td>
+                        <td className="bold bg-important">
+                          {info.chegadaEmpresa}
+                        </td>
+                        <td
+                          style={info.cor && {
                             backgroundColor: info.cor,
                             borderBottom: `1px solid ${info.cor}`,
                             borderRight: `1px solid ${info.cor}`,
                             borderLeft: `1px solid ${info.cor}`,
                             color: "#fff",
-                          }
-                        }
-                      >
-                        {info.consultora}
-                      </td>
-                      <td>{info.tecnico}</td>
-                      <td className="observation">{info.observacao}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+                            textShadow: '#5a5a5a -1px 0px 5px',
+                          }}
+                        >
+                          {info.consultora}
+                        </td>
+                        <td>{info.tecnico}</td>
+                        <td className="observation">{info.observacao}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table></>
             )}
             {schedule && schedule.length > 0 && (
               <table className="table-visit">
@@ -712,6 +700,7 @@ const Schedule = () => {
                               borderRight: `1px solid ${info.cor}`,
                               borderLeft: `1px solid ${info.cor}`,
                               color: "#fff",
+                              textShadow: '#5a5a5a -1px 0px 5px',
                             }
                           }
                         >
@@ -723,7 +712,7 @@ const Schedule = () => {
                           
                           {(info.confirmar === false &&
                             info.uid === user.id) ||
-                          user.email === "admin@infinitenergy.com.br" ||
+                          user.email === Users[0].email ||
                             info.consultora === "Almoço Téc." ? (
                             <>
                             <div aria-label="Editar Visita" 
@@ -761,9 +750,7 @@ const Schedule = () => {
                           )}
 
                           {info.confirmar === false &&
-                          info.consultora !== "Almoço Téc." &&
-                          (info.tecnicoUID === user.id ||
-                            user.email === "admin@infinitenergy.com.br") ? (
+                            user.email === Users[0].email ? (
                             <>
                             <div aria-label="Confirmar Visita" 
                               data-cooltipz-dir="left">
@@ -778,8 +765,7 @@ const Schedule = () => {
                           )}
 
                           {info.confirmar === true &&
-                          (info.tecnicoUID === user.id ||
-                            user.email === "admin@infinitenergy.com.br") ? (
+                            user.email === Users[0].email ? (
                             <>
                             <div aria-label="Cancelar Visita" 
                               data-cooltipz-dir="left">

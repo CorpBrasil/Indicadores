@@ -16,6 +16,8 @@ const CreateAdmin = ({ returnAdmin, members }) => {
   } = useForm();
   const navigate = useNavigate();
   const [cargo, setCargo] = useState('Vendedor(a)');
+  const [nome, setNome] = useState('');
+  const [cor, setCor] = useState('#000');
 
   const onSubmit = async (userData) => {
     const findEmail = members.find(member => member.email ===  userData.email);
@@ -45,7 +47,7 @@ const CreateAdmin = ({ returnAdmin, members }) => {
               .then((userCredential) => {
                 // Signed in 
                 updateProfile(auth.currentUser, {
-                  displayName: userData.nome,
+                  displayName: nome,
                 })
                 .then(() => {
                 })
@@ -53,7 +55,7 @@ const CreateAdmin = ({ returnAdmin, members }) => {
                   console.error(error);
                 });
                 const user = userCredential.user;
-                setDoc(doc(dataBase, "Membros", user.uid), {...userData, cargo: cargo, uid: user.uid});
+                setDoc(doc(dataBase, "Membros", user.uid), {...userData, nome: nome, cor: cor, cargo: cargo, uid: user.uid});
                 console.log(user);
                 // ...
               })
@@ -66,7 +68,7 @@ const CreateAdmin = ({ returnAdmin, members }) => {
               navigate("/");
               Swal.fire({
                 title: "Infinit Energy Brasil",
-                html: `O Colaborador(a) <b> ${userData.nome}</b> foi cadastrado com sucesso.`,
+                html: `O Colaborador(a) <b> ${nome}</b> foi cadastrado com sucesso.`,
                 icon: "success",
                 showConfirmButton: true,
                 confirmButtonColor: "#F39200"
@@ -97,7 +99,7 @@ const CreateAdmin = ({ returnAdmin, members }) => {
               type="text"
               placeholder="Digite o nome"
               autoComplete="off"
-              {...register("nome")}
+              onBlur={(e) => setNome(e.target.value)}
               required
               minLength={3}
             />
@@ -130,22 +132,36 @@ const CreateAdmin = ({ returnAdmin, members }) => {
           </select>
           </div>
           {cargo === 'Vendedor(a)' ? 
-            <div className='form-visit__color'>
-            <p>Escolha uma cor de destaque</p>
-            <input
-              type="color"
-              autoComplete="off"
-              {...register("cor")}
-              required
-            />
-          </div> : <label className="form-visit__label">
+            <><div className='form-visit__color'>
+              <p>Escolha uma cor de destaque</p>
+              <input
+                type="color"
+                autoComplete="off"
+                value={cor}
+                onChange={(e) => setCor(e.target.value)}
+                required />
+            </div>
+            {nome && 
+            <div className='form-visit__exemple'>
+              <h3>Resultado:</h3>
+              <p style={cor && {
+                            backgroundColor: cor,
+                            borderBottom: '1px solid' + cor,
+                            borderRight: '1px solid' + cor,
+                            borderLeft: '1px solid' + cor,
+                            color: "#fff",
+                            textShadow: '#5a5a5a -1px 0px 5px',
+                          }}>{nome}</p>
+            </div>
+            }</>
+          : <label className="form-visit__label">
             <input
               className="form-visit__text"
               type="number"
-              placeholder="Digite o número do carro"
+              placeholder="Digite o número do veículo"
               autoComplete="off"
               onInput={(e) => e.target.value = e.target.value.slice(0, 3)}
-              {...register("carro")}
+              {...register("veiculo")}
               required
             />
           </label>

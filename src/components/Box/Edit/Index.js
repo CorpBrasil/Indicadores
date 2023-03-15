@@ -34,6 +34,8 @@ const EditVisit = ({
   const [chegadaTexto, setChegadaTexto] = useState();
   const [dataTexto, setDataTexto] = useState();
   const [tecnicoTexto, setTecnicoTexto] = useState();
+  const [tecRefUID, setTecRefUID] = useState(); // Procura os tecnicos que vem da pagina 'Schedule'
+  const [veiculo, setVeiculo] = useState();
   const [city, setCity] = useState();
   const [hoursLimit, setHoursLimit] = useState(false);
 
@@ -49,13 +51,14 @@ const EditVisit = ({
         cliente: visitRef.cliente,
         observacao: visitRef.observacao,
       });
-      //setTempoTexto(visitRef.tempo);
       setVisitaNumero(visitRef.visitaNumero);
       setSaidaTexto(visitRef.saidaEmpresa);
       setChegadaTexto(visitRef.chegadaEmpresa);
       setSaidaCliente(visitRef.chegadaCliente);
       setDataTexto(moment(new Date(visitRef.dia)).format("YYYY-MM-DD"));
       setTecnicoTexto(visitRef.tecnico);
+      setTecRefUID(tecs.find((tec) => tec.nome === tecnicoTexto));
+      setVeiculo(visitRef.veiculo);
       setCity(visitRef.cidade);
       if (visitRef.consultora === "Almoço Téc.") {
         setHorarioTexto(visitRef.saidaEmpresa);
@@ -72,6 +75,13 @@ const EditVisit = ({
     } else {
       filterSchedule();
     }
+
+    if(tecnicoTexto) {
+      setTecRefUID(tecs.find((tec) => tec.nome === tecnicoTexto));
+    }
+    
+    if(tecRefUID && tecRefUID.nome !== visitRef.tecnico) setVeiculo(tecRefUID.veiculo)
+    if(tecRefUID && tecRefUID.nome === visitRef.tecnico) setVeiculo(visitRef.veiculo)
 
     // Muda o filtro de busca das visitas de acordo com o dia escolhido
     if (dataTexto === visitRef.data) {
@@ -137,7 +147,7 @@ const EditVisit = ({
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dataTexto, tecnicoTexto, horarioTexto]);
+  }, [dataTexto, tecnicoTexto, horarioTexto, tecRefUID]);
 
   useEffect(() => {
     // console.log(visitaNumero);
@@ -194,7 +204,7 @@ const EditVisit = ({
 
   const onSubmit = async (userData) => {
     try {
-      let tecRefUID = tecs.find((tec) => tec.nome === tecnicoTexto);
+      //let tecRefUID = tecs.find((tec) => tec.nome === tecnicoTexto);
       let diaRef,
         saidaEmpresaRef,
         chegadaClienteRef,
@@ -436,6 +446,7 @@ const EditVisit = ({
               visitRef.data !== dataTexto &&
               visitRef.consultora !== "Almoço Téc."
             ) {
+              console.log(userData.consultora)
               await updateDoc(
                 doc(dataBase, "Agendas", year, monthSelect, visitRef.id),
                 {
@@ -450,6 +461,7 @@ const EditVisit = ({
                   consultora: userData.consultora,
                   tecnico: tecRefUID.nome,
                   tecnicoUID: tecRefUID.uid,
+                  veiculo: veiculo,
                   cidade: visitRef.cidade,
                   cliente: userData.cliente,
                   observacao: userData.observacao,
@@ -465,6 +477,7 @@ const EditVisit = ({
               visitRef.data === dataTexto &&
               visitRef.consultora !== "Almoço Téc."
             ) {
+              console.log(userData.consultora)
               await updateDoc(
                 doc(dataBase, "Agendas", year, monthSelect, visitRef.id),
                 {
@@ -479,6 +492,7 @@ const EditVisit = ({
                   consultora: userData.consultora,
                   tecnico: tecRefUID.nome,
                   tecnicoUID: tecRefUID.uid,
+                  veiculo: veiculo,
                   cidade: visitRef.cidade,
                   cliente: userData.cliente,
                   observacao: userData.observacao,
@@ -577,18 +591,6 @@ const EditVisit = ({
             )}
             <label className="label">
               <p>Hórario Marcado *</p>
-              {/* {visitRef.consultora === 'Almoço Téc.' &&  
-              <input
-                className="label__input time"
-                type="time"
-                value={horarioTexto}
-                placeholder="Digite o hórario marcado"
-                min="07:00"
-                max="18:00"
-                onBlur={(e) => moment(e.target.value, 'hh:mm') < moment('07:00', 'hh:mm') || moment(e.target.value, 'hh:mm') > moment('18:00', 'hh:mm') ? setHoursLimit(true) : setHoursLimit(false)}
-                onChange={(e) => setHorarioTexto(e.target.value)}
-                required
-              />}  */}
               {(visitRef.visitaConjunta && !checkInput) ||
               (visitRef.group && !checkInput) ? (
                 <input
@@ -721,6 +723,18 @@ const EditVisit = ({
                 )}
               </div>
             </div>
+            {visitRef.consultora !== "Almoço Téc." && 
+            <label className="label">
+            <p>Veículo *</p>
+            <input
+              className="label__input"
+              type="text"
+              value={veiculo}
+              onChange={(e) => setVeiculo(e.target.value)} // onChange é necessario para poder atualizar a input
+              autoComplete="off"
+              required
+            />
+          </label>}
             <label className="label">
               <p>Observação</p>
               <input

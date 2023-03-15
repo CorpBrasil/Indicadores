@@ -30,6 +30,7 @@ const CreateVisit = ({
   const { user } = useAuth();
   const chegadaFormatadaTec = useRef();
   const saidaFormatadaTec = useRef();
+  const [tecRefUID, setTecRefUID] = useState(tecs[0]); // Procura os tecnicos que vem da pagina 'Schedule'
   let consultora;
   if(type) {
      consultora = 'Almoço Téc.';
@@ -64,6 +65,9 @@ const CreateVisit = ({
     } else {
       filterSchedule()
     }
+    if(tecnicoTexto) {
+      setTecRefUID(tecs.find((tec) => tec.nome === tecnicoTexto)); 
+    }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dataTexto, tecnicoTexto]);
 
@@ -80,7 +84,7 @@ const CreateVisit = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  console.log(checkInput)
+  console.log(tecRefUID)
 
   // useEffect(() => {
   //   if(dataTexto) {
@@ -138,16 +142,16 @@ const CreateVisit = ({
 
   const onSubmit = async (userData) => {
     try {
-      let tecRefUID = tecs.find((tec) => tec.nome === tecnicoTexto); // Procura os tecnicos que vem da pagina 'Schedule'
       let diaRef,
-        saidaEmpresaRef,
-        chegadaClienteRef,
-        TempoVisita,
-        SaidaClienteRef,
-        ChegadaEmpresaRef,
-        tempoRotaRef;
+      saidaEmpresaRef,
+      chegadaClienteRef,
+      TempoVisita,
+      SaidaClienteRef,
+      ChegadaEmpresaRef,
+      tempoRotaRef;
       const chegada = horarioTexto;
       moment.locale("pt-br");
+      console.log(userData);
       console.log(moment.locale());
       const tempo = moment('00:00', "HH:mm");
       chegadaClienteRef = chegada;
@@ -190,7 +194,7 @@ const CreateVisit = ({
           dia.tecnico === tecnicoTexto
       );
       const saidaFormatada = moment(saidaEmpresaRef, "hh:mm");
-      const chegadaFormatada = moment(ChegadaEmpresaRef, "hh:mm");
+      const chegadaFormatada = moment(SaidaClienteRef, "hh:mm");
 
       console.log(saidaFormatada);
       console.log(chegadaFormatada);
@@ -201,17 +205,15 @@ const CreateVisit = ({
       if ((lunch.length < 1 || lunch === undefined) && !checkInput) {
         if (
           chegadaFormatada > moment("10:59", "hh:mm") &&
-          chegadaFormatada < moment("14:01", "hh:mm")
+          chegadaFormatada < moment("13:01", "hh:mm")
         ) {
-          //setHorarioAlmoco({chegada: chegadaFormatada.add(1, "h")})
           chegadaFormatadaTec.current = chegadaFormatada.add(1, "h");
           saidaFormatadaTec.current = null; // UseRef não recebe renderização. emtão o valor antigo fica associado ainda
           console.log(chegadaFormatadaTec.current.format("kk:mm"));
         } else if (
-          saidaFormatada > moment("10:59", "hh:mm") &&
+          saidaFormatada > moment("11:59", "hh:mm") &&
           saidaFormatada < moment("14:01", "hh:mm")
         ) {
-          //setHorarioAlmoco({saida: saidaFormatada.subtract(1, "h")}) // Continua
           saidaFormatadaTec.current = saidaFormatada.subtract(1, "h");
           chegadaFormatadaTec.current = null;
           console.log(saidaFormatadaTec.current);
@@ -331,6 +333,17 @@ const CreateVisit = ({
                 confirmar: false,
                 tipo: "Almoço"
               });
+              Swal.fire({
+                title: "Infinit Energy Brasil",
+                html: `O horário de almoço do Técnico <b>${tecRefUID.nome}</b> foi criado com sucesso.`,
+                icon: "success",
+                showConfirmButton: true,
+                confirmButtonColor: "#F39200",
+              }).then((result) => {
+                if(result.isConfirmed) {
+                  return returnSchedule();
+                }
+              })
             } else {
               let almoco, chegadaEmpresaVisita, saidaAlmoco;
               const visita = {
@@ -345,6 +358,7 @@ const CreateVisit = ({
                 tecnico: tecRefUID.nome,
                 tecnicoUID: tecRefUID.uid,
                 cidade: city,
+                veiculo: tecRefUID.veiculo,
                 lat: lat,
                 lng: lng,
                 cliente: userData.cliente,
@@ -369,6 +383,7 @@ const CreateVisit = ({
                 consultora: userData.consultora,
                 tecnico: tecRefUID.nome,
                 tecnicoUID: tecRefUID.uid,
+                veiculo: tecRefUID.veiculo,
                 groupRef: "depois",
                 cidade: city,
                 lat: lat,
@@ -595,7 +610,7 @@ const CreateVisit = ({
                 required
               />
               {tempoTexto && tempoTexto && (
-                <p className="notice">Tempo da rota: {tempoTexto}</p>
+                <p className="notice">Tempo da rota: {tempoTexto} ✔️</p>
               )}
             </label>
             }
@@ -669,7 +684,7 @@ const CreateVisit = ({
             />
           </label>
           <div className="label margin-top">
-            <p>Técnico  *</p>
+            <p>Técnico *</p>
             <select
               value={tecnicoTexto}
               className="label__select"
@@ -682,6 +697,17 @@ const CreateVisit = ({
                 ))}
             </select>
           </div>
+          {!checkInput && 
+          <label className="label">
+          <p>Veículo *</p>
+          <input
+            className="label__input"
+            type="text"
+            autoComplete="off"
+            value={tecRefUID.veiculo || ''}
+            disabled
+          />
+        </label>}
           <label className="label">
             <p>Observação</p>
             <input

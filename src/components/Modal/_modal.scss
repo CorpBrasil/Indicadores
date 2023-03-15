@@ -131,6 +131,14 @@
       padding-bottom: 1rem;
     }
 
+    &__exemple {
+      font-weight: 100;
+
+      p {
+        padding: 0.5rem;
+      }
+    }
+
     .radio {
       margin: 1rem 0;
       display: flex;

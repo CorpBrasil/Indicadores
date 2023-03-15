@@ -174,7 +174,7 @@ useEffect(() => {
                 </table>
               ) }
               else { return (
-                <table className="table-finance">
+                <table key={index} className="table-finance">
                   <thead>
                     <tr>
                       <th rowSpan={2}>Vendedor(a)</th>
@@ -249,9 +249,9 @@ useEffect(() => {
               <tbody>
                 {schedule &&
                   schedule.map((info, index) => (
-                    <>
                       <tr
-                        className="table">
+                        className="table"
+                        key={index}>
                         <td className="bold">
                           {moment(new Date(info.dia)).format("D")}
                         </td>
@@ -261,21 +261,20 @@ useEffect(() => {
                           {info.horario}
                         </td>
                         <td
-                          style={
-                            info.cor && {
-                              backgroundColor: info.cor,
-                              border: `1px solid ${info.cor}`,
-                              borderTop: "none",
-                              color: "#fff",
-                            }
-                          }
+                          style={info.cor && {
+                            backgroundColor: info.cor,
+                            borderBottom: `1px solid ${info.cor}`,
+                            borderRight: `1px solid ${info.cor}`,
+                            borderLeft: `1px solid ${info.cor}`,
+                            color: "#fff",
+                            textShadow: '#5a5a5a -1px 0px 5px',
+                          }}
                         >
                           {info.consultora}
                         </td>
                         <td>{info.tecnico}</td>
-                        <td>{info.carro}</td>
+                        <td>{info.veiculo}</td>
                       </tr>
-                    </>
                   ))}
               </tbody>
             </table>

@@ -24,7 +24,7 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
   const [lng2, setLng2] = useState(0);
   const [latRef, setLatRef] = useState(0);
   const [lngRef, setLngRef] = useState(0);
-  //const [checkRef, setCheckRef] = useState(false)
+  const [tecRefUID] = useState(tecs.find((tec) => tec.nome === visitRef.tecnico)); // Procura os tecnicos que vem da pagina 'Schedule'
   const [check1, setCheck1] = useState(false);
   const [check2, setCheck2] = useState(false);
   const [rotaTempo1, setRotaTempo1] = useState();
@@ -105,6 +105,7 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
     } else {
       filterSchedule()
     }
+
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dataTexto, tecnicoTexto]);
 
@@ -148,7 +149,6 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
   const onSubmit = async (userData) => {
 
     try {
-      let tecRefUID = tecs.find((tec) => tec.nome === tecnicoTexto);
       let diaRef,
         saidaEmpresaRef,
         chegadaClienteRef,
@@ -345,6 +345,7 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
               consultora: userData.consultora,
               tecnico: tecRefUID.nome,
               tecnicoUID: tecRefUID.uid,
+              veiculo: tecRefUID.veiculo,
               cidade: city,
               cliente: userData.cliente,
               observacao: userData.observacao,
@@ -385,6 +386,7 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
               consultora: userData.consultora,
               tecnico: tecRefUID.nome,
               tecnicoUID: tecRefUID.uid,
+              veiculo: tecRefUID.veiculo,
               cidade: city,
               cliente: userData.cliente,
               observacao: userData.observacao,
@@ -459,7 +461,7 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
                 ref={ref}
               />
               {tempoTexto1 && tempoTexto2 && (
-                <p className="notice">Tempo da rota: {tempoTexto1}</p>
+                <p className="notice">Tempo da rota: {tempoTexto1} ✔️</p>
               )}
             </label>
             <label className="label">
@@ -526,6 +528,16 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
             </select>
             </div>
           </div>
+          <label className="label">
+          <p>Veículo *</p>
+          <input
+            className="label__input"
+            type="text"
+            autoComplete="off"
+            value={tecRefUID.veiculo || ''}
+            disabled
+          />
+        </label>
           <label className="label">
             <p>Observação</p>
             <input

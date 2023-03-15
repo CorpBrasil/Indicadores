@@ -1,15 +1,15 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'; // import do hook
 import { dataBase } from '../../firebase/database';
-
-import useAuth from '../../hooks/useAuth';
-import Header from '../../components/Header/Index';
-
 import { doc, onSnapshot, collection, deleteDoc } from "firebase/firestore";
 
-import './_style.scss';
 import CreateSchedule from '../../components/Modal/CreateSchedule/Index';
 import Swal from 'sweetalert2';
+import useAuth from '../../hooks/useAuth';
+import Header from '../../components/Header/Index';
+import { Users } from '../../data/Users';
+
+import './_style.scss';
 
 const Schedules = () => {
     const { user } = useAuth();
@@ -91,10 +91,11 @@ const Schedules = () => {
         <h2>Agendas</h2>
       </div>
        <div className='content-schedule'>
+       {(user.email !== Users[1].email) &&
         <div className='box-schedule'>
           {schedules && schedules.map((schedule, index) => (
             <li key={index} className='schedule'>
-              {user.email === "admin@infinitenergy.com.br" &&
+              {user.email === Users[0].email &&
               <div className='schedule__button'>
                 <button onClick={() => deleteSchedule(schedule.id)}></button>
               </div>
@@ -110,11 +111,12 @@ const Schedules = () => {
             </li>
           ))}
        </div>
-       {user.email === "admin@infinitenergy.com.br" &&
+        }
+       {(user.email === Users[0].email || user.email === Users[1].email) &&
         <><div className='box-schedule'>
             {financeSchedules && financeSchedules.map((schedule, index) => (
               <li key={index} className='schedule'>
-                {user.email === "admin@infinitenergy.com.br" &&
+                {user.email === Users[0].email &&
                   <div className='schedule__button'>
                     <button onClick={() => deleteSchedule(schedule.id)}></button>
                   </div>}
@@ -128,10 +130,13 @@ const Schedules = () => {
                 </div>
               </li>
             ))}
-          </div><div className='add-schedule'>
+          </div></>
+      }
+      {user.email === Users[0].email &&   
+      <div className='add-schedule'>
               <button onClick={() => setCreateSchedule(true)} className='add-schedule__btn'></button>
-            </div></>
-      }  
+      </div>
+      }
       </div>
       {createSchedule && <CreateSchedule returnSchedule={returnSchedule} schedules={schedules}></CreateSchedule>}
       

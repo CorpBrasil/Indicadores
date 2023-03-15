@@ -1,7 +1,8 @@
 import { Link } from "react-router-dom"; // Cria rotas de páginas
 import { signOut } from "firebase/auth";
-
 import { auth } from "../../firebase/database";
+
+import { Users } from "../../data/Users";
 
 //CSS
 import 'cooltipz-css';
@@ -33,7 +34,7 @@ const Header = ({ user }) => {
         </Link>
       </div>
       <div className="container-header__nav">
-          {user && user.email === "admin@infinitenergy.com.br" ? 
+          {user && user.email === Users[0].email ? 
             (<Link className="admin" to="/admin" aria-label="Painel Administrativo" data-cooltipz-dir="left"/>)
             :
             <></>
