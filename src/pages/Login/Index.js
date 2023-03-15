@@ -61,6 +61,7 @@ const Login = () => {
             text: errorMessageAuth,
             icon: "error",
             showConfirmButton: true,
+            showCloseButton: true,
             confirmButtonColor: "#F39200",
           });
         }

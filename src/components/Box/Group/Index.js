@@ -88,11 +88,20 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
         setLat2(visitRef.lat);
         setLng2(visitRef.lng);
       } else {
-        setLatRef(visitRef.lat);
-        setLngRef(visitRef.lng);
-        setLat2(-23.0881786);
-        setLng2(-47.6973284);
-        setHorarioTexto(moment(visitRef.saidaDoCliente, "hh:mm").add(rotaTempo1, 'seconds').format('kk:mm'));
+        
+        if(visitRef.visitaAlmoco) {
+          setHorarioTexto(moment(visitRef.chegadaEmpresa, "hh:mm").add(rotaTempo1, 'seconds').format('kk:mm'));
+          setLatRef(-23.0881786);
+          setLngRef(-47.6973284);
+          setLat2(-23.0881786);
+          setLng2(-47.6973284);
+        } else {
+          setHorarioTexto(moment(visitRef.saidaDoCliente, "hh:mm").add(rotaTempo1, 'seconds').format('kk:mm'));
+          setLatRef(visitRef.lat);
+          setLngRef(visitRef.lng);
+          setLat2(-23.0881786);
+          setLng2(-47.6973284);
+        }
       }
       //setHorarioTexto(moment(visitRef.saidaDoCliente, "hh:mm").add(600, 'seconds').format('kk:mm'));
     }, 0);
@@ -116,8 +125,11 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
       //setCheckRef(true);
     }
     if((type === 'depois' && visitaNumero) || (type === 'depois' && rotaTempo1)) {
-      setHorarioTexto(moment(visitRef.saidaDoCliente, "hh:mm").add(rotaTempo1, 'seconds').format('kk:mm'));
-      //setCheckRef(true);
+      if(visitRef.visitaAlmoco) {
+        setHorarioTexto(moment(visitRef.chegadaEmpresa, "hh:mm").add(rotaTempo1, 'seconds').format('kk:mm'));
+      } else {
+        setHorarioTexto(moment(visitRef.saidaDoCliente, "hh:mm").add(rotaTempo1, 'seconds').format('kk:mm'));
+      }
     }
     
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -303,6 +315,7 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
             visits,
           icon: "error",
           showConfirmButton: true,
+          showCloseButton: true,
           confirmButtonColor: "#F39200",
         });
       } else {
@@ -311,6 +324,7 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
         html: `Você deseja criar uma <b>Visita Conjunta?</b>`,
         icon: "question",
         showCancelButton: true,
+        showCloseButton: true,
         confirmButtonColor: "#F39200",
         cancelButtonColor: "#d33",
         confirmButtonText: "Sim",
@@ -412,6 +426,7 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
             html: `A Visita Conjunta <b>${visitRef.cidade}</b> foi criada com sucesso.`,
             icon: "success",
             showConfirmButton: true,
+            showCloseButton: true,
             confirmButtonColor: "#F39200"
           }).then((result) => {
             if (result.isConfirmed) {

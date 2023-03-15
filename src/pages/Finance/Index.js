@@ -19,7 +19,6 @@ const Finance = () => {
   const { year } = useParams();
   const { user } = useAuth();
   const month = ['','Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
-
   const [schedule, setSchedule] = useState();
   const [scheduleNew, setScheduleNew] = useState();
   const [members, setMembers] = useState();

@@ -24,6 +24,7 @@ const CreateSchedule = ({ returnSchedule, schedules }) => {
           html: `Já existe a <b>Agenda ${userData.ano}</b> no sistema.`,
           icon: "warning",
           showConfirmButton: true,
+          showCloseButton: true,
           confirmButtonColor: "#F39200",
         });
       } else {
@@ -33,6 +34,7 @@ const CreateSchedule = ({ returnSchedule, schedules }) => {
             text: `Você deseja criar uma nova Agenda?`,
             icon: "question",
             showCancelButton: true,
+            showCloseButton: true,
             confirmButtonColor: "#F39200",
             cancelButtonColor: "#d33",
             confirmButtonText: "Sim",
@@ -62,6 +64,7 @@ const CreateSchedule = ({ returnSchedule, schedules }) => {
                 html: `A <b>Agenda ${userData.ano}</b> foi criada com sucesso.`,
                 icon: "success",
                 showConfirmButton: true,
+                showCloseButton: true,
                 confirmButtonColor: "#F39200"
               }).then((result) => {
                 if (result.isConfirmed) {

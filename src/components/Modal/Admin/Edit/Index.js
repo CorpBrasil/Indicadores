@@ -35,6 +35,7 @@ const EditAdmin = ({ returnAdmin, memberRef }) => {
             text: `Você deseja alterar os dados?`,
             icon: "question",
             showCancelButton: true,
+            showCloseButton: true,
             confirmButtonColor: "#F39200",
             cancelButtonColor: "#d33",
             confirmButtonText: "Sim",
@@ -52,6 +53,7 @@ const EditAdmin = ({ returnAdmin, memberRef }) => {
                 html: msg,
                 icon: "success",
                 showConfirmButton: true,
+                showCloseButton: true,
                 confirmButtonColor: "#F39200"
               }).then((result) => {
                 returnAdmin();
@@ -66,6 +68,7 @@ const EditAdmin = ({ returnAdmin, memberRef }) => {
                   html: 'Somente as visitas criadas a partir de agora irão exibir a nova cor do colaborador.',
                   icon: "warning",
                   showConfirmButton: true,
+                  showCloseButton: true,
                   confirmButtonColor: "#F39200"
                 }).then((result) => {
                   Swal.fire({
@@ -73,6 +76,7 @@ const EditAdmin = ({ returnAdmin, memberRef }) => {
                     html: msg,
                     icon: "success",
                     showConfirmButton: true,
+                    showCloseButton: true,
                     confirmButtonColor: "#F39200"
                   }).then((result) => {
                     returnAdmin();

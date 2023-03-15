@@ -28,6 +28,7 @@ const CreateAdmin = ({ returnAdmin, members }) => {
             html: `O email <b>${userData.email}</b> já está cadastrado no sistema.`,
             icon: "warning",
             showConfirmButton: true,
+            showCloseButton: true,
             confirmButtonColor: "#F39200",
           });
         } else {
@@ -37,6 +38,7 @@ const CreateAdmin = ({ returnAdmin, members }) => {
             text: `Você deseja cadastrar um novo Colaborador(a)?`,
             icon: "question",
             showCancelButton: true,
+            showCloseButton: true,
             confirmButtonColor: "#F39200",
             cancelButtonColor: "#d33",
             confirmButtonText: "Sim",
@@ -71,6 +73,7 @@ const CreateAdmin = ({ returnAdmin, members }) => {
                 html: `O Colaborador(a) <b> ${nome}</b> foi cadastrado com sucesso.`,
                 icon: "success",
                 showConfirmButton: true,
+                showCloseButton: true,
                 confirmButtonColor: "#F39200"
               }).then((result) => {
                 if (result.isConfirmed) {

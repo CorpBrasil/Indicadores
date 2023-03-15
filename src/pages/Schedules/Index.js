@@ -11,7 +11,7 @@ import { Users } from '../../data/Users';
 
 import './_style.scss';
 
-const Schedules = () => {
+const Schedules = ({userRef}) => {
     const { user } = useAuth();
     const [schedules, setSchedules] = useState();
     const [financeSchedules, setFinanceSchedules] = useState();
@@ -62,6 +62,7 @@ const Schedules = () => {
         html: `Você deseja deletar essa <b>Agenda</b>?`,
         icon: "warning",
         showCancelButton: true,
+        showCloseButton: true,
         confirmButtonColor: "#F39200",
         cancelButtonColor: "#d33",
         confirmButtonText: "Sim",
@@ -75,6 +76,7 @@ const Schedules = () => {
             html: `A Agenda <b>${id}</b> foi deletada com sucesso.`,
             icon: "success",
             showConfirmButton: true,
+            showCloseButton: true,
             confirmButtonColor: "#F39200"
           })
         }
@@ -112,7 +114,7 @@ const Schedules = () => {
           ))}
        </div>
         }
-       {(user.email === Users[0].email || user.email === Users[1].email) &&
+       {(user.email === Users[0].email || user.email === Users[1].email || (userRef && userRef.cargo === "Técnico")) &&
         <><div className='box-schedule'>
             {financeSchedules && financeSchedules.map((schedule, index) => (
               <li key={index} className='schedule'>

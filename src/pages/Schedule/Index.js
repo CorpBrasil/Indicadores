@@ -25,7 +25,7 @@ import CreateVisit from "../../components/Box/Create/Index";
 import CreateVisitGroup from "../../components/Box/Group/Index";
 import { Users } from "../../data/Users";
 
-const Schedule = () => {
+const Schedule = ({userRef, members, tecs}) => {
   const data = new Date();
   const { year } = useParams();
   const { user } = useAuth();
@@ -33,9 +33,6 @@ const Schedule = () => {
   const boxVisitRef = useRef();
   const [schedule, setSchedule] = useState();
   const [scheduleNew, setScheduleNew] = useState();
-  const [members, setMembers] = useState();
-  const [userRef, setUserRef] = useState();
-  const [tecs, setTecs] = useState();
   const [monthSelect, setMonthSelect] = useState(
     String(data.getMonth() + 1).padStart(2, "0")
   );
@@ -44,7 +41,6 @@ const Schedule = () => {
   const [createVisitGroup, setCreateVisitGroup] = useState({ check: false });
   const [dayVisits, setDayVisits] = useState(undefined);
   const [scheduleRef, setScheduleRef] = useState();
-  const membersCollectionRef = collection(dataBase, "Membros");
   const [monthNumber, setMonthNumber] = useState();
 
   useEffect(
@@ -72,19 +68,19 @@ const Schedule = () => {
     [monthSelect]
   );
 
-  useEffect(
-    () => {
-      const fetchData = async () => {
-        onSnapshot(membersCollectionRef, (member) => {
-          // Atualiza os dados em tempo real
-          setMembers(member.docs.map((doc) => ({ ...doc.data(), id: doc.id }))); // puxa a coleção 'Chats' para o state
-        });
-      };
-      fetchData();
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
-  );
+  // useEffect(
+  //   () => {
+  //     const fetchData = async () => {
+  //       onSnapshot(membersCollectionRef, (member) => {
+  //         // Atualiza os dados em tempo real
+  //         setMembers(member.docs.map((doc) => ({ ...doc.data(), id: doc.id }))); // puxa a coleção 'Chats' para o state
+  //       });
+  //     };
+  //     fetchData();
+  //   },
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  //   []
+  // );
 
   useEffect(() => {
     setDayVisits(dayVisits);
@@ -106,19 +102,18 @@ const Schedule = () => {
     console.log(scheduleNew);
   }, [monthSelect, schedule, scheduleNew]);
 
-  useEffect(
-    () => {
-      const fetchData = async () => {
-        if (members) {
-          setUserRef(members.find((doc) => doc.uid === user.id));
-          setTecs(members.filter((member) => member.cargo === "Técnico"));
-        }
-      };
-      fetchData();
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [members]
-  );
+  // useEffect(
+  //   () => {
+  //     const fetchData = async () => {
+  //       if (members) {
+  //         setTecs(members.filter((member) => member.cargo === "Técnico"));
+  //       }
+  //     };
+  //     fetchData();
+  //   },
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  //   [members]
+  // );
 
   console.log(monthSelect);
 
@@ -174,6 +169,7 @@ const Schedule = () => {
         html: `Você deseja deletar essa <b>Visita</b>?`,
         icon: "warning",
         showCancelButton: true,
+        showCloseButton: true,
         confirmButtonColor: "#F39200",
         cancelButtonColor: "#d33",
         confirmButtonText: "Sim",
@@ -261,6 +257,7 @@ const Schedule = () => {
             html: `A Visita em <b>${visit.cidade}</b> foi deletada com sucesso.`,
             icon: "success",
             showConfirmButton: true,
+            showCloseButton: true,
             confirmButtonColor: "#F39200",
           });
         }
@@ -282,6 +279,7 @@ const Schedule = () => {
         html: `Você deseja confirmar essa <b>Visita</b>?`,
         icon: "question",
         showCancelButton: true,
+        showCloseButton: true,
         confirmButtonColor: "#F39200",
         cancelButtonColor: "#d33",
         confirmButtonText: "Sim",
@@ -309,6 +307,7 @@ const Schedule = () => {
             html: `A Visita em <b>${ref.cidade}</b> foi confirmada com sucesso.`,
             icon: "success",
             showConfirmButton: true,
+            showCloseButton: true,
             confirmButtonColor: "#F39200",
           });
         }
@@ -319,6 +318,7 @@ const Schedule = () => {
         html: `Você deseja cancelar essa <b>visita</b>?`,
         icon: "question",
         showCancelButton: true,
+        showCloseButton: true,
         confirmButtonColor: "#F39200",
         cancelButtonColor: "#d33",
         confirmButtonText: "Sim",
@@ -330,6 +330,7 @@ const Schedule = () => {
             html: `A Visita em <b>${ref.cidade}</b> foi cancelada com sucesso.`,
             icon: "success",
             showConfirmButton: true,
+            showCloseButton: true,
             confirmButtonColor: "#F39200",
           });
           await updateDoc(visitRef, {
@@ -374,6 +375,7 @@ const Schedule = () => {
             `<b>Exclua</b> ou <b>Altere</b> ${antes[0].tipo === 'Almoço' ? 'o <b>Almoço</b>' : 'a <b>Visita</b>'} para poder criar uma <b>Visita Conjunta</b>`,
             icon: "warning",
             showConfirmButton: true,
+            showCloseButton: true,
             confirmButtonColor: "#F39200",
           });
         } else {
@@ -403,6 +405,7 @@ const Schedule = () => {
             `<b>Exclua</b> ou <b>Altere</b> ${depois[0].tipo === 'Almoço' ? 'o <b>Almoço</b>' : 'a <b>Visita</b>'} para poder criar uma <b>Visita Conjunta</b>`,
             icon: "warning",
             showConfirmButton: true,
+            showCloseButton: true,
             confirmButtonColor: "#F39200",
           });
         } else {
@@ -588,20 +591,19 @@ const Schedule = () => {
                         </td>
                         <td className="no-wrap">{info.cidade}</td>
                         <td>{info.cliente}</td>
-                        <td className="bold bg-important">{info.saidaEmpresa}</td>
                         {info.tipo === "Almoço" ?
-                          <td></td> : <td>{info.chegadaCliente}</td>}
+                          <td></td> : <td className="bold bg-important">{info.saidaEmpresa}</td>}
+                        <td>{info.chegadaCliente}</td>
                         <td>{info.visita}</td>
                         <td
-                          className={info.consultora !== "Almoço Téc."
-                            ? "bg-important-2"
-                            : null}
+                          className={"bg-important-2"}
                         >
                           {info.saidaDoCliente}
                         </td>
-                        <td className="bold bg-important">
+                        {info.tipo === "Almoço" ?
+                          <td></td> : <td className="bold bg-important">
                           {info.chegadaEmpresa}
-                        </td>
+                        </td>}
                         <td
                           style={info.cor && {
                             backgroundColor: info.cor,
@@ -626,7 +628,7 @@ const Schedule = () => {
                 <thead>
                   <tr>
                     <th className="icons"></th>
-                    <th>V.C</th>
+                    {userRef && userRef.cargo !== "Técnico" && <th>V.C</th>}
                     <th>Dia</th>
                     <th>Cidade</th>
                     <th>Cliente</th>
@@ -638,7 +640,7 @@ const Schedule = () => {
                     <th>Consultora</th>
                     <th>Técnico</th>
                     <th>Observação</th>
-                    <th>Ação</th>
+                    {userRef && userRef.cargo !== "Técnico" && <th>Ação</th>}
                   </tr>
                 </thead>
                 <tbody>
@@ -657,7 +659,7 @@ const Schedule = () => {
                         (info.tipo === "Almoço" &&
                         (<td className="lunch-icon cursor-help" aria-label="Almoço" 
                         data-cooltipz-dir="right"></td>))}
-                        {info.confirmar === false ? (
+                        {info.confirmar === false && userRef && userRef.cargo !== "Técnico" ? (
                           <td aria-label="Criar Visita Conjunta" 
                           data-cooltipz-dir="right">
                             <button
@@ -675,7 +677,7 @@ const Schedule = () => {
                         </td>
                         <td className="no-wrap">{info.cidade}</td>
                         <td className="no-wrap">{info.cliente}</td>
-                        <td className="bold bg-important">
+                        {/* <td className="bold bg-important">
                           {info.saidaEmpresa}
                         </td>
                         {info.tipo === "Almoço" ?
@@ -691,7 +693,20 @@ const Schedule = () => {
                         }
                         <td className="bold bg-important">
                           {info.chegadaEmpresa}
+                        </td> */}
+                        {info.tipo === "Almoço" ?
+                          <td></td> : <td className="bold bg-important">{info.saidaEmpresa}</td>}
+                        <td>{info.chegadaCliente}</td>
+                        <td>{info.visita}</td>
+                        <td
+                          className={"bg-important-2"}
+                        >
+                          {info.saidaDoCliente}
                         </td>
+                        {info.tipo === "Almoço" ?
+                          <td></td> : <td className="bold bg-important">
+                          {info.chegadaEmpresa}
+                        </td>}
                         <td
                           style={
                             info.cor && {
@@ -713,7 +728,7 @@ const Schedule = () => {
                           {(info.confirmar === false &&
                             info.uid === user.id) ||
                           user.email === Users[0].email ||
-                            info.consultora === "Almoço Téc." ? (
+                            info.consultora === "Vendedor(a)" ? (
                             <>
                             <div aria-label="Editar Visita" 
                               data-cooltipz-dir="left">

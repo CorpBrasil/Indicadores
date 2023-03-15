@@ -301,6 +301,7 @@ const CreateVisit = ({
           html: `Você deseja cadastrar uma nova <b>Visita?</b>`,
           icon: "question",
           showCancelButton: true,
+          showCloseButton: true,
           confirmButtonColor: "#F39200",
           cancelButtonColor: "#d33",
           confirmButtonText: "Sim",
@@ -338,11 +339,10 @@ const CreateVisit = ({
                 html: `O horário de almoço do Técnico <b>${tecRefUID.nome}</b> foi criado com sucesso.`,
                 icon: "success",
                 showConfirmButton: true,
+                showCloseButton: true,
                 confirmButtonColor: "#F39200",
-              }).then((result) => {
-                if(result.isConfirmed) {
+              }).then(() => {
                   return returnSchedule();
-                }
               })
             } else {
               let almoco, chegadaEmpresaVisita, saidaAlmoco;
@@ -408,7 +408,7 @@ const CreateVisit = ({
                     title: "Infinit Energy Brasil",
                     html: `O horário de almoço do Técnico <b>${tecRefUID.nome}</b> irá ser criado automaticamente após a visita em <b>${city}</b>.<br/>` +
                     `Você deseja que o almoço seja em <b>${city}</b> ou em <b>Tietê</b>?`,
-                    icon: "warning",
+                    icon: "question",
                     showDenyButton: true,
                     showCloseButton: true,
                     confirmButtonColor: "#F39200",
@@ -440,9 +440,51 @@ const CreateVisit = ({
                         confirmar: false,
                         tipo: "Almoço"
                       })
-                      createVisitDay(visitaConjunta)
-                      console.log(almoco, chegadaEmpresaVisita, saidaAlmoco);
-                } else {
+                      Swal.fire({
+                        title: "Infinit Energy Brasil",
+                        html: `Após o almoço, o Técnico <b>${tecRefUID.nome}</b> irá <b>continuar</b> com mais visitas na região ou <b>retornará</b> para <b>Tietê</b>?</br></br>` +
+                        `Atenção: caso escolha <b>retornar</b> para <b>Tietê</b>, o <b>tempo de retorno</b> para a cidade vai contar após o <b>término do almoço</b>.`,
+                        icon: "question",
+                        showDenyButton: true,
+                        showCloseButton: true,
+                        confirmButtonColor: "#F39200",
+                        confirmButtonText: 'Continuar',
+                        denyButtonText: `Retornar`,
+                      }).then(async (result) => {
+                        if (result.isConfirmed) {
+                          createVisitDay(visitaConjunta)
+                        } else if(result.isDenied) {
+                          createVisitDay({
+                            dia: diaRef,
+                            saidaEmpresa: saidaEmpresaRef,
+                            chegadaCliente: chegadaClienteRef,
+                            visita: TempoVisita,
+                            visitaNumero: visitaNumero,
+                            saidaDoCliente: SaidaClienteRef,
+                            chegadaEmpresa: moment(ChegadaEmpresaRef, 'hh:mm').add(3600, 'seconds').format('kk:mm'),
+                            consultora: userData.consultora,
+                            groupRef: "depois",
+                            visitaAlmoco: true, // Para poder identificar que essa visita tem um almoço dentro dela
+                            tecnico: tecRefUID.nome,
+                            tecnicoUID: tecRefUID.uid,
+                            cidade: city,
+                            veiculo: tecRefUID.veiculo,
+                            lat: lat,
+                            lng: lng,
+                            cliente: userData.cliente,
+                            observacao: userData.observacao,
+                            tempoRota: tempoRotaRef,
+                            tempo: tempoTexto,
+                            data: dataTexto,
+                            uid: user.id,
+                            cor: userRef.cor,
+                            confirmar: false,
+                            visitaConjunta: true,
+                            tipo: 'Visita Conjunta',
+                          })
+                        }
+                      })
+                } else if (result.isDenied) {
                   await addDoc(scheduleRef, {
                     dia: diaRef,
                     saidaEmpresa: ChegadaEmpresaRef,
@@ -496,7 +538,16 @@ const CreateVisit = ({
                   confirmar: false,
                   tipo: "Almoço"
                 })
-                createVisitDay(visita)
+                Swal.fire({
+                  title: "Infinit Energy Brasil",
+                  html: `O horário de almoço do Técnico <b>${tecRefUID.nome}</b> foi criado automaticamente após a visita`,
+                  icon: "warning",
+                  showConfirmButton: true,
+                  showCloseButton: true,
+                  confirmButtonColor: "#F39200",
+                }).then(() => {
+                    createVisitDay(visita)
+                })
               }
             } else if(saidaFormatadaTec.current && lunch.length === 0) {
               await addDoc(scheduleRef, {
@@ -528,17 +579,16 @@ const CreateVisit = ({
                       html: `O horário de almoço do Técnico <b>${tecRefUID.nome}</b> foi criado automaticamente antes a visita`,
                       icon: "warning",
                       showConfirmButton: true,
+                      showCloseButton: true,
                       confirmButtonColor: "#F39200",
-                    }).then(async (result) => {
-                      if (result.isConfirmed) {
-                        createVisitDay(visita)
-                      }
-                    })
+                    }).then(() => {
+                      createVisitDay(visita)
+                  })
             } else {
               createVisitDay(visita);
             }
             }
-          }
+          } else return null
         });
       }
     } catch (error) {
@@ -552,6 +602,7 @@ const CreateVisit = ({
       html: `A visita em <b>${city}</b> foi criada com sucesso!`,
       icon: "success",
       showConfirmButton: true,
+      showCloseButton: true,
       confirmButtonColor: "#F39200",
     })
     return returnSchedule();
@@ -566,11 +617,10 @@ const CreateVisit = ({
             html: `Já existe um horário de almoço do técnico <b>${tecnicoTexto}</b> criado nesse dia.<br/><br/>` + 
             `Hórario: <b>${lunchDay.chegadaCliente} - ${lunchDay.saidaDoCliente}</b>`,
             confirmButtonText: "Fechar",
+            showCloseButton: true,
             confirmButtonColor: "#d33"  
-          }).then((result) => {
-            if(result.isConfirmed) {
+          }).then(() => { 
               setDataTexto('');
-            }
           })
         }
   }

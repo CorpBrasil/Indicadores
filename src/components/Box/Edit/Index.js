@@ -323,6 +323,7 @@ const EditVisit = ({
             visits,
           icon: "error",
           showConfirmButton: true,
+          showCloseButton: true,
           confirmButtonColor: "#F39200",
         });
       } else {
@@ -331,6 +332,7 @@ const EditVisit = ({
           html: `Você deseja alterar essa <b>Visita?</b>`,
           icon: "question",
           showCancelButton: true,
+          showCloseButton: true,
           confirmButtonColor: "#F39200",
           cancelButtonColor: "#d33",
           confirmButtonText: "Sim",
@@ -507,11 +509,10 @@ const EditVisit = ({
               html: `A Visita em <b>${visitRef.cidade}</b> foi alterada com sucesso.`,
               icon: "success",
               showConfirmButton: true,
+              showCloseButton: true,
               confirmButtonColor: "#F39200",
-            }).then(async (result) => {
-              if (result.isConfirmed) {
+            }).then(() => {
                 return returnSchedule();
-              }
             });
           }
         });
