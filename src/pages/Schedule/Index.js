@@ -628,7 +628,7 @@ const Schedule = ({userRef, members, tecs}) => {
                 <thead>
                   <tr>
                     <th className="icons"></th>
-                    {userRef && userRef.cargo !== "Técnico" && <th>V.C</th>}
+                    {userRef && userRef.cargo === "Técnico" ? <th></th> : <th>V.C</th>}
                     <th>Dia</th>
                     <th>Cidade</th>
                     <th>Cliente</th>
@@ -640,26 +640,30 @@ const Schedule = ({userRef, members, tecs}) => {
                     <th>Consultora</th>
                     <th>Técnico</th>
                     <th>Observação</th>
-                    {userRef && userRef.cargo !== "Técnico" && <th>Ação</th>}
+                    {userRef && userRef.cargo === "Técnico" ? <></> : <th>Ação</th>}
                   </tr>
                 </thead>
                 <tbody>
                   {schedule &&
                     schedule.map((info, index) => (
                       <tr
-                        className={info.confirmar ? "table-confirm" : "table"}
+                        className={"table"}
+                        // className={info.confirmar ? "table-confirm" : "table"}
                         key={index}
                       >
-                        {(info.tipo === "Visita" &&
+                        {(info.confirmar === false && info.tipo === "Visita" &&
                         (<td className="visit-icon cursor-help" aria-label="Visita" 
                         data-cooltipz-dir="right"></td>)) ||
-                        (info.tipo === "Visita Conjunta" &&
+                        (info.confirmar === false && info.tipo === "Visita Conjunta" &&
                         (<td className="group-icon cursor-help" aria-label="Visita Conjunta" 
                         data-cooltipz-dir="right"></td>)) || 
-                        (info.tipo === "Almoço" &&
+                        (info.confirmar === false && info.tipo === "Almoço" &&
                         (<td className="lunch-icon cursor-help" aria-label="Almoço" 
+                        data-cooltipz-dir="right"></td>)) || 
+                        (info.confirmar === true &&
+                        (<td className="confirm-icon cursor-help" aria-label="Visita Confirmada" 
                         data-cooltipz-dir="right"></td>))}
-                        {info.confirmar === false && userRef && userRef.cargo !== "Técnico" ? (
+                        {info.confirmar === true || (userRef && userRef.cargo === "Técnico")  ? <td></td> : (
                           <td aria-label="Criar Visita Conjunta" 
                           data-cooltipz-dir="right">
                             <button
@@ -668,10 +672,7 @@ const Schedule = ({userRef, members, tecs}) => {
                             >
                             </button>
                           </td>
-                        ) : (
-                          <></>
                         )}
-                        {info.confirmar === true && <td></td>}
                         <td className="bold">
                           {moment(new Date(info.dia)).format("D")}
                         </td>
@@ -723,7 +724,7 @@ const Schedule = ({userRef, members, tecs}) => {
                         </td>
                         <td>{info.tecnico}</td>
                         <td className="observation">{info.observacao}</td>
-                        <td className="action">
+                        <td className="action" style={info.observacao ? {} : null}>
                           
                           {(info.confirmar === false &&
                             info.uid === user.id) ||

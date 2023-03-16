@@ -456,7 +456,7 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
             <label className="label">
               <p>Dia *</p>
               <input
-                value={dataTexto}
+                value={dataTexto || ''}
                 className="label__input"
                 type="date"
                 min={monthNumber && monthNumber.min}
@@ -472,7 +472,6 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
               <input
                 className="label__input"
                 placeholder="Digite a cidade"
-                //value={city}
                 ref={ref}
               />
               {tempoTexto1 && tempoTexto2 && (
