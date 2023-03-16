@@ -2,14 +2,14 @@ import { Link } from "react-router-dom"; // Cria rotas de páginas
 import { signOut } from "firebase/auth";
 import { auth } from "../../firebase/database";
 
-import { Users } from "../../data/Users";
+import { Users } from "../../data/Data";
 
 //CSS
 import 'cooltipz-css';
 import "./_style.scss";
 
 // Imagem
-import Logo from '../../images/LogoIEB.png'
+import Logo from '../../images/LogoCORPBRASIL.png'
 
 const Header = ({ user }) => {
 
@@ -30,7 +30,7 @@ const Header = ({ user }) => {
     <div className="container-header">
       <div className="container-header__logo">
         <Link to="" onClick={returnPanel} aria-label="Voltar ao inicio" data-cooltipz-dir="right">
-          <img src={Logo} alt="Infinit"/>
+          <img src={Logo} alt="CORPBRASIL"/>
         </Link>
       </div>
       <div className="container-header__nav">

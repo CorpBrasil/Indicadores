@@ -3,16 +3,15 @@ import { memo, useEffect, useState, useRef } from "react";
 import { useForm } from "react-hook-form"; // cria formulário personalizado
 import Swal from "sweetalert2"; // cria alertas personalizado
 import * as moment from "moment";
-import "moment/locale/pt-br";
-
 import useAuth from "../../../hooks/useAuth";
-
 import { usePlacesWidget } from "react-google-autocomplete";
 import {
   DistanceMatrixService,
   GoogleMap,
   useLoadScript,
 } from "@react-google-maps/api";
+import "moment/locale/pt-br";
+import { Company } from "../../../data/Data";
 
 import "../style.scss";
 
@@ -287,7 +286,7 @@ const CreateVisit = ({
             "</b></br>"
         );
         Swal.fire({
-          title: "Infinit Energy Brasil",
+          title: Company,
           html:
             `Foram encontrado(s) <b>${visitsFindCount}</b> visita(s) marcada(s) nesse periodo.</br></br>` +
             visits,
@@ -297,7 +296,7 @@ const CreateVisit = ({
         });
       } else {
         Swal.fire({
-          title: "Infinit Energy Brasil",
+          title: Company,
           html: `Você deseja cadastrar uma nova <b>Visita?</b>`,
           icon: "question",
           showCancelButton: true,
@@ -335,7 +334,7 @@ const CreateVisit = ({
                 tipo: "Almoço"
               });
               Swal.fire({
-                title: "Infinit Energy Brasil",
+                title: Company,
                 html: `O horário de almoço do Técnico <b>${tecRefUID.nome}</b> foi criado com sucesso.`,
                 icon: "success",
                 showConfirmButton: true,
@@ -405,7 +404,7 @@ const CreateVisit = ({
               if (chegadaFormatadaTec.current && lunch.length === 0) {               
                 if(city !== 'Tietê') {
                   Swal.fire({
-                    title: "Infinit Energy Brasil",
+                    title: Company,
                     html: `O horário de almoço do Técnico <b>${tecRefUID.nome}</b> irá ser criado automaticamente após a visita em <b>${city}</b>.<br/>` +
                     `Você deseja que o almoço seja em <b>${city}</b> ou em <b>Tietê</b>?`,
                     icon: "question",
@@ -441,7 +440,7 @@ const CreateVisit = ({
                         tipo: "Almoço"
                       })
                       Swal.fire({
-                        title: "Infinit Energy Brasil",
+                        title: Company,
                         html: `Após o almoço, o Técnico <b>${tecRefUID.nome}</b> irá <b>continuar</b> com mais visitas na região ou <b>retornará</b> para <b>Tietê</b>?</br></br>` +
                         `Atenção: caso escolha <b>retornar</b> para <b>Tietê</b>, o <b>tempo de retorno</b> para a cidade vai contar após o <b>término do almoço</b>.`,
                         icon: "question",
@@ -539,7 +538,7 @@ const CreateVisit = ({
                   tipo: "Almoço"
                 })
                 Swal.fire({
-                  title: "Infinit Energy Brasil",
+                  title: Company,
                   html: `O horário de almoço do Técnico <b>${tecRefUID.nome}</b> foi criado automaticamente após a visita`,
                   icon: "warning",
                   showConfirmButton: true,
@@ -575,7 +574,7 @@ const CreateVisit = ({
                 tipo: "Almoço"
               })
               Swal.fire({
-                      title: "Infinit Energy Brasil",
+                      title: Company,
                       html: `O horário de almoço do Técnico <b>${tecRefUID.nome}</b> foi criado automaticamente antes a visita`,
                       icon: "warning",
                       showConfirmButton: true,
@@ -598,7 +597,7 @@ const CreateVisit = ({
   const createVisitDay = async (data) => {
      await addDoc(scheduleRef, data);
      Swal.fire({
-      title: "Infinit Energy Brasil",
+      title: Company,
       html: `A visita em <b>${city}</b> foi criada com sucesso!`,
       icon: "success",
       showConfirmButton: true,
@@ -612,7 +611,7 @@ const CreateVisit = ({
     const lunchDay = schedule.find((lunch) => lunch.data === dataTexto && lunch.tipo === "Almoço" && lunch.tecnico === tecnicoTexto)
         if(lunchDay && type) {
           Swal.fire({
-            title: "Infinit Energy Brasil",
+            title: Company,
             icon: "warning",
             html: `Já existe um horário de almoço do técnico <b>${tecnicoTexto}</b> criado nesse dia.<br/><br/>` + 
             `Hórario: <b>${lunchDay.chegadaCliente} - ${lunchDay.saidaDoCliente}</b>`,

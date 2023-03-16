@@ -23,10 +23,12 @@ import "./_style.scss";
 import EditVisit from "../../components/Box/Edit/Index";
 import CreateVisit from "../../components/Box/Create/Index";
 import CreateVisitGroup from "../../components/Box/Group/Index";
-import { Users } from "../../data/Users";
+import { Company, Users } from "../../data/Data";
 
 const Schedule = ({userRef, members, tecs}) => {
   const data = new Date();
+  const checked = JSON.parse(localStorage.getItem("foco"));
+  const [focoCheck, setFocoCheck] = useState(false);
   const { year } = useParams();
   const { user } = useAuth();
 
@@ -42,6 +44,8 @@ const Schedule = ({userRef, members, tecs}) => {
   const [dayVisits, setDayVisits] = useState(undefined);
   const [scheduleRef, setScheduleRef] = useState();
   const [monthNumber, setMonthNumber] = useState();
+  
+  
 
   useEffect(
     () => {
@@ -85,6 +89,12 @@ const Schedule = ({userRef, members, tecs}) => {
   useEffect(() => {
     setDayVisits(dayVisits);
   }, [dayVisits]);
+
+  useEffect(() => {
+    if (checked === true) { // Altera o valor da input 'toggle'
+      setFocoCheck(true)
+    };
+  }, [checked]);
 
   useEffect(() => {
     if (schedule && monthSelect) {
@@ -165,7 +175,7 @@ const Schedule = ({userRef, members, tecs}) => {
   const deleteVisit = async (visit) => {
     try {
       Swal.fire({
-        title: "Infinit Energy Brasil",
+        title: Company,
         html: `Você deseja deletar essa <b>Visita</b>?`,
         icon: "warning",
         showCancelButton: true,
@@ -253,7 +263,7 @@ const Schedule = ({userRef, members, tecs}) => {
           setBox();
           setDayVisits(undefined);
           Swal.fire({
-            title: "Infinit Energy Brasil",
+            title: Company,
             html: `A Visita em <b>${visit.cidade}</b> foi deletada com sucesso.`,
             icon: "success",
             showConfirmButton: true,
@@ -275,7 +285,7 @@ const Schedule = ({userRef, members, tecs}) => {
 
     if (type === "confirm") {
       Swal.fire({
-        title: "Infinit Energy Brasil",
+        title: Company,
         html: `Você deseja confirmar essa <b>Visita</b>?`,
         icon: "question",
         showCancelButton: true,
@@ -303,7 +313,7 @@ const Schedule = ({userRef, members, tecs}) => {
             veiculo: ref.veiculo,
           });
           Swal.fire({
-            title: "Infinit Energy Brasil",
+            title: Company,
             html: `A Visita em <b>${ref.cidade}</b> foi confirmada com sucesso.`,
             icon: "success",
             showConfirmButton: true,
@@ -314,7 +324,7 @@ const Schedule = ({userRef, members, tecs}) => {
       });
     } else {
       Swal.fire({
-        title: "Infinit Energy Brasil",
+        title: Company,
         html: `Você deseja cancelar essa <b>visita</b>?`,
         icon: "question",
         showCancelButton: true,
@@ -326,7 +336,7 @@ const Schedule = ({userRef, members, tecs}) => {
       }).then(async (result) => {
         if (result.isConfirmed) {
           Swal.fire({
-            title: "Infinit Energy Brasil",
+            title: Company,
             html: `A Visita em <b>${ref.cidade}</b> foi cancelada com sucesso.`,
             icon: "success",
             showConfirmButton: true,
@@ -349,7 +359,7 @@ const Schedule = ({userRef, members, tecs}) => {
 
   const createVisitGroupChoice = (ref) => {
     Swal.fire({
-      title: "Infinit Energy Brasil",
+      title: Company,
       html: `Você deseja criar a visita conjunta <b>antes</b> ou <b>depois</b> da visita escolhida? </br></br>
       <b>Atenção: Verifique se já existe alguma visita criada proxima a visita escolhida.</b>`,
       icon: "question",
@@ -370,7 +380,7 @@ const Schedule = ({userRef, members, tecs}) => {
             msg = 'uma <b>Visita</b> criada';
           }
           Swal.fire({
-            title: "Infinit Energy Brasil",
+            title: Company,
             html: `Já existe ${msg} acima dessa visita.<br/>` +
             `<b>Exclua</b> ou <b>Altere</b> ${antes[0].tipo === 'Almoço' ? 'o <b>Almoço</b>' : 'a <b>Visita</b>'} para poder criar uma <b>Visita Conjunta</b>`,
             icon: "warning",
@@ -400,7 +410,7 @@ const Schedule = ({userRef, members, tecs}) => {
             msg = 'uma <b>Visita</b> criada';
           }
           Swal.fire({
-            title: "Infinit Energy Brasil",
+            title: Company,
             html: `Já existe ${msg} abaixo dessa visita.<br/>` +
             `<b>Exclua</b> ou <b>Altere</b> ${depois[0].tipo === 'Almoço' ? 'o <b>Almoço</b>' : 'a <b>Visita</b>'} para poder criar uma <b>Visita Conjunta</b>`,
             icon: "warning",
@@ -424,7 +434,10 @@ const Schedule = ({userRef, members, tecs}) => {
     });
   };
 
-  // ToolTips
+  const changeFoco = () => {
+    setFocoCheck(!focoCheck); // Altera o estado do FocoCheck
+    localStorage.setItem("foco", !focoCheck);
+  }
 
 
   return (
@@ -551,10 +564,18 @@ const Schedule = ({userRef, members, tecs}) => {
             </div>
           )}
           <div className="container-table">
+            {schedule && schedule.length > 0 &&
+            <div className="toggle-box">
+                <p>Modo foco</p>
+                <input type="checkbox" id="toggle" className="toggle toggle--shadow" checked={focoCheck} onChange={() => changeFoco()} />
+              <label htmlFor="toggle"></label>
+            </div>
+            }
             {dayVisits && dayVisits.length > 0 && (
               <><div>
                 <h2>Visitas do Dia {moment(new Date(dayVisits[0].dia)).format("D")}</h2>
-              </div><table className="table-visit">
+              </div>
+              <table className={focoCheck ? "table-visit table-foco" : "table-visit"}>
                   <thead>
                     <tr>
                       <th className="icons"></th>
@@ -574,18 +595,21 @@ const Schedule = ({userRef, members, tecs}) => {
                   <tbody>
                     {dayVisits.map((info, index) => (
                       <tr
-                        className={info.confirmar ? "table-confirm" : "table"}
+                        className="table"
                         key={index}
                       >
-                        {(info.tipo === "Visita" &&
-                          (<td className="visit-icon cursor-help" aria-label="Visita"
-                            data-cooltipz-dir="right"></td>)) ||
-                          (info.tipo === "Visita Conjunta" &&
-                            (<td className="group-icon cursor-help" aria-label="Visita Conjunta"
-                              data-cooltipz-dir="right"></td>)) ||
-                          (info.tipo === "Almoço" &&
-                            (<td className="lunch-icon cursor-help" aria-label="Almoço"
-                              data-cooltipz-dir="right"></td>))}
+                        {(info.confirmar === false && info.tipo === "Visita" &&
+                        (<td className="visit-icon cursor-help" aria-label="Visita" 
+                        data-cooltipz-dir="right"></td>)) ||
+                        (info.confirmar === false && info.tipo === "Visita Conjunta" &&
+                        (<td className="group-icon cursor-help" aria-label="Visita Conjunta" 
+                        data-cooltipz-dir="right"></td>)) || 
+                        (info.confirmar === false && info.tipo === "Almoço" &&
+                        (<td className="lunch-icon cursor-help" aria-label="Almoço" 
+                        data-cooltipz-dir="right"></td>)) || 
+                        (info.confirmar === true &&
+                        (<td className="confirm-icon cursor-help" aria-label="Visita Confirmada" 
+                        data-cooltipz-dir="right"></td>))}
                         <td className="bold">
                           {moment(new Date(info.dia)).format("D")}
                         </td>
@@ -624,7 +648,7 @@ const Schedule = ({userRef, members, tecs}) => {
                 </table></>
             )}
             {schedule && schedule.length > 0 && (
-              <table className="table-visit">
+              <table className={focoCheck ? "table-visit table-foco" : "table-visit"}>
                 <thead>
                   <tr>
                     <th className="icons"></th>
@@ -648,7 +672,6 @@ const Schedule = ({userRef, members, tecs}) => {
                     schedule.map((info, index) => (
                       <tr
                         className={"table"}
-                        // className={info.confirmar ? "table-confirm" : "table"}
                         key={index}
                       >
                         {(info.confirmar === false && info.tipo === "Visita" &&
@@ -766,7 +789,8 @@ const Schedule = ({userRef, members, tecs}) => {
                           )}
 
                           {info.confirmar === false &&
-                            user.email === Users[0].email ? (
+                            user.email === Users[0].email &&
+                            info.consultora !== "Almoço Téc." ? (
                             <>
                             <div aria-label="Confirmar Visita" 
                               data-cooltipz-dir="left">

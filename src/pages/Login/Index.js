@@ -5,8 +5,9 @@ import Swal from "sweetalert2"; // cria alertas personalizado
 import { auth } from "../../firebase/database";
 import useAuth from "../../hooks/useAuth";
 import { signInWithEmailAndPassword } from "firebase/auth";
+import { Company } from "../../data/Data";
 
-import Logo from "../../images/LogoIEB.jpg";
+import Logo from "../../images/LogoCORPBRASIL.png";
 
 import "./_style.scss";
 
@@ -57,7 +58,7 @@ const Login = () => {
         }
         if (errorCode) {
           Swal.fire({
-            title: "Infinit Energy Brasil",
+            title: Company,
             text: errorMessageAuth,
             icon: "error",
             showConfirmButton: true,
@@ -74,7 +75,6 @@ const Login = () => {
         <img className="logo-IEB" src={Logo} alt="" />
         <div className="title-login">
           <h2>VISITA TÉCNICA</h2>
-          <h2>AGENDA</h2>
         </div>
         <form className="form-login" onSubmit={handleSubmit(formSubmit)}>
           <label className="form-login__label">
@@ -115,6 +115,9 @@ const Login = () => {
             ENTRAR
           </button>
         </form>
+      </div>
+      <div className="footer-login">
+        <p>Desenvolvido por <a href="http://www.brunosapalacio.com" aria-label="Clique aqui para maiores informações" data-cooltipz-dir="top">Bruno Sapalacio</a> </p>
       </div>
     </div>
   );

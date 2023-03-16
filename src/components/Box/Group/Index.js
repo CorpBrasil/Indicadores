@@ -11,6 +11,7 @@ import {
   GoogleMap,
   useLoadScript,
 } from "@react-google-maps/api";
+import { Company } from "../../../data/Data";
 
 import '../style.scss';
 
@@ -309,7 +310,7 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
             "</b></br>"
         );
         Swal.fire({
-          title: "Infinit Energy Brasil",
+          title: Company,
           html:
             `Foram encontrado(s) <b>${visitsFindCount}</b> visita(s) marcada(s) nesse periodo.</br></br>` +
             visits,
@@ -320,7 +321,7 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
         });
       } else {
             Swal.fire({
-        title: "Infinit Energy Brasil",
+        title: Company,
         html: `Você deseja criar uma <b>Visita Conjunta?</b>`,
         icon: "question",
         showCancelButton: true,
@@ -422,7 +423,7 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
             });
           }
           Swal.fire({
-            title: "Infinit Energy Brasil",
+            title: Company,
             html: `A Visita Conjunta <b>${visitRef.cidade}</b> foi criada com sucesso.`,
             icon: "success",
             showConfirmButton: true,

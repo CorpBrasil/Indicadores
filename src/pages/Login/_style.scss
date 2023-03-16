@@ -13,7 +13,6 @@
         .logo-IEB {
             margin: 2rem 0 1rem 0;
             width: 14rem;
-            height: 6rem;
         }
     
         .title-login {
@@ -49,6 +48,17 @@
                 margin: 1em auto;
             }
 
+        }
+    }
+
+    .footer-login {
+        position: fixed;
+        bottom: 1rem;
+
+        a {
+            font-weight: bold;
+            text-decoration: none;
+            color: #111;
         }
     }
 }

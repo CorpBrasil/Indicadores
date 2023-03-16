@@ -3,6 +3,7 @@ import { useLayoutEffect, useState } from 'react'
 import { useForm } from "react-hook-form"; // cria formulário personalizado
 import Swal from "sweetalert2"; // cria alertas personalizado
 import { dataBase } from '../../../../firebase/database';
+import { Company } from '../../../../data/Data'
 
 import '../../_modal.scss';
 
@@ -31,7 +32,7 @@ const EditAdmin = ({ returnAdmin, memberRef }) => {
   const onSubmit = async (userData) => {
         try {
           Swal.fire({
-            title: "Infinit Energy Brasil",
+            title: Company,
             text: `Você deseja alterar os dados?`,
             icon: "question",
             showCancelButton: true,
@@ -49,7 +50,7 @@ const EditAdmin = ({ returnAdmin, memberRef }) => {
                 })
                 msg = `O veículo do ${memberRef.cargo} <b> ${userData.nome}</b> foi alterado com sucesso.`;
                  Swal.fire({
-                title: "Infinit Energy Brasil",
+                title: Company,
                 html: msg,
                 icon: "success",
                 showConfirmButton: true,
@@ -72,7 +73,7 @@ const EditAdmin = ({ returnAdmin, memberRef }) => {
                   confirmButtonColor: "#F39200"
                 }).then((result) => {
                   Swal.fire({
-                    title: "Infinit Energy Brasil",
+                    title: Company,
                     html: msg,
                     icon: "success",
                     showConfirmButton: true,

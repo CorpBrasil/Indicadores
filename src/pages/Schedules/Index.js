@@ -2,12 +2,11 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'; // import do hook
 import { dataBase } from '../../firebase/database';
 import { doc, onSnapshot, collection, deleteDoc } from "firebase/firestore";
-
 import CreateSchedule from '../../components/Modal/CreateSchedule/Index';
 import Swal from 'sweetalert2';
 import useAuth from '../../hooks/useAuth';
 import Header from '../../components/Header/Index';
-import { Users } from '../../data/Users';
+import { Users, Company } from '../../data/Data';
 
 import './_style.scss';
 
@@ -58,7 +57,7 @@ const Schedules = ({userRef}) => {
   const deleteSchedule = async (id) => {
     try {
       Swal.fire({
-        title: "Infinit Energy Brasil",
+        title: Company,
         html: `Você deseja deletar essa <b>Agenda</b>?`,
         icon: "warning",
         showCancelButton: true,
@@ -72,7 +71,7 @@ const Schedules = ({userRef}) => {
           await deleteDoc(doc(dataBase, "Agendas", id));
           await deleteDoc(doc(dataBase, "Financeiro", id));
           Swal.fire({
-            title: "Infinit Energy Brasil",
+            title: Company,
             html: `A Agenda <b>${id}</b> foi deletada com sucesso.`,
             icon: "success",
             showConfirmButton: true,

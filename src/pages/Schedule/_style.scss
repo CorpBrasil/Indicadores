@@ -1,13 +1,16 @@
 @import "../../styles/mixins.scss";
 
 @media (max-width: 930px) {
- .table-visit, .table-finance{
-  overflow-x: auto;
- }
+  .table-visit,
+  .table-finance {
+    overflow-x: auto;
+  }
 }
 
 @media print {
-  .schedule-month, .box-schedule-visit, .print {
+  .schedule-month,
+  .box-schedule-visit,
+  .print {
     display: none;
   }
 }
@@ -39,7 +42,7 @@
     flex-direction: column;
     margin: auto;
 
-    .box-schedule-visit {
+    .box-schedule-visit { // ============= Criar Visita/Almoço ================== //
       display: flex;
       flex-direction: column;
       flex-wrap: wrap;
@@ -88,8 +91,7 @@
         }
       }
 
-
-      .schedule-month {
+      .schedule-month { // ============= Botão que altera os meses ================== //
         &__select {
           width: 15rem;
           padding: 1rem;
@@ -119,12 +121,86 @@
         width: 100%;
         overflow-x: auto;
         z-index: 0;
+
+        .toggle-box { // ============= Botão que altera o foco ================== //
+          display: flex;
+          justify-content: flex-end;
+          align-items: center;
+          gap: 0.5rem;
+          margin-right: 1rem;
+
+          .toggle {
+            position: absolute;
+            margin-left: -9999px;
+            visibility: hidden;
+          }
+  
+          .toggle + label {
+            display: block;
+            position: relative;
+            cursor: pointer;
+            outline: none;
+            user-select: none;
+          }
+  
+          .toggle--shadow + label {
+            padding: 2px;
+            width: 40px;
+            height: 20px;
+            background-color: #dddddd;
+            border-radius: 60px;
+          }
+  
+          .toggle--shadow + label:before,
+          .toggle--shadow + label:after {
+            display: block;
+            position: absolute;
+            top: 1px;
+            left: 1px;
+            bottom: 1px;
+            content: "";
+          }
+          .toggle--shadow + label:before {
+            right: 1px;
+            background-color: #f1f1f1;
+            border-radius: 60px;
+            transition: all 0.4s;
+          }
+          .toggle--shadow + label:after {
+            width: 20px;
+            background-color: #fff;
+            border-radius: 100%;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+            transition: all 0.4s;
+          }
+  
+          .toggle--shadow:checked + label:before {
+            background-color: #8ce196;
+          }
+          .toggle--shadow:checked + label:after {
+            transform: translateX(22px);
+          }
+        }
+        //==============================//
       }
-      .table-visit {
+
+      .table-foco { // Estilo da tabela em modo foco
+        tbody {
+          &:hover tr {
+            opacity: 0.3;
+          }
+
+          tr:hover {
+            opacity: 1;
+          }
+        }
+      }
+
+      .table-visit { // ============= Tabela de Visita ================== //
         border-collapse: collapse;
         display: block;
         position: relative;
-        margin:1rem;
+        margin: 1rem;
         box-shadow: 0 4px 4px rgb(0 0 0 / 25%);
 
         thead {
@@ -134,7 +210,8 @@
           color: #fff;
           border-right: none;
 
-          th, td {
+          th,
+          td {
             padding: 1rem;
           }
 
@@ -146,51 +223,14 @@
         tbody {
           background-color: #fff;
           border-bottom: 1px solid;
-          
 
-          &:hover tr {
-            opacity: 0.3;
-          }
-          
           .table {
             opacity: 1;
-          }
-
-          .visited {
-            position: absolute;
-            margin: auto;
-            width: 3.5rem;
-            height: 2.5rem;
-            background: url(../../images/icons/Done.svg) center no-repeat;
-            background-size: 1rem;
           }
 
           tr {
             &:hover {
               opacity: 1;
-            }
-          }
-
-          .confirm {
-            &::before {
-              content: '✔️';
-              position: absolute;
-              width: 1rem;
-              background-color: #000;
-              height: 30px;
-              left: -1rem;
-              z-index: 111;
-            }
-          }
-
-          .table-confirm {
-            td {
-              &:nth-child(-n + 12) {
-                opacity: 0.3;
-                background-color: #fff;
-                border-color: #ccc !important;
-                border-top: none;
-              }
             }
           }
 
@@ -204,7 +244,7 @@
 
             &:first-child {
               display: flex;
-              border: none!important;
+              border: none !important;
               padding: 0;
               width: 104%;
               right: 1px;
@@ -214,7 +254,7 @@
               border-right: 1px solid #ccc;
             }
 
-            .btn {
+            .btn { // ============= Botões da visita ================== //
               &-edit {
                 @include btnTable("../../images/icons/Edit.svg", #000);
               }
@@ -233,12 +273,11 @@
 
               &-add {
                 @include btnTable("../../images/icons/Add.svg", #f39200, 100%);
-                border: 1px solid #f39200!important;
+                border: 1px solid #f39200 !important;
                 top: 1px;
               }
             }
           }
-          
         }
       }
 
@@ -246,9 +285,9 @@
       .bg-total {
         background-color: #000;
         color: #fff;
-        
+
         td {
-          font-weight: 600!important;
+          font-weight: 600 !important;
         }
       }
 
@@ -267,8 +306,8 @@
 
       .end {
         thead {
-          background-color: #000!important;
-          border: 1px solid #000!important;
+          background-color: #000 !important;
+          border: 1px solid #000 !important;
         }
 
         tbody {
@@ -276,7 +315,7 @@
 
           td {
             background-color: #e2e2e2;
-            font-weight: 600!important;
+            font-weight: 600 !important;
           }
 
           tr {
@@ -298,69 +337,68 @@
           height: 3rem;
           color: #fff;
           border-right: none;
-  
-          th, td {
+
+          th,
+          td {
             padding: 1rem;
           }
         }
 
-         tbody {
-           td {
-             font-weight: 100;
-             height: 40px;
-             max-height: 40px;
-             border: 1px solid #ccc;
-             border-right: none;
-             border-top: none;
-             padding: 0 0.5rem;
-           }
-         }
-
-        }
-
-        .last {
-         tbody {
-           td {
-             border-right: 1px solid #ccc;
-           }
-         }
-        }
-
-        .print {
-          max-width: 350px;
-          margin: 2rem auto;
-
-          .btn {
-            &-print {
-              @include btnForm(#fff, #f39200, 100%);
-            }
+        tbody {
+          td {
+            font-weight: 100;
+            height: 40px;
+            max-height: 40px;
+            border: 1px solid #ccc;
+            border-right: none;
+            border-top: none;
+            padding: 0 0.5rem;
           }
         }
-    // ======================================================== //
+      }
+
+      .last {
+        tbody {
+          td {
+            border-right: 1px solid #ccc;
+          }
+        }
+      }
+
+      .print {
+        max-width: 350px;
+        margin: 2rem auto;
+
+        .btn {
+          &-print {
+            @include btnForm(#fff, #f39200, 100%);
+          }
+        }
+      }
+      // ======================================================== //
     }
 
     .bold {
-      font-weight: 600!important;
+      font-weight: 600 !important;
     }
 
     .bg-important {
-      background-color: #d9ead3!important;
+      background-color: #d9ead3 !important;
     }
 
     .bg-important-2 {
-      background-color: #f4cccc!important;
+      background-color: #f4cccc !important;
     }
-
   }
 }
 
-.action {
+.action { // coluna 'Ação'
   display: flex;
-  border: none!important;
+  border: none !important;
   padding: 0;
 }
 
-.observation {
+.observation { // coluna 'Observação'
   max-width: 7rem;
   white-space: nowrap; // Impede que a linha de texto seja quebrada
   padding: 0 0.5rem;
@@ -371,6 +409,7 @@
   }
 }
 
+// ============= Icones da visita ================== //
 .visit-icon {
   background: url("../../images/icons/VisitB.svg") center no-repeat;
   background-size: 1rem;
@@ -390,8 +429,4 @@
   background: url("../../images/icons/DoneW.svg") center #0eb05f no-repeat;
   background-size: 1rem;
   border: 1px solid #0eb05f;
-}
-
-.invert-color {
-  filter: invert(100%);
 }

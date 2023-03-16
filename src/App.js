@@ -10,7 +10,7 @@ import Finance from './pages/Finance/Index';
 import { collection, onSnapshot } from "firebase/firestore";
 
 import { dataBase } from "./firebase/database";
-import { Users } from "./data/Users";
+import { Users } from "./data/Data";
 
 function App() {
   const { user } = useAuth();
@@ -61,6 +61,7 @@ function App() {
             <Route exact path="/financeiro/:year" element={<Finance />} />
        }
             <Route path="/agenda/:year" element={<Schedule userRef={userRef} members={members} tecs={tecs} />} />
+            <Route path="*" element={<Schedules userRef={userRef} />} />
           </Route>
           <Route exact path="/login" element={<Login />} />
         </Routes>

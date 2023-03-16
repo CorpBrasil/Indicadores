@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form"; // cria formulário personalizado
 import Swal from "sweetalert2"; // cria alertas personalizado
 import * as moment from "moment";
 import "moment/locale/pt-br";
+import { Company } from "../../../data/Data";
 
 import "../style.scss";
 
@@ -317,7 +318,7 @@ const EditVisit = ({
             "</b></br>"
         );
         Swal.fire({
-          title: "Infinit Energy Brasil",
+          title: Company,
           html:
             `Foram encontrado(s) <b>${visitsFindCount}</b> visita(s) marcada(s) nesse periodo.</br></br>` +
             visits,
@@ -328,7 +329,7 @@ const EditVisit = ({
         });
       } else {
         Swal.fire({
-          title: "Infinit Energy Brasil",
+          title: Company,
           html: `Você deseja alterar essa <b>Visita?</b>`,
           icon: "question",
           showCancelButton: true,
@@ -505,7 +506,7 @@ const EditVisit = ({
             }
 
             Swal.fire({
-              title: "Infinit Energy Brasil",
+              title: Company,
               html: `A Visita em <b>${visitRef.cidade}</b> foi alterada com sucesso.`,
               icon: "success",
               showConfirmButton: true,

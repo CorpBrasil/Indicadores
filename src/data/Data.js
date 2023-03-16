@@ -6,3 +6,5 @@ export const Users = [
      email: "financeiro@corpbrasil.com"
     }
 ]
+
+export const Company = 'CORPBRASIL';

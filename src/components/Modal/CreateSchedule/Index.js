@@ -2,6 +2,7 @@ import { doc, setDoc, collection, addDoc } from 'firebase/firestore';
 import { useForm } from "react-hook-form"; // cria formulário personalizado
 import Swal from "sweetalert2"; // cria alertas personalizado
 import { dataBase } from '../../../firebase/database';
+import { Company } from '../../../data/Data';
 
 import '../_modal.scss';
 
@@ -20,7 +21,7 @@ const CreateSchedule = ({ returnSchedule, schedules }) => {
       const findSchedule = schedules.find(schedule => schedule.id === userData.ano);
       if (findSchedule) {
         return Swal.fire({
-          title: "Infinit Energy Brasil",
+          title: Company,
           html: `Já existe a <b>Agenda ${userData.ano}</b> no sistema.`,
           icon: "warning",
           showConfirmButton: true,
@@ -30,7 +31,7 @@ const CreateSchedule = ({ returnSchedule, schedules }) => {
       } else {
         try {
           Swal.fire({
-            title: "Infinit Energy Brasil",
+            title: Company,
             text: `Você deseja criar uma nova Agenda?`,
             icon: "question",
             showCancelButton: true,
@@ -41,11 +42,8 @@ const CreateSchedule = ({ returnSchedule, schedules }) => {
             cancelButtonText: "Não",
           }).then(async (result) => {
             if (result.isConfirmed) {
-              // const docRef = doc(dataBase, "chats", userData.ano);
-              // const colRef = collection(docRef, 'Janeiro');
               await setDoc(doc(dataBase, "Agendas", userData.ano), {ano:userData.ano})
               await setDoc(doc(dataBase, "Financeiro", userData.ano), {ano:userData.ano})
-              // await addDoc(collection(docRef, 'Janeiro'), {ano:userData.ano});
               const scheduleRefYear = doc(dataBase, "Agendas", userData.ano);
               const financeScheduleRefYear = doc(dataBase, "Financeiro", userData.ano);
                 for (let value of months) {
@@ -60,7 +58,7 @@ const CreateSchedule = ({ returnSchedule, schedules }) => {
                 }
 
               Swal.fire({
-                title: "Infinit Energy Brasil",
+                title: Company,
                 html: `A <b>Agenda ${userData.ano}</b> foi criada com sucesso.`,
                 icon: "success",
                 showConfirmButton: true,
