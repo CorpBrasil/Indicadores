@@ -17,7 +17,7 @@ import {
   setDoc,
 } from "firebase/firestore";
 
-import 'cooltipz-css';
+import "cooltipz-css";
 import "./_style.scss";
 
 import EditVisit from "../../components/Box/Edit/Index";
@@ -25,7 +25,7 @@ import CreateVisit from "../../components/Box/Create/Index";
 import CreateVisitGroup from "../../components/Box/Group/Index";
 import { Company, Users } from "../../data/Data";
 
-const Schedule = ({userRef, members, tecs}) => {
+const Schedule = ({ userRef, members, tecs }) => {
   const data = new Date();
   const checked = JSON.parse(localStorage.getItem("foco"));
   const [focoCheck, setFocoCheck] = useState(false);
@@ -44,8 +44,6 @@ const Schedule = ({userRef, members, tecs}) => {
   const [dayVisits, setDayVisits] = useState(undefined);
   const [scheduleRef, setScheduleRef] = useState();
   const [monthNumber, setMonthNumber] = useState();
-  
-  
 
   useEffect(
     () => {
@@ -91,9 +89,10 @@ const Schedule = ({userRef, members, tecs}) => {
   }, [dayVisits]);
 
   useEffect(() => {
-    if (checked === true) { // Altera o valor da input 'toggle'
-      setFocoCheck(true)
-    };
+    if (checked === true) {
+      // Altera o valor da input 'toggle'
+      setFocoCheck(true);
+    }
   }, [checked]);
 
   useEffect(() => {
@@ -168,9 +167,19 @@ const Schedule = ({userRef, members, tecs}) => {
   };
 
   const visitsFind = (type, visit) => {
-    if (type === 'antes')  return schedule.filter(ref => (ref.data === visit.data && ref.chegadaEmpresa === visit.saidaEmpresa))
-    if (type === 'depois') return schedule.filter(ref => (ref.data === visit.data && ref.saidaEmpresa === visit.chegadaEmpresa))
-  }
+    if (type === "antes")
+      return schedule.filter(
+        (ref) =>
+          ref.data === visit.data && ref.chegadaEmpresa === visit.saidaEmpresa
+          && ref.tipo !== "Almoço" && !ref.visitaAlmoco
+      );
+    if (type === "depois")
+      return schedule.filter(
+        (ref) =>
+          ref.data === visit.data && ref.saidaEmpresa === visit.chegadaEmpresa
+          && ref.tipo !== "Almoço" && !ref.visitaAlmoco
+      );
+  };
 
   const deleteVisit = async (visit) => {
     try {
@@ -186,77 +195,116 @@ const Schedule = ({userRef, members, tecs}) => {
         cancelButtonText: "Não",
       }).then(async (result) => {
         if (result.isConfirmed) {
-          const visitsAntes = visitsFind('antes', visit);
-          const visitsDepois = visitsFind('depois', visit);
-          if(visitsAntes.length > 0) {
+          const visitsAntes = visitsFind("antes", visit);
+          const visitsDepois = visitsFind("depois", visit);
+          if (visitsAntes.length > 0) {
             visitsAntes.map(async (ref) => {
-              const visitBefore =  schedule.filter(before => (before.data === ref.data && before.chegadaEmpresa === ref.saidaEmpresa && ref.consultora !== 'Almoço Téc.' && before.tipo === "Visita Conjunta"));
-              if(ref.cidade === visit.cidade) {
-                if(visitBefore) {
+              const visitBefore = schedule.filter(
+                (before) =>
+                  before.data === ref.data &&
+                  before.chegadaEmpresa === ref.saidaEmpresa &&
+                  ref.consultora !== "Almoço Téc." &&
+                  before.tipo === "Visita Conjunta" &&
+                  !before.visitaAlmoco
+              );
+              if (ref.cidade === visit.cidade) {
+                if (visitBefore) {
                   visitBefore.map(async (ref) => {
-                    await updateDoc(doc(dataBase, "Agendas", year, monthSelect, ref.id),
-                                {
-                                  chegadaEmpresa: moment(ref.saidaDoCliente, "hh:mm").add(ref.tempoRota, 'seconds').format('kk:mm'),
-                                  groupRef: "",
-                                  group: "",
-                                  visitaConjunta: false,
-                                  tipo: "Visita"
-                                })
-                              })
-                  }
+                    await updateDoc(
+                      doc(dataBase, "Agendas", year, monthSelect, ref.id),
+                      {
+                        chegadaEmpresa: moment(ref.saidaDoCliente, "hh:mm")
+                          .add(ref.tempoRota, "seconds")
+                          .format("kk:mm"),
+                        groupRef: "",
+                        group: "",
+                        visitaConjunta: false,
+                        tipo: "Visita",
+                      }
+                    );
+                  });
+                }
                 await deleteDoc(
                   doc(dataBase, "Agendas", year, monthSelect, ref.id)
                 );
               } else {
-                await updateDoc(doc(dataBase, "Agendas", year, monthSelect, ref.id),
-                            {
-                              chegadaEmpresa: moment(ref.saidaDoCliente, "hh:mm").add(ref.tempoRota, 'seconds').format('kk:mm'),
-                              groupRef: "",
-                              group: "",
-                              visitaConjunta: false,
-                              tipo: "Visita"
-                            })
+                await updateDoc(
+                  doc(dataBase, "Agendas", year, monthSelect, ref.id),
+                  {
+                    chegadaEmpresa: moment(ref.saidaDoCliente, "hh:mm")
+                      .add(ref.tempoRota, "seconds")
+                      .format("kk:mm"),
+                    groupRef: "",
+                    group: "",
+                    visitaConjunta: false,
+                    tipo: "Visita",
+                  }
+                );
               }
-                console.log(ref.chegadaEmpresa ,moment(ref.chegadaEmpresa, "hh:mm").add(ref.tempoRota, 'seconds').format('kk:mm'))
-          })
+              console.log(
+                ref.chegadaEmpresa,
+                moment(ref.chegadaEmpresa, "hh:mm")
+                  .add(ref.tempoRota, "seconds")
+                  .format("kk:mm")
+              );
+            });
           }
           if (visitsDepois.length > 0) {
             visitsDepois.map(async (ref) => {
-             const visitNext =  schedule.filter(next => (next.data === ref.data && next.saidaEmpresa === ref.chegadaEmpresa && ref.consultora !== 'Almoço Téc.' && next.tipo === "Visita Conjunta"));
-              if(ref.cidade === visit.cidade) {
-                if(visitNext) {
-                  visitNext.map(async (ref) => {
-                    await updateDoc(doc(dataBase, "Agendas", year, monthSelect, ref.id),
-                                {
-                                  saidaEmpresa: moment(ref.chegadaCliente, "hh:mm").subtract(ref.tempoRota, 'seconds').format('kk:mm'),
-                                  groupRef: "",
-                                  group: "",
-                                  visitaConjunta: false,
-                                  tipo: "Visita"
-                                })
-                              })
-                  }
-               await deleteDoc(
-                doc(dataBase, "Agendas", year, monthSelect, ref.id)
+              const visitNext = schedule.filter(
+                (next) =>
+                  next.data === ref.data &&
+                  next.saidaEmpresa === ref.chegadaEmpresa &&
+                  ref.consultora !== "Almoço Téc." &&
+                  next.tipo === "Visita Conjunta" &&
+                  !next.visitaAlmoco
               );
+              if (ref.cidade === visit.cidade) {
+                if (visitNext) {
+                  visitNext.map(async (ref) => {
+                    await updateDoc(
+                      doc(dataBase, "Agendas", year, monthSelect, ref.id),
+                      {
+                        saidaEmpresa: moment(ref.chegadaCliente, "hh:mm")
+                          .subtract(ref.tempoRota, "seconds")
+                          .format("kk:mm"),
+                        groupRef: "",
+                        group: "",
+                        visitaConjunta: false,
+                        tipo: "Visita",
+                      }
+                    );
+                  });
+                }
+                await deleteDoc(
+                  doc(dataBase, "Agendas", year, monthSelect, ref.id)
+                );
               } else {
-                console.log('cidade diferente')
+                console.log("cidade diferente");
 
-                await updateDoc(doc(dataBase, "Agendas", year, monthSelect, ref.id),
-                          {
-                            saidaEmpresa: moment(ref.chegadaCliente, "hh:mm").subtract(ref.tempoRota, 'seconds').format('kk:mm'),
-                            groupRef: "",
-                            group: "",
-                            visitaConjunta: false,
-                            tipo: "Visita"
-                          })
+                await updateDoc(
+                  doc(dataBase, "Agendas", year, monthSelect, ref.id),
+                  {
+                    saidaEmpresa: moment(ref.chegadaCliente, "hh:mm")
+                      .subtract(ref.tempoRota, "seconds")
+                      .format("kk:mm"),
+                    groupRef: "",
+                    group: "",
+                    visitaConjunta: false,
+                    tipo: "Visita",
+                  }
+                );
               }
-              
-              console.log(ref.saidaEmpresa ,moment(ref.chegadaCliente, "hh:mm").subtract(ref.tempoRota, 'seconds').format('kk:mm'))
-            })
 
+              console.log(
+                ref.saidaEmpresa,
+                moment(ref.chegadaCliente, "hh:mm")
+                  .subtract(ref.tempoRota, "seconds")
+                  .format("kk:mm")
+              );
+            });
           }
-          console.log(visitsAntes, visitsDepois)
+          console.log(visitsAntes, visitsDepois);
           await deleteDoc(
             doc(dataBase, "Agendas", year, monthSelect, visit.id)
           );
@@ -372,17 +420,22 @@ const Schedule = ({userRef, members, tecs}) => {
       /* Read more about isConfirmed, isDenied below */
       if (result.isConfirmed) {
         let msg;
-        const antes = visitsFind('antes', ref);
-        if(antes.length > 0) {
-          if(antes[0].tipo === 'Almoço') {
-            msg = 'um <b>Almoço</b> criado';
+        const antes = visitsFind("antes", ref);
+        if (antes.length > 0) {
+          if (antes[0].tipo === "Almoço") {
+            msg = "um <b>Almoço</b> criado";
           } else {
-            msg = 'uma <b>Visita</b> criada';
+            msg = "uma <b>Visita</b> criada";
           }
           Swal.fire({
             title: Company,
-            html: `Já existe ${msg} acima dessa visita.<br/>` +
-            `<b>Exclua</b> ou <b>Altere</b> ${antes[0].tipo === 'Almoço' ? 'o <b>Almoço</b>' : 'a <b>Visita</b>'} para poder criar uma <b>Visita Conjunta</b>`,
+            html:
+              `Já existe ${msg} acima dessa visita.<br/>` +
+              `<b>Exclua</b> ou <b>Altere</b> ${
+                antes[0].tipo === "Almoço"
+                  ? "o <b>Almoço</b>"
+                  : "a <b>Visita</b>"
+              } para poder criar uma <b>Visita Conjunta</b>`,
             icon: "warning",
             showConfirmButton: true,
             showCloseButton: true,
@@ -402,34 +455,39 @@ const Schedule = ({userRef, members, tecs}) => {
         }
       } else if (result.isDenied) {
         let msg;
-        const depois = visitsFind('depois', ref);
-        if(depois.length > 0) {
-          if(depois[0].tipo === 'Almoço') {
-            msg = 'um <b>Almoço</b> criado';
+        const depois = visitsFind("depois", ref);
+        if (depois.length > 0) {
+          if (depois[0].tipo === "Almoço") {
+            msg = "um <b>Almoço</b> criado";
           } else {
-            msg = 'uma <b>Visita</b> criada';
+            msg = "uma <b>Visita</b> criada";
           }
           Swal.fire({
             title: Company,
-            html: `Já existe ${msg} abaixo dessa visita.<br/>` +
-            `<b>Exclua</b> ou <b>Altere</b> ${depois[0].tipo === 'Almoço' ? 'o <b>Almoço</b>' : 'a <b>Visita</b>'} para poder criar uma <b>Visita Conjunta</b>`,
+            html:
+              `Já existe ${msg} abaixo dessa visita.<br/>` +
+              `<b>Exclua</b> ou <b>Altere</b> ${
+                depois[0].tipo === "Almoço"
+                  ? "o <b>Almoço</b>"
+                  : "a <b>Visita</b>"
+              } para poder criar uma <b>Visita Conjunta</b>`,
             icon: "warning",
             showConfirmButton: true,
             showCloseButton: true,
             confirmButtonColor: "#F39200",
           });
         } else {
-        setTimeout(() => {
-          setCreateVisitGroup({
-            check: true,
-            type: "depois",
-            info: ref,
-            ref: doc(dataBase, "Agendas", year, monthSelect, ref.id),
-          });
-          setBox("group");
-          return handleBoxVisitRef();
-        }, 400);
-      }
+          setTimeout(() => {
+            setCreateVisitGroup({
+              check: true,
+              type: "depois",
+              info: ref,
+              ref: doc(dataBase, "Agendas", year, monthSelect, ref.id),
+            });
+            setBox("group");
+            return handleBoxVisitRef();
+          }, 400);
+        }
       }
     });
   };
@@ -437,8 +495,7 @@ const Schedule = ({userRef, members, tecs}) => {
   const changeFoco = () => {
     setFocoCheck(!focoCheck); // Altera o estado do FocoCheck
     localStorage.setItem("foco", !focoCheck);
-  }
-
+  };
 
   return (
     <div className="container-schedule">
@@ -462,19 +519,19 @@ const Schedule = ({userRef, members, tecs}) => {
                   monthNumber={monthNumber}
                 />
               )) || // Chama o componente 'Create'
-              (box === "create lunch" && (
-                <CreateVisit
-                  returnSchedule={returnSchedule}
-                  filterSchedule={filterSchedule}
-                  scheduleRef={scheduleRef}
-                  membersRef={members}
-                  tecs={tecs}
-                  userRef={userRef}
-                  schedule={schedule}
-                  monthNumber={monthNumber}
-                  type={'lunch'}
-                />
-              )) || // Chama o componente 'Create'
+                (box === "create lunch" && (
+                  <CreateVisit
+                    returnSchedule={returnSchedule}
+                    filterSchedule={filterSchedule}
+                    scheduleRef={scheduleRef}
+                    membersRef={members}
+                    tecs={tecs}
+                    userRef={userRef}
+                    schedule={schedule}
+                    monthNumber={monthNumber}
+                    type={"lunch"}
+                  />
+                )) || // Chama o componente 'Create'
                 (box === "edit" && (
                   <EditVisit
                     returnSchedule={returnSchedule}
@@ -564,18 +621,32 @@ const Schedule = ({userRef, members, tecs}) => {
             </div>
           )}
           <div className="container-table">
-            {schedule && schedule.length > 0 &&
-            <div className="toggle-box">
+            {schedule && schedule.length > 0 && (
+              <div className="toggle-box">
                 <p>Modo foco</p>
-                <input type="checkbox" id="toggle" className="toggle toggle--shadow" checked={focoCheck} onChange={() => changeFoco()} />
-              <label htmlFor="toggle"></label>
-            </div>
-            }
-            {dayVisits && dayVisits.length > 0 && (
-              <><div>
-                <h2>Visitas do Dia {moment(new Date(dayVisits[0].dia)).format("D")}</h2>
+                <input
+                  type="checkbox"
+                  id="toggle"
+                  className="toggle toggle--shadow"
+                  checked={focoCheck}
+                  onChange={() => changeFoco()}
+                />
+                <label htmlFor="toggle"></label>
               </div>
-              <table className={focoCheck ? "table-visit table-foco" : "table-visit"}>
+            )}
+            {dayVisits && dayVisits.length > 0 && (
+              <>
+                <div>
+                  <h2>
+                    Visitas do Dia{" "}
+                    {moment(new Date(dayVisits[0].dia)).format("D")}
+                  </h2>
+                </div>
+                <table
+                  className={
+                    focoCheck ? "table-visit table-foco" : "table-visit"
+                  }
+                >
                   <thead>
                     <tr>
                       <th className="icons"></th>
@@ -594,49 +665,73 @@ const Schedule = ({userRef, members, tecs}) => {
                   </thead>
                   <tbody>
                     {dayVisits.map((info, index) => (
-                      <tr
-                        className="table"
-                        key={index}
-                      >
-                        {(info.confirmar === false && info.tipo === "Visita" &&
-                        (<td className="visit-icon cursor-help" aria-label="Visita" 
-                        data-cooltipz-dir="right"></td>)) ||
-                        (info.confirmar === false && info.tipo === "Visita Conjunta" &&
-                        (<td className="group-icon cursor-help" aria-label="Visita Conjunta" 
-                        data-cooltipz-dir="right"></td>)) || 
-                        (info.confirmar === false && info.tipo === "Almoço" &&
-                        (<td className="lunch-icon cursor-help" aria-label="Almoço" 
-                        data-cooltipz-dir="right"></td>)) || 
-                        (info.confirmar === true &&
-                        (<td className="confirm-icon cursor-help" aria-label="Visita Confirmada" 
-                        data-cooltipz-dir="right"></td>))}
+                      <tr className="table" key={index}>
+                        {(info.confirmar === false &&
+                          info.tipo === "Visita" && (
+                            <td
+                              className="visit-icon cursor-help"
+                              aria-label="Visita"
+                              data-cooltipz-dir="right"
+                            ></td>
+                          )) ||
+                          (info.confirmar === false &&
+                            info.tipo === "Visita Conjunta" && (
+                              <td
+                                className="group-icon cursor-help"
+                                aria-label="Visita Conjunta"
+                                data-cooltipz-dir="right"
+                              ></td>
+                            )) ||
+                          (info.confirmar === false &&
+                            info.tipo === "Almoço" && (
+                              <td
+                                className="lunch-icon cursor-help"
+                                aria-label="Almoço"
+                                data-cooltipz-dir="right"
+                              ></td>
+                            )) ||
+                          (info.confirmar === true && (
+                            <td
+                              className="confirm-icon cursor-help"
+                              aria-label="Visita Confirmada"
+                              data-cooltipz-dir="right"
+                            ></td>
+                          ))}
                         <td className="bold">
                           {moment(new Date(info.dia)).format("D")}
                         </td>
                         <td className="no-wrap">{info.cidade}</td>
                         <td>{info.cliente}</td>
-                        {info.tipo === "Almoço" ?
-                          <td></td> : <td className="bold bg-important">{info.saidaEmpresa}</td>}
+                        {info.tipo === "Almoço" ? (
+                          <td></td>
+                        ) : (
+                          <td className="bold bg-important">
+                            {info.saidaEmpresa}
+                          </td>
+                        )}
                         <td>{info.chegadaCliente}</td>
                         <td>{info.visita}</td>
-                        <td
-                          className={"bg-important-2"}
-                        >
+                        <td className={"bg-important-2"}>
                           {info.saidaDoCliente}
                         </td>
-                        {info.tipo === "Almoço" ?
-                          <td></td> : <td className="bold bg-important">
-                          {info.chegadaEmpresa}
-                        </td>}
+                        {info.tipo === "Almoço" ? (
+                          <td></td>
+                        ) : (
+                          <td className="bold bg-important">
+                            {info.chegadaEmpresa}
+                          </td>
+                        )}
                         <td
-                          style={info.cor && {
-                            backgroundColor: info.cor,
-                            borderBottom: `1px solid ${info.cor}`,
-                            borderRight: `1px solid ${info.cor}`,
-                            borderLeft: `1px solid ${info.cor}`,
-                            color: "#fff",
-                            textShadow: '#5a5a5a -1px 0px 5px',
-                          }}
+                          style={
+                            info.cor && {
+                              backgroundColor: info.cor,
+                              borderBottom: `1px solid ${info.cor}`,
+                              borderRight: `1px solid ${info.cor}`,
+                              borderLeft: `1px solid ${info.cor}`,
+                              color: "#fff",
+                              textShadow: "#5a5a5a -1px 0px 5px",
+                            }
+                          }
                         >
                           {info.consultora}
                         </td>
@@ -645,14 +740,21 @@ const Schedule = ({userRef, members, tecs}) => {
                       </tr>
                     ))}
                   </tbody>
-                </table></>
+                </table>
+              </>
             )}
             {schedule && schedule.length > 0 && (
-              <table className={focoCheck ? "table-visit table-foco" : "table-visit"}>
+              <table
+                className={focoCheck ? "table-visit table-foco" : "table-visit"}
+              >
                 <thead>
                   <tr>
                     <th className="icons"></th>
-                    {userRef && userRef.cargo === "Técnico" ? <th></th> : <th>V.C</th>}
+                    {userRef && userRef.cargo === "Técnico" ? (
+                      <th></th>
+                    ) : (
+                      <th>V.C</th>
+                    )}
                     <th>Dia</th>
                     <th>Cidade</th>
                     <th>Cliente</th>
@@ -664,36 +766,60 @@ const Schedule = ({userRef, members, tecs}) => {
                     <th>Consultora</th>
                     <th>Técnico</th>
                     <th>Observação</th>
-                    {userRef && userRef.cargo === "Técnico" ? <></> : <th>Ação</th>}
+                    {userRef && userRef.cargo === "Técnico" ? (
+                      <></>
+                    ) : (
+                      <th>Ação</th>
+                    )}
                   </tr>
                 </thead>
                 <tbody>
                   {schedule &&
                     schedule.map((info, index) => (
-                      <tr
-                        className={"table"}
-                        key={index}
-                      >
-                        {(info.confirmar === false && info.tipo === "Visita" &&
-                        (<td className="visit-icon cursor-help" aria-label="Visita" 
-                        data-cooltipz-dir="right"></td>)) ||
-                        (info.confirmar === false && info.tipo === "Visita Conjunta" &&
-                        (<td className="group-icon cursor-help" aria-label="Visita Conjunta" 
-                        data-cooltipz-dir="right"></td>)) || 
-                        (info.confirmar === false && info.tipo === "Almoço" &&
-                        (<td className="lunch-icon cursor-help" aria-label="Almoço" 
-                        data-cooltipz-dir="right"></td>)) || 
-                        (info.confirmar === true &&
-                        (<td className="confirm-icon cursor-help" aria-label="Visita Confirmada" 
-                        data-cooltipz-dir="right"></td>))}
-                        {info.confirmar === true || (userRef && userRef.cargo === "Técnico")  ? <td></td> : (
-                          <td aria-label="Criar Visita Conjunta" 
-                          data-cooltipz-dir="right">
+                      <tr className={"table"} key={index}>
+                        {(info.confirmar === false &&
+                          info.tipo === "Visita" && (
+                            <td
+                              className="visit-icon cursor-help"
+                              aria-label="Visita"
+                              data-cooltipz-dir="right"
+                            ></td>
+                          )) ||
+                          (info.confirmar === false &&
+                            info.tipo === "Visita Conjunta" && (
+                              <td
+                                className="group-icon cursor-help"
+                                aria-label="Visita Conjunta"
+                                data-cooltipz-dir="right"
+                              ></td>
+                            )) ||
+                          (info.confirmar === false &&
+                            info.tipo === "Almoço" && (
+                              <td
+                                className="lunch-icon cursor-help"
+                                aria-label="Almoço"
+                                data-cooltipz-dir="right"
+                              ></td>
+                            )) ||
+                          (info.confirmar === true && (
+                            <td
+                              className="confirm-icon cursor-help"
+                              aria-label="Visita Confirmada"
+                              data-cooltipz-dir="right"
+                            ></td>
+                          ))}
+                        {info.confirmar === true ||
+                        (userRef && userRef.cargo === "Técnico") ? (
+                          <td></td>
+                        ) : (
+                          <td
+                            aria-label="Criar Visita Conjunta"
+                            data-cooltipz-dir="right"
+                          >
                             <button
                               className="btn-add"
                               onClick={() => createVisitGroupChoice(info)}
-                            >
-                            </button>
+                            ></button>
                           </td>
                         )}
                         <td className="bold">
@@ -718,19 +844,25 @@ const Schedule = ({userRef, members, tecs}) => {
                         <td className="bold bg-important">
                           {info.chegadaEmpresa}
                         </td> */}
-                        {info.tipo === "Almoço" ?
-                          <td></td> : <td className="bold bg-important">{info.saidaEmpresa}</td>}
+                        {info.tipo === "Almoço" ? (
+                          <td></td>
+                        ) : (
+                          <td className="bold bg-important">
+                            {info.saidaEmpresa}
+                          </td>
+                        )}
                         <td>{info.chegadaCliente}</td>
                         <td>{info.visita}</td>
-                        <td
-                          className={"bg-important-2"}
-                        >
+                        <td className={"bg-important-2"}>
                           {info.saidaDoCliente}
                         </td>
-                        {info.tipo === "Almoço" ?
-                          <td></td> : <td className="bold bg-important">
-                          {info.chegadaEmpresa}
-                        </td>}
+                        {info.tipo === "Almoço" ? (
+                          <td></td>
+                        ) : (
+                          <td className="bold bg-important">
+                            {info.chegadaEmpresa}
+                          </td>
+                        )}
                         <td
                           style={
                             info.cor && {
@@ -739,7 +871,7 @@ const Schedule = ({userRef, members, tecs}) => {
                               borderRight: `1px solid ${info.cor}`,
                               borderLeft: `1px solid ${info.cor}`,
                               color: "#fff",
-                              textShadow: '#5a5a5a -1px 0px 5px',
+                              textShadow: "#5a5a5a -1px 0px 5px",
                             }
                           }
                         >
@@ -747,41 +879,46 @@ const Schedule = ({userRef, members, tecs}) => {
                         </td>
                         <td>{info.tecnico}</td>
                         <td className="observation">{info.observacao}</td>
-                        <td className="action" style={info.observacao ? {} : null}>
-                          
-                          {(info.confirmar === false &&
-                            info.uid === user.id) ||
+                        <td
+                          className="action"
+                          style={info.observacao ? {} : null}
+                        >
+                          {(info.confirmar === false && info.uid === user.id) ||
                           user.email === Users[0].email ||
-                            info.consultora === "Vendedor(a)" ? (
+                          info.consultora === "Vendedor(a)" ? (
                             <>
-                            <div aria-label="Editar Visita" 
-                              data-cooltipz-dir="left">
-                              <button
-                                className="btn-edit"
-                                id="edit-visit"
-                                onClick={() => {
-                                  setBox("edit");
-                                  setEditVisit({
-                                    info: info,
-                                    ref: doc(
-                                      dataBase,
-                                      "Agendas",
-                                      year,
-                                      monthSelect,
-                                      info.id
-                                    ),
-                                  });
-                                  return handleBoxVisitRef();
-                                }}
-                              ></button>
+                              <div
+                                aria-label="Editar Visita"
+                                data-cooltipz-dir="left"
+                              >
+                                <button
+                                  className="btn-edit"
+                                  id="edit-visit"
+                                  onClick={() => {
+                                    setBox("edit");
+                                    setEditVisit({
+                                      info: info,
+                                      ref: doc(
+                                        dataBase,
+                                        "Agendas",
+                                        year,
+                                        monthSelect,
+                                        info.id
+                                      ),
+                                    });
+                                    return handleBoxVisitRef();
+                                  }}
+                                ></button>
                               </div>
-                              <div aria-label="Excluir Visita" 
-                              data-cooltipz-dir="left">
-                              <button
-                                className="btn-delete"
-                                id="edit-visit"
-                                onClick={() => deleteVisit(info)}
-                              ></button>
+                              <div
+                                aria-label="Excluir Visita"
+                                data-cooltipz-dir="left"
+                              >
+                                <button
+                                  className="btn-delete"
+                                  id="edit-visit"
+                                  onClick={() => deleteVisit(info)}
+                                ></button>
                               </div>
                             </>
                           ) : (
@@ -789,15 +926,17 @@ const Schedule = ({userRef, members, tecs}) => {
                           )}
 
                           {info.confirmar === false &&
-                            user.email === Users[0].email &&
-                            info.consultora !== "Almoço Téc." ? (
+                          user.email === Users[0].email &&
+                          info.consultora !== "Almoço Téc." ? (
                             <>
-                            <div aria-label="Confirmar Visita" 
-                              data-cooltipz-dir="left">
-                              <button
-                                className="btn-confirm"
-                                onClick={() => confirmVisit(info, "confirm")}
-                              ></button>
+                              <div
+                                aria-label="Confirmar Visita"
+                                data-cooltipz-dir="left"
+                              >
+                                <button
+                                  className="btn-confirm"
+                                  onClick={() => confirmVisit(info, "confirm")}
+                                ></button>
                               </div>
                             </>
                           ) : (
@@ -805,14 +944,16 @@ const Schedule = ({userRef, members, tecs}) => {
                           )}
 
                           {info.confirmar === true &&
-                            user.email === Users[0].email ? (
+                          user.email === Users[0].email ? (
                             <>
-                            <div aria-label="Cancelar Visita" 
-                              data-cooltipz-dir="left">
-                              <button
-                                className="btn-cancel"
-                                onClick={() => confirmVisit(info, "cancel")}
-                              ></button>
+                              <div
+                                aria-label="Cancelar Visita"
+                                data-cooltipz-dir="left"
+                              >
+                                <button
+                                  className="btn-cancel"
+                                  onClick={() => confirmVisit(info, "cancel")}
+                                ></button>
                               </div>
                             </>
                           ) : (

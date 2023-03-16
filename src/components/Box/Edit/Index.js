@@ -345,18 +345,21 @@ const EditVisit = ({
                 (ref) =>
                   ref.data === visitRef.data &&
                   ref.chegadaEmpresa === visitRef.saidaEmpresa &&
-                  ref.tipo !== "Almoço"
+                  ref.tipo !== "Almoço" &&
+                  !ref.visitaAlmoco
+
               );
              const visitsDepois = schedule.filter(
                 (ref) =>
                   ref.data === visitRef.data &&
                   ref.saidaEmpresa === visitRef.chegadaEmpresa &&
-                  ref.tipo !== "Almoço"
+                  ref.tipo !== "Almoço" &&
+                  !ref.visitaAlmoco
               );
               console.log(visitsAntes, visitsDepois);
           if(visitsAntes.length > 0) {
             visitsAntes.map(async (ref) => {
-              const visitBefore =  schedule.filter(before => (before.data === ref.data && before.chegadaEmpresa === ref.saidaEmpresa && ref.consultora !== 'Almoço Téc.' && before.tipo === "Visita Conjunta"));
+              const visitBefore =  schedule.filter(before => (before.data === ref.data && before.chegadaEmpresa === ref.saidaEmpresa && ref.consultora !== 'Almoço Téc.' && before.tipo === "Visita Conjunta" && !before.visitaAlmoco));
               if(ref.cidade === visitRef.cidade) {
                 if(visitBefore) {
                   visitBefore.map(async (ref) => {
@@ -388,7 +391,7 @@ const EditVisit = ({
           }
           if (visitsDepois.length > 0) {
             visitsDepois.map(async (ref) => {
-             const visitNext =  schedule.filter(next => (next.data === ref.data && next.saidaEmpresa === ref.chegadaEmpresa && ref.consultora !== 'Almoço Téc.' && next.tipo === "Visita Conjunta"));
+             const visitNext =  schedule.filter(next => (next.data === ref.data && next.saidaEmpresa === ref.chegadaEmpresa && ref.consultora !== 'Almoço Téc.' && next.tipo === "Visita Conjunta" && !next.visitaAlmoco));
               if(ref.cidade === visitRef.cidade) {
                 if(visitNext) {
                   visitNext.map(async (ref) => {
@@ -406,7 +409,6 @@ const EditVisit = ({
                 doc(dataBase, "Agendas", year, monthSelect, ref.id)
               );
               } else {
-
                 await updateDoc(doc(dataBase, "Agendas", year, monthSelect, ref.id),
                           {
                             saidaEmpresa: moment(ref.chegadaCliente, "hh:mm").subtract(ref.tempoRota, 'seconds').format('kk:mm'),
