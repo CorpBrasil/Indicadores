@@ -8,3 +8,5 @@ export const Users = [
 ]
 
 export const Company = 'CORPBRASIL';
+
+export const KeyMaps = 'AIzaSyBbTGwFUfZTO0n2E5JwB8YnbJ6qRmvebgc';

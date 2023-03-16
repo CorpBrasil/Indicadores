@@ -11,7 +11,7 @@ import {
   GoogleMap,
   useLoadScript,
 } from "@react-google-maps/api";
-import { Company } from "../../../data/Data";
+import { Company, KeyMaps } from "../../../data/Data";
 
 import '../style.scss';
 
@@ -53,12 +53,12 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
 
   const { isLoaded } = useLoadScript({
     id: "google-map-script",
-    googleMapsApiKey: "AIzaSyD1WsJJhTpdhTIVLxxXCgdlV8iYfmOeiC4",
+    googleMapsApiKey: KeyMaps,
     libraries,
   });
 
   const { ref } = usePlacesWidget({
-    apiKey: "AIzaSyD1WsJJhTpdhTIVLxxXCgdlV8iYfmOeiC4",
+    apiKey: KeyMaps,
     onPlaceSelected: (place) => {
       setCity(place.address_components[0].long_name);
       setLat(place.geometry?.location?.lat());
