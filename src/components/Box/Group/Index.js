@@ -358,8 +358,7 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
                })
                SaidaClienteRef2 = SaidaClienteRef;
             }
-
-             await addDoc(scheduleRef, {
+            createVisitDay({
               dia: diaRef,
               saidaEmpresa: saidaEmpresaRef,
               chegadaCliente: chegadaClienteRef,
@@ -390,7 +389,7 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
               cor: userRef.cor,
               confirmar: false,
               tipo: "Visita Conjunta"
-            });
+            })
           } else {
             if(visitRef.consultora !== "Almoço Téc.") {
               await updateDoc(scheduleVisitRef, {
