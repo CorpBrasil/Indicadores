@@ -43,7 +43,7 @@ const CreateVisit = ({
   const [rotaTempo, setRotaTempo] = useState(undefined);
   const [tempoTexto, setTempoTexto] = useState(undefined);
   const [visitaNumero, setVisitaNumero] = useState(1800);
-  const [saidaCliente, setSaidaCliente] = useState();
+  const [saidaCliente, setSaidaCliente] = useState(undefined);
   const [horarioTexto, setHorarioTexto] = useState(undefined);
   const [saidaTexto, setSaidaTexto] = useState(undefined);
   const [chegadaTexto, setChegadaTexto] = useState(undefined);
@@ -51,7 +51,8 @@ const CreateVisit = ({
   const [tecnicoTexto, setTecnicoTexto] = useState(tecs[0].nome);
   const [hoursLimit, setHoursLimit] = useState(false);
 
-  const [city, setCity] = useState();
+  const [city, setCity] = useState(undefined);
+  const [addressComplete, setAddressComplete] = useState(undefined);
   const [libraries] = useState(["places"]);
   //const [tecs, setTecs] = useState();
   //const [dayVisits, setDayVisits] = useState();
@@ -62,7 +63,7 @@ const CreateVisit = ({
     if(dataTexto) {
       filterSchedule(dataTexto, tecnicoTexto)
     } else {
-      filterSchedule()
+      filterSchedule(null)
     }
     if(tecnicoTexto) {
       setTecRefUID(tecs.find((tec) => tec.nome === tecnicoTexto)); 
@@ -92,7 +93,7 @@ const CreateVisit = ({
   //       if(a.saidaEmpresa > b.saidaEmpresa) return 1;
   //       return 0;
   //     }))
-  //     console.log('oi')
+  //     console.log('oi')-47.7152547
   //   }
   // },[dayVisits, dataTexto])
 
@@ -127,15 +128,19 @@ const CreateVisit = ({
   const { ref } = usePlacesWidget({
     apiKey: KeyMaps,
     onPlaceSelected: (place) => {
-      setCity(place.address_components[0].long_name);
+      const address = place.formatted_address;
+      const cityRef = place.address_components.find(ref => ref.types[0] === 'administrative_area_level_2');
+      setCity(cityRef.long_name);
+      setAddressComplete(address.substring(0, address.length - 19));
       setLat(place.geometry?.location?.lat());
       setLng(place.geometry?.location?.lng());
+      console.log(place);
       setCheck(true); // Habilita o serviço de calculo de distancia do google
-      //console.log(place);
     },
     options: {
-      types: ["(regions)"],
+      types: ["geocode"],
       componentRestrictions: { country: "br" },
+      fields: ["formatted_address", "address_components", "geometry.location"],
     },
   });
 
@@ -357,6 +362,7 @@ const CreateVisit = ({
                 tecnico: tecRefUID.nome,
                 tecnicoUID: tecRefUID.uid,
                 cidade: city,
+                endereco: addressComplete,
                 veiculo: tecRefUID.veiculo,
                 lat: lat,
                 lng: lng,
@@ -385,6 +391,7 @@ const CreateVisit = ({
                 veiculo: tecRefUID.veiculo,
                 groupRef: "depois",
                 cidade: city,
+                endereco: addressComplete,
                 lat: lat,
                 lng: lng,
                 cliente: userData.cliente,
@@ -467,6 +474,7 @@ const CreateVisit = ({
                             tecnico: tecRefUID.nome,
                             tecnicoUID: tecRefUID.uid,
                             cidade: city,
+                            endereco: addressComplete,
                             veiculo: tecRefUID.veiculo,
                             lat: lat,
                             lng: lng,
@@ -639,7 +647,7 @@ const CreateVisit = ({
               <input
                 className="label__input"
                 type="date"
-                value={dataTexto}
+                value={dataTexto || ''}
                 onBlur={() => verifyLunch()}
                 min={monthNumber && monthNumber.min}
                 max={monthNumber && monthNumber.max}
@@ -651,7 +659,7 @@ const CreateVisit = ({
             </label>
             {!checkInput &&
               <label className="label">
-              <p>Cidade *</p>
+              <p>Endereço *</p>
               <input
                 className="label__input"
                 placeholder="Digite a cidade"
@@ -659,7 +667,8 @@ const CreateVisit = ({
                 required
               />
               {tempoTexto && tempoTexto && (
-                <p className="notice">Tempo da rota: {tempoTexto} ✔️</p>
+                <><p className="notice">Tempo da rota: {tempoTexto} ✔️</p>
+                <p className="notice">Cidade: {city} ✔️</p></>
               )}
             </label>
             }
@@ -784,12 +793,13 @@ const CreateVisit = ({
       </div>
 
       {isLoaded && check === true ? (
-        <GoogleMap zoom={10} center={{ lat: -27.598824, lng: -48.551262 }}>
+        <GoogleMap zoom={10} center={{lat: -23.109731, lng: -47.715045}}>
           <DistanceMatrixService
             options={{
               destinations: [{ lat: lat, lng: lng }],
-              origins: [{ lng: -47.6973284, lat: -23.0881786 }],
+              origins: [{ lng: -47.715045, lat: -23.109731}],
               travelMode: "DRIVING",
+              drivingOptions: { departureTime: new Date(), trafficModel: 'bestguess'}, // Pega o trafico no tempo de criação da visita
             }}
             callback={(response, status) => {
               if (status === "OK") {

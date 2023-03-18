@@ -35,10 +35,11 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
   const [visitaNumero, setVisitaNumero] = useState(1800);
   const [saidaCliente, setSaidaCliente] = useState();
   const [horarioTexto, setHorarioTexto] = useState()
-  const [saidaTexto, setSaidaTexto] = useState()
-  const [chegadaTexto, setChegadaTexto] = useState()
-  const [dataTexto, setDataTexto] = useState()
-  const [tecnicoTexto, setTecnicoTexto] = useState()
+  const [saidaTexto, setSaidaTexto] = useState();
+  const [chegadaTexto, setChegadaTexto] = useState();
+  const [dataTexto, setDataTexto] = useState();
+  const [tecnicoTexto, setTecnicoTexto] = useState();
+  const [addressComplete, setAddressComplete] = useState(undefined);
   const [city, setCity] = useState();
   const [hoursLimit, setHoursLimit] = useState(false);
   const [libraries] = useState(["places"]);
@@ -60,15 +61,19 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
   const { ref } = usePlacesWidget({
     apiKey: KeyMaps,
     onPlaceSelected: (place) => {
-      setCity(place.address_components[0].long_name);
+      const address = place.formatted_address;
+      const cityRef = place.address_components.find(ref => ref.types[0] === 'administrative_area_level_2');
+      setCity(cityRef.long_name);
+      setAddressComplete(address.substring(0, address.length - 19));
       setLat(place.geometry?.location?.lat());
       setLng(place.geometry?.location?.lng());
       setCheck1(true); // Habilita o serviço de calculo de distancia do google
       //console.log(place);
     },
     options: {
-      types: ["(regions)"],
+      types: ["geocode"],
       componentRestrictions: { country: "br" },
+      fields: ["formatted_address", "address_components", "geometry.location"],
     },
   });
 
@@ -84,24 +89,24 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
       setTecnicoTexto(visitRef.tecnico);
       setCity(visitRef.cidade);
       if(type === 'antes') {
-        setLatRef(-23.0881786);
-        setLngRef(-47.6973284);
+        setLatRef(-23.109731);
+        setLngRef(-47.715045);
         setLat2(visitRef.lat);
         setLng2(visitRef.lng);
       } else {
         
         if(visitRef.visitaAlmoco) {
           setHorarioTexto(moment(visitRef.chegadaEmpresa, "hh:mm").add(rotaTempo1, 'seconds').format('kk:mm'));
-          setLatRef(-23.0881786);
-          setLngRef(-47.6973284);
-          setLat2(-23.0881786);
-          setLng2(-47.6973284);
+          setLatRef(-23.109731);
+          setLngRef(-47.715045);
+          setLat2(-23.109731);
+          setLng2(-47.715045);
         } else {
           setHorarioTexto(moment(visitRef.saidaDoCliente, "hh:mm").add(rotaTempo1, 'seconds').format('kk:mm'));
           setLatRef(visitRef.lat);
           setLngRef(visitRef.lng);
-          setLat2(-23.0881786);
-          setLng2(-47.6973284);
+          setLat2(-23.109731);
+          setLng2(-47.715045);
         }
       }
       //setHorarioTexto(moment(visitRef.saidaDoCliente, "hh:mm").add(600, 'seconds').format('kk:mm'));
@@ -362,6 +367,7 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
               tecnicoUID: tecRefUID.uid,
               veiculo: tecRefUID.veiculo,
               cidade: city,
+              endereco: addressComplete,
               cliente: userData.cliente,
               observacao: userData.observacao,
               tempoRota: rotaTempo1,
@@ -403,6 +409,7 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
               tecnicoUID: tecRefUID.uid,
               veiculo: tecRefUID.veiculo,
               cidade: city,
+              endereco: addressComplete,
               cliente: userData.cliente,
               observacao: userData.observacao,
               tempoRota: rotaTempo2,
@@ -469,14 +476,15 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
               /> 
             </label>
             <label className="label">
-              <p>Cidade *</p>
+              <p>Endereço *</p>
               <input
                 className="label__input"
                 placeholder="Digite a cidade"
                 ref={ref}
               />
               {tempoTexto1 && tempoTexto2 && (
-                <p className="notice">Tempo da rota: {tempoTexto1} ✔️</p>
+                <><p className="notice">Tempo da rota: {tempoTexto1} ✔️</p>
+                <p className="notice">Cidade: {city} ✔️</p></>
               )}
             </label>
             <label className="label">
@@ -586,6 +594,7 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
               destinations: [{ lat: lat, lng: lng }],
               origins: [{ lng: lngRef, lat: latRef }],
               travelMode: "DRIVING",
+              drivingOptions: { departureTime: new Date(), trafficModel: 'bestguess'} // Pega o trafico no tempo de criação da visita
             }}
             callback={(response, status) => {
               if (status === "OK") {
@@ -618,6 +627,7 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
               destinations: [{ lat: lat, lng: lng }], // Boituva
               origins: [{ lng: lng2, lat: lat2 }], // Boituva
               travelMode: "DRIVING",
+              drivingOptions: { departureTime: new Date(), trafficModel: 'bestguess'}
             }}
             callback={(response, status) => {
               if (status === "OK") {

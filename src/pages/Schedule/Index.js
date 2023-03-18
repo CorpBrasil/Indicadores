@@ -700,7 +700,9 @@ const Schedule = ({ userRef, members, tecs }) => {
                         <td className="bold">
                           {moment(new Date(info.dia)).format("D")}
                         </td>
-                        <td className="no-wrap">{info.cidade}</td>
+                        <td className="no-wrap"
+                            aria-label={info.endereco}
+                            data-cooltipz-dir="top">{info.cidade}</td>
                         <td>{info.cliente}</td>
                         {info.tipo === "Almoço" ? (
                           <td></td>
@@ -825,7 +827,9 @@ const Schedule = ({ userRef, members, tecs }) => {
                         <td className="bold">
                           {moment(new Date(info.dia)).format("D")}
                         </td>
-                        <td className="no-wrap">{info.cidade}</td>
+                        <td className="no-wrap" 
+                            aria-label={info.endereco}
+                            data-cooltipz-dir="top">{info.cidade}</td>
                         <td className="no-wrap">{info.cliente}</td>
                         {/* <td className="bold bg-important">
                           {info.saidaEmpresa}

@@ -571,15 +571,15 @@ const EditVisit = ({
             {visitRef.consultora !== "Almoço Téc." && (
               <>
                 <label className="label">
-                  <p>Cidade *</p>
+                  <p>Endereço *</p>
                   <input
                     className="label__input"
                     placeholder="Digite a cidade"
-                    value={city}
+                    value={visitRef.endereco ? visitRef.endereco : city}
                     disabled
                   />
                   {tempoTexto && tempoTexto && (
-                    <p className="notice">Tempo da rota: {tempoTexto}</p>
+                    <p className="notice">Tempo da rota: {tempoTexto} ✔️</p>
                   )}
                 </label>
                 <label className="label">
