@@ -39,6 +39,7 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
   const [chegadaTexto, setChegadaTexto] = useState();
   const [dataTexto, setDataTexto] = useState();
   const [tecnicoTexto, setTecnicoTexto] = useState();
+  const [numberAddress, setNumberAddress] = useState(undefined);
   const [addressComplete, setAddressComplete] = useState(undefined);
   const [city, setCity] = useState();
   const [hoursLimit, setHoursLimit] = useState(false);
@@ -63,6 +64,12 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
     onPlaceSelected: (place) => {
       const address = place.formatted_address;
       const cityRef = place.address_components.find(ref => ref.types[0] === 'administrative_area_level_2');
+      if (place.address_components[0].types[0] === "street_number") {
+        const numberRef = place.address_components.find(ref => ref.types[0] === "street_number");
+        setNumberAddress(numberRef.long_name);
+      } else {
+        setNumberAddress(undefined);
+      }
       setCity(cityRef.long_name);
       setAddressComplete(address.substring(0, address.length - 19));
       setLat(place.geometry?.location?.lat());
@@ -393,54 +400,240 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
                 tipo: "Visita Conjunta"
                })
             } 
-        
-             await addDoc(scheduleRef, {
-              dia: diaRef,
-              saidaEmpresa: saidaEmpresaRef,
-              saidaEmpresaRef: visitRef.saidaEmpresa,
-              chegadaCliente: chegadaClienteRef,
-              visita: TempoVisita,
-              visitaNumero: visitaNumero,
-              saidaDoCliente: SaidaClienteRef,
-              chegadaEmpresa: ChegadaEmpresaRef,
-              chegadaEmpresaRef: visitRef.chegadaEmpresa,
-              consultora: userData.consultora,
-              tecnico: tecRefUID.nome,
-              tecnicoUID: tecRefUID.uid,
-              veiculo: tecRefUID.veiculo,
-              cidade: city,
-              endereco: addressComplete,
-              cliente: userData.cliente,
-              observacao: userData.observacao,
-              tempoRota: rotaTempo2,
-              tempo: tempoTexto2,
-              tempoRotaConjunta: rotaTempo1,
-              tempoConjunta: tempoTexto1,
-              lng: lng,
-              lat: lat,
-              lngRef: lng2,
-              latRef: lat2,
-              data: dataTexto,
-              uid: user.id,
-              idRef: visitRef.id,
-              group: 'depois',
-              cor: userRef.cor,
-              confirmar: false,
-              tipo: "Visita Conjunta"
-            });
+              //====================================== DEPOIS
+              const visita = {
+                dia: diaRef,
+                saidaEmpresa: saidaEmpresaRef,
+                chegadaCliente: chegadaClienteRef,
+                visita: TempoVisita,
+                visitaNumero: visitaNumero,
+                saidaDoCliente: SaidaClienteRef,
+                chegadaEmpresa: ChegadaEmpresaRef,
+                consultora: userData.consultora,
+                tecnico: tecRefUID.nome,
+                tecnicoUID: tecRefUID.uid,
+                cidade: city,
+                endereco: addressComplete,
+                veiculo: tecRefUID.veiculo,
+                lat: lat,
+                lng: lng,
+                cliente: userData.cliente,
+                observacao: userData.observacao,
+                tempoRota: rotaTempo2,
+                tempo: tempoTexto2,
+                tempoRotaConjunta: rotaTempo1,
+                tempoConjunta: tempoTexto1,
+                lngRef: lng2,
+                latRef: lat2,
+                data: dataTexto,
+                uid: user.id,
+                cor: userRef.cor,
+                confirmar: false,
+                group: 'depois',
+                visitaConjunta: true,
+                tipo: 'Visita Conjunta',
+              };
+
+              const visitaConjunta = {
+                dia: diaRef,
+                saidaEmpresa: saidaEmpresaRef,
+                chegadaCliente: chegadaClienteRef,
+                visita: TempoVisita,
+                visitaNumero: visitaNumero,
+                saidaDoCliente: SaidaClienteRef,
+                chegadaEmpresa: SaidaClienteRef,
+                consultora: userData.consultora,
+                tecnico: tecRefUID.nome,
+                tecnicoUID: tecRefUID.uid,
+                veiculo: tecRefUID.veiculo,
+                groupRef: "depois",
+                cidade: city,
+                endereco: addressComplete,
+                lat: lat,
+                lng: lng,
+                cliente: userData.cliente,
+                observacao: userData.observacao,
+                tempoRota: rotaTempo2,
+                tempo: tempoTexto2,
+                tempoRotaConjunta: rotaTempo1,
+                tempoConjunta: tempoTexto1,
+                lngRef: lng2,
+                latRef: lat2,
+                data: dataTexto,
+                uid: user.id,
+                cor: userRef.cor,
+                confirmar: false,
+                visitaConjunta: true,
+                group: 'depois',
+                tipo: 'Visita Conjunta',
+              };
+              if (chegadaFormatadaTec.current && lunch.length === 0) {               
+                if(city !== 'Tietê') {
+                  Swal.fire({
+                    title: Company,
+                    html: `O horário de almoço do Técnico <b>${tecRefUID.nome}</b> irá ser criado automaticamente após a visita em <b>${city}</b>.<br/>` +
+                    `Você deseja que o almoço seja em <b>${city}</b> ou em <b>Tietê</b>?`,
+                    icon: "question",
+                    showDenyButton: true,
+                    showCloseButton: true,
+                    confirmButtonColor: "#F39200",
+                    confirmButtonText: city,
+                    denyButtonText: `Tietê`,
+                  }).then(async (result) => {
+                    if (result.isConfirmed) {
+                      await addDoc(scheduleRef, {
+                        dia: diaRef,
+                        saidaEmpresa: SaidaClienteRef,
+                        chegadaCliente: SaidaClienteRef,
+                        visita: "01:00",
+                        visitaNumero: 3600,
+                        saidaDoCliente: moment(SaidaClienteRef, 'hh:mm').add(3600, 'seconds').format('kk:mm'),
+                        chegadaEmpresa: moment(SaidaClienteRef, 'hh:mm').add(3600, 'seconds').format('kk:mm'),
+                        consultora: "Almoço Téc.",
+                        tecnico: tecRefUID.nome,
+                        tecnicoUID: tecRefUID.uid,
+                        cidade: '',
+                        lat: lat,
+                        lng: lng,
+                        tempoRota: '',
+                        tempo: '',
+                        cliente: '',
+                        observacao: '',
+                        data: dataTexto,
+                        uid: user.id,
+                        cor: "#111111",
+                        confirmar: false,
+                        tipo: "Almoço"
+                      })
+                      Swal.fire({
+                        title: Company,
+                        html: `Após o almoço, o Técnico <b>${tecRefUID.nome}</b> irá <b>continuar</b> com mais visitas na região ou <b>retornará</b> para <b>Tietê</b>?</br></br>` +
+                        `Atenção: caso escolha <b>retornar</b> para <b>Tietê</b>, o <b>tempo de retorno</b> para a cidade vai contar após o <b>término do almoço</b>.`,
+                        icon: "question",
+                        showDenyButton: true,
+                        showCloseButton: true,
+                        confirmButtonColor: "#F39200",
+                        confirmButtonText: 'Continuar',
+                        denyButtonText: `Retornar`,
+                      }).then(async (result) => {
+                        if (result.isConfirmed) {
+                          createVisitDay(visitaConjunta)
+                        } else if(result.isDenied) {
+                          createVisitDay({
+                            dia: diaRef,
+                            saidaEmpresa: saidaEmpresaRef,
+                            chegadaCliente: chegadaClienteRef,
+                            visita: TempoVisita,
+                            visitaNumero: visitaNumero,
+                            saidaDoCliente: SaidaClienteRef,
+                            chegadaEmpresa: moment(ChegadaEmpresaRef, 'hh:mm').add(3600, 'seconds').format('kk:mm'),
+                            consultora: userData.consultora,
+                            group: "depois",
+                            visitaAlmoco: true, // Para poder identificar que essa visita tem um almoço dentro dela
+                            tecnico: tecRefUID.nome,
+                            tecnicoUID: tecRefUID.uid,
+                            cidade: city,
+                            endereco: addressComplete,
+                            veiculo: tecRefUID.veiculo,
+                            lat: lat,
+                            lng: lng,
+                            lngRef: lng2,
+                            latRef: lat2,
+                            cliente: userData.cliente,
+                            observacao: userData.observacao,
+                            tempoRota: rotaTempo2,
+                            tempo: tempoTexto2,
+                            tempoRotaConjunta: rotaTempo1,
+                            tempoConjunta: tempoTexto1,
+                            data: dataTexto,
+                            uid: user.id,
+                            cor: userRef.cor,
+                            confirmar: false,
+                            visitaConjunta: true,
+                            tipo: 'Visita Conjunta',
+                          })
+                        }
+                      })
+                } else if (result.isDenied) {
+                  await addDoc(scheduleRef, {
+                    dia: diaRef,
+                    saidaEmpresa: ChegadaEmpresaRef,
+                    chegadaCliente: ChegadaEmpresaRef,
+                    visita: "01:00",
+                    visitaNumero: 3600,
+                    saidaDoCliente: moment(ChegadaEmpresaRef, 'hh:mm').add(3600, 'seconds').format('kk:mm'),
+                    chegadaEmpresa: moment(ChegadaEmpresaRef, 'hh:mm').add(3600, 'seconds').format('kk:mm'),
+                    consultora: "Almoço Téc.",
+                    tecnico: tecRefUID.nome,
+                    tecnicoUID: tecRefUID.uid,
+                    cidade: '',
+                    lat: -23.0881786,
+                    lng: -47.6973284,
+                    tempoRota: '',
+                    tempo: '',
+                    cliente: '',
+                    observacao: '',
+                    data: dataTexto,
+                    uid: user.id,
+                    cor: "#111111",
+                    confirmar: false,
+                    tipo: "Almoço"
+                  })
+                  createVisitDay(visita)
+                }
+                });
+              } else {
+                await addDoc(scheduleRef, {
+                  dia: diaRef,
+                  saidaEmpresa: ChegadaEmpresaRef,
+                  chegadaCliente: ChegadaEmpresaRef,
+                  visita: "01:00",
+                  visitaNumero: 3600,
+                  saidaDoCliente: moment(ChegadaEmpresaRef, 'hh:mm').add(3600, 'seconds').format('kk:mm'),
+                  chegadaEmpresa: moment(ChegadaEmpresaRef, 'hh:mm').add(3600, 'seconds').format('kk:mm'),
+                  consultora: "Almoço Téc.",
+                  tecnico: tecRefUID.nome,
+                  tecnicoUID: tecRefUID.uid,
+                  cidade: '',
+                  lat: -23.0881786,
+                  lng: -47.6973284,
+                  tempoRota: '',
+                  tempo: '',
+                  cliente: '',
+                  observacao: '',
+                  data: dataTexto,
+                  uid: user.id,
+                  cor: "#111111",
+                  confirmar: false,
+                  tipo: "Almoço"
+                })
+                Swal.fire({
+                  title: Company,
+                  html: `O horário de almoço do Técnico <b>${tecRefUID.nome}</b> foi criado automaticamente após a visita`,
+                  icon: "warning",
+                  showConfirmButton: true,
+                  showCloseButton: true,
+                  confirmButtonColor: "#F39200",
+                }).then(() => {
+                    createVisitDay(visita)
+                })
+              }
+            } else {
+              createVisitDay(visita)
+            }  
           }
-          Swal.fire({
-            title: Company,
-            html: `A Visita Conjunta <b>${visitRef.cidade}</b> foi criada com sucesso.`,
-            icon: "success",
-            showConfirmButton: true,
-            showCloseButton: true,
-            confirmButtonColor: "#F39200"
-          }).then((result) => {
-            if (result.isConfirmed) {
-                return returnSchedule();
-            }
-          })
+          // Swal.fire({
+          //   title: Company,
+          //   html: `A Visita Conjunta <b>${visitRef.cidade}</b> foi criada com sucesso.`,
+          //   icon: "success",
+          //   showConfirmButton: true,
+          //   showCloseButton: true,
+          //   confirmButtonColor: "#F39200"
+          // }).then((result) => {
+          //   if (result.isConfirmed) {
+          //       return returnSchedule();
+          //   }
+          // })
         }
       })
     }
@@ -449,8 +642,18 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
     } 
     }
 
-    console.log(rotaTempo1, tempoTexto1);
-    console.log(rotaTempo2);
+    const createVisitDay = async (data) => {
+      await addDoc(scheduleRef, data);
+      Swal.fire({
+       title: Company,
+       html: `A visita em <b>${city}</b> foi criada com sucesso!`,
+       icon: "success",
+       showConfirmButton: true,
+       showCloseButton: true,
+       confirmButtonColor: "#F39200",
+     })
+     return returnSchedule();
+   }
 
   return (
     <div className="box-visit">
@@ -484,7 +687,7 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
               />
               {tempoTexto1 && tempoTexto2 && (
                 <><p className="notice">Tempo da rota: {tempoTexto1} ✔️</p>
-                <p className="notice">Cidade: {city} ✔️</p></>
+                <p className="notice">Cidade: {city} ✔️ N° {numberAddress ? numberAddress + '✔️' : '... ❌'}</p></>
               )}
             </label>
             <label className="label">
@@ -602,13 +805,8 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
                 if (
                   rotaTempo1 === undefined || rotaTempo1 !== response?.rows[0].elements[0].duration.value
                   ) {
-                    if(response?.rows[0].elements[0].duration.value < 60) {
-                      setRotaTempo1(900);
-                      setTempoTexto1('15 minutos');
-                    } else {
-                      setRotaTempo1(response?.rows[0].elements[0].duration.value);
-                      setTempoTexto1(response?.rows[0].elements[0].duration.text);
-                    }
+                    setRotaTempo1(response?.rows[0].elements[0].duration.value);
+                    setTempoTexto1(response?.rows[0].elements[0].duration.text);
                     console.log(response?.rows[0].elements[0].duration.text)
                     setCheck2(true);
                     setCheck1(false);
@@ -635,13 +833,8 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
                 if (
                   rotaTempo2 === undefined || rotaTempo2 !== response?.rows[0].elements[0].duration.value
                   ) {
-                    if(response?.rows[0].elements[0].duration.value < 60) {
-                      setRotaTempo2(900);
-                      setTempoTexto2('15 minutos');
-                    } else {
                       setRotaTempo2(response?.rows[0].elements[0].duration.value);
                       setTempoTexto2(response?.rows[0].elements[0].duration.text);
-                    }
                       console.log(response?.rows[0].elements[0].duration.value);
                       setCheck2(false);
                 }

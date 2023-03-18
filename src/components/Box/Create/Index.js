@@ -52,6 +52,7 @@ const CreateVisit = ({
   const [hoursLimit, setHoursLimit] = useState(false);
 
   const [city, setCity] = useState(undefined);
+  const [numberAddress, setNumberAddress] = useState(undefined);
   const [addressComplete, setAddressComplete] = useState(undefined);
   const [libraries] = useState(["places"]);
   //const [tecs, setTecs] = useState();
@@ -130,6 +131,12 @@ const CreateVisit = ({
     onPlaceSelected: (place) => {
       const address = place.formatted_address;
       const cityRef = place.address_components.find(ref => ref.types[0] === 'administrative_area_level_2');
+      if (place.address_components[0].types[0] === "street_number") {
+        const numberRef = place.address_components.find(ref => ref.types[0] === "street_number");
+        setNumberAddress(numberRef.long_name);
+      } else {
+        setNumberAddress(undefined);
+      }
       setCity(cityRef.long_name);
       setAddressComplete(address.substring(0, address.length - 19));
       setLat(place.geometry?.location?.lat());
@@ -349,7 +356,6 @@ const CreateVisit = ({
                   return returnSchedule();
               })
             } else {
-              let almoco, chegadaEmpresaVisita, saidaAlmoco;
               const visita = {
                 dia: diaRef,
                 saidaEmpresa: saidaEmpresaRef,
@@ -517,7 +523,6 @@ const CreateVisit = ({
                     tipo: "Almoço"
                   })
                   createVisitDay(visita)
-                  console.log(almoco, chegadaEmpresaVisita, saidaAlmoco);
                 }
                 });
               } else {
@@ -668,7 +673,7 @@ const CreateVisit = ({
               />
               {tempoTexto && tempoTexto && (
                 <><p className="notice">Tempo da rota: {tempoTexto} ✔️</p>
-                <p className="notice">Cidade: {city} ✔️</p></>
+                <p className="notice">Cidade: {city} ✔️ N° {numberAddress ? numberAddress + '✔️' : '... ❌'}</p></>
               )}
             </label>
             }
