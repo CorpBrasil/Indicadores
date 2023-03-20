@@ -18,7 +18,7 @@ function App() {
   const [userRef, setUserRef] = useState();
   const [tecs, setTecs] = useState();
   const membersCollectionRef = collection(dataBase, "Membros");
-  console.log(user)
+  // console.log(user)
 
   useEffect(
     () => {

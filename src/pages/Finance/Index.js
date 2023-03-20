@@ -85,7 +85,7 @@ useEffect(() => {
         return setTecs(docs.sort());
       })
     }
-    console.log(tecs);
+    // console.log(tecs);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   },[members, monthSelect, schedule, scheduleNew])
 
@@ -109,7 +109,7 @@ useEffect(() => {
     [members]
   );
 
-  console.log(sales);
+  // console.log(sales);
 
   return (
     <div className="container-schedule">

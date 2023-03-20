@@ -16,7 +16,7 @@ const CreateSchedule = ({ returnSchedule, schedules }) => {
   const months = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
 
   const onSubmit = (userData) => {
-    console.log(schedules.length);
+    // console.log(schedules.length);
     if (schedules.length > 0) {
       const findSchedule = schedules.find(schedule => schedule.id === userData.ano);
       if (findSchedule) {
@@ -72,7 +72,7 @@ const CreateSchedule = ({ returnSchedule, schedules }) => {
             }
           })
         } catch (error) {
-          console.log(error);
+          // console.log(error);
         }
       }
     }

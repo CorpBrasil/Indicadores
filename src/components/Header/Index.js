@@ -17,7 +17,7 @@ const Header = ({ user }) => {
     signOut(auth)
       .then(() => {})
       .catch((error) => {
-        console.error(error);
+        // console.error(error);
       });
       document.location.replace("/");
   };

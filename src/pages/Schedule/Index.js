@@ -108,7 +108,7 @@ const Schedule = ({ userRef, members, tecs }) => {
         })
       );
     }
-    console.log(scheduleNew);
+    // console.log(scheduleNew);
   }, [monthSelect, schedule, scheduleNew]);
 
   // useEffect(
@@ -124,7 +124,7 @@ const Schedule = ({ userRef, members, tecs }) => {
   //   [members]
   // );
 
-  console.log(monthSelect);
+  // console.log(monthSelect);
 
   useEffect(() => {
     const findMonth = () => {
@@ -161,8 +161,8 @@ const Schedule = ({ userRef, members, tecs }) => {
       );
     } else {
       setDayVisits(undefined);
-      console.log(dayVisits);
-      console.log(data);
+      // console.log(dayVisits);
+      // console.log(data);
     }
   };
 
@@ -241,12 +241,12 @@ const Schedule = ({ userRef, members, tecs }) => {
                   }
                 );
               }
-              console.log(
-                ref.chegadaEmpresa,
-                moment(ref.chegadaEmpresa, "hh:mm")
-                  .add(ref.tempoRota, "seconds")
-                  .format("kk:mm")
-              );
+              // console.log(
+              //   ref.chegadaEmpresa,
+              //   moment(ref.chegadaEmpresa, "hh:mm")
+              //     .add(ref.tempoRota, "seconds")
+              //     .format("kk:mm")
+              // );
             });
           }
           if (visitsDepois.length > 0) {
@@ -280,7 +280,7 @@ const Schedule = ({ userRef, members, tecs }) => {
                   doc(dataBase, "Agendas", year, monthSelect, ref.id)
                 );
               } else {
-                console.log("cidade diferente");
+                // console.log("cidade diferente");
 
                 await updateDoc(
                   doc(dataBase, "Agendas", year, monthSelect, ref.id),
@@ -296,15 +296,15 @@ const Schedule = ({ userRef, members, tecs }) => {
                 );
               }
 
-              console.log(
-                ref.saidaEmpresa,
-                moment(ref.chegadaCliente, "hh:mm")
-                  .subtract(ref.tempoRota, "seconds")
-                  .format("kk:mm")
-              );
+              // console.log(
+              //   ref.saidaEmpresa,
+              //   moment(ref.chegadaCliente, "hh:mm")
+              //     .subtract(ref.tempoRota, "seconds")
+              //     .format("kk:mm")
+              // );
             });
           }
-          console.log(visitsAntes, visitsDepois);
+          // console.log(visitsAntes, visitsDepois);
           await deleteDoc(
             doc(dataBase, "Agendas", year, monthSelect, visit.id)
           );
@@ -324,9 +324,7 @@ const Schedule = ({ userRef, members, tecs }) => {
   };
 
   const confirmVisit = async (ref, type) => {
-    console.log(type, ref);
-    const tecRef = tecs.find((tec) => tec.uid === ref.tecnicoUID);
-    console.log(tecRef);
+    // console.log(type, ref);
     const visitRef = doc(dataBase, "Agendas", year, monthSelect, ref.id);
     const financeCol = collection(dataBase, "Financeiro", year, monthSelect);
     const financeRef = doc(financeCol, ref.id);
@@ -348,18 +346,20 @@ const Schedule = ({ userRef, members, tecs }) => {
             //Atualizar dados sem sobrescrever os existentes
             confirmar: true,
           });
-          await setDoc(financeRef, {
-            data: ref.data,
-            dia: ref.dia,
-            cidade: ref.cidade,
-            cliente: ref.cliente,
-            horario: ref.chegadaCliente,
-            consultora: ref.consultora,
-            cor: ref.cor,
-            tecnico: ref.tecnico,
-            tecnicoUID: ref.tecnicoUID,
-            veiculo: ref.veiculo,
-          });
+          if(ref.tipo !== "Almoço") {
+            await setDoc(financeRef, {
+              data: ref.data,
+              dia: ref.dia,
+              cidade: ref.cidade,
+              cliente: ref.cliente,
+              horario: ref.chegadaCliente,
+              consultora: ref.consultora,
+              cor: ref.cor,
+              tecnico: ref.tecnico,
+              tecnicoUID: ref.tecnicoUID,
+              veiculo: ref.veiculo,
+            });
+          }
           Swal.fire({
             title: Company,
             html: `A Visita em <b>${ref.cidade}</b> foi confirmada com sucesso.`,
@@ -831,23 +831,6 @@ const Schedule = ({ userRef, members, tecs }) => {
                             aria-label={info.endereco}
                             data-cooltipz-dir="top">{info.cidade}</td>
                         <td className="no-wrap">{info.cliente}</td>
-                        {/* <td className="bold bg-important">
-                          {info.saidaEmpresa}
-                        </td>
-                        {info.tipo === "Almoço" ?
-                        <td></td> : <td>{info.chegadaCliente}</td>
-                        }
-                        <td>{info.visita}</td>
-                        {info.consultora === "Almoço Téc." ?
-                        <td></td> : <td className={
-                          info.consultora !== "Almoço Téc."
-                            ? "bg-important-2"
-                            : null
-                        }>{info.saidaDoCliente}</td>
-                        }
-                        <td className="bold bg-important">
-                          {info.chegadaEmpresa}
-                        </td> */}
                         {info.tipo === "Almoço" ? (
                           <td></td>
                         ) : (
@@ -930,8 +913,7 @@ const Schedule = ({ userRef, members, tecs }) => {
                           )}
 
                           {info.confirmar === false &&
-                          user.email === Users[0].email &&
-                          info.consultora !== "Almoço Téc." ? (
+                          user.email === Users[0].email ? (
                             <>
                               <div
                                 aria-label="Confirmar Visita"

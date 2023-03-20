@@ -78,14 +78,14 @@ const CreateVisit = ({
         setCheckInput(true);
         setVisitaNumero(3600);
       }
-      console.log(consultora)
+      // console.log(consultora)
     };
 
     lunch();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  console.log(tecRefUID)
+  // console.log(tecRefUID)
 
   // useEffect(() => {
   //   if(dataTexto) {
@@ -99,7 +99,7 @@ const CreateVisit = ({
   // },[dayVisits, dataTexto])
 
   useEffect(() => {
-    console.log(visitaNumero);
+    // console.log(visitaNumero);
     if (horarioTexto && visitaNumero) {
       moment.locale("pt-br");
 
@@ -113,7 +113,7 @@ const CreateVisit = ({
       chegadaCliente.add(visitaNumero, "seconds").format("hh:mm"); //Adiciona tempo de viagem volta
       setSaidaCliente(chegadaCliente.format("kk:mm"));
       chegadaCliente.add(rotaTempo, "seconds").format("hh:mm"); //Adiciona tempo de viagem volta
-      console.log(chegadaCliente)
+      // console.log(chegadaCliente)
       setChegadaTexto(chegadaCliente.format("kk:mm"));
     }
   }, [horarioTexto, visitaNumero, chegadaTexto, saidaTexto, rotaTempo]);
@@ -141,7 +141,7 @@ const CreateVisit = ({
       setAddressComplete(address.substring(0, address.length - 19));
       setLat(place.geometry?.location?.lat());
       setLng(place.geometry?.location?.lng());
-      console.log(place);
+      // console.log(place);
       setCheck(true); // Habilita o serviço de calculo de distancia do google
     },
     options: {
@@ -162,8 +162,8 @@ const CreateVisit = ({
       tempoRotaRef;
       const chegada = horarioTexto;
       moment.locale("pt-br");
-      console.log(userData);
-      console.log(moment.locale());
+      // console.log(userData);
+      // console.log(moment.locale());
       const tempo = moment('00:00', "HH:mm");
       chegadaClienteRef = chegada;
 
@@ -183,17 +183,17 @@ const CreateVisit = ({
       ChegadaEmpresaRef = chegadaTexto;
       tempoRotaRef = rotaTempo;
 
-      console.log({
-        dia: diaRef,
-        saidaEmpresa: saidaEmpresaRef,
-        chegadaCliente: chegadaClienteRef,
-        visita: TempoVisita,
-        saidaDoCliente: SaidaClienteRef,
-        chegadaEmpresa: ChegadaEmpresaRef,
-        consultora: userData.consultora,
-        tecnico: tecnicoTexto,
-        cidade: city,
-      });
+      // console.log({
+      //   dia: diaRef,
+      //   saidaEmpresa: saidaEmpresaRef,
+      //   chegadaCliente: chegadaClienteRef,
+      //   visita: TempoVisita,
+      //   saidaDoCliente: SaidaClienteRef,
+      //   chegadaEmpresa: ChegadaEmpresaRef,
+      //   consultora: userData.consultora,
+      //   tecnico: tecnicoTexto,
+      //   cidade: city,
+      // });
 
       const dataRef = schedule.filter(
         (dia) => dia.data === dataTexto && dia.tecnico === tecnicoTexto
@@ -207,8 +207,8 @@ const CreateVisit = ({
       const saidaFormatada = moment(saidaEmpresaRef, "hh:mm");
       const chegadaFormatada = moment(SaidaClienteRef, "hh:mm");
 
-      console.log(saidaFormatada);
-      console.log(chegadaFormatada);
+      // console.log(saidaFormatada);
+      // console.log(chegadaFormatada);
       let check = [];
       let visitsFind = [];
 
@@ -220,14 +220,14 @@ const CreateVisit = ({
         ) {
           chegadaFormatadaTec.current = chegadaFormatada.add(1, "h");
           saidaFormatadaTec.current = null; // UseRef não recebe renderização. emtão o valor antigo fica associado ainda
-          console.log(chegadaFormatadaTec.current.format("kk:mm"));
+          // console.log(chegadaFormatadaTec.current.format("kk:mm"));
         } else if (
           saidaFormatada > moment("11:59", "hh:mm") &&
           saidaFormatada < moment("14:01", "hh:mm")
         ) {
           saidaFormatadaTec.current = saidaFormatada.subtract(1, "h");
           chegadaFormatadaTec.current = null;
-          console.log(saidaFormatadaTec.current);
+          // console.log(saidaFormatadaTec.current);
         }
 
         dataRef.map((ref) => {
@@ -244,7 +244,7 @@ const CreateVisit = ({
         });
       } else {
         dataRef.map((ref) => {
-          console.log("eae");
+          // console.log("eae");
           if (
             saidaFormatada <= moment(ref.saidaEmpresa, "hh:mm") &&
             chegadaFormatada <= moment(ref.saidaEmpresa, "hh:mm")
@@ -258,7 +258,7 @@ const CreateVisit = ({
         });
       }
 
-      console.log(chegadaFormatadaTec.current, saidaFormatadaTec.current);
+      // console.log(chegadaFormatadaTec.current, saidaFormatadaTec.current);
 
       // dataRef.map((ref) => {
       //   console.log('eae')
@@ -271,10 +271,10 @@ const CreateVisit = ({
       //     return dataRef;
       //   })
 
-      console.log(">>", check, dataRef);
-      console.log(lunch.length);
+      // console.log(">>", check, dataRef);
+      // console.log(lunch.length);
       const visitsFindCount = dataRef.length - check.length;
-      console.log(visitsFindCount);
+      // console.log(visitsFindCount);
 
       dataRef.map((a) => {
         //Percorre todos os arrays de 'dataRef' e compara se os arrays são iguais
@@ -283,7 +283,7 @@ const CreateVisit = ({
         }
         return visitsFind;
       });
-      console.log(visitsFind);
+      // console.log(visitsFind);
       let c = 1;
 
       if (visitsFindCount < 0 || visitsFindCount > 0) {
@@ -319,7 +319,7 @@ const CreateVisit = ({
           cancelButtonText: "Não",
         }).then(async (result) => {
           if (result.isConfirmed) {
-            console.log(checkInput)
+            // console.log(checkInput)
             if(checkInput === true && lunch.length === 0) {
               await addDoc(scheduleRef, {
                 dia: diaRef,
@@ -708,7 +708,7 @@ const CreateVisit = ({
               <p>Tempo de Visita *</p>
               {checkInput ? (
                 <select
-                  value={visitaNumero}
+                  value={visitaNumero || ''}
                   className="label__select"
                   name="tec"
                   disabled
@@ -721,7 +721,7 @@ const CreateVisit = ({
                 </select>
               ) : (
                 <select
-                  value={visitaNumero}
+                  value={visitaNumero || ''}
                   className="label__select"
                   name="tec"
                   required
@@ -749,7 +749,7 @@ const CreateVisit = ({
           <div className="label margin-top">
             <p>Técnico *</p>
             <select
-              value={tecnicoTexto}
+              value={tecnicoTexto || ''}
               className="label__select"
               name="tec"
               onBlur={() => verifyLunch()}
@@ -808,7 +808,7 @@ const CreateVisit = ({
             }}
             callback={(response, status) => {
               if (status === "OK") {
-                console.log(response);
+                // console.log(response);
                 if (
                   rotaTempo === undefined || rotaTempo !== response?.rows[0].elements[0].duration.value
                   ) {

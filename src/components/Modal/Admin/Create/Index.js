@@ -19,7 +19,7 @@ const CreateAdmin = ({ returnAdmin, members }) => {
 
   const onSubmit = async (userData) => {
     const findEmail = members.find((member) => member.email === userData.email);
-    console.log(findEmail);
+    // console.log(findEmail);
     if (findEmail) {
       return Swal.fire({
         title: Company,
@@ -55,7 +55,7 @@ const CreateAdmin = ({ returnAdmin, members }) => {
                 })
                   .then(() => {})
                   .catch((error) => {
-                    console.error(error);
+                    // console.error(error);
                   });
                 const user = userCredential.user;
                 setDoc(doc(dataBase, "Membros", user.uid), {
@@ -65,7 +65,7 @@ const CreateAdmin = ({ returnAdmin, members }) => {
                   cargo: cargo,
                   uid: user.uid,
                 });
-                console.log(user);
+                // console.log(user);
                 // ...
               })
               .catch((error) => {
@@ -90,7 +90,7 @@ const CreateAdmin = ({ returnAdmin, members }) => {
           }
         });
       } catch (error) {
-        console.log(error);
+        // console.log(error);
       }
     }
   };

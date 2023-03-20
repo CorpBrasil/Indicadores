@@ -51,7 +51,7 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
     reset
   } = useForm();
 
-  console.log(visitRef)
+  // console.log(visitRef)
 
   const { isLoaded } = useLoadScript({
     id: "google-map-script",
@@ -184,7 +184,7 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
         //tempoRotaRef;
         const chegada = horarioTexto;
         moment.locale("pt-br");
-        console.log(moment.locale());
+        // console.log(moment.locale());
         const tempo = moment('00:00', "HH:mm");
         chegadaClienteRef = chegada;
   
@@ -227,14 +227,14 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
         ) {
           chegadaFormatadaTec.current = chegadaFormatada.add(1, "h");
           saidaFormatadaTec.current = null; // UseRef não recebe renderização. emtão o valor antigo fica associado ainda
-          console.log(chegadaFormatadaTec.current.format("kk:mm"));
+          // console.log(chegadaFormatadaTec.current.format("kk:mm"));
         } else if (
           saidaFormatada > moment("10:59", "hh:mm") &&
           saidaFormatada < moment("14:01", "hh:mm")
         ) {
           saidaFormatadaTec.current = saidaFormatada.subtract(1, "h");
           chegadaFormatadaTec.current = null;
-          console.log(saidaFormatadaTec.current);
+          // console.log(saidaFormatadaTec.current);
         }
 
         dataRef.map((ref) => {
@@ -251,7 +251,7 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
         });
       } else {
         dataRef.map((ref) => {
-          console.log("eae");
+          // console.log("eae");
           if (
             saidaFormatada <= moment(ref.saidaEmpresa, "hh:mm") &&
             chegadaFormatada <= moment(ref.saidaEmpresa, "hh:mm")
@@ -264,12 +264,12 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
           return dataRef;
         });
       }
-
-      console.log(chegadaFormatadaTec.current, saidaFormatadaTec.current);
-      console.log(">>", check, dataRef);
-      console.log(lunch.length);
+      
       const visitsFindCount = dataRef.length - check.length;
-      console.log(visitsFindCount);
+      // console.log(chegadaFormatadaTec.current, saidaFormatadaTec.current);
+      // console.log(">>", check, dataRef);
+      // console.log(lunch.length);
+      // console.log(visitsFindCount);
 
       dataRef.map((a) => {
         //Percorre todos os arrays de 'dataRef' e compara se os arrays são iguais
@@ -278,36 +278,36 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
         }
         return visitsFind;
       });
-      console.log(visitsFind);
+      // console.log(visitsFind);
 
-      console.log({
-        dia: diaRef,
-              saidaEmpresa: saidaEmpresaRef,
-              chegadaCliente: chegadaClienteRef,
-              visita: TempoVisita,
-              visitaNumero: visitaNumero,
-              saidaDoCliente: SaidaClienteRef,
-              chegadaEmpresa: saidaCliente,
-              saidaEmpresaRef: visitRef.saidaEmpresa,
-              consultora: userData.consultora,
-              tecnico: tecRefUID.nome,
-              tecnicoUID: tecRefUID.uid,
-              cidade: city,
-              cliente: userData.cliente,
-              observacao: userData.observacao,
-              tempoRota: rotaTempo1,
-              tempo: tempoTexto1,
-              tempoRotaConjunta: rotaTempo2,
-              tempoConjunta: tempoTexto2,
-              lng: lng,
-              lat: lat,
-              data: dataTexto,
-              uid: user.id,
-              idRef: visitRef.id,
-              group: 'antes',
-              cor: userRef.cor,
-              confirmar: false,
-      });
+      // console.log({
+      //   dia: diaRef,
+      //         saidaEmpresa: saidaEmpresaRef,
+      //         chegadaCliente: chegadaClienteRef,
+      //         visita: TempoVisita,
+      //         visitaNumero: visitaNumero,
+      //         saidaDoCliente: SaidaClienteRef,
+      //         chegadaEmpresa: saidaCliente,
+      //         saidaEmpresaRef: visitRef.saidaEmpresa,
+      //         consultora: userData.consultora,
+      //         tecnico: tecRefUID.nome,
+      //         tecnicoUID: tecRefUID.uid,
+      //         cidade: city,
+      //         cliente: userData.cliente,
+      //         observacao: userData.observacao,
+      //         tempoRota: rotaTempo1,
+      //         tempo: tempoTexto1,
+      //         tempoRotaConjunta: rotaTempo2,
+      //         tempoConjunta: tempoTexto2,
+      //         lng: lng,
+      //         lat: lat,
+      //         data: dataTexto,
+      //         uid: user.id,
+      //         idRef: visitRef.id,
+      //         group: 'antes',
+      //         cor: userRef.cor,
+      //         confirmar: false,
+      // });
 
       let c = 1;
       if (visitsFindCount < 0 || visitsFindCount > 0) {
@@ -637,7 +637,7 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
       })
     }
     } catch (error) {
-      console.log(error)
+      // console.log(error)
     } 
     }
 
@@ -800,13 +800,13 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
             }}
             callback={(response, status) => {
               if (status === "OK") {
-                console.log(response);
+                // console.log(response);
                 if (
                   rotaTempo1 === undefined || rotaTempo1 !== response?.rows[0].elements[0].duration.value
                   ) {
                     setRotaTempo1(response?.rows[0].elements[0].duration.value);
                     setTempoTexto1(response?.rows[0].elements[0].duration.text);
-                    console.log(response?.rows[0].elements[0].duration.text)
+                    // console.log(response?.rows[0].elements[0].duration.text)
                     setCheck2(true);
                     setCheck1(false);
                 }
@@ -834,7 +834,7 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
                   ) {
                       setRotaTempo2(response?.rows[0].elements[0].duration.value);
                       setTempoTexto2(response?.rows[0].elements[0].duration.text);
-                      console.log(response?.rows[0].elements[0].duration.value);
+                      // console.log(response?.rows[0].elements[0].duration.value);
                       setCheck2(false);
                 }
               }

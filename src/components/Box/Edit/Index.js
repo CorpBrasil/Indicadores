@@ -40,7 +40,7 @@ const EditVisit = ({
   const [city, setCity] = useState();
   const [hoursLimit, setHoursLimit] = useState(false);
 
-  console.log(monthSelect);
+  // console.log(monthSelect);
 
   const { register, handleSubmit, reset } = useForm();
 
@@ -115,7 +115,7 @@ const EditVisit = ({
       ) {
         setTempoTexto(visitRef.tempoConjunta);
         setRotaTempo(visitRef.tempoRotaConjunta);
-        console.log("2");
+        // console.log("2");
       }
       if (
         (dataTexto === visitRef.data &&
@@ -132,7 +132,7 @@ const EditVisit = ({
         // Primeira visita do 'antes'
         setTempoTexto(visitRef.tempo);
         setRotaTempo(visitRef.tempoRota);
-        console.log("33333");
+        // console.log("33333");
       }
     } else {
       if (
@@ -144,7 +144,7 @@ const EditVisit = ({
       ) {
         setTempoTexto(visitRef.tempo);
         setRotaTempo(visitRef.tempoRota);
-        console.log("2222222");
+        // console.log("2222222");
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -160,7 +160,7 @@ const EditVisit = ({
 
       saidaEmpresa.subtract(rotaTempo, "seconds").format("hh:mm"); // Pega o tempo que o tecnico vai precisar sair da empresa
 
-      console.log(saidaTexto, rotaTempo);
+      // console.log(saidaTexto, rotaTempo);
       setSaidaTexto(saidaEmpresa.format("kk:mm"));
       chegadaCliente.add(visitaNumero, "seconds").format("hh:mm"); //Adiciona tempo de viagem volta
       setSaidaCliente(chegadaCliente.format("kk:mm"));
@@ -176,7 +176,7 @@ const EditVisit = ({
       } else {
         chegadaCliente.add(rotaTempo, "seconds").format("hh:mm");
         setCheckInput(true);
-        console.log("trocou");
+        // console.log("trocou");
         setChegadaTexto(chegadaCliente.format("kk:mm"));
       }
     }
@@ -234,39 +234,33 @@ const EditVisit = ({
       ChegadaEmpresaRef = chegadaTexto;
       //tempoRotaRef = rotaTempo;
 
-      console.log({
-        // dia: diaRef,
-        saidaEmpresa: saidaEmpresaRef,
-        // chegadaCliente: chegadaClienteRef,
-        // visita: TempoVisita,
-        // saidaDoCliente: SaidaClienteRef,
-        chegadaEmpresa: ChegadaEmpresaRef,
-        // consultora: userData.consultora,
-        // tecnico: tecnicoTexto,
-        // cidade: city,
-      });
+      // console.log({
+      //   // dia: diaRef,
+      //   saidaEmpresa: saidaEmpresaRef,
+      //   // chegadaCliente: chegadaClienteRef,
+      //   // visita: TempoVisita,
+      //   // saidaDoCliente: SaidaClienteRef,
+      //   chegadaEmpresa: ChegadaEmpresaRef,
+      //   // consultora: userData.consultora,
+      //   // tecnico: tecnicoTexto,
+      //   // cidade: city,
+      // });
 
       // const dataRef = schedule.filter(
       //   (dia) => dia.data === dataTexto && dia.tecnico === tecnicoTexto && dia.chegadaCliente !== visitRef.chegadaCliente
       // );
 
-      console.log(dataRef);
-      const lunch = schedule.filter(
-        (dia) =>
-          dia.data === dataTexto &&
-          dia.consultora === "Almoço Téc." &&
-          dia.tecnico === tecnicoTexto
-      );
+      // console.log(dataRef);
       const saidaFormatada = moment(saidaEmpresaRef, "hh:mm");
       const chegadaFormatada = moment(ChegadaEmpresaRef, "hh:mm");
 
-      console.log(saidaFormatada);
-      console.log(chegadaFormatada);
+      // console.log(saidaFormatada);
+      // console.log(chegadaFormatada);
       let check = [];
       let visitsFind = [];
 
         dataRef.map((ref) => {
-          console.log("eae");
+          // console.log("eae");
           if (
             saidaFormatada <= moment(ref.saidaEmpresa, "hh:mm") &&
             chegadaFormatada <= moment(ref.saidaEmpresa, "hh:mm")
@@ -291,10 +285,10 @@ const EditVisit = ({
       //     return dataRef;
       //   })
 
-      console.log(">>", check, dataRef);
-      console.log(lunch.length);
+      // console.log(">>", check, dataRef);
+      // console.log(lunch.length);
       const visitsFindCount = dataRef.length - check.length;
-      console.log(visitsFindCount);
+      // console.log(visitsFindCount);
 
       dataRef.map((a) => {
         //Percorre todos os arrays de 'dataRef' e compara se os arrays são iguais
@@ -303,7 +297,7 @@ const EditVisit = ({
         }
         return visitsFind;
       });
-      console.log(visitsFind);
+      // console.log(visitsFind);
 
       let c = 1;
       if (visitsFindCount < 0 || visitsFindCount > 0) {
@@ -328,9 +322,17 @@ const EditVisit = ({
           confirmButtonColor: "#F39200",
         });
       } else {
+        let msg1, msg2;
+        if (visitRef.consultora === "Almoço Téc.") {
+          msg1 = 'o <b>horário de almoço?</b>'
+          msg2 = 'O <b>horário de almoço</b> foi alterado'
+        } else { 
+          msg1 = 'essa <b>Visita?</b>'
+          msg2 = `A visita em <b>${visitRef.cidade}</b> foi alterada`
+         }
         Swal.fire({
           title: Company,
-          html: `Você deseja alterar essa <b>Visita?</b>`,
+          html: `Você deseja alterar ${msg1}`,
           icon: "question",
           showCancelButton: true,
           showCloseButton: true,
@@ -356,7 +358,7 @@ const EditVisit = ({
                   ref.tipo !== "Almoço" &&
                   !ref.visitaAlmoco
               );
-              console.log(visitsAntes, visitsDepois);
+              // console.log(visitsAntes, visitsDepois);
           if(visitsAntes.length > 0) {
             visitsAntes.map(async (ref) => {
               const visitBefore =  schedule.filter(before => (before.data === ref.data && before.chegadaEmpresa === ref.saidaEmpresa && ref.consultora !== 'Almoço Téc.' && before.tipo === "Visita Conjunta" && !before.visitaAlmoco));
@@ -386,7 +388,7 @@ const EditVisit = ({
                               tipo: "Visita"
                             })
               }
-                console.log(ref.chegadaEmpresa ,moment(ref.chegadaEmpresa, "hh:mm").add(ref.tempoRota, 'seconds').format('kk:mm'))
+                // console.log(ref.chegadaEmpresa ,moment(ref.chegadaEmpresa, "hh:mm").add(ref.tempoRota, 'seconds').format('kk:mm'))
           })
           }
           if (visitsDepois.length > 0) {
@@ -419,7 +421,7 @@ const EditVisit = ({
                           })
               }
               
-              console.log(ref.saidaEmpresa ,moment(ref.chegadaCliente, "hh:mm").subtract(ref.tempoRota, 'seconds').format('kk:mm'))
+              // console.log(ref.saidaEmpresa ,moment(ref.chegadaCliente, "hh:mm").subtract(ref.tempoRota, 'seconds').format('kk:mm'))
             })
             }
           }
@@ -451,7 +453,7 @@ const EditVisit = ({
               visitRef.data !== dataTexto &&
               visitRef.consultora !== "Almoço Téc."
             ) {
-              console.log(userData.consultora)
+              // console.log(userData.consultora)
               await updateDoc(
                 doc(dataBase, "Agendas", year, monthSelect, visitRef.id),
                 {
@@ -482,7 +484,7 @@ const EditVisit = ({
               visitRef.data === dataTexto &&
               visitRef.consultora !== "Almoço Téc."
             ) {
-              console.log(userData.consultora)
+              // console.log(userData.consultora)
               await updateDoc(
                 doc(dataBase, "Agendas", year, monthSelect, visitRef.id),
                 {
@@ -509,7 +511,7 @@ const EditVisit = ({
 
             Swal.fire({
               title: Company,
-              html: `A Visita em <b>${visitRef.cidade}</b> foi alterada com sucesso.`,
+              html: `${msg2} com sucesso.`,
               icon: "success",
               showConfirmButton: true,
               showCloseButton: true,
@@ -521,11 +523,11 @@ const EditVisit = ({
         });
       }
     } catch (error) {
-      console.log(error);
+      // console.log(error);
     }
   };
 
-  console.log(visitRef);
+  // console.log(visitRef);
 
   return (
     <div className="box-visit">
@@ -533,11 +535,9 @@ const EditVisit = ({
         <div className="box-visit__close">
           <button onClick={returnSchedule} className="btn-close" />
         </div>
-        {visitRef.visitaConjunta ? (
-          <h4>Editar Visita Conjunta</h4>
-        ) : (
-          <h4>Editar Visita</h4>
-        )}
+        {visitRef.visitaConjunta && 
+          <h4>Editar Visita Conjunta</h4>}
+        {visitRef.consultora === "Almoço Téc." ? <h4>Editar Almoço</h4> : <h4>Editar Visita</h4>}
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="box-visit__container">
             <label className="label">

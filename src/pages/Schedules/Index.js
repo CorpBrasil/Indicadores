@@ -47,7 +47,6 @@ const Schedules = ({userRef}) => {
 
   const returnSchedule = () => {
     setCreateSchedule(false);
-    console.log('oi')
   }
 
   const goToSchedule = (type, year) => {

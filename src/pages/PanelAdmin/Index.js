@@ -16,9 +16,7 @@ const PanelAdmin = ({ user }) => {
   const [memberRef, setMemberRef] = useState();
   const [createAdmin, setCreateAdmin] = useState(undefined);
   const [editAdmin, setEditAdmin] = useState(undefined);
-  const [schedules, setSchedules] = useState();
   const membersCollectionRef = collection(dataBase, "Membros");
-  const schedulesCollectionRef = collection(dataBase, "Agendas");
 
   useEffect(() => {
     if (collection) {
@@ -37,25 +35,25 @@ const PanelAdmin = ({ user }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [collection]);
 
-  useEffect(() => {
-    if (collection) {
-      // const q = query(membersCollectionRef); // Pega aos chats pela ordem descrescente do 'Created'
-      const unsub = onSnapshot(schedulesCollectionRef, (schedules) => {
-        // Atualiza os dados em tempo real
-        let documents = [];
-        schedules.forEach((doc) => {
-          documents.push({ ...doc.data(), id: doc.id });
-        });
-        setSchedules(documents); // puxa a coleção 'Chats' para o state
-      });
+  // useEffect(() => {
+  //   if (collection) {
+  //     // const q = query(membersCollectionRef); // Pega aos chats pela ordem descrescente do 'Created'
+  //     const unsub = onSnapshot(schedulesCollectionRef, (schedules) => {
+  //       // Atualiza os dados em tempo real
+  //       let documents = [];
+  //       schedules.forEach((doc) => {
+  //         documents.push({ ...doc.data(), id: doc.id });
+  //       });
+  //       setSchedules(documents); // puxa a coleção 'Chats' para o state
+  //     });
 
-      return unsub;
-    }
+  //     return unsub;
+  //   }
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [collection]);
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [collection]);
 
-  console.log(schedules);
+  // console.log(schedules);
 
   const returnAdmin = () => {
     setCreateAdmin(false);
