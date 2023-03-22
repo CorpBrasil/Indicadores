@@ -11,11 +11,11 @@ import {
   GoogleMap,
   useLoadScript,
 } from "@react-google-maps/api";
-import { Company, KeyMaps } from "../../../data/Data";
+import { Company, KeyMaps, Users } from "../../../data/Data";
 
 import '../style.scss';
 
-const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visitRef, scheduleRef, scheduleVisitRef, schedule, monthNumber, type}) => {
+const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, sellers, userRef, visitRef, scheduleRef, scheduleVisitRef, schedule, monthNumber, type}) => {
   const { user } = useAuth();
   const chegadaFormatadaTec = useRef();
   const saidaFormatadaTec = useRef();
@@ -26,6 +26,7 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
   const [latRef, setLatRef] = useState(0);
   const [lngRef, setLngRef] = useState(0);
   const [tecRefUID] = useState(tecs.find((tec) => tec.nome === visitRef.tecnico)); // Procura os tecnicos que vem da pagina 'Schedule'
+  const [sellerRef, setSellerRef] = useState(sellers[0]); // Procura os tecnicos que vem da pagina 'Schedule'
   const [check1, setCheck1] = useState(false);
   const [check2, setCheck2] = useState(false);
   const [rotaTempo1, setRotaTempo1] = useState();
@@ -39,6 +40,7 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
   const [chegadaTexto, setChegadaTexto] = useState();
   const [dataTexto, setDataTexto] = useState();
   const [tecnicoTexto, setTecnicoTexto] = useState();
+  const [consultoraTexto, setConsultoraTexto] = useState(userRef.cargo === "Vendedor(a)" ? userRef.nome : sellers[0].nome);
   const [numberAddress, setNumberAddress] = useState(undefined);
   const [addressComplete, setAddressComplete] = useState(undefined);
   const [city, setCity] = useState();
@@ -51,7 +53,6 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
     reset
   } = useForm();
 
-  // console.log(visitRef)
 
   const { isLoaded } = useLoadScript({
     id: "google-map-script",
@@ -127,9 +128,11 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
     } else {
       filterSchedule()
     }
-
+    if(consultoraTexto) {
+      setSellerRef(sellers.find((sel) => sel.nome === consultoraTexto)); 
+    }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dataTexto, tecnicoTexto]);
+  }, [dataTexto, tecnicoTexto, consultoraTexto]);
 
   useEffect(() => {
 
@@ -368,7 +371,9 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
               chegadaEmpresa: SaidaClienteRef2,
               chegadaEmpresaRef: visitRef.chegadaEmpresa,
               saidaEmpresaRef: visitRef.saidaEmpresa,
-              consultora: userData.consultora,
+              consultora: consultoraTexto,
+              uid: sellerRef.id,
+              cor: sellerRef.cor,
               tecnico: tecRefUID.nome,
               tecnicoUID: tecRefUID.uid,
               veiculo: tecRefUID.veiculo,
@@ -383,10 +388,8 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
               lng: lng,
               lat: lat,
               data: dataTexto,
-              uid: user.id,
               idRef: visitRef.id,
               group: 'antes',
-              cor: userRef.cor,
               confirmar: false,
               tipo: "Visita Conjunta"
             })
@@ -402,13 +405,15 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
               //====================================== DEPOIS
               const visita = {
                 dia: diaRef,
-                saidaEmpresa: saidaEmpresaRef,
+                saidaEmpresa: visitRef.tipo === "Almoço" ? visitRef.saidaDoCliente : saidaEmpresaRef,
                 chegadaCliente: chegadaClienteRef,
                 visita: TempoVisita,
                 visitaNumero: visitaNumero,
                 saidaDoCliente: SaidaClienteRef,
                 chegadaEmpresa: ChegadaEmpresaRef,
-                consultora: userData.consultora,
+                consultora: consultoraTexto,
+                uid: sellerRef.id,
+                cor: sellerRef.cor,
                 tecnico: tecRefUID.nome,
                 tecnicoUID: tecRefUID.uid,
                 cidade: city,
@@ -425,8 +430,6 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
                 lngRef: lng2,
                 latRef: lat2,
                 data: dataTexto,
-                uid: user.id,
-                cor: userRef.cor,
                 confirmar: false,
                 group: 'depois',
                 visitaConjunta: true,
@@ -441,7 +444,9 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
                 visitaNumero: visitaNumero,
                 saidaDoCliente: SaidaClienteRef,
                 chegadaEmpresa: SaidaClienteRef,
-                consultora: userData.consultora,
+                consultora: consultoraTexto,
+                uid: sellerRef.id,
+                cor: sellerRef.cor,
                 tecnico: tecRefUID.nome,
                 tecnicoUID: tecRefUID.uid,
                 veiculo: tecRefUID.veiculo,
@@ -459,8 +464,6 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
                 lngRef: lng2,
                 latRef: lat2,
                 data: dataTexto,
-                uid: user.id,
-                cor: userRef.cor,
                 confirmar: false,
                 visitaConjunta: true,
                 group: 'depois',
@@ -566,8 +569,8 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
                     tecnico: tecRefUID.nome,
                     tecnicoUID: tecRefUID.uid,
                     cidade: '',
-                    lat: -23.0881786,
-                    lng: -47.6973284,
+                    lat: -23.109731, 
+                    lng: -47.715045,
                     tempoRota: '',
                     tempo: '',
                     cliente: '',
@@ -594,8 +597,8 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
                   tecnico: tecRefUID.nome,
                   tecnicoUID: tecRefUID.uid,
                   cidade: '',
-                  lat: -23.0881786,
-                  lng: -47.6973284,
+                  lat: -23.109731, 
+                  lng: -47.715045,
                   tempoRota: '',
                   tempo: '',
                   cliente: '',
@@ -726,17 +729,33 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
                   <option value={7200}>02:00</option>
             </select>
             </label>
+            {user.email === Users[0].email && 
+          <div className="label margin-top">
+          <p>Consultora *</p>
+          <select
+            value={consultoraTexto || ''}
+            className="label__select"
+            name="tec"
+            onChange={(e) => setConsultoraTexto(e.target.value)}>
+              {sellers &&
+              sellers.map((seller, index) => (
+                <option key={index} value={seller.nome}>{seller.nome}</option>
+              ))}
+          </select>
+        </div>}
+        {userRef.cargo === 'Vendedor(a)' &&
           <label className="label">
-            <p>Consultora *</p>
-            <input
-              className="label__input"
-              type="text"
-              autoComplete="off"
-              {...register("consultora")}
-              disabled
-            />
-          </label>
-
+          <p>Consultora *</p>
+          <input
+            className="label__input"
+            type="text"
+            value={consultoraTexto || ''}
+            placeholder="Digite o nome do Cliente"
+            autoComplete="off"
+            disabled
+          />
+        </label> 
+        }
           <div className="label margin-top">
             <p>Técnico *</p>
             <div className="radio">
@@ -778,7 +797,7 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
             <div className="box-visit__info prev">
               <span className="">Previsão de Visita</span>
               <p className="notice">
-                Saindo da Empresa: <b>{saidaTexto}</b>
+                Saindo da Empresa: <b>{visitRef.tipo === "Almoço" ? visitRef.saidaDoCliente : saidaTexto}</b>
               </p>
               <p className="notice">
                 Chegando na Empresa: <b>{chegadaTexto}</b>
@@ -828,7 +847,7 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, userRef, visit
             }}
             callback={(response, status) => {
               if (status === "OK") {
-                console.log(response);
+                // console.log(response);
                 if (
                   rotaTempo2 === undefined || rotaTempo2 !== response?.rows[0].elements[0].duration.value
                   ) {

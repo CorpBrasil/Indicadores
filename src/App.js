@@ -17,6 +17,7 @@ function App() {
   const [members, setMembers] = useState();
   const [userRef, setUserRef] = useState();
   const [tecs, setTecs] = useState();
+  const [sellers, setSellers] = useState();
   const membersCollectionRef = collection(dataBase, "Membros");
   // console.log(user)
 
@@ -40,6 +41,7 @@ function App() {
         if (members) {
           setUserRef(members.find((doc) => doc.uid === user.id));
           setTecs(members.filter((member) => member.cargo === "Técnico"));
+          setSellers(members.filter((member) => member.cargo === "Vendedor(a)"));
         }
       };
       fetchData();
@@ -60,7 +62,7 @@ function App() {
           {user && (user.email === Users[0].email || user.email === Users[1].email || (userRef && userRef.cargo === "Técnico")) &&
             <Route exact path="/financeiro/:year" element={<Finance />} />
        }
-            <Route path="/agenda/:year" element={<Schedule userRef={userRef} members={members} tecs={tecs} />} />
+            <Route path="/agenda/:year" element={<Schedule userRef={userRef} members={members} tecs={tecs} sellers={sellers} />} />
             <Route path="*" element={<Schedules userRef={userRef} />} />
           </Route>
           <Route exact path="/login" element={<Login />} />

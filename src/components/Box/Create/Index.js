@@ -11,7 +11,7 @@ import {
   useLoadScript,
 } from "@react-google-maps/api";
 import "moment/locale/pt-br";
-import { Company, KeyMaps } from "../../../data/Data";
+import { Company, KeyMaps, Users } from "../../../data/Data";
 
 import "../style.scss";
 
@@ -21,6 +21,7 @@ const CreateVisit = ({
   scheduleRef,
   membersRef,
   tecs,
+  sellers,
   userRef,
   schedule,
   monthNumber,
@@ -30,12 +31,7 @@ const CreateVisit = ({
   const chegadaFormatadaTec = useRef();
   const saidaFormatadaTec = useRef();
   const [tecRefUID, setTecRefUID] = useState(tecs[0]); // Procura os tecnicos que vem da pagina 'Schedule'
-  let consultora;
-  if(type) {
-     consultora = 'Almoço Téc.';
-  } else {
-     consultora = user.name;
-  }
+  const [sellerRef, setSellerRef] = useState(sellers[0]); // Procura os tecnicos que vem da pagina 'Schedule'
   const [lat, setLat] = useState(0);
   const [lng, setLng] = useState(0);
   const [check, setCheck] = useState(false);
@@ -49,15 +45,12 @@ const CreateVisit = ({
   const [chegadaTexto, setChegadaTexto] = useState(undefined);
   const [dataTexto, setDataTexto] = useState(undefined);
   const [tecnicoTexto, setTecnicoTexto] = useState(tecs[0].nome);
+  const [consultoraTexto, setConsultoraTexto] = useState(userRef.cargo === "Vendedor(a)" ? userRef.nome : sellers[0].nome);
   const [hoursLimit, setHoursLimit] = useState(false);
-
   const [city, setCity] = useState(undefined);
   const [numberAddress, setNumberAddress] = useState(undefined);
   const [addressComplete, setAddressComplete] = useState(undefined);
   const [libraries] = useState(["places"]);
-  //const [tecs, setTecs] = useState();
-  //const [dayVisits, setDayVisits] = useState();
-
   const { register, handleSubmit } = useForm();
   
   useEffect(() => {
@@ -69,8 +62,11 @@ const CreateVisit = ({
     if(tecnicoTexto) {
       setTecRefUID(tecs.find((tec) => tec.nome === tecnicoTexto)); 
     }
+    if(consultoraTexto) {
+      setSellerRef(sellers.find((sel) => sel.nome === consultoraTexto)); 
+    }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dataTexto, tecnicoTexto]);
+  }, [dataTexto, tecnicoTexto, consultoraTexto]);
 
   useEffect(() => {
     const lunch = () => {
@@ -84,8 +80,6 @@ const CreateVisit = ({
     lunch();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  // console.log(tecRefUID)
 
   // useEffect(() => {
   //   if(dataTexto) {
@@ -333,8 +327,8 @@ const CreateVisit = ({
                 tecnico: tecRefUID.nome,
                 tecnicoUID: tecRefUID.uid,
                 cidade: '',
-                lat: -23.0881786,
-                lng: -47.6973284,
+                lat: -23.109731, 
+                lng: -47.715045,
                 tempoRota: '',
                 tempo: '',
                 cliente: '',
@@ -364,7 +358,9 @@ const CreateVisit = ({
                 visitaNumero: visitaNumero,
                 saidaDoCliente: SaidaClienteRef,
                 chegadaEmpresa: ChegadaEmpresaRef,
-                consultora: userData.consultora,
+                consultora: consultoraTexto,
+                uid: sellerRef.id,
+                cor: sellerRef.cor,
                 tecnico: tecRefUID.nome,
                 tecnicoUID: tecRefUID.uid,
                 cidade: city,
@@ -377,8 +373,6 @@ const CreateVisit = ({
                 tempoRota: tempoRotaRef,
                 tempo: tempoTexto,
                 data: dataTexto,
-                uid: user.id,
-                cor: userRef.cor,
                 confirmar: false,
                 tipo: 'Visita',
               };
@@ -391,7 +385,9 @@ const CreateVisit = ({
                 visitaNumero: visitaNumero,
                 saidaDoCliente: SaidaClienteRef,
                 chegadaEmpresa: SaidaClienteRef,
-                consultora: userData.consultora,
+                consultora: consultoraTexto,
+                uid: sellerRef.id,
+                cor: sellerRef.cor,
                 tecnico: tecRefUID.nome,
                 tecnicoUID: tecRefUID.uid,
                 veiculo: tecRefUID.veiculo,
@@ -407,8 +403,6 @@ const CreateVisit = ({
                 tempoRotaConjunta: tempoRotaRef,
                 tempoConjunta: tempoTexto,
                 data: dataTexto,
-                uid: user.id,
-                cor: userRef.cor,
                 confirmar: false,
                 visitaConjunta: true,
                 tipo: 'Visita Conjunta',
@@ -474,7 +468,6 @@ const CreateVisit = ({
                             visitaNumero: visitaNumero,
                             saidaDoCliente: SaidaClienteRef,
                             chegadaEmpresa: moment(ChegadaEmpresaRef, 'hh:mm').add(3600, 'seconds').format('kk:mm'),
-                            consultora: userData.consultora,
                             groupRef: "depois",
                             visitaAlmoco: true, // Para poder identificar que essa visita tem um almoço dentro dela
                             tecnico: tecRefUID.nome,
@@ -489,8 +482,9 @@ const CreateVisit = ({
                             tempoRota: tempoRotaRef,
                             tempo: tempoTexto,
                             data: dataTexto,
-                            uid: user.id,
-                            cor: userRef.cor,
+                            consultora: consultoraTexto,
+                            uid: sellerRef.id,
+                            cor: sellerRef.cor,
                             confirmar: false,
                             visitaConjunta: true,
                             tipo: 'Visita Conjunta',
@@ -510,8 +504,8 @@ const CreateVisit = ({
                     tecnico: tecRefUID.nome,
                     tecnicoUID: tecRefUID.uid,
                     cidade: '',
-                    lat: -23.0881786,
-                    lng: -47.6973284,
+                    lat: -23.109731, 
+                    lng: -47.715045,
                     tempoRota: '',
                     tempo: '',
                     cliente: '',
@@ -538,8 +532,8 @@ const CreateVisit = ({
                   tecnico: tecRefUID.nome,
                   tecnicoUID: tecRefUID.uid,
                   cidade: '',
-                  lat: -23.0881786,
-                  lng: -47.6973284,
+                  lat: -23.109731, 
+                  lng: -47.715045,
                   tempoRota: '',
                   tempo: '',
                   cliente: '',
@@ -574,8 +568,8 @@ const CreateVisit = ({
                 tecnico: tecRefUID.nome,
                 tecnicoUID: tecRefUID.uid,
                 cidade: '',
-                lat: -23.0881786,
-                lng: -47.6973284,
+                lat: -23.109731, 
+                lng: -47.715045,
                 tempoRota: '',
                 tempo: '',
                 cliente: '',
@@ -734,18 +728,33 @@ const CreateVisit = ({
                 </select>
               )}
             </label>
+            {user.email === Users[0].email && !type && 
+          <div className="label margin-top">
+          <p>Consultora *</p>
+          <select
+            value={consultoraTexto || ''}
+            className="label__select"
+            name="tec"
+            onChange={(e) => setConsultoraTexto(e.target.value)}>
+              {sellers &&
+              sellers.map((seller, index) => (
+                <option key={index} value={seller.nome}>{seller.nome}</option>
+              ))}
+          </select>
+        </div>}
+        {userRef.cargo === 'Vendedor(a)' && !type &&
           <label className="label">
-            <p>Consultora  *</p>
-            <input
-              className="label__input"
-              type="text"
-              autoComplete="off"
-              {...register("consultora", {
-                value: consultora,
-              })}
-              disabled
-            />
-          </label>
+          <p>Consultora *</p>
+          <input
+            className="label__input"
+            type="text"
+            value={consultoraTexto || ''}
+            placeholder="Digite o nome do Cliente"
+            autoComplete="off"
+            disabled
+          />
+        </label> 
+        }
           <div className="label margin-top">
             <p>Técnico *</p>
             <select

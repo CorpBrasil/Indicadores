@@ -25,7 +25,7 @@ import CreateVisit from "../../components/Box/Create/Index";
 import CreateVisitGroup from "../../components/Box/Group/Index";
 import { Company, Users } from "../../data/Data";
 
-const Schedule = ({ userRef, members, tecs }) => {
+const Schedule = ({ userRef, members, tecs, sellers }) => {
   const data = new Date();
   const checked = JSON.parse(localStorage.getItem("foco"));
   const [focoCheck, setFocoCheck] = useState(false);
@@ -44,6 +44,7 @@ const Schedule = ({ userRef, members, tecs }) => {
   const [dayVisits, setDayVisits] = useState(undefined);
   const [scheduleRef, setScheduleRef] = useState();
   const [monthNumber, setMonthNumber] = useState();
+  const [sellersOrder, setSellersOrder] = useState();
 
   useEffect(
     () => {
@@ -61,7 +62,6 @@ const Schedule = ({ userRef, members, tecs }) => {
             schedule.docs.map((doc) => ({ ...doc.data(), id: doc.id }))
           ); // puxa a coleção 'Chats' para o state
           setScheduleRef(schedulesCollectionRef);
-          //setDayVisits(schedule.docs.map((doc) => ({ ...doc.data(), id: doc.id })))
         });
       };
       fetchData();
@@ -70,19 +70,18 @@ const Schedule = ({ userRef, members, tecs }) => {
     [monthSelect]
   );
 
-  // useEffect(
-  //   () => {
-  //     const fetchData = async () => {
-  //       onSnapshot(membersCollectionRef, (member) => {
-  //         // Atualiza os dados em tempo real
-  //         setMembers(member.docs.map((doc) => ({ ...doc.data(), id: doc.id }))); // puxa a coleção 'Chats' para o state
-  //       });
-  //     };
-  //     fetchData();
-  //   },
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  //   []
-  // );
+  useEffect(() => {
+    if(sellers) {
+      setSellersOrder(sellers.sort((a,b) => {
+        if(a.nome< b.nome) return -1;
+        if(a.nome > b.nome) return 1;
+        return 0;
+      }))
+    }
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [sellers]
+  );
 
   useEffect(() => {
     setDayVisits(dayVisits);
@@ -514,6 +513,7 @@ const Schedule = ({ userRef, members, tecs }) => {
                   scheduleRef={scheduleRef}
                   membersRef={members}
                   tecs={tecs}
+                  sellers={sellersOrder}
                   userRef={userRef}
                   schedule={schedule}
                   monthNumber={monthNumber}
@@ -526,10 +526,11 @@ const Schedule = ({ userRef, members, tecs }) => {
                     scheduleRef={scheduleRef}
                     membersRef={members}
                     tecs={tecs}
+                    sellers={sellersOrder}
                     userRef={userRef}
                     schedule={schedule}
                     monthNumber={monthNumber}
-                    type={"lunch"}
+                    type={"lunch"} // Para identificar se é para criar almoço ou mão
                   />
                 )) || // Chama o componente 'Create'
                 (box === "edit" && (
@@ -537,6 +538,8 @@ const Schedule = ({ userRef, members, tecs }) => {
                     returnSchedule={returnSchedule}
                     filterSchedule={filterSchedule}
                     tecs={tecs}
+                    sellers={sellersOrder}
+                    userRef={userRef}
                     scheduleRef={scheduleRef}
                     scheduleRefUID={editVisit.ref}
                     visitRef={editVisit.info}
@@ -552,6 +555,7 @@ const Schedule = ({ userRef, members, tecs }) => {
                     returnSchedule={returnSchedule}
                     filterSchedule={filterSchedule}
                     tecs={tecs}
+                    sellers={sellers}
                     userRef={userRef}
                     scheduleRef={scheduleRef}
                     scheduleVisitRef={createVisitGroup.ref}
@@ -566,7 +570,7 @@ const Schedule = ({ userRef, members, tecs }) => {
             }
           </div>
           {(userRef && userRef.cargo === "Vendedor(a)" && !box) ||
-          user.email === Users[0].email ? (
+          (user.email === Users[0].email && !box) ? (
             <div className="box-schedule-visit__add">
               <button
                 className="visit"
@@ -582,7 +586,7 @@ const Schedule = ({ userRef, members, tecs }) => {
             <></>
           )}
           {(userRef && userRef.cargo === "Vendedor(a)" && !box) ||
-          user.email === Users[0].email ? (
+          (user.email === Users[0].email && !box) ? (
             <div className="box-schedule-visit__add">
               <button
                 className="lunch"

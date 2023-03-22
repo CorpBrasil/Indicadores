@@ -5,7 +5,8 @@ import { useForm } from "react-hook-form"; // cria formulário personalizado
 import Swal from "sweetalert2"; // cria alertas personalizado
 import * as moment from "moment";
 import "moment/locale/pt-br";
-import { Company } from "../../../data/Data";
+import { Company, Users } from "../../../data/Data";
+import useAuth from "../../../hooks/useAuth";
 
 import "../style.scss";
 
@@ -13,6 +14,8 @@ const EditVisit = ({
   returnSchedule,
   filterSchedule,
   tecs,
+  sellers,
+  userRef,
   visitRef,
   scheduleRef,
   scheduleRefUID,
@@ -23,7 +26,7 @@ const EditVisit = ({
 }) => {
   // const chegadaFormatadaTec = useRef();
   // const saidaFormatadaTec = useRef();
-
+  const { user } = useAuth();
   const [rotaTempo, setRotaTempo] = useState();
   const [tempoTexto, setTempoTexto] = useState();
   const [visitaNumero, setVisitaNumero] = useState(1800);
@@ -35,6 +38,8 @@ const EditVisit = ({
   const [chegadaTexto, setChegadaTexto] = useState();
   const [dataTexto, setDataTexto] = useState();
   const [tecnicoTexto, setTecnicoTexto] = useState();
+  const [consultoraTexto, setConsultoraTexto] = useState(userRef.cargo === "Vendedor(a)" ? userRef.nome : visitRef.consultora);
+  const [sellerRef, setSellerRef] = useState(); // Procura os tecnicos que vem da pagina 'Schedule'
   const [tecRefUID, setTecRefUID] = useState(); // Procura os tecnicos que vem da pagina 'Schedule'
   const [veiculo, setVeiculo] = useState();
   const [city, setCity] = useState();
@@ -76,11 +81,12 @@ const EditVisit = ({
     } else {
       filterSchedule();
     }
-
     if(tecnicoTexto) {
       setTecRefUID(tecs.find((tec) => tec.nome === tecnicoTexto));
     }
-    
+    if(consultoraTexto) {
+      setSellerRef(sellers.find((sel) => sel.nome === consultoraTexto)); 
+    }
     if(tecRefUID && tecRefUID.nome !== visitRef.tecnico) setVeiculo(tecRefUID.veiculo)
     if(tecRefUID && tecRefUID.nome === visitRef.tecnico) setVeiculo(visitRef.veiculo)
 
@@ -148,7 +154,7 @@ const EditVisit = ({
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dataTexto, tecnicoTexto, horarioTexto, tecRefUID]);
+  }, [dataTexto, tecnicoTexto, horarioTexto, tecRefUID, consultoraTexto]);
 
   useEffect(() => {
     // console.log(visitaNumero);
@@ -158,10 +164,11 @@ const EditVisit = ({
       const saidaEmpresa = moment(horarioTexto, "hh:mm"); //Horario de chegada
       const chegadaCliente = moment(horarioTexto, "hh:mm"); //Horario de chegada
 
+      if(visitRef.data !== dataTexto) {
       saidaEmpresa.subtract(rotaTempo, "seconds").format("hh:mm"); // Pega o tempo que o tecnico vai precisar sair da empresa
-
       // console.log(saidaTexto, rotaTempo);
-      setSaidaTexto(saidaEmpresa.format("kk:mm"));
+        setSaidaTexto(saidaEmpresa.format("kk:mm"));
+      }
       chegadaCliente.add(visitaNumero, "seconds").format("hh:mm"); //Adiciona tempo de viagem volta
       setSaidaCliente(chegadaCliente.format("kk:mm"));
 
@@ -191,17 +198,6 @@ const EditVisit = ({
     dataTexto,
   ]);
 
-  // const verificaVisitas = (novaVisita, visitasExist) => {
-  //   for (let i = 0; i < visitasExist.length; i++) {
-  //     const visita = visitasExist[i];
-  //     if ((novaVisita.saidaEmpresa >= visita.saidaEmpresa && novaVisita.saidaEmpresa < visita.chegadaEmpresa) &&
-  //         (novaVisita.chegadaEmpresa > visita.saidaEmpresa && novaVisita.chegadaEmpresa <= visita.chegadaEmpresa)) {
-  //         console.log('trueeee')
-  //       return true;
-  //     }
-  //   }
-  //   return false;
-  // }
 
   const onSubmit = async (userData) => {
     try {
@@ -450,10 +446,9 @@ const EditVisit = ({
               });
             }
             if (
-              visitRef.data !== dataTexto &&
+              visitRef.data !== dataTexto && // Visita editada para outro dia
               visitRef.consultora !== "Almoço Téc."
             ) {
-              // console.log(userData.consultora)
               await updateDoc(
                 doc(dataBase, "Agendas", year, monthSelect, visitRef.id),
                 {
@@ -465,15 +460,15 @@ const EditVisit = ({
                   visitaNumero: visitaNumero,
                   saidaDoCliente: SaidaClienteRef,
                   chegadaEmpresa: ChegadaEmpresaRef,
-                  consultora: userData.consultora,
                   tecnico: tecRefUID.nome,
                   tecnicoUID: tecRefUID.uid,
                   veiculo: veiculo,
                   cidade: visitRef.cidade,
                   cliente: userData.cliente,
                   observacao: userData.observacao,
-                  uid: visitRef.uid,
-                  cor: visitRef.cor,
+                  consultora: consultoraTexto,
+                  uid: sellerRef.id,
+                  cor: sellerRef.cor,
                   visitaConjunta: false,
                   groupRef: "",
                   group: "",
@@ -481,7 +476,7 @@ const EditVisit = ({
                 }
               );
             } else if (
-              visitRef.data === dataTexto &&
+              visitRef.data === dataTexto && // Visita editada para o mesmo dia
               visitRef.consultora !== "Almoço Téc."
             ) {
               // console.log(userData.consultora)
@@ -490,21 +485,21 @@ const EditVisit = ({
                 {
                   dia: diaRef,
                   data: dataTexto,
-                  saidaEmpresa: saidaEmpresaRef,
+                  saidaEmpresa: visitRef.saidaEmpresa,
                   chegadaCliente: chegadaClienteRef,
                   visita: TempoVisita,
                   visitaNumero: visitaNumero,
                   saidaDoCliente: SaidaClienteRef,
                   chegadaEmpresa: ChegadaEmpresaRef,
-                  consultora: userData.consultora,
                   tecnico: tecRefUID.nome,
                   tecnicoUID: tecRefUID.uid,
                   veiculo: veiculo,
                   cidade: visitRef.cidade,
                   cliente: userData.cliente,
                   observacao: userData.observacao,
-                  uid: visitRef.uid,
-                  cor: visitRef.cor,
+                  consultora: consultoraTexto,
+                  uid: sellerRef.id,
+                  cor: sellerRef.cor,
                 }
               );
             }
@@ -535,9 +530,12 @@ const EditVisit = ({
         <div className="box-visit__close">
           <button onClick={returnSchedule} className="btn-close" />
         </div>
-        {visitRef.visitaConjunta && 
-          <h4>Editar Visita Conjunta</h4>}
-        {visitRef.consultora === "Almoço Téc." ? <h4>Editar Almoço</h4> : <h4>Editar Visita</h4>}
+        {(visitRef.visitaConjunta && (
+          <h4>Editar Visita Conjunta</h4>)) || 
+        (visitRef.tipo === "Almoço" && (
+          <h4>Editar Almoço</h4>))  ||
+        (visitRef.tipo === "Visita" && (
+          <h4>Editar Visita</h4>))}
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="box-visit__container">
             <label className="label">
@@ -679,17 +677,33 @@ const EditVisit = ({
                 </select>
               )}
             </label>
-            <label className="label">
-              <p>Consultora *</p>
-              <input
-                className="label__input"
-                type="text"
-                autoComplete="off"
-                {...register("consultora")}
-                disabled
-              />
-            </label>
-
+            {user.email === Users[0].email && visitRef.tipo !== "Almoço" &&
+          <div className="label margin-top">
+          <p>Consultora *</p>
+          <select
+            value={consultoraTexto || ''}
+            className="label__select"
+            name="tec"
+            onChange={(e) => setConsultoraTexto(e.target.value)}>
+              {sellers &&
+              sellers.map((seller, index) => (
+                <option key={index} value={seller.nome}>{seller.nome}</option>
+              ))}
+          </select>
+        </div>}
+        {userRef.cargo === 'Vendedor(a)' &&
+          <label className="label">
+          <p>Consultora *</p>
+          <input
+            className="label__input"
+            type="text"
+            value={consultoraTexto || ''}
+            placeholder="Digite o nome do Cliente"
+            autoComplete="off"
+            disabled
+          />
+        </label> 
+        }
             <div className="label margin-top">
               <p>Técnico *</p>
               <div className="radio">
@@ -755,7 +769,7 @@ const EditVisit = ({
               <span className="">Previsão de Visita</span>
               <p className="notice">
                 Saindo da Empresa:
-                <b>{saidaTexto}</b>
+                <b>{visitRef.data === dataTexto ? visitRef.saidaEmpresa : saidaTexto}</b>
               </p>
               <p className="notice">
                 Chegando na Empresa: <b>{chegadaTexto}</b>
