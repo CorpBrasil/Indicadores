@@ -19,7 +19,6 @@ const CreateVisit = ({
   returnSchedule,
   filterSchedule,
   scheduleRef,
-  membersRef,
   tecs,
   sellers,
   userRef,
@@ -81,17 +80,6 @@ const CreateVisit = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // useEffect(() => {
-  //   if(dataTexto) {
-  //     setDayVisits(dayVisits.sort(function(a, b) {
-  //       if(a.saidaEmpresa < b.saidaEmpresa) return -1;
-  //       if(a.saidaEmpresa > b.saidaEmpresa) return 1;
-  //       return 0;
-  //     }))
-  //     console.log('oi')-47.7152547
-  //   }
-  // },[dayVisits, dataTexto])
-
   useEffect(() => {
     // console.log(visitaNumero);
     if (horarioTexto && visitaNumero) {
@@ -135,11 +123,10 @@ const CreateVisit = ({
       setAddressComplete(address.substring(0, address.length - 19));
       setLat(place.geometry?.location?.lat());
       setLng(place.geometry?.location?.lng());
-      // console.log(place);
       setCheck(true); // Habilita o serviço de calculo de distancia do google
     },
     options: {
-      types: ["geocode"],
+      types: ["geocode", "establishment"],
       componentRestrictions: { country: "br" },
       fields: ["formatted_address", "address_components", "geometry.location"],
     },
@@ -154,10 +141,9 @@ const CreateVisit = ({
       SaidaClienteRef,
       ChegadaEmpresaRef,
       tempoRotaRef;
+
       const chegada = horarioTexto;
       moment.locale("pt-br");
-      // console.log(userData);
-      // console.log(moment.locale());
       const tempo = moment('00:00', "HH:mm");
       chegadaClienteRef = chegada;
 
@@ -252,21 +238,6 @@ const CreateVisit = ({
         });
       }
 
-      // console.log(chegadaFormatadaTec.current, saidaFormatadaTec.current);
-
-      // dataRef.map((ref) => {
-      //   console.log('eae')
-      //   if(saidaFormatada < moment(ref.saidaEmpresa, 'hh:mm') && chegadaFormatada < moment(ref.saidaEmpresa, 'hh:mm')) {
-      //       check.push(ref);
-      //     } else {
-      //       if(saidaFormatada > moment(ref.chegadaEmpresa, 'hh:mm'))
-      //       check.push(ref);
-      //     }
-      //     return dataRef;
-      //   })
-
-      // console.log(">>", check, dataRef);
-      // console.log(lunch.length);
       const visitsFindCount = dataRef.length - check.length;
       // console.log(visitsFindCount);
 

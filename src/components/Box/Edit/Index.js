@@ -201,7 +201,6 @@ const EditVisit = ({
 
   const onSubmit = async (userData) => {
     try {
-      //let tecRefUID = tecs.find((tec) => tec.nome === tecnicoTexto);
       let diaRef,
         saidaEmpresaRef,
         chegadaClienteRef,
@@ -246,12 +245,9 @@ const EditVisit = ({
       //   (dia) => dia.data === dataTexto && dia.tecnico === tecnicoTexto && dia.chegadaCliente !== visitRef.chegadaCliente
       // );
 
-      // console.log(dataRef);
       const saidaFormatada = moment(saidaEmpresaRef, "hh:mm");
       const chegadaFormatada = moment(ChegadaEmpresaRef, "hh:mm");
 
-      // console.log(saidaFormatada);
-      // console.log(chegadaFormatada);
       let check = [];
       let visitsFind = [];
 
