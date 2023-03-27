@@ -699,7 +699,7 @@ const CreateVisit = ({
                 </select>
               )}
             </label>
-            {user.email === Users[0].email && !type && 
+            {(user.email === Users[0].email && !type) || (userRef.cargo === "Administrador" && !type) ?
           <div className="label margin-top">
           <p>Consultora *</p>
           <select
@@ -712,7 +712,7 @@ const CreateVisit = ({
                 <option key={index} value={seller.nome}>{seller.nome}</option>
               ))}
           </select>
-        </div>}
+        </div> : <></>}
         {userRef.cargo === 'Vendedor(a)' && !type &&
           <label className="label">
           <p>Consultora *</p>

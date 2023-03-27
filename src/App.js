@@ -56,11 +56,11 @@ function App() {
         <Routes>
           <Route exact element={<PrivateRoute />}>
             <Route exact path="/" element={<Schedules userRef={userRef} />} />
-            {user && user.email === Users[0].email &&
-            <Route exact path="/admin" element={<PanelAdmin user={user} />} />
+            {user && userRef && (user.email === Users[0].email || userRef.cargo === "Administrador") &&
+            <Route exact path="/admin" element={<PanelAdmin user={user} userRef={userRef} />} />
        }
-          {user && (user.email === Users[0].email || user.email === Users[1].email || (userRef && userRef.cargo === "Técnico")) &&
-            <Route exact path="/financeiro/:year" element={<Finance />} />
+          {user && userRef && (user.email === Users[0].email || user.email === Users[1].email || userRef.cargo === "Técnico" || userRef.cargo === "Administrador") &&
+            <Route exact path="/financeiro/:year" element={<Finance userRef={userRef} />} />
        }
             <Route path="/agenda/:year" element={<Schedule userRef={userRef} members={members} tecs={tecs} sellers={sellers} />} />
             <Route path="*" element={<Schedules userRef={userRef} />} />

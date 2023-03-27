@@ -729,7 +729,7 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, sellers, userR
                   <option value={7200}>02:00</option>
             </select>
             </label>
-            {user.email === Users[0].email && 
+            {(user.email === Users[0].email || userRef.cargo === "Administrador") && 
           <div className="label margin-top">
           <p>Consultora *</p>
           <select

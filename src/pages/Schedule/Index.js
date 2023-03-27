@@ -498,7 +498,7 @@ const Schedule = ({ userRef, members, tecs, sellers }) => {
 
   return (
     <div className="container-schedule">
-      <Header user={user}></Header>
+      <Header user={user} userRef={userRef}></Header>
       <div className="title-schedule">
         <h2>Visita Técnica - Agenda {year} </h2>
       </div>
@@ -570,6 +570,7 @@ const Schedule = ({ userRef, members, tecs, sellers }) => {
             }
           </div>
           {(userRef && userRef.cargo === "Vendedor(a)" && !box) ||
+          (userRef && userRef.cargo === "Administrador" && !box) ||
           (user.email === Users[0].email && !box) ? (
             <div className="box-schedule-visit__add">
               <button
@@ -586,6 +587,7 @@ const Schedule = ({ userRef, members, tecs, sellers }) => {
             <></>
           )}
           {(userRef && userRef.cargo === "Vendedor(a)" && !box) ||
+          (userRef && userRef.cargo === "Administrador" && !box) ||
           (user.email === Users[0].email && !box) ? (
             <div className="box-schedule-visit__add">
               <button
@@ -624,8 +626,7 @@ const Schedule = ({ userRef, members, tecs, sellers }) => {
               </select>
             </div>
           )}
-          <div className="container-table">
-            {schedule && schedule.length > 0 && (
+          {schedule && schedule.length > 0 && (
               <div className="toggle-box">
                 <p>Modo foco</p>
                 <input
@@ -638,6 +639,7 @@ const Schedule = ({ userRef, members, tecs, sellers }) => {
                 <label htmlFor="toggle"></label>
               </div>
             )}
+          <div className="container-table">
             {dayVisits && dayVisits.length > 0 && (
               <>
                 <div>
@@ -876,6 +878,7 @@ const Schedule = ({ userRef, members, tecs, sellers }) => {
                         >
                           {(info.confirmar === false && info.uid === user.id) ||
                           user.email === Users[0].email ||
+                          userRef.cargo === "Administrador" ||
                           info.consultora === "Vendedor(a)" ? (
                             <>
                               <div
@@ -917,7 +920,7 @@ const Schedule = ({ userRef, members, tecs, sellers }) => {
                           )}
 
                           {info.confirmar === false &&
-                          user.email === Users[0].email ? (
+                          (user.email === Users[0].email || userRef.cargo === "Administrador") ? (
                             <>
                               <div
                                 aria-label="Confirmar Visita"
@@ -934,7 +937,7 @@ const Schedule = ({ userRef, members, tecs, sellers }) => {
                           )}
 
                           {info.confirmar === true &&
-                          user.email === Users[0].email ? (
+                          (user.email === Users[0].email || userRef.cargo === "Administrador") ? (
                             <>
                               <div
                                 aria-label="Cancelar Visita"

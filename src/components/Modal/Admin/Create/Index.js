@@ -15,7 +15,7 @@ const CreateAdmin = ({ returnAdmin, members }) => {
   const navigate = useNavigate();
   const [cargo, setCargo] = useState("Vendedor(a)");
   const [nome, setNome] = useState("");
-  const [cor, setCor] = useState("#000");
+  const [cor, setCor] = useState("#000000");
 
   const onSubmit = async (userData) => {
     const findEmail = members.find((member) => member.email === userData.email);
@@ -143,9 +143,10 @@ const CreateAdmin = ({ returnAdmin, members }) => {
             >
               <option value="Vendedor(a)">Vendedor(a)</option>
               <option value="Técnico">Técnico</option>
+              <option value="Administrador">Administrador</option>
             </select>
           </div>
-          {cargo === "Vendedor(a)" ? (
+          {cargo === "Vendedor(a)" || cargo === "Administrador" ? (
             <>
               <div className="form-visit__color">
                 <p>Escolha uma cor de destaque</p>

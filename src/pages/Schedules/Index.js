@@ -10,7 +10,7 @@ import { Users, Company } from '../../data/Data';
 
 import './_style.scss';
 
-const Schedules = ({userRef}) => {
+const Schedules = ({ userRef }) => {
     const { user } = useAuth();
     const [schedules, setSchedules] = useState();
     const [financeSchedules, setFinanceSchedules] = useState();
@@ -86,7 +86,7 @@ const Schedules = ({userRef}) => {
 
   return (
     <div className='container-schedules'>
-      <Header user={user}></Header>
+      <Header user={user} userRef={userRef}></Header>
       <div className='title-schedule'>
         <h2>Agendas</h2>
       </div>
@@ -112,7 +112,7 @@ const Schedules = ({userRef}) => {
           ))}
        </div>
         }
-       {(user.email === Users[0].email || user.email === Users[1].email || (userRef && userRef.cargo === "Técnico")) &&
+       {userRef && (user.email === Users[0].email || user.email === Users[1].email || userRef.cargo === "Técnico" || userRef.cargo === "Administrador") &&
         <><div className='box-schedule'>
             {financeSchedules && financeSchedules.map((schedule, index) => (
               <li key={index} className='schedule'>

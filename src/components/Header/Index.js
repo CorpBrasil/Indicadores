@@ -11,7 +11,7 @@ import "./_style.scss";
 // Imagem
 import Logo from '../../images/LogoCORPBRASIL.png'
 
-const Header = ({ user }) => {
+const Header = ({ user,  userRef }) => {
 
   const logoff = () => {
     signOut(auth)
@@ -34,7 +34,7 @@ const Header = ({ user }) => {
         </Link>
       </div>
       <div className="container-header__nav">
-          {user && user.email === Users[0].email ? 
+          {user && userRef && (user.email === Users[0].email || userRef.cargo === 'Administrador') ? 
             (<Link className="admin" to="/admin" aria-label="Painel Administrativo" data-cooltipz-dir="left"/>)
             :
             <></>

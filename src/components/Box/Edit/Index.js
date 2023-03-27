@@ -673,7 +673,7 @@ const EditVisit = ({
                 </select>
               )}
             </label>
-            {user.email === Users[0].email && visitRef.tipo !== "Almoço" &&
+            {(user.email === Users[0].email || userRef.cargo === "Administrador") && visitRef.tipo !== "Almoço" &&
           <div className="label margin-top">
           <p>Consultora *</p>
           <select

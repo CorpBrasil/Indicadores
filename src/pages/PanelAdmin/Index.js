@@ -11,7 +11,7 @@ import "./_style.scss";
 import CreateAdmin from "../../components/Modal/Admin/Create/Index";
 import EditAdmin from "../../components/Modal/Admin/Edit/Index";
 
-const PanelAdmin = ({ user }) => {
+const PanelAdmin = ({ user, userRef }) => {
   const [members, setMembers] = useState();
   const [memberRef, setMemberRef] = useState();
   const [createAdmin, setCreateAdmin] = useState(undefined);
