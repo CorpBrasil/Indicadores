@@ -153,6 +153,31 @@ const Schedule = ({ userRef, members, tecs, sellers }) => {
     setDayVisits(undefined);
   };
 
+  const showAddress = (visit) => {
+    if(visit) {
+      Swal.fire({
+        title: Company,
+        html: `Endereço: </br>` + 
+        `<b>${visit}</b>`,
+        showCloseButton: true,
+        confirmButtonColor: "#F39200",
+        confirmButtonText: "Copiar Endereço",
+      }).then((result) => {
+        if(result.isConfirmed) {
+          Swal.fire({
+            title: Company,
+            html: `<b>Endereço</b> copiado com sucesso.`,
+            icon: "success",
+            showConfirmButton: true,
+            showCloseButton: true,
+            confirmButtonColor: "#F39200",
+          });
+          navigator.clipboard.writeText(visit) // Copia o texto 'visit'
+        }
+      })
+    }
+  }
+
   const filterSchedule = (data, tec) => {
     if (data) {
       setDayVisits(
@@ -664,7 +689,7 @@ const Schedule = ({ userRef, members, tecs, sellers }) => {
                       <th>Tempo de Visita</th>
                       <th>Saída no Cliente</th>
                       <th>Chegada na Empresa</th>
-                      <th>Consultora</th>
+                      <th>Consultor(a)</th>
                       <th>Técnico</th>
                       <th>Observação</th>
                     </tr>
@@ -771,14 +796,10 @@ const Schedule = ({ userRef, members, tecs, sellers }) => {
                     <th>Tempo de Visita</th>
                     <th>Saída no Cliente</th>
                     <th>Chegada na Empresa</th>
-                    <th>Consultora</th>
+                    <th>Consultor(a)</th>
                     <th>Técnico</th>
                     <th>Observação</th>
-                    {userRef && userRef.cargo === "Técnico" ? (
-                      <></>
-                    ) : (
-                      <th>Ação</th>
-                    )}
+                    <th>Ação</th>  
                   </tr>
                 </thead>
                 <tbody>
@@ -833,7 +854,8 @@ const Schedule = ({ userRef, members, tecs, sellers }) => {
                         <td className="bold">
                           {moment(new Date(info.dia)).format("D")}
                         </td>
-                        <td className="no-wrap" 
+                        <td onClick={() => showAddress(info.endereco)}
+                        className="no-wrap" 
                             aria-label={info.endereco}
                             data-cooltipz-dir="top">{info.cidade}</td>
                         <td className="no-wrap">{info.cliente}</td>
@@ -920,7 +942,7 @@ const Schedule = ({ userRef, members, tecs, sellers }) => {
                           )}
 
                           {info.confirmar === false &&
-                          (user.email === Users[0].email || userRef.cargo === "Administrador") ? (
+                          (user.email === Users[0].email || userRef.cargo === "Administrador" || userRef.uid === info.tecnicoUID) ? (
                             <>
                               <div
                                 aria-label="Confirmar Visita"
@@ -937,7 +959,7 @@ const Schedule = ({ userRef, members, tecs, sellers }) => {
                           )}
 
                           {info.confirmar === true &&
-                          (user.email === Users[0].email || userRef.cargo === "Administrador") ? (
+                          (user.email === Users[0].email || userRef.cargo === "Administrador" || userRef.uid === info.tecnicoUID) ? (
                             <>
                               <div
                                 aria-label="Cancelar Visita"

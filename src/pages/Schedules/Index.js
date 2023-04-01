@@ -95,7 +95,7 @@ const Schedules = ({ userRef }) => {
         <div className='box-schedule'>
           {schedules && schedules.map((schedule, index) => (
             <li key={index} className='schedule'>
-              {user.email === Users[0].email &&
+              {userRef && (user.email === Users[0].email || userRef.cargo === "Administrador") &&
               <div className='schedule__button'>
                 <button onClick={() => deleteSchedule(schedule.id)}></button>
               </div>
@@ -116,7 +116,7 @@ const Schedules = ({ userRef }) => {
         <><div className='box-schedule'>
             {financeSchedules && financeSchedules.map((schedule, index) => (
               <li key={index} className='schedule'>
-                {user.email === Users[0].email &&
+                {userRef && (user.email === Users[0].email || userRef.cargo === "Administrador") &&
                   <div className='schedule__button'>
                     <button onClick={() => deleteSchedule(schedule.id)}></button>
                   </div>}

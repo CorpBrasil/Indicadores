@@ -187,8 +187,8 @@ const CreateVisit = ({
       const saidaFormatada = moment(saidaEmpresaRef, "hh:mm");
       const chegadaFormatada = moment(SaidaClienteRef, "hh:mm");
 
-      // console.log(saidaFormatada);
-      // console.log(chegadaFormatada);
+      console.log(saidaFormatada);
+      console.log(chegadaFormatada);
       let check = [];
       let visitsFind = [];
 
@@ -239,7 +239,7 @@ const CreateVisit = ({
       }
 
       const visitsFindCount = dataRef.length - check.length;
-      // console.log(visitsFindCount);
+      console.log(visitsFindCount);
 
       dataRef.map((a) => {
         //Percorre todos os arrays de 'dataRef' e compara se os arrays são iguais
@@ -248,7 +248,7 @@ const CreateVisit = ({
         }
         return visitsFind;
       });
-      // console.log(visitsFind);
+      console.log(visitsFind);
       let c = 1;
 
       if (visitsFindCount < 0 || visitsFindCount > 0) {
@@ -303,7 +303,7 @@ const CreateVisit = ({
                 tempoRota: '',
                 tempo: '',
                 cliente: '',
-                observacao: '',
+                observacao: userData.observacao,
                 data: dataTexto,
                 uid: user.id,
                 cor: "#111111",

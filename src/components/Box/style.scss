@@ -1,5 +1,9 @@
 @import '../../styles/mixins.scss';
 
+.pac-container { // Box do Google AutoComplete
+  width: 25rem!important;
+}
+
 .box-visit {
     width: 100%;
     display: flex;

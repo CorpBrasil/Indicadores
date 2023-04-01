@@ -11,7 +11,7 @@ import "./_style.scss";
 import CreateAdmin from "../../components/Modal/Admin/Create/Index";
 import EditAdmin from "../../components/Modal/Admin/Edit/Index";
 
-const PanelAdmin = ({ user, userRef }) => {
+const PanelAdmin = ({ user }) => {
   const [members, setMembers] = useState();
   const [memberRef, setMemberRef] = useState();
   const [createAdmin, setCreateAdmin] = useState(undefined);
@@ -34,26 +34,6 @@ const PanelAdmin = ({ user, userRef }) => {
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [collection]);
-
-  // useEffect(() => {
-  //   if (collection) {
-  //     // const q = query(membersCollectionRef); // Pega aos chats pela ordem descrescente do 'Created'
-  //     const unsub = onSnapshot(schedulesCollectionRef, (schedules) => {
-  //       // Atualiza os dados em tempo real
-  //       let documents = [];
-  //       schedules.forEach((doc) => {
-  //         documents.push({ ...doc.data(), id: doc.id });
-  //       });
-  //       setSchedules(documents); // puxa a coleção 'Chats' para o state
-  //     });
-
-  //     return unsub;
-  //   }
-
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [collection]);
-
-  // console.log(schedules);
 
   const returnAdmin = () => {
     setCreateAdmin(false);
