@@ -900,7 +900,7 @@ const Schedule = ({ userRef, members, tecs, sellers }) => {
                         >
                           {(info.confirmar === false && info.uid === user.id) ||
                           user.email === Users[0].email ||
-                          userRef.cargo === "Administrador" ||
+                          (userRef && userRef.cargo === "Administrador") ||
                           info.consultora === "Vendedor(a)" ? (
                             <>
                               <div
@@ -942,7 +942,7 @@ const Schedule = ({ userRef, members, tecs, sellers }) => {
                           )}
 
                           {info.confirmar === false &&
-                          (user.email === Users[0].email || userRef.cargo === "Administrador" || userRef.uid === info.tecnicoUID) ? (
+                          (user.email === Users[0].email || (userRef && userRef.cargo === "Administrador") || (userRef && userRef.uid === info.tecnicoUID)) ? (
                             <>
                               <div
                                 aria-label="Confirmar Visita"
@@ -959,7 +959,7 @@ const Schedule = ({ userRef, members, tecs, sellers }) => {
                           )}
 
                           {info.confirmar === true &&
-                          (user.email === Users[0].email || userRef.cargo === "Administrador" || userRef.uid === info.tecnicoUID) ? (
+                          (user.email === Users[0].email || (userRef && userRef.cargo === "Administrador") || (userRef && userRef.uid === info.tecnicoUID)) ? (
                             <>
                               <div
                                 aria-label="Cancelar Visita"
