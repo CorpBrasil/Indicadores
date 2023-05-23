@@ -25,7 +25,7 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, sellers, userR
   const [lng2, setLng2] = useState(0);
   const [latRef, setLatRef] = useState(0);
   const [lngRef, setLngRef] = useState(0);
-  const [tecRefUID] = useState(tecs.find((tec) => tec.nome === visitRef.tecnico)); // Procura os tecnicos que vem da pagina 'Schedule'
+  const [tecRefUID, setTecRefUID] = useState(tecs.find((tec) => tec.nome === visitRef.tecnico)); // Procura os tecnicos que vem da pagina 'Schedule'
   const [sellerRef, setSellerRef] = useState(sellers[0]); // Procura os tecnicos que vem da pagina 'Schedule'
   const [check1, setCheck1] = useState(false);
   const [check2, setCheck2] = useState(false);
@@ -763,24 +763,36 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, sellers, userR
               value={tecnicoTexto || ''}
               className="label__select"
               name="tec"
-              disabled
               onChange={(e) => setTecnicoTexto(e.target.value)}>
                 {tecs &&
                 tecs.map((tec, index) => (
                   <option key={index} value={tec.nome}>{tec.nome}</option>
                 ))}
+                <option value='Nenhum'>Nenhum</option>
             </select>
             </div>
           </div>
           <label className="label">
           <p>Veículo *</p>
+          {tecnicoTexto !== 'Nenhum' ? 
           <input
             className="label__input"
             type="text"
             autoComplete="off"
             value={tecRefUID.veiculo || ''}
             disabled
-          />
+          /> :
+          <input
+          className="label__input"
+          type="text"
+          autoComplete="off"
+          onChange={(e) => setTecRefUID({
+            nome: 'Nenhum',
+            uid: '000',
+            veiculo: e.target.value
+          })}
+          value={tecRefUID.veiculo || ''}
+        />  }
         </label>
           <label className="label">
             <p>Observação</p>

@@ -58,7 +58,7 @@ const CreateVisit = ({
     } else {
       filterSchedule(null)
     }
-    if(tecnicoTexto) {
+    if(tecnicoTexto !== 'Nenhum') {
       setTecRefUID(tecs.find((tec) => tec.nome === tecnicoTexto)); 
     }
     if(consultoraTexto) {
@@ -602,6 +602,8 @@ const CreateVisit = ({
         }
   }
 
+  console.log(tecRefUID);
+
   return (
     <div className="box-visit">
       <div className="box-visit__box">
@@ -738,18 +740,31 @@ const CreateVisit = ({
                 tecs.map((tec, index) => (
                   <option key={index} value={tec.nome}>{tec.nome}</option>
                 ))}
+                <option value='Nenhum'>Nenhum</option>
             </select>
           </div>
           {!checkInput && 
           <label className="label">
-          <p>Veículo *</p>
+            <p>Veículo *</p>
+          {tecnicoTexto !== 'Nenhum' ? 
           <input
             className="label__input"
             type="text"
             autoComplete="off"
             value={tecRefUID.veiculo || ''}
             disabled
-          />
+          /> :
+          <input
+          className="label__input"
+          type="text"
+          autoComplete="off"
+          onChange={(e) => setTecRefUID({
+            nome: 'Nenhum',
+            uid: '000',
+            veiculo: e.target.value
+          })}
+          value={tecRefUID.veiculo || ''}
+        />  }
         </label>}
           <label className="label">
             <p>Observação</p>

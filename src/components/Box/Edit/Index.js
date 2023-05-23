@@ -45,8 +45,6 @@ const EditVisit = ({
   const [city, setCity] = useState();
   const [hoursLimit, setHoursLimit] = useState(false);
 
-  // console.log(monthSelect);
-
   const { register, handleSubmit, reset } = useForm();
 
   useLayoutEffect(() => {
@@ -63,7 +61,11 @@ const EditVisit = ({
       setSaidaCliente(visitRef.chegadaCliente);
       setDataTexto(moment(new Date(visitRef.dia)).format("YYYY-MM-DD"));
       setTecnicoTexto(visitRef.tecnico);
-      setTecRefUID(tecs.find((tec) => tec.nome === tecnicoTexto));
+      if(visitRef.tecnico !== 'Nenhum') {
+        setTecRefUID(tecs.find((tec) => tec.nome === tecnicoTexto));
+      } else {
+        setTecRefUID({nome: 'Nenhum', uid: '000', veiculo: visitRef.veiculo});
+      }
       setVeiculo(visitRef.veiculo);
       setCity(visitRef.cidade);
       if (visitRef.consultora === "Almoço Téc.") {
@@ -76,19 +78,23 @@ const EditVisit = ({
   }, [visitRef]);
 
   useEffect(() => {
+    if(tecRefUID && tecRefUID.nome !== 'Nenhum') {
+      if(tecnicoTexto && tecnicoTexto === 'Nenhum') return setTecRefUID({nome: 'Nenhum', uid: '000'})
+    }
+  },[tecRefUID, tecnicoTexto])
+
+  useEffect(() => {
     if (dataTexto) {
       filterSchedule(dataTexto, tecnicoTexto);
     } else {
       filterSchedule();
     }
-    if(tecnicoTexto) {
-      setTecRefUID(tecs.find((tec) => tec.nome === tecnicoTexto));
-    }
+    if(tecnicoTexto && tecnicoTexto !== 'Nenhum') setTecRefUID(tecs.find((tec) => tec.nome === tecnicoTexto));  
     if(consultoraTexto) {
       setSellerRef(sellers.find((sel) => sel.nome === consultoraTexto)); 
     }
-    if(tecRefUID && tecRefUID.nome !== visitRef.tecnico) setVeiculo(tecRefUID.veiculo)
-    if(tecRefUID && tecRefUID.nome === visitRef.tecnico) setVeiculo(visitRef.veiculo)
+    if(tecRefUID && tecRefUID.nome !== visitRef.tecnico && tecRefUID.nome !== 'Nenhum') setVeiculo(tecRefUID.veiculo)
+    if(tecRefUID && tecRefUID.nome === visitRef.tecnico && tecRefUID.nome !== 'Nenhum') setVeiculo(visitRef.veiculo)
 
     // Muda o filtro de busca das visitas de acordo com o dia escolhido
     if (dataTexto === visitRef.data) {
@@ -164,7 +170,7 @@ const EditVisit = ({
       const saidaEmpresa = moment(horarioTexto, "hh:mm"); //Horario de chegada
       const chegadaCliente = moment(horarioTexto, "hh:mm"); //Horario de chegada
 
-      if(visitRef.data !== dataTexto) {
+      if(visitRef.data) { // Observação
       saidaEmpresa.subtract(rotaTempo, "seconds").format("hh:mm"); // Pega o tempo que o tecnico vai precisar sair da empresa
       // console.log(saidaTexto, rotaTempo);
         setSaidaTexto(saidaEmpresa.format("kk:mm"));
@@ -222,6 +228,8 @@ const EditVisit = ({
 
       saidaEmpresaRef = saidaTexto;
 
+      console.log(saidaTexto)
+
       SaidaClienteRef = saidaCliente;
 
       chegadaCliente.add(rotaTempo, "seconds").format("hh:mm"); //Adiciona tempo de viagem volta
@@ -247,6 +255,11 @@ const EditVisit = ({
 
       const saidaFormatada = moment(saidaEmpresaRef, "hh:mm");
       const chegadaFormatada = moment(ChegadaEmpresaRef, "hh:mm");
+      //saidaFormatada.add(1, "minutes").format("hh:mm");
+      chegadaFormatada.subtract(1, "minutes").format("hh:mm");
+
+      console.log(saidaEmpresaRef);
+      //console.log(chegadaFormatada)
 
       let check = [];
       let visitsFind = [];
@@ -703,8 +716,7 @@ const EditVisit = ({
             <div className="label margin-top">
               <p>Técnico *</p>
               <div className="radio">
-                {visitRef.consultora === "Almoço Téc." ||
-                visitRef.visitaConjunta ? (
+                {visitRef.consultora === "Almoço Téc." ? (
                   <select
                     value={tecnicoTexto}
                     className="label__select"
@@ -733,6 +745,7 @@ const EditVisit = ({
                           {tec.nome}
                         </option>
                       ))}
+                      <option value='Nenhum'>Nenhum</option>
                   </select>
                 )}
               </div>
@@ -740,14 +753,26 @@ const EditVisit = ({
             {visitRef.consultora !== "Almoço Téc." && 
             <label className="label">
             <p>Veículo *</p>
-            <input
-              className="label__input"
-              type="text"
-              value={veiculo}
-              onChange={(e) => setVeiculo(e.target.value)} // onChange é necessario para poder atualizar a input
-              autoComplete="off"
-              required
-            />
+            {veiculo && tecnicoTexto !== 'Nenhum' ? 
+          <input
+            className="label__input"
+            type="text"
+            autoComplete="off"
+            value={veiculo}
+            disabled
+          /> :
+          <input
+          className="label__input"
+          type="text"
+          autoComplete="off"
+          onChange={(e) => setVeiculo (e.target.value)}
+          // onChange={(e) => setTecRefUID({
+          //   nome: 'Nenhum',
+          //   uid: '000',
+          //   veiculo: e.target.value
+          // })}
+          value={veiculo}
+        />  }
           </label>}
             <label className="label">
               <p>Observação</p>

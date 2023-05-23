@@ -109,7 +109,7 @@ useEffect(() => {
     [members]
   );
 
-  // console.log(sales);
+   console.log(schedule);
 
   return (
     <div className="container-schedule">
@@ -220,13 +220,13 @@ useEffect(() => {
                       <tr className="table" key={index}>
                       <td>{schedule.filter((ref) => ref.consultora === vend).length}</td>
                       <td>
-                      {(schedule.filter((ref) => ref.consultora === vend).length * 20).toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})}
+                      {(schedule.filter((ref) => ref.consultora === vend && ref.tecnico !== 'Nenhum').length * 20).toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})}
                       </td>
                     </tr>
                     ))}
                     <tr className="bg-total">
                       <td>{schedule.filter((ref) => ref.tecnico).length}</td>
-                      <td>{(schedule.filter((ref) => ref.tecnico).length * 20).toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})}</td>
+                      <td>{(schedule.filter((ref) => ref.tecnico && ref.tecnico !== 'Nenhum').length * 20).toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})}</td>
                     </tr>
                   </tbody>
                 </table>
