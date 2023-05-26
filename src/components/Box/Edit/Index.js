@@ -494,7 +494,7 @@ const EditVisit = ({
                 {
                   dia: diaRef,
                   data: dataTexto,
-                  saidaEmpresa: visitRef.saidaEmpresa,
+                  saidaEmpresa: saidaEmpresaRef,
                   chegadaCliente: chegadaClienteRef,
                   visita: TempoVisita,
                   visitaNumero: visitaNumero,
@@ -790,7 +790,7 @@ const EditVisit = ({
               <span className="">Previsão de Visita</span>
               <p className="notice">
                 Saindo da Empresa:
-                <b>{visitRef.data === dataTexto ? visitRef.saidaEmpresa : saidaTexto}</b>
+                <b>{saidaTexto}</b>
               </p>
               <p className="notice">
                 Chegando na Empresa: <b>{chegadaTexto}</b>
