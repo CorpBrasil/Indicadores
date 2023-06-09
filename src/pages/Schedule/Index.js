@@ -852,7 +852,8 @@ const Schedule = ({ userRef, members, tecs, sellers }) => {
                           </td>
                         )}
                         <td className="bold">
-                          {moment(info.dia).format("D")}
+                          {/* {moment.utc(info.dia).local().format('D')} */}
+                          {info.dia.substring(info.dia.length - 2)}
                         </td>
                         <td onClick={() => showAddress(info.endereco)}
                         className="no-wrap" 

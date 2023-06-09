@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import moment from "moment";
 import { useParams } from "react-router-dom";
 import { dataBase } from "../../firebase/database";
 import Header from "../../components/Header/Index";
@@ -252,7 +251,7 @@ useEffect(() => {
                         className="table"
                         key={index}>
                         <td className="bold">
-                          {moment(new Date(info.dia)).format("D")}
+                          {info.dia.substring(info.dia.length - 2)}
                         </td>
                         <td>{info.cidade}</td>
                         <td>{info.cliente}</td>
