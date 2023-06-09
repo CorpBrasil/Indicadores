@@ -25,7 +25,7 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, sellers, userR
   const [lng2, setLng2] = useState(0);
   const [latRef, setLatRef] = useState(0);
   const [lngRef, setLngRef] = useState(0);
-  const [tecRefUID, setTecRefUID] = useState(tecs.find((tec) => tec.nome === visitRef.tecnico)); // Procura os tecnicos que vem da pagina 'Schedule'
+  const [tecRefUID, setTecRefUID] = useState(tecs.find((tec) => tec.nome === visitRef.tecnico) || {nome: 'Nenhum', uid: '000', veiculo: '001'}); // Procura os tecnicos que vem da pagina 'Schedule'
   const [sellerRef, setSellerRef] = useState(sellers[0]); // Procura os tecnicos que vem da pagina 'Schedule'
   const [check1, setCheck1] = useState(false);
   const [check2, setCheck2] = useState(false);
