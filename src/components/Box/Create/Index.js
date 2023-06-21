@@ -40,7 +40,7 @@ const CreateVisit = ({
   const [tempoTexto, setTempoTexto] = useState(undefined);
   const [visitaNumero, setVisitaNumero] = useState(1800);
   const [saidaCliente, setSaidaCliente] = useState(undefined);
-  const [horarioTexto, setHorarioTexto] = useState(undefined);
+  const [horarioTexto, setHorarioTexto] = useState('00:00');
   const [saidaTexto, setSaidaTexto] = useState(undefined);
   const [chegadaTexto, setChegadaTexto] = useState(undefined);
   const [dataTexto, setDataTexto] = useState(undefined);
@@ -606,6 +606,7 @@ const CreateVisit = ({
   }
 
   const verifyLunch = () => {
+
     const lunchDay = schedule.find((lunch) => lunch.data === dataTexto && lunch.tipo === "Almoço" && lunch.tecnico === tecnicoTexto)
         if(lunchDay && type) {
           Swal.fire({
@@ -621,8 +622,6 @@ const CreateVisit = ({
           })
         }
   }
-
-  console.log(tecRefUID);
 
   return (
     <div className="box-visit">
@@ -685,6 +684,7 @@ const CreateVisit = ({
                 placeholder="Digite o hórario marcado"
                 min="07:00"
                 max="18:00"
+                value={horarioTexto || ''}
                 onBlur={(e) => moment(e.target.value, 'hh:mm') < moment('07:00', 'hh:mm') || moment(e.target.value, 'hh:mm') > moment('18:00', 'hh:mm') ? setHoursLimit(true) : setHoursLimit(false)}
                 onChange={(e) => setHorarioTexto(e.target.value)}
                 required
