@@ -574,7 +574,7 @@ const CreateVisit = ({
   };
 
   const createVisitDay = async (data) => {
-     //await addDoc(scheduleRef, data);
+     await addDoc(scheduleRef, data);
      Swal.fire({
       title: Company,
       html: `A visita em <b>${city}</b> foi criada com sucesso!`,
@@ -602,7 +602,7 @@ const CreateVisit = ({
       })
     }
     console.log(data);
-    //return returnSchedule();
+    return returnSchedule();
   }
 
   const verifyLunch = () => {
