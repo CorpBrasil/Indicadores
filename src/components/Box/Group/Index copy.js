@@ -1,7 +1,6 @@
 import { updateDoc, addDoc } from "firebase/firestore";
 import { useLayoutEffect, useState, useEffect, useRef } from 'react'
 import { useForm } from "react-hook-form"; // cria formulário personalizado
-import axios from 'axios';
 import Swal from "sweetalert2"; // cria alertas personalizado
 import * as moment from 'moment';
 import 'moment/locale/pt-br';
@@ -437,40 +436,91 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, sellers, userR
                 tipo: 'Visita Conjunta',
               };
 
-              // const visitaConjunta = {
-              //   dia: diaRef,
-              //   saidaEmpresa: saidaEmpresaRef,
-              //   chegadaCliente: chegadaClienteRef,
-              //   visita: TempoVisita,
-              //   visitaNumero: visitaNumero,
-              //   saidaDoCliente: SaidaClienteRef,
-              //   chegadaEmpresa: SaidaClienteRef,
-              //   consultora: consultoraTexto,
-              //   uid: sellerRef.id,
-              //   cor: sellerRef.cor,
-              //   tecnico: tecRefUID.nome,
-              //   tecnicoUID: tecRefUID.uid,
-              //   veiculo: tecRefUID.veiculo,
-              //   groupRef: "depois",
-              //   cidade: city,
-              //   endereco: addressComplete,
-              //   lat: lat,
-              //   lng: lng,
-              //   cliente: userData.cliente,
-              //   observacao: userData.observacao,
-              //   tempoRota: rotaTempo2,
-              //   tempo: tempoTexto2,
-              //   tempoRotaConjunta: rotaTempo1,
-              //   tempoConjunta: tempoTexto1,
-              //   lngRef: lng2,
-              //   latRef: lat2,
-              //   data: dataTexto,
-              //   confirmar: false,
-              //   visitaConjunta: true,
-              //   group: 'depois',
-              //   tipo: 'Visita Conjunta',
-              // };
+              const visitaConjunta = {
+                dia: diaRef,
+                saidaEmpresa: saidaEmpresaRef,
+                chegadaCliente: chegadaClienteRef,
+                visita: TempoVisita,
+                visitaNumero: visitaNumero,
+                saidaDoCliente: SaidaClienteRef,
+                chegadaEmpresa: SaidaClienteRef,
+                consultora: consultoraTexto,
+                uid: sellerRef.id,
+                cor: sellerRef.cor,
+                tecnico: tecRefUID.nome,
+                tecnicoUID: tecRefUID.uid,
+                veiculo: tecRefUID.veiculo,
+                groupRef: "depois",
+                cidade: city,
+                endereco: addressComplete,
+                lat: lat,
+                lng: lng,
+                cliente: userData.cliente,
+                observacao: userData.observacao,
+                tempoRota: rotaTempo2,
+                tempo: tempoTexto2,
+                tempoRotaConjunta: rotaTempo1,
+                tempoConjunta: tempoTexto1,
+                lngRef: lng2,
+                latRef: lat2,
+                data: dataTexto,
+                confirmar: false,
+                visitaConjunta: true,
+                group: 'depois',
+                tipo: 'Visita Conjunta',
+              };
               if (chegadaFormatadaTec.current && lunch.length === 0) {               
+                if(city !== 'Tietê') {
+                  Swal.fire({
+                    title: Company,
+                    html: `O horário de almoço do Técnico <b>${tecRefUID.nome}</b> irá ser criado automaticamente após a visita em <b>${city}</b>.<br/>` +
+                    `Você deseja que o almoço seja em <b>${city}</b> ou em <b>Tietê</b>?`,
+                    icon: "question",
+                    showDenyButton: true,
+                    showCloseButton: true,
+                    confirmButtonColor: "#F39200",
+                    confirmButtonText: city,
+                    denyButtonText: `Tietê`,
+                  }).then(async (result) => {
+                    if (result.isConfirmed) {
+                      await addDoc(scheduleRef, {
+                        dia: diaRef,
+                        saidaEmpresa: SaidaClienteRef,
+                        chegadaCliente: SaidaClienteRef,
+                        visita: "01:00",
+                        visitaNumero: 3600,
+                        saidaDoCliente: moment(SaidaClienteRef, 'hh:mm').add(3600, 'seconds').format('kk:mm'),
+                        chegadaEmpresa: moment(SaidaClienteRef, 'hh:mm').add(3600, 'seconds').format('kk:mm'),
+                        consultora: "Almoço Téc.",
+                        tecnico: tecRefUID.nome,
+                        tecnicoUID: tecRefUID.uid,
+                        cidade: '',
+                        lat: lat,
+                        lng: lng,
+                        tempoRota: '',
+                        tempo: '',
+                        cliente: '',
+                        observacao: '',
+                        data: dataTexto,
+                        uid: user.id,
+                        cor: "#111111",
+                        confirmar: false,
+                        tipo: "Almoço"
+                      })
+                      Swal.fire({
+                        title: Company,
+                        html: `Após o almoço, o Técnico <b>${tecRefUID.nome}</b> irá <b>continuar</b> com mais visitas na região ou <b>retornará</b> para <b>Tietê</b>?</br></br>` +
+                        `Atenção: caso escolha <b>retornar</b> para <b>Tietê</b>, o <b>tempo de retorno</b> para a cidade vai contar após o <b>término do almoço</b>.`,
+                        icon: "question",
+                        showDenyButton: true,
+                        showCloseButton: true,
+                        confirmButtonColor: "#F39200",
+                        confirmButtonText: 'Continuar',
+                        denyButtonText: `Retornar`,
+                      }).then(async (result) => {
+                        if (result.isConfirmed) {
+                          createVisitDay(visitaConjunta)
+                        } else if(result.isDenied) {
                           createVisitDay({
                             dia: diaRef,
                             saidaEmpresa: saidaEmpresaRef,
@@ -504,9 +554,88 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, sellers, userR
                             visitaConjunta: true,
                             tipo: 'Visita Conjunta',
                           })
-                        }  
+                        }
+                      })
+                } else if (result.isDenied) {
+                  await addDoc(scheduleRef, {
+                    dia: diaRef,
+                    saidaEmpresa: ChegadaEmpresaRef,
+                    chegadaCliente: ChegadaEmpresaRef,
+                    visita: "01:00",
+                    visitaNumero: 3600,
+                    saidaDoCliente: moment(ChegadaEmpresaRef, 'hh:mm').add(3600, 'seconds').format('kk:mm'),
+                    chegadaEmpresa: moment(ChegadaEmpresaRef, 'hh:mm').add(3600, 'seconds').format('kk:mm'),
+                    consultora: "Almoço Téc.",
+                    tecnico: tecRefUID.nome,
+                    tecnicoUID: tecRefUID.uid,
+                    cidade: '',
+                    lat: -23.109731, 
+                    lng: -47.715045,
+                    tempoRota: '',
+                    tempo: '',
+                    cliente: '',
+                    observacao: '',
+                    data: dataTexto,
+                    uid: user.id,
+                    cor: "#111111",
+                    confirmar: false,
+                    tipo: "Almoço"
+                  })
+                  createVisitDay(visita)
+                }
+                });
+              } else {
+                await addDoc(scheduleRef, {
+                  dia: diaRef,
+                  saidaEmpresa: ChegadaEmpresaRef,
+                  chegadaCliente: ChegadaEmpresaRef,
+                  visita: "01:00",
+                  visitaNumero: 3600,
+                  saidaDoCliente: moment(ChegadaEmpresaRef, 'hh:mm').add(3600, 'seconds').format('kk:mm'),
+                  chegadaEmpresa: moment(ChegadaEmpresaRef, 'hh:mm').add(3600, 'seconds').format('kk:mm'),
+                  consultora: "Almoço Téc.",
+                  tecnico: tecRefUID.nome,
+                  tecnicoUID: tecRefUID.uid,
+                  cidade: '',
+                  lat: -23.109731, 
+                  lng: -47.715045,
+                  tempoRota: '',
+                  tempo: '',
+                  cliente: '',
+                  observacao: '',
+                  data: dataTexto,
+                  uid: user.id,
+                  cor: "#111111",
+                  confirmar: false,
+                  tipo: "Almoço"
+                })
+                Swal.fire({
+                  title: Company,
+                  html: `O horário de almoço do Técnico <b>${tecRefUID.nome}</b> foi criado automaticamente após a visita`,
+                  icon: "warning",
+                  showConfirmButton: true,
+                  showCloseButton: true,
+                  confirmButtonColor: "#F39200",
+                }).then(() => {
+                    createVisitDay(visita)
+                })
+              }
+            } else {
               createVisitDay(visita)
+            }  
           }
+          // Swal.fire({
+          //   title: Company,
+          //   html: `A Visita Conjunta <b>${visitRef.cidade}</b> foi criada com sucesso.`,
+          //   icon: "success",
+          //   showConfirmButton: true,
+          //   showCloseButton: true,
+          //   confirmButtonColor: "#F39200"
+          // }).then((result) => {
+          //   if (result.isConfirmed) {
+          //       return returnSchedule();
+          //   }
+          // })
         }
       })
     }
@@ -516,7 +645,6 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, sellers, userR
     }
 
     const createVisitDay = async (data) => {
-      let endereco;
       await addDoc(scheduleRef, data);
       Swal.fire({
        title: Company,
@@ -526,30 +654,7 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, sellers, userR
        showCloseButton: true,
        confirmButtonColor: "#F39200",
      })
-     if(data.endereco.length < 3) {
-      endereco = city;
-     } else {
-      endereco = data.endereco;
-     }
-     if(data.tecnico === "Lucas") {
-      axios.post('https://backend.botconversa.com.br/api/v1/webhooks-automation/catch/43469/qiwZHdtY6dK1/', {
-        data: moment(data.data).format("DD.MM.YYYY"),
-        nome: data.tecnico,
-        cliente: data.cliente,
-        endereco: endereco,
-        saida: data.saidaEmpresa,
-        marcado: data.chegadaCliente,
-        chegada: data.chegadaEmpresa,
-        tipo: data.tipo,
-        consultora: data.consultora,
-        telefone: "5515991573088",
-        lat: data.lat,
-        lng: data.lng,
-        duracao: data.visita,
-        saidaCliente: data.saidaDoCliente
-      })
-    }
-     //return returnSchedule();
+     return returnSchedule();
    }
 
   return (
