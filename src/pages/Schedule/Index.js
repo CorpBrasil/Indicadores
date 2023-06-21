@@ -25,7 +25,7 @@ import CreateVisit from "../../components/Box/Create/Index";
 import CreateVisitGroup from "../../components/Box/Group/Index";
 import { Company, Users } from "../../data/Data";
 
-const Schedule = ({ userRef, members, tecs, sellers }) => {
+const Schedule = ({ userRef, members, tecs, sellers, alerts }) => {
   const data = new Date();
   const checked = JSON.parse(localStorage.getItem("foco"));
   const [focoCheck, setFocoCheck] = useState(false);
@@ -523,7 +523,7 @@ const Schedule = ({ userRef, members, tecs, sellers }) => {
 
   return (
     <div className="container-schedule">
-      <Header user={user} userRef={userRef}></Header>
+      <Header user={user} userRef={userRef} alerts={alerts}></Header>
       <div className="title-schedule">
         <h2>Visita Técnica - Agenda {year} </h2>
       </div>

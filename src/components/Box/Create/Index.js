@@ -3,6 +3,7 @@ import { memo, useEffect, useState, useRef } from "react";
 import { useForm } from "react-hook-form"; // cria formulário personalizado
 import Swal from "sweetalert2"; // cria alertas personalizado
 import * as moment from "moment";
+import axios from 'axios';
 import useAuth from "../../../hooks/useAuth";
 import { usePlacesWidget } from "react-google-autocomplete";
 import {
@@ -239,7 +240,7 @@ const CreateVisit = ({
       }
 
       const visitsFindCount = dataRef.length - check.length;
-      console.log(visitsFindCount);
+      //console.log(visitsFindCount);
 
       dataRef.map((a) => {
         //Percorre todos os arrays de 'dataRef' e compara se os arrays são iguais
@@ -248,7 +249,7 @@ const CreateVisit = ({
         }
         return visitsFind;
       });
-      console.log(visitsFind);
+      //console.log(visitsFind);
       let c = 1;
 
       if (visitsFindCount < 0 || visitsFindCount > 0) {
@@ -573,7 +574,7 @@ const CreateVisit = ({
   };
 
   const createVisitDay = async (data) => {
-     await addDoc(scheduleRef, data);
+     //await addDoc(scheduleRef, data);
      Swal.fire({
       title: Company,
       html: `A visita em <b>${city}</b> foi criada com sucesso!`,
@@ -582,7 +583,26 @@ const CreateVisit = ({
       showCloseButton: true,
       confirmButtonColor: "#F39200",
     })
-    return returnSchedule();
+    if(data.tecnico === "Lucas") {
+      axios.post('https://backend.botconversa.com.br/api/v1/webhooks-automation/catch/43469/qiwZHdtY6dK1/', {
+        data: moment(data.data).format("DD.MM.YYYY"),
+        nome: data.tecnico,
+        cliente: data.cliente,
+        endereco: data.endereco,
+        saida: data.saidaEmpresa,
+        marcado: data.chegadaCliente,
+        chegada: data.chegadaEmpresa,
+        tipo: data.tipo,
+        consultora: data.consultora,
+        telefone: "5515991573088",
+        lat: data.lat,
+        lng: data.lng,
+        duracao: data.visita,
+        saidaCliente: data.saidaDoCliente
+      })
+    }
+    console.log(data);
+    //return returnSchedule();
   }
 
   const verifyLunch = () => {

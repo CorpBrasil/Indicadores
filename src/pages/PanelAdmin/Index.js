@@ -11,7 +11,7 @@ import "./_style.scss";
 import CreateAdmin from "../../components/Modal/Admin/Create/Index";
 import EditAdmin from "../../components/Modal/Admin/Edit/Index";
 
-const PanelAdmin = ({ user }) => {
+const PanelAdmin = ({ user, alerts }) => {
   const [members, setMembers] = useState();
   const [memberRef, setMemberRef] = useState();
   const [createAdmin, setCreateAdmin] = useState(undefined);
@@ -42,7 +42,7 @@ const PanelAdmin = ({ user }) => {
 
   return (
     <div className="container-panel">
-      <Header user={user}></Header>
+      <Header user={user} alerts={alerts}></Header>
       <div className="title-panel">
         <h2>Área Administrativa</h2>
       </div>

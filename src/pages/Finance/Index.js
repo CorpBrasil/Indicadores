@@ -13,7 +13,7 @@ import {
 
 import "../Schedule/_style.scss";
 
-const Finance = ({ userRef }) => {
+const Finance = ({ userRef, alerts }) => {
   const data = new Date();
   const { year } = useParams();
   const { user } = useAuth();
@@ -112,7 +112,7 @@ useEffect(() => {
 
   return (
     <div className="container-schedule">
-      <Header user={user} userRef={userRef}></Header>
+      <Header user={user} userRef={userRef} alerts={alerts}></Header>
       <div className="title-schedule">
         <h2>Agenda {year} </h2>
         <h2>Relátorio Mensal - {month[parseFloat(monthSelect)]} </h2>

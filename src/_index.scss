@@ -33,6 +33,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
+  background-color: #f5f5f5;;
 }
 
 code {
@@ -79,4 +80,14 @@ input:disabled {
 .no-wrap {
   white-space: nowrap;
   padding: 0 0.5rem;
+}
+
+.my-validation-message::before {
+  display: none;
+}
+
+.my-validation-message i {
+  margin: 0 .4em;
+  color: #f27474;
+  font-size: 1.4em;
 }

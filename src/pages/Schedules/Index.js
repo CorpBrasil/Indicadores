@@ -1,16 +1,18 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react';
+import { Link } from "react-router-dom";
 import { useNavigate } from 'react-router-dom'; // import do hook
 import { dataBase } from '../../firebase/database';
 import { doc, onSnapshot, collection, deleteDoc } from "firebase/firestore";
 import CreateSchedule from '../../components/Modal/CreateSchedule/Index';
 import Swal from 'sweetalert2';
+import PeopleIcon from '@mui/icons-material/People';
 import useAuth from '../../hooks/useAuth';
 import Header from '../../components/Header/Index';
 import { Users, Company } from '../../data/Data';
 
 import './_style.scss';
 
-const Schedules = ({ userRef }) => {
+const Schedules = ({ userRef, alerts }) => {
     const { user } = useAuth();
     const [schedules, setSchedules] = useState();
     const [financeSchedules, setFinanceSchedules] = useState();
@@ -86,7 +88,7 @@ const Schedules = ({ userRef }) => {
 
   return (
     <div className='container-schedules'>
-      <Header user={user} userRef={userRef}></Header>
+      <Header user={user} userRef={userRef} alerts={alerts}></Header>
       <div className='title-schedule'>
         <h2>Agendas</h2>
       </div>
@@ -132,14 +134,28 @@ const Schedules = ({ userRef }) => {
             ))}
           </div></>
       }
+       {userRef && (user.email === Users[0].email || userRef.cargo === "Vendedor(a)" || userRef.cargo === "Administrador") &&
+        <>
+        <div className='box-schedule'>
+             <li className='alert'>
+                <Link className='alert__content' to="/leads">
+                  <div className='alert__text'>
+                    <p>Confirmar</p>
+                    <p>Leads</p>
+                  <PeopleIcon />
+                  </div>
+                </Link>
+              </li>
+          </div>
+          </>
+      }
       {user.email === Users[0].email &&   
       <div className='add-schedule'>
               <button onClick={() => setCreateSchedule(true)} className='add-schedule__btn'></button>
       </div>
       }
       </div>
-      {createSchedule && <CreateSchedule returnSchedule={returnSchedule} schedules={schedules}></CreateSchedule>}
-      
+      {createSchedule && <CreateSchedule returnSchedule={returnSchedule} schedules={schedules}></CreateSchedule>} 
     </div>
 
   )

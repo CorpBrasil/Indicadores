@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import Login from './pages/Login/Index';
 import Schedules from './pages/Schedules/Index';
 import PanelAdmin from './pages/PanelAdmin/Index';
+import Alert from './pages/Alert/Index';
 import useAuth from './hooks/useAuth';
 import PrivateRoute from './components/PrivateRoute';
 import Schedule from './pages/Schedule/Index';
@@ -16,9 +17,11 @@ function App() {
   const { user } = useAuth();
   const [members, setMembers] = useState();
   const [userRef, setUserRef] = useState();
+  const [userAlerts, setUserAlerts] = useState();
   const [tecs, setTecs] = useState();
   const [sellers, setSellers] = useState();
   const membersCollectionRef = collection(dataBase, "Membros");
+  //const alertCollectionRef = collection(dataBase, "Membros/lJaVzpzKq3VQ3Ke8SdC35EH8pjj1/Avisos");
   // console.log(user)
 
   useEffect(
@@ -26,7 +29,12 @@ function App() {
       const fetchData = async () => {
         onSnapshot(membersCollectionRef, (member) => {
           // Atualiza os dados em tempo real
-          setMembers(member.docs.map((doc) => ({ ...doc.data(), id: doc.id }))); // puxa a coleção 'Chats' para o state
+          setMembers(member.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
+        });
+
+        onSnapshot(collection(dataBase, "Membros/" + user.id + "/Avisos"), (member) => {
+          // Atualiza os dados em tempo real
+          setUserAlerts(member.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
         });
       };
       fetchData();
@@ -55,14 +63,15 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route exact element={<PrivateRoute />}>
-            <Route exact path="/" element={<Schedules userRef={userRef} />} />
-            {user && userRef && (user.email === Users[0].email || userRef.cargo === "Administrador") &&
-            <Route exact path="/admin" element={<PanelAdmin user={user} userRef={userRef} />} />
-       }
-          {user && userRef && (user.email === Users[0].email || user.email === Users[1].email || userRef.cargo === "Técnico" || userRef.cargo === "Administrador") &&
-            <Route exact path="/financeiro/:year" element={<Finance userRef={userRef} />} />
-       }
-            <Route path="/agenda/:year" element={<Schedule userRef={userRef} members={members} tecs={tecs} sellers={sellers} />} />
+            <Route exact path="/" element={<Schedules userRef={userRef} alerts={userAlerts} />} />
+              {user && userRef && (user.email === Users[0].email || userRef.cargo === "Administrador") &&
+            <Route exact path="/admin" element={<PanelAdmin user={user} userRef={userRef} alerts={userAlerts} />} />
+            }
+            {user && userRef && (user.email === Users[0].email || user.email === Users[1].email || userRef.cargo === "Técnico" || userRef.cargo === "Administrador") &&
+              <Route exact path="/financeiro/:year" element={<Finance userRef={userRef} alerts={userAlerts} />} />
+            }
+            <Route exact path="/leads" element={<Alert user={user} userRef={userRef} alerts={userAlerts} />} />
+            <Route path="/agenda/:year" element={<Schedule userRef={userRef} members={members} tecs={tecs} sellers={sellers} alerts={userAlerts} />} />
             <Route path="*" element={<Schedules userRef={userRef} />} />
           </Route>
           <Route exact path="/login" element={<Login />} />
