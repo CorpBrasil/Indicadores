@@ -542,6 +542,7 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts }) => {
                   userRef={userRef}
                   schedule={schedule}
                   monthNumber={monthNumber}
+                  createVisitGroupChoice={createVisitGroupChoice}
                 />
               )) || // Chama o componente 'Create'
                 (box === "create lunch" && (
@@ -665,117 +666,6 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts }) => {
               </div>
             )}
           <div className="container-table">
-            {dayVisits && dayVisits.length > 0 && (
-              <>
-                <div>
-                  <h2>
-                    Visitas do Dia{" "}
-                    {moment(new Date(dayVisits[0].dia)).format("D")}
-                  </h2>
-                </div>
-                <table
-                  className={
-                    focoCheck ? "table-visit table-foco" : "table-visit"
-                  }
-                >
-                  <thead>
-                    <tr>
-                      <th className="icons"></th>
-                      <th>Dia</th>
-                      <th>Cidade</th>
-                      <th>Cliente</th>
-                      <th>Hórario de Saida</th>
-                      <th>Chegada no Cliente</th>
-                      <th>Tempo de Visita</th>
-                      <th>Saída no Cliente</th>
-                      <th>Chegada na Empresa</th>
-                      <th>Consultor(a)</th>
-                      <th>Técnico</th>
-                      <th>Observação</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {dayVisits.map((info, index) => (
-                      <tr className="table" key={index}>
-                        {(info.confirmar === false &&
-                          info.tipo === "Visita" && (
-                            <td
-                              className="visit-icon cursor-help"
-                              aria-label="Visita"
-                              data-cooltipz-dir="right"
-                            ></td>
-                          )) ||
-                          (info.confirmar === false &&
-                            info.tipo === "Visita Conjunta" && (
-                              <td
-                                className="group-icon cursor-help"
-                                aria-label="Visita Conjunta"
-                                data-cooltipz-dir="right"
-                              ></td>
-                            )) ||
-                          (info.confirmar === false &&
-                            info.tipo === "Almoço" && (
-                              <td
-                                className="lunch-icon cursor-help"
-                                aria-label="Almoço"
-                                data-cooltipz-dir="right"
-                              ></td>
-                            )) ||
-                          (info.confirmar === true && (
-                            <td
-                              className="confirm-icon cursor-help"
-                              aria-label="Visita Confirmada"
-                              data-cooltipz-dir="right"
-                            ></td>
-                          ))}
-                        <td className="bold">
-                          {moment(new Date(info.dia)).format("D")}
-                        </td>
-                        <td className="no-wrap"
-                            aria-label={info.endereco}
-                            data-cooltipz-dir="top">{info.cidade}</td>
-                        <td>{info.cliente}</td>
-                        {info.tipo === "Almoço" ? (
-                          <td></td>
-                        ) : (
-                          <td className="bold bg-important">
-                            {info.saidaEmpresa}
-                          </td>
-                        )}
-                        <td>{info.chegadaCliente}</td>
-                        <td>{info.visita}</td>
-                        <td className={"bg-important-2"}>
-                          {info.saidaDoCliente}
-                        </td>
-                        {info.tipo === "Almoço" ? (
-                          <td></td>
-                        ) : (
-                          <td className="bold bg-important">
-                            {info.chegadaEmpresa}
-                          </td>
-                        )}
-                        <td
-                          style={
-                            info.cor && {
-                              backgroundColor: info.cor,
-                              borderBottom: `1px solid ${info.cor}`,
-                              borderRight: `1px solid ${info.cor}`,
-                              borderLeft: `1px solid ${info.cor}`,
-                              color: "#fff",
-                              textShadow: "#5a5a5a -1px 0px 5px",
-                            }
-                          }
-                        >
-                          {info.consultora}
-                        </td>
-                        <td>{info.tecnico}</td>
-                        <td className="observation">{info.observacao}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </>
-            )}
             {schedule && schedule.length > 0 && (
               <table
                 className={focoCheck ? "table-visit table-foco" : "table-visit"}
@@ -905,11 +795,12 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts }) => {
                           info.consultora === "Vendedor(a)" ? (
                             <>
                               <div
+                                style={info.confirmar ? {pointerEvents: 'none', opacity: '0.5'} : {pointerEvents: 'initial'}}
                                 aria-label="Editar Visita"
                                 data-cooltipz-dir="left"
                               >
                                 <button
-                                  className="btn-edit"
+                                  className='btn-edit'
                                   id="edit-visit"
                                   onClick={() => {
                                     setBox("edit");

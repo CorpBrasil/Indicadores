@@ -14,6 +14,10 @@ import {
 import "moment/locale/pt-br";
 import { Company, KeyMaps, Users } from "../../../data/Data";
 
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+//import ListItemText from '@mui/material/ListItemText';
+
 import "../style.scss";
 
 const CreateVisit = ({
@@ -25,7 +29,8 @@ const CreateVisit = ({
   userRef,
   schedule,
   monthNumber,
-  type
+  type,
+  createVisitGroupChoice
 }) => {
   const { user } = useAuth();
   // const chegadaFormatadaTec = useRef();
@@ -50,6 +55,7 @@ const CreateVisit = ({
   const [city, setCity] = useState(undefined);
   const [numberAddress, setNumberAddress] = useState(undefined);
   const [addressComplete, setAddressComplete] = useState(undefined);
+  const [visits, setVisits] = useState(schedule);
   const [libraries] = useState(["places"]);
   const { register, handleSubmit } = useForm();
   
@@ -76,10 +82,20 @@ const CreateVisit = ({
       }
       // console.log(consultora)
     };
-
     lunch();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    if(dataTexto) {
+      const visitsData = schedule.filter((visit) => visit.data === dataTexto);
+      if (visitsData && dataTexto.substring(8,10) !== "00") {
+        setVisits(visitsData);
+      }
+    } else {
+      setVisits(schedule);
+    }
+  },[dataTexto, schedule])
 
   useEffect(() => {
     // console.log(visitaNumero);
@@ -356,6 +372,8 @@ const CreateVisit = ({
     }
   };
 
+  console.log(schedule);
+
   const createVisitDay = async (data) => {
      await addDoc(scheduleRef, data);
      Swal.fire({
@@ -415,6 +433,21 @@ const CreateVisit = ({
         
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="box-visit__container">
+          {!checkInput &&
+                <label className="label">
+                <p>Endereço *</p>
+                <input
+                  className="label__input"
+                  placeholder="Digite a cidade"
+                  ref={ref}
+                  required
+                />
+                {tempoTexto && tempoTexto && (
+                  <><p className="notice">Tempo da rota: {tempoTexto} ✔️</p>
+                  <p className="notice">Cidade: {city} ✔️ N° {numberAddress ? numberAddress + '✔️' : '... ❌'}</p></>
+                )}
+              </label>
+              }
             <label className="label">
               <p>Dia *</p>
               <input
@@ -430,34 +463,6 @@ const CreateVisit = ({
                 required
               />
             </label>
-            {!checkInput &&
-              <label className="label">
-              <p>Endereço *</p>
-              <input
-                className="label__input"
-                placeholder="Digite a cidade"
-                ref={ref}
-                required
-              />
-              {tempoTexto && tempoTexto && (
-                <><p className="notice">Tempo da rota: {tempoTexto} ✔️</p>
-                <p className="notice">Cidade: {city} ✔️ N° {numberAddress ? numberAddress + '✔️' : '... ❌'}</p></>
-              )}
-            </label>
-            }
-            {!checkInput && 
-            <label className="label">
-            <p>Cliente *</p>
-            <input
-              className="label__input"
-              type="text"
-              placeholder="Digite o nome do Cliente"
-              autoComplete="off"
-              {...register("cliente")}
-              required
-            />
-          </label>
-            }
             <label className="label">
               <p>Hórario Marcado  *</p>
               <input
@@ -466,7 +471,7 @@ const CreateVisit = ({
                 placeholder="Digite o hórario marcado"
                 min="07:00"
                 max="18:00"
-                value={horarioTexto || ''}
+                //value={horarioTexto || ''}
                 onBlur={(e) => moment(e.target.value, 'hh:mm') < moment('07:00', 'hh:mm') || moment(e.target.value, 'hh:mm') > moment('18:00', 'hh:mm') ? setHoursLimit(true) : setHoursLimit(false)}
                 onChange={(e) => setHorarioTexto(e.target.value)}
                 required
@@ -503,6 +508,56 @@ const CreateVisit = ({
                 </select>
               )}
             </label>
+            {visits && visits.length > 0 ? 
+            <List
+            sx={{
+              width: '90%',
+              maxWidth: 500,            
+              bgcolor: 'background.paper',
+              position: 'relative',
+              overflow: 'auto',
+              maxHeight: 200,
+              '& ul': { padding: 0 },
+            }}>
+              {visits.map((visita, index) => (
+                <ListItem className="list-visit" sx={{ borderLeft: `10px solid ${visita.cor}` }} key={index}>
+                  <p><b>{visita.dia.substring(8,10)}</b></p>
+                  <div className="btn-add"
+                   onClick={() => createVisitGroupChoice(visita)}
+                  ></div>
+                  <p className="saida">{visita.saidaEmpresa}</p>
+                  <p className="chegada">{visita.chegadaEmpresa}</p>
+                  <p className="tecnico">{visita.tecnico}</p>
+                  <p>{visita.cidade ? visita.cidade : 'ALMOÇO'}</p>
+                </ListItem>
+              ))}
+             </List>:
+             <div style={{ display: 'none!impoortant' }} className="visit-aviso">
+              <h1>Nenhuma Visita Encontrada</h1>
+             </div>
+             }
+              <div className="box-visit__info prev">
+              <span className="">Previsão de Visita</span>
+              <p className="notice">
+                Saindo da Empresa: <b>{saidaTexto}</b>
+              </p>
+              <p className="notice">
+                Chegando na Empresa: <b>{chegadaTexto}</b>
+              </p>
+            </div>
+              {!checkInput && 
+              <label className="label">
+              <p>Cliente *</p>
+              <input
+                className="label__input"
+                type="text"
+                placeholder="Digite o nome do Cliente"
+                autoComplete="off"
+                {...register("cliente")}
+                required
+              />
+            </label>
+              }
             {(user.email === Users[0].email && !type) || (userRef.cargo === "Administrador" && !type) ?
           <div className="label margin-top">
           <p>Consultora *</p>
@@ -531,7 +586,7 @@ const CreateVisit = ({
         </label> 
         }
           <div className="label margin-top">
-            <p>Técnico *</p>
+            <p>Técnico/Motorista *</p>
             <select
               value={tecnicoTexto || ''}
               className="label__select"
@@ -579,17 +634,6 @@ const CreateVisit = ({
             />
           </label>
           </div>
-          {chegadaTexto && saidaTexto && (
-            <div className="box-visit__info prev">
-              <span className="">Previsão de Visita</span>
-              <p className="notice">
-                Saindo da Empresa: <b>{saidaTexto}</b>
-              </p>
-              <p className="notice">
-                Chegando na Empresa: <b>{chegadaTexto}</b>
-              </p>
-            </div>
-          )}
           <input className="box-visit__btn" type="submit" value="CRIAR" />
         </form>
       </div>

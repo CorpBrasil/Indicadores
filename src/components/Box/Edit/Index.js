@@ -5,6 +5,8 @@ import { useForm } from "react-hook-form"; // cria formulário personalizado
 import Swal from "sweetalert2"; // cria alertas personalizado
 import * as moment from "moment";
 import "moment/locale/pt-br";
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
 import { Company, Users } from "../../../data/Data";
 import useAuth from "../../../hooks/useAuth";
 
@@ -43,6 +45,7 @@ const EditVisit = ({
   const [tecRefUID, setTecRefUID] = useState(); // Procura os tecnicos que vem da pagina 'Schedule'
   const [veiculo, setVeiculo] = useState();
   const [city, setCity] = useState();
+  const [visits, setVisits] = useState(schedule);
   const [hoursLimit, setHoursLimit] = useState(false);
 
   const { register, handleSubmit, reset } = useForm();
@@ -82,6 +85,17 @@ const EditVisit = ({
       if(tecnicoTexto && tecnicoTexto === 'Nenhum') return setTecRefUID({nome: 'Nenhum', uid: '000'})
     }
   },[tecRefUID, tecnicoTexto])
+
+  useEffect(() => {
+    if(dataTexto) {
+      const visitsData = schedule.filter((visit) => visit.data === dataTexto);
+      if (visitsData && dataTexto.substring(8,10) !== "00") {
+        setVisits(visitsData);
+      }
+    } else {
+      setVisits(schedule);
+    }
+  },[dataTexto, schedule])
 
   useEffect(() => {
     if (dataTexto) {
@@ -547,6 +561,22 @@ const EditVisit = ({
           <h4>Editar Visita</h4>))}
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="box-visit__container">
+          {visitRef.consultora !== "Almoço Téc." && (
+            <>
+              <label className="label">
+                <p>Endereço *</p>
+                <input
+                  className="label__input"
+                  placeholder="Digite a cidade"
+                  value={visitRef.endereco ? visitRef.endereco : city}
+                  disabled
+                />
+                {tempoTexto && tempoTexto && (
+                  <p className="notice">Tempo da rota: {tempoTexto} ✔️</p>
+                )}
+              </label>
+            </>
+          )}
             <label className="label">
               <p>Dia *</p>
               {visitRef.consultora === "Almoço Téc." ? (
@@ -575,31 +605,6 @@ const EditVisit = ({
                 />
               )}
             </label>
-            {visitRef.consultora !== "Almoço Téc." && (
-              <>
-                <label className="label">
-                  <p>Endereço *</p>
-                  <input
-                    className="label__input"
-                    placeholder="Digite a cidade"
-                    value={visitRef.endereco ? visitRef.endereco : city}
-                    disabled
-                  />
-                  {tempoTexto && tempoTexto && (
-                    <p className="notice">Tempo da rota: {tempoTexto} ✔️</p>
-                  )}
-                </label>
-                <label className="label">
-                  <p>Cliente *</p>
-                  <input
-                    className="label__input"
-                    placeholder="Digite a cidade"
-                    {...register("cliente")}
-                    required
-                  />
-                </label>
-              </>
-            )}
             <label className="label">
               <p>Hórario Marcado *</p>
               {(visitRef.visitaConjunta && !checkInput) ||
@@ -686,35 +691,75 @@ const EditVisit = ({
                 </select>
               )}
             </label>
-            {(user.email === Users[0].email || userRef.cargo === "Administrador") && visitRef.tipo !== "Almoço" &&
-          <div className="label margin-top">
-          <p>Consultora *</p>
-          <select
-            value={consultoraTexto || ''}
-            className="label__select"
-            name="tec"
-            onChange={(e) => setConsultoraTexto(e.target.value)}>
-              {sellers &&
-              sellers.map((seller, index) => (
-                <option key={index} value={seller.nome}>{seller.nome}</option>
+            {visits && visits.length > 0 ? 
+            <List
+            sx={{
+              width: '90%',
+              maxWidth: 500,            
+              bgcolor: 'background.paper',
+              position: 'relative',
+              overflow: 'auto',
+              maxHeight: 200,
+              '& ul': { padding: 0 },
+            }}>
+              {visits.map((visita, index) => (
+                <ListItem className="list-visit" sx={{ borderLeft: `10px solid ${visita.cor}` }} key={index}>
+                  <p><b>{visita.dia.substring(8,10)}</b></p>
+                  <p className="saida">{visita.saidaEmpresa}</p>
+                  <p className="chegada">{visita.chegadaEmpresa}</p>
+                  <p className="tecnico">{visita.tecnico}</p>
+                  <p>{visita.cidade ? visita.cidade : 'ALMOÇO'}</p>
+                </ListItem>
               ))}
-          </select>
-        </div>}
+             </List>:
+             <div style={{ display: 'none!impoortant' }} className="visit-aviso">
+              <h1>Nenhuma Visita Encontrada</h1>
+             </div>
+             }
+              <div className="box-visit__info prev">
+              <span className="">Previsão de Visita</span>
+              <p className="notice">
+                Saindo da Empresa: <b>{saidaTexto}</b>
+              </p>
+              <p className="notice">
+                Chegando na Empresa: <b>{chegadaTexto}</b>
+              </p>
+            </div>
+            {(user.email === Users[0].email || userRef.cargo === "Administrador") && visitRef.tipo !== "Almoço" &&
+            <><label className="label">
+                <p>Cliente *</p>
+                <input
+                  className="label__input"
+                  placeholder="Digite a cidade"
+                  {...register("cliente")}
+                  required />
+              </label><div className="label margin-top">
+                  <p>Consultora *</p>
+                  <select
+                    value={consultoraTexto || ''}
+                    className="label__select"
+                    name="tec"
+                    onChange={(e) => setConsultoraTexto(e.target.value)}>
+                    {sellers &&
+                      sellers.map((seller, index) => (
+                        <option key={index} value={seller.nome}>{seller.nome}</option>
+                      ))}
+                  </select>
+                </div></>}
         {userRef.cargo === 'Vendedor(a)' &&
-          <label className="label">
-          <p>Consultora *</p>
-          <input
-            className="label__input"
-            type="text"
-            value={consultoraTexto || ''}
-            placeholder="Digite o nome do Cliente"
-            autoComplete="off"
-            disabled
-          />
-        </label> 
+            <label className="label">
+                  <p>Consultora *</p>
+                  <input
+                    className="label__input"
+                    type="text"
+                    value={consultoraTexto || ''}
+                    placeholder="Digite o nome do Cliente"
+                    autoComplete="off"
+                    disabled />
+                </label>
         }
             <div className="label margin-top">
-              <p>Técnico *</p>
+              <p>Técnico/Motorista *</p>
               <div className="radio">
                 {visitRef.consultora === "Almoço Téc." ? (
                   <select
@@ -785,18 +830,6 @@ const EditVisit = ({
               />
             </label>
           </div>
-          {chegadaTexto && saidaTexto && (
-            <div className="box-visit__info prev">
-              <span className="">Previsão de Visita</span>
-              <p className="notice">
-                Saindo da Empresa:
-                <b>{saidaTexto}</b>
-              </p>
-              <p className="notice">
-                Chegando na Empresa: <b>{chegadaTexto}</b>
-              </p>
-            </div>
-          )}
           <input className="box-visit__btn" type="submit" value="EDITAR" />
         </form>
       </div>

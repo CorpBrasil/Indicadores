@@ -116,23 +116,57 @@
           }
             }
         }
+
+        .list-visit {
+          width: 100%;
+          gap: 0.6rem!important;
+
+          @media (max-width: 900px) {
+            width: 120%;
+          } 
+
+          .btn-add {
+            @include btnTable("../../images/icons/Add.svg", #f39200, 25px);
+            border: 1px solid #f39200 !important;
+            height: 35px;
+            border-radius: 5px;
+          }
+
+          .saida {background-color: #72e9ae;}
+          .chegada {background-color: #efbec3;}
+          .tecnico {background-color: #171717; color: #fff;}
+
+          .saida, .chegada, .tecnico {
+            border-radius: 5px;
+            padding: 0.5rem;
+            font-weight: bold;
+          }
+        }
+
+        .visit-aviso {
+          width: 90%;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          max-width: 500px;
+          height: 200px;
+          color: #cdcdcd;
+        }
     }
 
     &__info{
         display: flex;
         flex-direction: column;
         justify-content: center;
-        margin: 2rem auto;
-        padding: 1rem;
+        margin: 0 0.5rem;
+        padding: 2rem;
         border-radius: 5px;
         border: 1px solid;
-        width: 40%;
-        background-color: #fff3cd;
-        color: #856404;
-        border-color: #ffeeba;
-        @include responsive(0, 1024px) {
-            width: 83%;
-        }
+        width: 90%;
+        max-width: 400px;
+        background-color: #2a2a2a;
+        color: #fff;
+        border-color: #111;
   
         span {
           margin-bottom: 1rem;

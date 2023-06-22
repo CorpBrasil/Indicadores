@@ -12,6 +12,8 @@ import {
   GoogleMap,
   useLoadScript,
 } from "@react-google-maps/api";
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
 import { Company, KeyMaps, Users } from "../../../data/Data";
 
 import '../style.scss';
@@ -45,6 +47,7 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, sellers, userR
   const [numberAddress, setNumberAddress] = useState(undefined);
   const [addressComplete, setAddressComplete] = useState(undefined);
   const [city, setCity] = useState();
+  const [visits] = useState(schedule.filter((visit) => visit.data === moment(new Date(visitRef.dia)).format('YYYY-MM-DD')));
   const [hoursLimit, setHoursLimit] = useState(false);
   const [libraries] = useState(["places"]);
 
@@ -53,6 +56,9 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, sellers, userR
     handleSubmit,
     reset
   } = useForm();
+
+  console.log(visitRef);
+  console.log(type);
 
 
   const { isLoaded } = useLoadScript({
@@ -549,7 +555,7 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, sellers, userR
         saidaCliente: data.saidaDoCliente
       })
     }
-     //return returnSchedule();
+     return returnSchedule();
    }
 
   return (
@@ -561,20 +567,6 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, sellers, userR
         <h4>Criar Visita Conjunta</h4>
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="box-visit__container">
-            <label className="label">
-              <p>Dia *</p>
-              <input
-                value={dataTexto || ''}
-                className="label__input"
-                type="date"
-                min={monthNumber && monthNumber.min}
-                max={monthNumber && monthNumber.max}
-                onChange={(e) => setDataTexto(e.target.value)}
-                placeholder="Digite o dia"
-                autoComplete="off"
-                disabled
-              /> 
-            </label>
             <label className="label">
               <p>Endereço *</p>
               <input
@@ -588,13 +580,18 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, sellers, userR
               )}
             </label>
             <label className="label">
-              <p>Cliente *</p>
+              <p>Dia *</p>
               <input
+                value={dataTexto || ''}
                 className="label__input"
-                placeholder="Digite o nome do Cliente"
-                {...register("cliente")}
-                required
-              />
+                type="date"
+                min={monthNumber && monthNumber.min}
+                max={monthNumber && monthNumber.max}
+                onChange={(e) => setDataTexto(e.target.value)}
+                placeholder="Digite o dia"
+                autoComplete="off"
+                disabled
+              /> 
             </label>
             <label className="label">
               <p>Hórario Marcado *</p>
@@ -624,6 +621,52 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, sellers, userR
                   <option value={7200}>02:00</option>
             </select>
             </label>
+            {visits && visits.length > 0 ? 
+            <List
+            sx={{
+              width: '90%',
+              maxWidth: 500,
+              margin: 'auto 1rem',
+              bgcolor: 'background.paper',
+              position: 'relative',
+              overflow: 'auto',
+              maxHeight: 200,
+              '& ul': { padding: 0 },
+            }}>
+              {visits.map((visita, index) => (
+                <ListItem className="list-visit" sx={{ borderLeft: `10px solid ${visita.cor}` }} key={index}>
+                  <p><b>{visita.dia.substring(8,10)}</b></p>
+                  <p className="saida">{type === 'antes' ? visitRef.chegadaCliente : visita.saidaEmpresa}</p>
+                  <p className="chegada">{type === 'depois' ? visitRef.saidaDoCliente  : visita.chegadaEmpresa}</p>
+                  <p className="tecnico">{visita.tecnico}</p>
+                  <p>{visita.cidade ? visita.cidade : 'ALMOÇO'}</p>
+                </ListItem>
+              ))}
+             </List>:
+             <div className="visit-aviso">
+              <h1>Nenhuma Visita Encontrada</h1>
+             </div>
+             }
+             {chegadaTexto && horarioTexto && 
+            <div className="box-visit__info prev">
+              <span className="">Previsão de Visita</span>
+              <p className="notice">
+                Saindo: <b>{visitRef.tipo === "Almoço" ? visitRef.saidaDoCliente : saidaTexto}</b>
+              </p>
+              <p className="notice">
+                Chegando: <b>{chegadaTexto}</b>
+              </p>
+            </div>
+          }
+            <label className="label">
+              <p>Cliente *</p>
+              <input
+                className="label__input"
+                placeholder="Digite o nome do Cliente"
+                {...register("cliente")}
+                required
+              />
+            </label>
             {(user.email === Users[0].email || userRef.cargo === "Administrador") && 
           <div className="label margin-top">
           <p>Consultora *</p>
@@ -652,7 +695,7 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, sellers, userR
         </label> 
         }
           <div className="label margin-top">
-            <p>Técnico *</p>
+            <p>Técnico/Motorista *</p>
             <div className="radio">
             <select
               value={tecnicoTexto || ''}
@@ -700,17 +743,6 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, sellers, userR
             />
           </label>
           </div>
-          {chegadaTexto && horarioTexto && 
-            <div className="box-visit__info prev">
-              <span className="">Previsão de Visita</span>
-              <p className="notice">
-                Saindo da Empresa: <b>{visitRef.tipo === "Almoço" ? visitRef.saidaDoCliente : saidaTexto}</b>
-              </p>
-              <p className="notice">
-                Chegando na Empresa: <b>{chegadaTexto}</b>
-              </p>
-            </div>
-          }
           <input className="box-visit__btn" type="submit" value="CRIAR" />
         </form>
       </div>
