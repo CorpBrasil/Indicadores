@@ -75,7 +75,7 @@ const Alert = ({user,  userRef, alerts}) => {
         Campanha: lead.campanha,
         Consultora: lead.consultora,
       }).then(async response => {
-        await deleteDoc(doc(dataBase, "Membros", userRef.uid, "Avisos", alert.id));
+        await deleteDoc(doc(dataBase, "Membros", userRef.uid, "Avisos", lead.id));
         Swal.fire({
           position: 'top-center',
           icon: 'success',
