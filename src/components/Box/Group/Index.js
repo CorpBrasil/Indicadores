@@ -636,10 +636,10 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, sellers, userR
               {visits.map((visita, index) => (
                 <ListItem className="list-visit" sx={{ borderLeft: `10px solid ${visita.cor}` }} key={index}>
                   <p><b>{visita.dia.substring(8,10)}</b></p>
-                  <p className="saida">{type === 'antes' ? visitRef.chegadaCliente : visita.saidaEmpresa}</p>
+                  <p className="saida">{type === 'antes' && visitRef.id === visita.id ? visitRef.chegadaCliente : visita.saidaEmpresa}</p>
                   <p className="chegada">{type === 'depois' ? visitRef.saidaDoCliente  : visita.chegadaEmpresa}</p>
                   <p className="tecnico">{visita.tecnico}</p>
-                  <p>{visita.cidade ? visita.cidade : 'ALMOÇO'}</p>
+                  <p className="cidade">{visita.cidade ? visita.cidade : 'ALMOÇO'}</p>
                 </ListItem>
               ))}
              </List>:

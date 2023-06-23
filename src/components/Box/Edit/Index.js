@@ -269,7 +269,7 @@ const EditVisit = ({
 
       const saidaFormatada = moment(saidaEmpresaRef, "hh:mm");
       const chegadaFormatada = moment(ChegadaEmpresaRef, "hh:mm");
-      //saidaFormatada.add(1, "minutes").format("hh:mm");
+      saidaFormatada.add(1, "minutes").format("hh:mm");
       chegadaFormatada.subtract(1, "minutes").format("hh:mm");
 
       console.log(saidaEmpresaRef);
@@ -553,12 +553,13 @@ const EditVisit = ({
         <div className="box-visit__close">
           <button onClick={returnSchedule} className="btn-close" />
         </div>
-        {(visitRef.visitaConjunta && (
+        {(visitRef.tipo === "Visita Conjunta" && (
           <h4>Editar Visita Conjunta</h4>)) || 
         (visitRef.tipo === "Almoço" && (
           <h4>Editar Almoço</h4>))  ||
         (visitRef.tipo === "Visita" && (
           <h4>Editar Visita</h4>))}
+          {/* <h4>Editar Visita</h4> */}
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="box-visit__container">
           {visitRef.consultora !== "Almoço Téc." && (
@@ -708,7 +709,7 @@ const EditVisit = ({
                   <p className="saida">{visita.saidaEmpresa}</p>
                   <p className="chegada">{visita.chegadaEmpresa}</p>
                   <p className="tecnico">{visita.tecnico}</p>
-                  <p>{visita.cidade ? visita.cidade : 'ALMOÇO'}</p>
+                  <p className="cidade">{visita.cidade ? visita.cidade : 'ALMOÇO'}</p>
                 </ListItem>
               ))}
              </List>:

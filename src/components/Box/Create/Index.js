@@ -523,12 +523,14 @@ const CreateVisit = ({
                 <ListItem className="list-visit" sx={{ borderLeft: `10px solid ${visita.cor}` }} key={index}>
                   <p><b>{visita.dia.substring(8,10)}</b></p>
                   <div className="btn-add"
+                  aria-label="Criar Visita Conjunta"
+                  data-cooltipz-dir="right"
                    onClick={() => createVisitGroupChoice(visita)}
                   ></div>
                   <p className="saida">{visita.saidaEmpresa}</p>
                   <p className="chegada">{visita.chegadaEmpresa}</p>
                   <p className="tecnico">{visita.tecnico}</p>
-                  <p>{visita.cidade ? visita.cidade : 'ALMOÇO'}</p>
+                  <p className="cidade">{visita.cidade ? visita.cidade : 'ALMOÇO'}</p>
                 </ListItem>
               ))}
              </List>:
