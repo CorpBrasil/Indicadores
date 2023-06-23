@@ -92,6 +92,8 @@
       }
 
       .schedule-month { // ============= Botão que altera os meses ================== //
+        width: 100%;
+
         &__select {
           width: 15rem;
           margin: 0.5rem;
@@ -124,6 +126,7 @@
         align-items: center;
         gap: 0.5rem;
         margin-right: 1rem;
+        width: 100%;
 
         .toggle {
           position: absolute;
