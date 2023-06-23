@@ -565,16 +565,15 @@ const EditVisit = ({
           {visitRef.consultora !== "Almoço Téc." && (
             <>
               <label className="label">
-                <p>Endereço *</p>
+              <p data-cooltipz-size="fit"
+                 aria-label={tempoTexto && `Tempo da Rota: ${tempoTexto}`}
+                  className="notice cooltipz--top cooltipz--visible">Endereço *</p>
                 <input
                   className="label__input"
                   placeholder="Digite a cidade"
                   value={visitRef.endereco ? visitRef.endereco : city}
                   disabled
                 />
-                {tempoTexto && tempoTexto && (
-                  <p className="notice">Tempo da rota: {tempoTexto} ✔️</p>
-                )}
               </label>
             </>
           )}

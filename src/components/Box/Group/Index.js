@@ -568,16 +568,14 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, sellers, userR
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="box-visit__container">
             <label className="label">
-              <p>Endereço *</p>
+            <p data-cooltipz-size="fit"
+                 aria-label={tempoTexto1 && tempoTexto2 && `Tempo da Rota: ${tempoTexto1} | Cidade: ${city} | N° ${numberAddress ? numberAddress + ' ✅' : '❌'}`}
+                  className="notice cooltipz--top cooltipz--visible">Endereço *</p>
               <input
                 className="label__input"
                 placeholder="Digite a cidade"
                 ref={ref}
               />
-              {tempoTexto1 && tempoTexto2 && (
-                <><p className="notice">Tempo da rota: {tempoTexto1} ✔️</p>
-                <p className="notice">Cidade: {city} ✔️ N° {numberAddress ? numberAddress + '✔️' : '... ❌'}</p></>
-              )}
             </label>
             <label className="label">
               <p>Dia *</p>

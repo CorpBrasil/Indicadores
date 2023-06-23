@@ -435,17 +435,15 @@ const CreateVisit = ({
           <div className="box-visit__container">
           {!checkInput &&
                 <label className="label">
-                <p>Endereço *</p>
+                <p data-cooltipz-size="fit"
+                 aria-label={tempoTexto && `Tempo da Rota: ${tempoTexto} | Cidade: ${city} | N° ${numberAddress ? numberAddress + ' ✅' : '❌'}`}
+                  className="notice cooltipz--top cooltipz--visible">Endereço *</p>
                 <input
                   className="label__input"
                   placeholder="Digite a cidade"
                   ref={ref}
                   required
                 />
-                {tempoTexto && tempoTexto && (
-                  <><p className="notice">Tempo da rota: {tempoTexto} ✔️</p>
-                  <p className="notice">Cidade: {city} ✔️ N° {numberAddress ? numberAddress + '✔️' : '... ❌'}</p></>
-                )}
               </label>
               }
             <label className="label">
