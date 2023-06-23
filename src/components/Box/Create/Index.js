@@ -395,7 +395,7 @@ const CreateVisit = ({
         chegada: data.chegadaEmpresa,
         tipo: data.tipo,
         consultora: data.consultora,
-        telefone: "5515991573088",
+        telefone: "5515991907957",
         lat: data.lat,
         lng: data.lng,
         duracao: data.visita,
