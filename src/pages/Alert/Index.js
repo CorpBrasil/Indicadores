@@ -187,6 +187,7 @@ const Alert = ({user,  userRef, alerts}) => {
                   <div style={{ margin: '1rem' }}>
                     <Rating
                       //sx={{ padding: '1rem' }}
+                      size="large"
                       name="hover-feedback"
                       value={value}
                       precision={1}
