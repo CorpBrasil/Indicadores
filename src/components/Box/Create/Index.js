@@ -57,7 +57,7 @@ const CreateVisit = ({
   const [addressComplete, setAddressComplete] = useState(undefined);
   const [visits, setVisits] = useState(schedule);
   const [libraries] = useState(["places"]);
-  const { register, handleSubmit } = useForm();
+  const { register, handleSubmit } = useForm(); 
   
   useEffect(() => {
     if(dataTexto) {
@@ -372,10 +372,39 @@ const CreateVisit = ({
     }
   };
 
-  console.log(schedule);
+  function getMonthlyWeekNumber(dt)
+{
+    // como função interna, permite reuso
+    var getmonweek = function(myDate) {
+        var today = new Date(myDate.getFullYear(),myDate.getMonth(),myDate.getDate(),0,0,0);
+        var first_of_month = new Date(myDate.getFullYear(),myDate.getMonth(),1,0,0,0);
+        var p = Math.floor((today.getTime()-first_of_month.getTime())/1000/60/60/24/7);
+        // ajuste de contagem
+        if (today.getDay()<first_of_month.getDay()) ++p;
+        // ISO 8601.
+        if (first_of_month.getDay()<=3) p++;
+        return p;
+    }
+    // último dia do mês
+    var udm = (new Date(dt.getFullYear(),dt.getMonth()+1,0,0,0,0)).getDate();
+    /*  Nos seis primeiros dias de um mês: verifica se estamos antes do primeiro Domingo.
+     *  Caso positivo, usa o último dia do mês anterior para o cálculo.
+     */
+    if ((dt.getDate()<7) && ((dt.getDate()-dt.getDay())<-2))
+        return getmonweek(new Date(dt.getFullYear(),dt.getMonth(),0));
+    /*  Nos seis últimos dias de um mês: verifica se estamos dentro ou depois do último Domingo.
+     *  Caso positivo, retorna 1 "de pronto".
+     */
+    else if ((dt.getDate()>(udm-6)) && ((dt.getDate()-dt.getDay())>(udm-3)))
+        return 1;
+    else
+        return getmonweek(dt);
+}
 
   const createVisitDay = async (data) => {
      await addDoc(scheduleRef, data);
+     console.log(data)
+     const date = new Date(data.data);
      Swal.fire({
       title: Company,
       html: `A visita em <b>${city}</b> foi criada com sucesso!`,
@@ -399,9 +428,25 @@ const CreateVisit = ({
         lat: data.lat,
         lng: data.lng,
         duracao: data.visita,
-        saidaCliente: data.saidaDoCliente
+        saidaCliente: data.saidaDoCliente,
       })
     }
+
+    axios.post('https://hook.us1.make.com/tmfl4xr8g9tk9qoi9jdpo1d7istl8ksd', {
+        data: moment(data.data).format("DD/MM/YYYY"),
+        nome: data.tecnico,
+        cliente: data.cliente,
+        saida: data.saidaEmpresa,
+        marcado: data.chegadaCliente,
+        consultora: data.consultora,
+        city: city,
+        duracao: data.visita,
+        saidaCliente: data.saidaDoCliente,
+        semana: getMonthlyWeekNumber(date),
+        mes: moment(data.data).format("M"),
+        ende: data.endereco,
+      })
+
     return returnSchedule();
   }
 

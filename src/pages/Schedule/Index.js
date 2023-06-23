@@ -1,3 +1,4 @@
+import axios from "axios";
 import { useEffect, useState, useRef } from "react";
 import moment from "moment";
 import Swal from "sweetalert2";
@@ -334,6 +335,19 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts }) => {
           );
           setBox();
           setDayVisits(undefined);
+          const date = new Date(visit.data);
+          axios.post('https://hook.us1.make.com/tmfl4xr8g9tk9qoi9jdpo1d7istl8ksd', {
+            data: moment(visit.data).format("DD/MM/YYYY"),
+            nome: visit.tecnico,
+            cliente: visit.cliente,
+            marcado: visit.chegadaCliente,
+            consultora: visit.consultora,
+            city: visit.cidade,
+            semana: getMonthlyWeekNumber(date),
+            mes: moment(visit.data).format("M"),
+            ende: visit.endereco,
+            del: true
+          })
           Swal.fire({
             title: Company,
             html: `A Visita em <b>${visit.cidade}</b> foi deletada com sucesso.`,
@@ -346,6 +360,35 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts }) => {
       });
     } catch {}
   };
+
+  function getMonthlyWeekNumber(dt)
+  {
+      // como função interna, permite reuso
+      var getmonweek = function(myDate) {
+          var today = new Date(myDate.getFullYear(),myDate.getMonth(),myDate.getDate(),0,0,0);
+          var first_of_month = new Date(myDate.getFullYear(),myDate.getMonth(),1,0,0,0);
+          var p = Math.floor((today.getTime()-first_of_month.getTime())/1000/60/60/24/7);
+          // ajuste de contagem
+          if (today.getDay()<first_of_month.getDay()) ++p;
+          // ISO 8601.
+          if (first_of_month.getDay()<=3) p++;
+          return p;
+      }
+      // último dia do mês
+      var udm = (new Date(dt.getFullYear(),dt.getMonth()+1,0,0,0,0)).getDate();
+      /*  Nos seis primeiros dias de um mês: verifica se estamos antes do primeiro Domingo.
+       *  Caso positivo, usa o último dia do mês anterior para o cálculo.
+       */
+      if ((dt.getDate()<7) && ((dt.getDate()-dt.getDay())<-2))
+          return getmonweek(new Date(dt.getFullYear(),dt.getMonth(),0));
+      /*  Nos seis últimos dias de um mês: verifica se estamos dentro ou depois do último Domingo.
+       *  Caso positivo, retorna 1 "de pronto".
+       */
+      else if ((dt.getDate()>(udm-6)) && ((dt.getDate()-dt.getDay())>(udm-3)))
+          return 1;
+      else
+          return getmonweek(dt);
+  }
 
   const confirmVisit = async (ref, type) => {
     // console.log(type, ref);
@@ -384,6 +427,18 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts }) => {
               veiculo: ref.veiculo,
             });
           }
+          const date = new Date(ref.data);
+          axios.post('https://hook.us1.make.com/abw8fych1w74c9k51mde1n5m5bqpkpdd', {
+            data: moment(ref.data).format("DD/MM/YYYY"),
+            nome: ref.tecnico,
+            cliente: ref.cliente,
+            marcado: ref.chegadaCliente,
+            consultora: ref.consultora,
+            city: ref.cidade,
+            semana: getMonthlyWeekNumber(date),
+            mes: moment(ref.data).format("M"),
+            ende: ref.endereco,
+          })
           Swal.fire({
             title: Company,
             html: `A Visita em <b>${ref.cidade}</b> foi confirmada com sucesso.`,

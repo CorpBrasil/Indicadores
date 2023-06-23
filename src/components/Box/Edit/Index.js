@@ -1,5 +1,6 @@
 import { deleteDoc, updateDoc, doc } from "firebase/firestore";
 import { dataBase } from "../../../firebase/database";
+import axios from 'axios';
 import { useLayoutEffect, useState, useEffect } from "react";
 import { useForm } from "react-hook-form"; // cria formulário personalizado
 import Swal from "sweetalert2"; // cria alertas personalizado
@@ -526,7 +527,20 @@ const EditVisit = ({
                 }
               );
             }
-
+            if(visitRef.consultora !== "Almoço Téc.") {
+              const date = new Date(visitRef.data);
+              axios.post('https://hook.us1.make.com/tmfl4xr8g9tk9qoi9jdpo1d7istl8ksd', {
+                data: moment(visitRef.data).format("DD/MM/YYYY"),
+                nome: tecRefUID.nome,
+                cliente: userData.cliente,
+                marcado: chegadaClienteRef,
+                consultora: consultoraTexto,
+                city: visitRef.cidade,
+                semana: getMonthlyWeekNumber(date),
+                mes: moment(visitRef.data).format("M"),
+                ende: visitRef.endereco,
+              })
+            }
             Swal.fire({
               title: Company,
               html: `${msg2} com sucesso.`,
@@ -545,6 +559,34 @@ const EditVisit = ({
     }
   };
 
+  function getMonthlyWeekNumber(dt)
+  {
+      // como função interna, permite reuso
+      var getmonweek = function(myDate) {
+          var today = new Date(myDate.getFullYear(),myDate.getMonth(),myDate.getDate(),0,0,0);
+          var first_of_month = new Date(myDate.getFullYear(),myDate.getMonth(),1,0,0,0);
+          var p = Math.floor((today.getTime()-first_of_month.getTime())/1000/60/60/24/7);
+          // ajuste de contagem
+          if (today.getDay()<first_of_month.getDay()) ++p;
+          // ISO 8601.
+          if (first_of_month.getDay()<=3) p++;
+          return p;
+      }
+      // último dia do mês
+      var udm = (new Date(dt.getFullYear(),dt.getMonth()+1,0,0,0,0)).getDate();
+      /*  Nos seis primeiros dias de um mês: verifica se estamos antes do primeiro Domingo.
+       *  Caso positivo, usa o último dia do mês anterior para o cálculo.
+       */
+      if ((dt.getDate()<7) && ((dt.getDate()-dt.getDay())<-2))
+          return getmonweek(new Date(dt.getFullYear(),dt.getMonth(),0));
+      /*  Nos seis últimos dias de um mês: verifica se estamos dentro ou depois do último Domingo.
+       *  Caso positivo, retorna 1 "de pronto".
+       */
+      else if ((dt.getDate()>(udm-6)) && ((dt.getDate()-dt.getDay())>(udm-3)))
+          return 1;
+      else
+          return getmonweek(dt);
+  }
   // console.log(visitRef);
 
   return (
