@@ -539,6 +539,7 @@ const EditVisit = ({
                 semana: getMonthlyWeekNumber(date),
                 mes: moment(visitRef.data).format("M"),
                 ende: visitRef.endereco,
+                confirmada: 'Não'
               })
             }
             Swal.fire({

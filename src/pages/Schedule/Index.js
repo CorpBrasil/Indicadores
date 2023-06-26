@@ -395,6 +395,7 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts }) => {
     const visitRef = doc(dataBase, "Agendas", year, monthSelect, ref.id);
     const financeCol = collection(dataBase, "Financeiro", year, monthSelect);
     const financeRef = doc(financeCol, ref.id);
+    const date = new Date(ref.data);
 
     if (type === "confirm") {
       Swal.fire({
@@ -427,8 +428,7 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts }) => {
               veiculo: ref.veiculo,
             });
           }
-          const date = new Date(ref.data);
-          axios.post('https://hook.us1.make.com/abw8fych1w74c9k51mde1n5m5bqpkpdd', {
+          axios.post('https://hook.us1.make.com/tmfl4xr8g9tk9qoi9jdpo1d7istl8ksd', {
             data: moment(ref.data).format("DD/MM/YYYY"),
             nome: ref.tecnico,
             cliente: ref.cliente,
@@ -438,6 +438,7 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts }) => {
             semana: getMonthlyWeekNumber(date),
             mes: moment(ref.data).format("M"),
             ende: ref.endereco,
+            confirmada: 'Sim'
           })
           Swal.fire({
             title: Company,
@@ -462,6 +463,18 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts }) => {
         cancelButtonText: "Não",
       }).then(async (result) => {
         if (result.isConfirmed) {
+          axios.post('https://hook.us1.make.com/tmfl4xr8g9tk9qoi9jdpo1d7istl8ksd', {
+            data: moment(ref.data).format("DD/MM/YYYY"),
+            nome: ref.tecnico,
+            cliente: ref.cliente,
+            marcado: ref.chegadaCliente,
+            consultora: ref.consultora,
+            city: ref.cidade,
+            semana: getMonthlyWeekNumber(date),
+            mes: moment(ref.data).format("M"),
+            ende: ref.endereco,
+            confirmada: 'Não'
+          })
           Swal.fire({
             title: Company,
             html: `A Visita em <b>${ref.cidade}</b> foi cancelada com sucesso.`,

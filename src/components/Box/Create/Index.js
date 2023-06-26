@@ -445,6 +445,7 @@ const CreateVisit = ({
         semana: getMonthlyWeekNumber(date),
         mes: moment(data.data).format("M"),
         ende: data.endereco,
+        confirmada: 'Não'
       })
 
     return returnSchedule();
