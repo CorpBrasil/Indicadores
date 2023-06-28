@@ -8,7 +8,6 @@ import { dataBase } from '../../firebase/database';
 import CurrencyInput from "react-currency-input-field";
 import { doc, onSnapshot, collection, deleteDoc } from "firebase/firestore";
 import CreateSchedule from '../../components/Modal/CreateSchedule/Index';
-// import Swal from 'sweetalert2';
 import Swal from 'sweetalert2/dist/sweetalert2.js';
 import useAuth from '../../hooks/useAuth';
 import Header from '../../components/Header/Index';
@@ -143,20 +142,7 @@ const Schedules = ({ userRef, alerts }) => {
         async (response) => {
           console.log(response)
          let cityRef = response.results[0].address_components;
-        //  const city = cityRef.find((ref) => ref.types[0] === 'administrative_area_level_2');
           setCidade(cityRef.find((ref) => ref.types[0] === 'administrative_area_level_2'));
-         // for (let i = 0; i < response.results[0].address_components.length; i++) {
-         //   for (let j = 0; j < response.results[0].address_components[i].types.length; j++) {
-         //     switch (response.results[0].address_components[i].types[j]) {
-         //       case "locality":
-         //         setCidade(response.results[0].address_components[i].long_name)
-         //         break;
-         //         default:
-         //     }
-         //   }
-         // }
-         //setCidade(response.results[0].address_components.find(ref => ref.types[0] === 'administrative_area_level_2'));
-         //setEndereco(response.results[0].formatted_address);
          console.log(cidade)
        },
        (error) => {

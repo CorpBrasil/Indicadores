@@ -8,7 +8,7 @@ import useAuth from './hooks/useAuth';
 import PrivateRoute from './components/PrivateRoute';
 import Schedule from './pages/Schedule/Index';
 import Finance from './pages/Finance/Index';
-import { collection, onSnapshot } from "firebase/firestore";
+import { collection, onSnapshot, query, orderBy } from "firebase/firestore";
 
 import { dataBase } from "./firebase/database";
 import { Users } from "./data/Data";
@@ -31,8 +31,7 @@ function App() {
           // Atualiza os dados em tempo real
           setMembers(member.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
         });
-
-        onSnapshot(collection(dataBase, "Membros/" + user.id + "/Avisos"), (member) => {
+        onSnapshot(query(collection(dataBase, "Membros/" + user.id + "/Avisos"), orderBy("data")), (member) => {
           // Atualiza os dados em tempo real
           setUserAlerts(member.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
         });

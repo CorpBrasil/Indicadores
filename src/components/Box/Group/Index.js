@@ -2,7 +2,7 @@ import { updateDoc, addDoc } from "firebase/firestore";
 import { useLayoutEffect, useState, useEffect, useRef } from 'react'
 import { useForm } from "react-hook-form"; // cria formulário personalizado
 import axios from 'axios';
-import Swal from "sweetalert2"; // cria alertas personalizado
+import Swal from 'sweetalert2/dist/sweetalert2.js';
 import * as moment from 'moment';
 import 'moment/locale/pt-br';
 import useAuth from "../../../hooks/useAuth";

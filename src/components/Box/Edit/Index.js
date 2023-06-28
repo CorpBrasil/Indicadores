@@ -3,7 +3,7 @@ import { dataBase } from "../../../firebase/database";
 import axios from 'axios';
 import { useLayoutEffect, useState, useEffect } from "react";
 import { useForm } from "react-hook-form"; // cria formulário personalizado
-import Swal from "sweetalert2"; // cria alertas personalizado
+import Swal from 'sweetalert2/dist/sweetalert2.js';
 import * as moment from "moment";
 import "moment/locale/pt-br";
 import List from '@mui/material/List';

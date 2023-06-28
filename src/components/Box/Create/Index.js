@@ -1,7 +1,7 @@
 import { addDoc } from "firebase/firestore";
 import { memo, useEffect, useState } from "react";
 import { useForm } from "react-hook-form"; // cria formulário personalizado
-import Swal from "sweetalert2"; // cria alertas personalizado
+import Swal from 'sweetalert2/dist/sweetalert2.js';
 import * as moment from "moment";
 import axios from 'axios';
 import useAuth from "../../../hooks/useAuth";

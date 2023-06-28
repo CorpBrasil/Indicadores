@@ -3,7 +3,7 @@ import { deleteDoc, doc } from "firebase/firestore";
 import Header from "../../components/Header/Index";
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import Button from '@mui/material/Button';
-import Swal from "sweetalert2";
+import Swal from 'sweetalert2/dist/sweetalert2.js';
 import axios from 'axios';
 import Rating from '@mui/material/Rating';
 import { dataBase } from "../../firebase/database";
