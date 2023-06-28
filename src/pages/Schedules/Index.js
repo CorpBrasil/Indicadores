@@ -170,8 +170,6 @@ const Schedules = ({ userRef, alerts }) => {
     const totalFormat = total.replace(',',".");
     const litroFormat = litro.replace(',',".");
     const litros = (totalFormat/litroFormat).toFixed(2);
-    const litrosFormat = litros.replace(".",",");
-    console.log(litrosFormat)
     setOpen(false);
       Swal.fire({
         title: Company,
@@ -194,13 +192,14 @@ const Schedules = ({ userRef, alerts }) => {
             nome: posto,
             km: km,
             litro: litro,
-            QtdeLitro: litrosFormat,
+            QtdeLitro: litros,
             total: total,
             lat: lat,
             lng: lng,
             cidade: cidade.long_name,
             endereco: `https://maps.google.com/?q=${lat},${lng}`,
-            responsavel: userRef.nome
+            responsavel: userRef.nome,
+            telefone: '5515991573088'
           })
           Swal.fire({
             position: 'top-center',
@@ -324,7 +323,6 @@ const Schedules = ({ userRef, alerts }) => {
             variant="outlined"
           />
           <TextField
-            autoFocus
             margin="dense"
             id="name"
             label="Quilometragem do Veiculo"
@@ -362,7 +360,6 @@ const Schedules = ({ userRef, alerts }) => {
           fullWidth
           />
           <TextField
-            autoFocus
             margin="dense"
             id="name"
             label="Veiculo"
