@@ -1,20 +1,49 @@
 import { useEffect, useState } from 'react';
+import moment from "moment";
+import Geocode from "react-geocode";
+import axios from 'axios';
 import { Link } from "react-router-dom";
 import { useNavigate } from 'react-router-dom'; // import do hook
 import { dataBase } from '../../firebase/database';
+import CurrencyInput from "react-currency-input-field";
 import { doc, onSnapshot, collection, deleteDoc } from "firebase/firestore";
 import CreateSchedule from '../../components/Modal/CreateSchedule/Index';
-import Swal from 'sweetalert2';
-import PeopleIcon from '@mui/icons-material/People';
+// import Swal from 'sweetalert2';
+import Swal from 'sweetalert2/dist/sweetalert2.js';
 import useAuth from '../../hooks/useAuth';
 import Header from '../../components/Header/Index';
-import { Users, Company } from '../../data/Data';
+import { Users, Company, KeyMaps } from '../../data/Data';
+
+import Button from '@mui/material/Button';
+import TextField from '@mui/material/TextField';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
+import PeopleIcon from '@mui/icons-material/People';
+import LocalGasStationIcon from '@mui/icons-material/LocalGasStation';
 
 import './_style.scss';
 
 const Schedules = ({ userRef, alerts }) => {
+  Geocode.setLanguage("pt-BR");
+  Geocode.setRegion("br");
+  Geocode.setApiKey(KeyMaps);
+  Geocode.setLocationType("ROOFTOP");
+
     const { user } = useAuth();
     const [schedules, setSchedules] = useState();
+    const [posto, setPosto] = useState();
+    const [km, setKm] = useState();
+    const [litro, setLitro] = useState();
+    const [total, setTotal] = useState();
+    const [cidade, setCidade] = useState(undefined);
+    const [lng, setLng] = useState();
+    const [lat, setLat] = useState();
+    // eslint-disable-next-line no-unused-vars
+    const [rawValue, setRawValue] = useState(" ");
+    const [open, setOpen] = useState(false);
     const [financeSchedules, setFinanceSchedules] = useState();
     const navigate = useNavigate(); //chamado do hook
     const [createSchedule, setCreateSchedule] = useState(undefined);
@@ -86,6 +115,110 @@ const Schedules = ({ userRef, alerts }) => {
     }
   }
 
+  const handleClickOpen = () => {
+    navigator.geolocation.getCurrentPosition(function (position) {
+        setLat(position.coords.latitude);
+        setLng(position.coords.longitude);
+      })
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  const handleOnValueChange = (value) => {
+    setRawValue(value === undefined ? "undefined" : value || " ");
+    setLitro(value);
+  };
+
+  const handleOnValueChange2 = (value) => {
+    setRawValue(value === undefined ? "undefined" : value || " ");
+    setTotal(value);
+  };
+
+  useEffect( () => {
+    if(!cidade && lng) {
+      Geocode.fromLatLng(lat,lng).then(
+        async (response) => {
+          console.log(response)
+         let cityRef = response.results[0].address_components;
+        //  const city = cityRef.find((ref) => ref.types[0] === 'administrative_area_level_2');
+          setCidade(cityRef.find((ref) => ref.types[0] === 'administrative_area_level_2'));
+         // for (let i = 0; i < response.results[0].address_components.length; i++) {
+         //   for (let j = 0; j < response.results[0].address_components[i].types.length; j++) {
+         //     switch (response.results[0].address_components[i].types[j]) {
+         //       case "locality":
+         //         setCidade(response.results[0].address_components[i].long_name)
+         //         break;
+         //         default:
+         //     }
+         //   }
+         // }
+         //setCidade(response.results[0].address_components.find(ref => ref.types[0] === 'administrative_area_level_2'));
+         //setEndereco(response.results[0].formatted_address);
+         console.log(cidade)
+       },
+       (error) => {
+         console.error(error);
+       })
+    }
+  },[cidade,lat,lng, open])
+
+  const sendData = (e) => {
+    e.preventDefault();
+    const totalFormat = total.replace(',',".");
+    const litroFormat = litro.replace(',',".");
+    const litros = (totalFormat/litroFormat).toFixed(2);
+    const litrosFormat = litros.replace(".",",");
+    console.log(litrosFormat)
+    setOpen(false);
+      Swal.fire({
+        title: Company,
+        html: `Verifique os dados abaixo para confirmar o <b>Abastecimento.</b> </br></br>` +
+        `Nome do Posto: <b>${posto}</b> </br>` +
+        `Quilometragem: <b>${km}</b> </br>` +
+        `Preço por Litro: <b>R$ ${litro}</b> </br>` +
+        `Preço Total: <b>R$ ${total}</b>`,
+        icon: "warning",
+        showCancelButton: true,
+        showCloseButton: true,
+        confirmButtonColor: "#F39200",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Confirmar",
+        cancelButtonText: "Cancelar",
+      }).then(async (result) => {
+        if(result.isConfirmed) {
+          axios.post('https://hook.us1.make.com/7158so5nvctf4a2wkpnfc2s59h9acpnk', {
+            data: moment(new Date()).format('DD/MM/YYYY HH:mm'),
+            nome: posto,
+            km: km,
+            litro: litro,
+            QtdeLitro: litrosFormat,
+            total: total,
+            lat: lat,
+            lng: lng,
+            cidade: cidade.long_name,
+            endereco: `https://maps.google.com/?q=${lat},${lng}`,
+            responsavel: userRef.nome
+          })
+          Swal.fire({
+            position: 'top-center',
+            icon: 'success',
+            title: 'Abastecimento confirmado com Sucesso!',
+            showConfirmButton: false,
+            timer: 2000
+          })
+        } else {
+          setOpen(true);
+        }
+    },
+    function(error) {
+      console.log('Erro!' + error)
+    });
+  }
+  
+
   return (
     <div className='container-schedules'>
       <Header user={user} userRef={userRef} alerts={alerts}></Header>
@@ -137,12 +270,27 @@ const Schedules = ({ userRef, alerts }) => {
        {userRef && (user.email === Users[0].email || userRef.cargo === "Vendedor(a)" || userRef.cargo === "Administrador") &&
         <>
         <div className='box-schedule'>
-             <li className='alert'>
-                <Link className='alert__content' to="/leads">
-                  <div className='alert__text'>
+             <li className='card alert'>
+                <Link className='card__content' to="/leads">
+                  <div className='card__text'>
                     <p>Confirmar</p>
                     <p>Leads</p>
                   <PeopleIcon />
+                  </div>
+                </Link>
+              </li>
+          </div>
+          </>
+      }
+       {userRef && (user.email === Users[0].email || userRef.cargo === "Administrador") &&
+        <>
+        <div className='box-schedule'>
+             <li className='card fuel'>
+                <Link className='card__content' onClick={() => handleClickOpen()}>
+                  <div className='card__text'>
+                    <p>Confirmar</p>
+                    <p>Combustivel</p>
+                  <LocalGasStationIcon />
                   </div>
                 </Link>
               </li>
@@ -156,6 +304,81 @@ const Schedules = ({ userRef, alerts }) => {
       }
       </div>
       {createSchedule && <CreateSchedule returnSchedule={returnSchedule} schedules={schedules}></CreateSchedule>} 
+      <Dialog open={open} onClose={handleClose}>
+        <DialogTitle sx={{ fontSize: '1.4rem' }}>Confirmar Combustivel</DialogTitle>
+          <form onSubmit={sendData}>
+        <DialogContent>
+          <DialogContentText sx={{ marginBottom: "1rem" }}>
+            Preencha os campos abaixo para confirmar o abastecimento do veículo.
+          </DialogContentText>
+          <TextField
+            autoFocus
+            margin="dense"
+            id="name"
+            label="Nome do Posto"
+            type="text"
+            onChange={(e) => setPosto(e.target.value)}
+            value={posto || ''}
+            fullWidth
+            required
+            variant="outlined"
+          />
+          <TextField
+            autoFocus
+            margin="dense"
+            id="name"
+            label="Quilometragem do Veiculo"
+            type="number"
+            onChange={(e) => setKm(e.target.value)}
+            value={km  || ''}
+            fullWidth
+            required
+            variant="outlined"
+          />
+          <CurrencyInput
+          customInput={TextField}
+          style={{ margin: '0.7rem 0rem 0.3rem 0' }}
+          className="label__text"
+          label="Preço por Litro"
+          placeholder="R$ 00"
+          intlConfig={{ locale: "pt-BR", currency: "BRL" }}
+          onValueChange={handleOnValueChange}
+          decimalsLimit={2}
+          value={litro || ''}
+          required
+          fullWidth
+          />
+          <CurrencyInput
+          customInput={TextField}
+          style={{ margin: '0.3rem 0rem 0.3rem 0' }}
+          className="label__text"
+          label="Preço Total"
+          placeholder="R$ 00"
+          intlConfig={{ locale: "pt-BR", currency: "BRL" }}
+          onValueChange={handleOnValueChange2}
+          decimalsLimit={2}
+          value={total || ''}
+          required
+          fullWidth
+          />
+          <TextField
+            autoFocus
+            margin="dense"
+            id="name"
+            label="Veiculo"
+            type="number"
+            value="004"
+            disabled
+            fullWidth
+            variant="outlined"
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button type='submit'>Confirmar</Button>
+          <Button onClick={handleClose}>Cancelar</Button>
+        </DialogActions>
+          </form>
+      </Dialog>
     </div>
 
   )

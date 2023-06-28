@@ -39,7 +39,10 @@
         padding: 3rem 0 1.5rem 0;
       }
 
-      .alert {
+      .alert {background-color: #111;}
+      .fuel {background-color: #ad1717;}
+
+      .card {
         display: flex;
         align-items: center;
         flex-direction: column;
@@ -50,7 +53,6 @@
         cursor: pointer;
         transition: cubic-bezier(0.075, 0.82, 0.165, 1) 0.3s;
         flex-direction: row;
-        background-color: #111;
 
         &:hover {
           transform: scale(1.1);
