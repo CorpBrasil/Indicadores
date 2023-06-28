@@ -22,6 +22,10 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import PeopleIcon from '@mui/icons-material/People';
 import LocalGasStationIcon from '@mui/icons-material/LocalGasStation';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import Select from '@mui/material/Select';
 
 import './_style.scss';
 
@@ -40,6 +44,7 @@ const Schedules = ({ userRef, alerts }) => {
     const [cidade, setCidade] = useState(undefined);
     const [lng, setLng] = useState();
     const [lat, setLat] = useState();
+    const [combustivel, setCombustivel] = useState();
     const [members, setMembers] = useState(undefined);
     const [findTec, setFindTec] = useState(undefined);
     // eslint-disable-next-line no-unused-vars
@@ -185,6 +190,7 @@ const Schedules = ({ userRef, alerts }) => {
           `Quilometragem: <b>${km}</b> </br>` +
           `Preço por Litro: <b>R$ ${litro}</b> </br>` +
           `Preço Total: <b>R$ ${total}</b> </br>` +
+          `Combustivel: <b>${combustivel}</b> </br>` +
           `Veiculo: <b>${findTec.veiculo}</b>`,
           icon: "warning",
           showCancelButton: true,
@@ -208,7 +214,8 @@ const Schedules = ({ userRef, alerts }) => {
               endereco: `https://maps.google.com/?q=${lat},${lng}`,
               responsavel: userRef.nome,
               telefone: '5515998307457',
-              veiculo: findTec.veiculo
+              veiculo: findTec.veiculo,
+              combustivel: combustivel
             })
             Swal.fire({
               position: 'top-center',
@@ -223,6 +230,7 @@ const Schedules = ({ userRef, alerts }) => {
             setTotal('');
             setLng('');
             setLat('');
+            setCombustivel('');
           } else {
             setOpen(true);
           }
@@ -371,7 +379,7 @@ const Schedules = ({ userRef, alerts }) => {
           />
           <CurrencyInput
           customInput={TextField}
-          style={{ margin: '0.3rem 0rem 0.3rem 0' }}
+          style={{ margin: '0.4rem 0rem 0.7rem 0' }}
           className="label__text"
           label="Preço Total"
           placeholder="R$ 00"
@@ -382,6 +390,20 @@ const Schedules = ({ userRef, alerts }) => {
           required
           fullWidth
           />
+          <FormControl sx={{ margin: '0.3rem 0' }} fullWidth>
+            <InputLabel id="demo-simple-select-label">Combustível</InputLabel>
+            <Select
+              labelId="demo-simple-select-label"
+              id="demo-simple-select"
+              value={combustivel}
+              label="Combustível"
+              required
+              onChange={(e) => setCombustivel(e.target.value)}
+            >
+              <MenuItem value='Gasolina'>Gasolina</MenuItem>
+              <MenuItem value='Álcool'>Álcool</MenuItem>
+            </Select>
+          </FormControl>
           <TextField
             margin="dense"
             id="name"
