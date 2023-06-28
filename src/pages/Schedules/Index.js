@@ -217,6 +217,12 @@ const Schedules = ({ userRef, alerts }) => {
               showConfirmButton: false,
               timer: 2000
             })
+            setPosto('');
+            setKm('');
+            setLitro('');
+            setTotal('');
+            setLng('');
+            setLat('');
           } else {
             setOpen(true);
           }
