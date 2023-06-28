@@ -207,7 +207,7 @@ const Schedules = ({ userRef, alerts }) => {
               cidade: cidade.long_name,
               endereco: `https://maps.google.com/?q=${lat},${lng}`,
               responsavel: userRef.nome,
-              telefone: '5515991573088',
+              telefone: '5515998307457',
               veiculo: findTec.veiculo
             })
             Swal.fire({
