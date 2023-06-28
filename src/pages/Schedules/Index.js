@@ -160,61 +160,70 @@ const Schedules = ({ userRef, alerts }) => {
          console.log(cidade)
        },
        (error) => {
-         console.error(error);
+         console.log(error);
        })
     }
   },[cidade,lat,lng, open])
 
   const sendData = (e) => {
     e.preventDefault();
-    const totalFormat = total.replace(',',".");
-    const litroFormat = litro.replace(',',".");
-    const litros = (totalFormat/litroFormat).toFixed(2);
-    setOpen(false);
+    if(cidade) {
+      const totalFormat = total.replace(',',".");
+      const litroFormat = litro.replace(',',".");
+      const litros = (totalFormat/litroFormat).toFixed(2);
+      setOpen(false);
+        Swal.fire({
+          title: 'Atenção',
+          html: `Verifique os dados abaixo para confirmar o <b>Abastecimento.</b> </br></br>` +
+          `Nome do Posto: <b>${posto}</b> </br>` +
+          `Quilometragem: <b>${km}</b> </br>` +
+          `Preço por Litro: <b>R$ ${litro}</b> </br>` +
+          `Preço Total: <b>R$ ${total}</b>`,
+          icon: "warning",
+          showCancelButton: true,
+          showCloseButton: true,
+          confirmButtonColor: "#F39200",
+          cancelButtonColor: "#d33",
+          confirmButtonText: "Confirmar",
+          cancelButtonText: "Cancelar",
+        }).then(async (result) => {
+          if(result.isConfirmed) {
+            axios.post('https://hook.us1.make.com/7158so5nvctf4a2wkpnfc2s59h9acpnk', {
+              data: moment(new Date()).format('DD/MM/YYYY HH:mm'),
+              nome: posto,
+              km: km,
+              litro: litro,
+              QtdeLitro: litros,
+              total: total,
+              lat: lat,
+              lng: lng,
+              cidade: cidade.long_name,
+              endereco: `https://maps.google.com/?q=${lat},${lng}`,
+              responsavel: userRef.nome,
+              telefone: '5515991573088'
+            })
+            Swal.fire({
+              position: 'top-center',
+              icon: 'success',
+              title: 'Abastecimento confirmado com Sucesso!',
+              showConfirmButton: false,
+              timer: 2000
+            })
+          } else {
+            setOpen(true);
+          }
+      });
+    } else {
+      setOpen(false);
       Swal.fire({
-        title: Company,
-        html: `Verifique os dados abaixo para confirmar o <b>Abastecimento.</b> </br></br>` +
-        `Nome do Posto: <b>${posto}</b> </br>` +
-        `Quilometragem: <b>${km}</b> </br>` +
-        `Preço por Litro: <b>R$ ${litro}</b> </br>` +
-        `Preço Total: <b>R$ ${total}</b>`,
-        icon: "warning",
-        showCancelButton: true,
+        title: 'GPS Desativado',
+        html: `Ative o <b>GPS</b> para confirmar o abastecimento.`,
+        icon: "error",
         showCloseButton: true,
         confirmButtonColor: "#F39200",
-        cancelButtonColor: "#d33",
-        confirmButtonText: "Confirmar",
-        cancelButtonText: "Cancelar",
-      }).then(async (result) => {
-        if(result.isConfirmed) {
-          axios.post('https://hook.us1.make.com/7158so5nvctf4a2wkpnfc2s59h9acpnk', {
-            data: moment(new Date()).format('DD/MM/YYYY HH:mm'),
-            nome: posto,
-            km: km,
-            litro: litro,
-            QtdeLitro: litros,
-            total: total,
-            lat: lat,
-            lng: lng,
-            cidade: cidade.long_name,
-            endereco: `https://maps.google.com/?q=${lat},${lng}`,
-            responsavel: userRef.nome,
-            telefone: '5515991573088'
-          })
-          Swal.fire({
-            position: 'top-center',
-            icon: 'success',
-            title: 'Abastecimento confirmado com Sucesso!',
-            showConfirmButton: false,
-            timer: 2000
-          })
-        } else {
-          setOpen(true);
-        }
-    },
-    function(error) {
-      console.log('Erro!' + error)
-    });
+        confirmButtonText: "Ok",
+      })
+    }
   }
   
 
