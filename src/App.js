@@ -71,7 +71,7 @@ function App() {
             }
             <Route exact path="/leads" element={<Alert user={user} userRef={userRef} alerts={userAlerts} />} />
             <Route path="/agenda/:year" element={<Schedule userRef={userRef} members={members} tecs={tecs} sellers={sellers} alerts={userAlerts} />} />
-            <Route path="*" element={<Schedules userRef={userRef} />} />
+            <Route path="*" element={<Schedules userRef={userRef} members={members} />} />
           </Route>
           <Route exact path="/login" element={<Login />} />
         </Routes>

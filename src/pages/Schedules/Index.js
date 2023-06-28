@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, memo } from 'react';
 import moment from "moment";
 import Geocode from "react-geocode";
 import axios from 'axios';
@@ -40,6 +40,8 @@ const Schedules = ({ userRef, alerts }) => {
     const [cidade, setCidade] = useState(undefined);
     const [lng, setLng] = useState();
     const [lat, setLat] = useState();
+    const [members, setMembers] = useState(undefined);
+    const [findTec, setFindTec] = useState(undefined);
     // eslint-disable-next-line no-unused-vars
     const [rawValue, setRawValue] = useState(" ");
     const [open, setOpen] = useState(false);
@@ -48,6 +50,7 @@ const Schedules = ({ userRef, alerts }) => {
     const [createSchedule, setCreateSchedule] = useState(undefined);
     const schedulesCollectionRef = collection(dataBase, "Agendas");
     const FinanceSchedulesCollectionRef = collection(dataBase, "Financeiro");
+    const MembersSchedulesCollectionRef = collection(dataBase, "Membros");
 
     useEffect(() => {
         if(collection) { 
@@ -68,12 +71,29 @@ const Schedules = ({ userRef, alerts }) => {
               })
               setFinanceSchedules(docFinance); // puxa a coleção 'Agendas' para o state
           })
+              onSnapshot(MembersSchedulesCollectionRef, (schedules) => { // Atualiza os dados em tempo real
+              let docMembers = [];
+              schedules.forEach(doc => {
+                docMembers.push({ ...doc.data(), id: doc.id })
+              })
+              setMembers(docMembers); // puxa a coleção 'Agendas' para o state
+          })
         }
             unsub();
           };
     
         // eslint-disable-next-line react-hooks/exhaustive-deps
         }, [collection]);
+    
+  useEffect(() => {
+    if(members){
+      setFindTec(members.find((ref) => ref.nome === user.name && ref.cargo === "Técnico"))
+    }
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  },[members])
+
+  // console.log(findTec)
 
   const returnSchedule = () => {
     setCreateSchedule(false);
@@ -140,13 +160,13 @@ const Schedules = ({ userRef, alerts }) => {
     if(!cidade && lng) {
       Geocode.fromLatLng(lat,lng).then(
         async (response) => {
-          console.log(response)
+          // console.log(response)
          let cityRef = response.results[0].address_components;
           setCidade(cityRef.find((ref) => ref.types[0] === 'administrative_area_level_2'));
-         console.log(cidade)
+        //  console.log(cidade)
        },
        (error) => {
-         console.log(error);
+        //  console.log(error);
        })
     }
   },[cidade,lat,lng, open])
@@ -164,7 +184,8 @@ const Schedules = ({ userRef, alerts }) => {
           `Nome do Posto: <b>${posto}</b> </br>` +
           `Quilometragem: <b>${km}</b> </br>` +
           `Preço por Litro: <b>R$ ${litro}</b> </br>` +
-          `Preço Total: <b>R$ ${total}</b>`,
+          `Preço Total: <b>R$ ${total}</b> </br>` +
+          `Veiculo: <b>${findTec.veiculo}</b>`,
           icon: "warning",
           showCancelButton: true,
           showCloseButton: true,
@@ -186,7 +207,8 @@ const Schedules = ({ userRef, alerts }) => {
               cidade: cidade.long_name,
               endereco: `https://maps.google.com/?q=${lat},${lng}`,
               responsavel: userRef.nome,
-              telefone: '5515991573088'
+              telefone: '5515991573088',
+              veiculo: findTec.veiculo
             })
             Swal.fire({
               position: 'top-center',
@@ -276,7 +298,7 @@ const Schedules = ({ userRef, alerts }) => {
           </div>
           </>
       }
-       {userRef && (user.email === Users[0].email || userRef.cargo === "Administrador") &&
+       {userRef && (user.email === Users[0].email || userRef.cargo === "Administrador" || userRef.cargo === "Técnico" || findTec) &&
         <>
         <div className='box-schedule'>
              <li className='card fuel'>
@@ -359,7 +381,7 @@ const Schedules = ({ userRef, alerts }) => {
             id="name"
             label="Veiculo"
             type="number"
-            value="004"
+            value={findTec && findTec.veiculo}
             disabled
             fullWidth
             variant="outlined"
@@ -376,4 +398,4 @@ const Schedules = ({ userRef, alerts }) => {
   )
 }
 
-export default Schedules
+export default memo(Schedules)
