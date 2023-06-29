@@ -6,12 +6,12 @@ import { Link } from "react-router-dom";
 import { useNavigate } from 'react-router-dom'; // import do hook
 import { dataBase } from '../../firebase/database';
 import CurrencyInput from "react-currency-input-field";
-import { doc, onSnapshot, collection, deleteDoc } from "firebase/firestore";
+import { onSnapshot, collection } from "firebase/firestore";
 import CreateSchedule from '../../components/Modal/CreateSchedule/Index';
 import Swal from 'sweetalert2/dist/sweetalert2.js';
 import useAuth from '../../hooks/useAuth';
 import Header from '../../components/Header/Index';
-import { Users, Company, KeyMaps } from '../../data/Data';
+import { Users, KeyMaps } from '../../data/Data';
 
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
@@ -26,6 +26,7 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 
 import './_style.scss';
 
@@ -108,36 +109,36 @@ const Schedules = ({ userRef, alerts }) => {
       navigate(type + year);
   }
 
-  const deleteSchedule = async (id) => {
-    try {
-      Swal.fire({
-        title: Company,
-        html: `Você deseja deletar essa <b>Agenda</b>?`,
-        icon: "warning",
-        showCancelButton: true,
-        showCloseButton: true,
-        confirmButtonColor: "#F39200",
-        cancelButtonColor: "#d33",
-        confirmButtonText: "Sim",
-        cancelButtonText: "Não",
-      }).then(async (result) => {
-        if (result.isConfirmed) {
-          await deleteDoc(doc(dataBase, "Agendas", id));
-          await deleteDoc(doc(dataBase, "Financeiro", id));
-          Swal.fire({
-            title: Company,
-            html: `A Agenda <b>${id}</b> foi deletada com sucesso.`,
-            icon: "success",
-            showConfirmButton: true,
-            showCloseButton: true,
-            confirmButtonColor: "#F39200"
-          })
-        }
-      })
-    } catch {
+  // const deleteSchedule = async (id) => {
+  //   try {
+  //     Swal.fire({
+  //       title: Company,
+  //       html: `Você deseja deletar essa <b>Agenda</b>?`,
+  //       icon: "warning",
+  //       showCancelButton: true,
+  //       showCloseButton: true,
+  //       confirmButtonColor: "#F39200",
+  //       cancelButtonColor: "#d33",
+  //       confirmButtonText: "Sim",
+  //       cancelButtonText: "Não",
+  //     }).then(async (result) => {
+  //       if (result.isConfirmed) {
+  //         await deleteDoc(doc(dataBase, "Agendas", id));
+  //         await deleteDoc(doc(dataBase, "Financeiro", id));
+  //         Swal.fire({
+  //           title: Company,
+  //           html: `A Agenda <b>${id}</b> foi deletada com sucesso.`,
+  //           icon: "success",
+  //           showConfirmButton: true,
+  //           showCloseButton: true,
+  //           confirmButtonColor: "#F39200"
+  //         })
+  //       }
+  //     })
+  //   } catch {
 
-    }
-  }
+  //   }
+  // }
 
   const handleClickOpen = () => {
     navigator.geolocation.getCurrentPosition(function (position) {
@@ -253,25 +254,26 @@ const Schedules = ({ userRef, alerts }) => {
     <div className='container-schedules'>
       <Header user={user} userRef={userRef} alerts={alerts}></Header>
       <div className='title-schedule'>
-        <h2>Agendas</h2>
+        <h2>Inicio</h2>
       </div>
        <div className='content-schedule'>
        {(user.email !== Users[1].email) &&
         <div className='box-schedule'>
           {schedules && schedules.map((schedule, index) => (
             <li key={index} className='schedule'>
-              {userRef && (user.email === Users[0].email || userRef.cargo === "Administrador") &&
+              {/* {userRef && (user.email === Users[0].email || userRef.cargo === "Administrador") &&
               <div className='schedule__button'>
                 <button onClick={() => deleteSchedule(schedule.id)}></button>
               </div>
-              }
+              } */}
               <div className='schedule__content' onClick={() => goToSchedule('/agenda/', schedule.id)}>
+              <div className='schedule__icon visits'><CalendarMonthIcon /></div>
+              <div className='schedule__text-box'>
               <div className='schedule__text'>
-                <p>Agenda</p>
-                <p>Visita</p>
+                <p>Agenda Visita</p>
                 <p>{schedule.id}</p>
               </div>
-              <div className='schedule__icon'></div>
+              </div>
               </div>
             </li>
           ))}
@@ -281,51 +283,45 @@ const Schedules = ({ userRef, alerts }) => {
         <><div className='box-schedule'>
             {financeSchedules && financeSchedules.map((schedule, index) => (
               <li key={index} className='schedule'>
-                {userRef && (user.email === Users[0].email || userRef.cargo === "Administrador") &&
+                {/* {userRef && (user.email === Users[0].email || userRef.cargo === "Administrador") &&
                   <div className='schedule__button'>
                     <button onClick={() => deleteSchedule(schedule.id)}></button>
-                  </div>}
+                  </div>} */}
                 <div className='schedule__content' onClick={() => goToSchedule('/financeiro/', schedule.id)}>
+                  <div className='schedule__icon finance'><CalendarMonthIcon /></div>
                   <div className='schedule__text'>
-                    <p>Agenda</p>
-                    <p>Financeiro</p>
+                    <p>Agenda Financeiro</p>
                     <p>{schedule.id}</p>
                   </div>
-                  <div className='schedule__icon'></div>
                 </div>
               </li>
             ))}
           </div></>
       }
        {userRef && (user.email === Users[0].email || userRef.cargo === "Vendedor(a)" || userRef.cargo === "Administrador") &&
-        <>
-        <div className='box-schedule'>
-             <li className='card alert'>
-                <Link className='card__content' to="/leads">
-                  <div className='card__text'>
-                    <p>Confirmar</p>
-                    <p>Leads</p>
-                  <PeopleIcon />
-                  </div>
-                </Link>
-              </li>
-          </div>
-          </>
+       <><div className='box-schedule'>
+         <li className='schedule'>
+           <Link className='schedule__content' to="/leads">
+             <div className='schedule__icon alert'><PeopleIcon /></div>
+             <div className='schedule__text'>
+               <p>Confirmar Leads</p>
+             </div>
+             </Link>
+         </li>
+           </div></>
       }
        {userRef && (user.email === Users[0].email || userRef.cargo === "Administrador" || userRef.cargo === "Técnico" || findTec) &&
-        <>
-        <div className='box-schedule'>
-             <li className='card fuel'>
-                <Link className='card__content' onClick={() => handleClickOpen()}>
-                  <div className='card__text'>
-                    <p>Confirmar</p>
-                    <p>Combustivel</p>
-                  <LocalGasStationIcon />
-                  </div>
-                </Link>
-              </li>
-          </div>
-          </>
+        <><div className='box-schedule'>
+        <li className='schedule'>
+          <Link className='schedule__content' onClick={() => handleClickOpen()}>
+            <div className='schedule__icon fuel'><LocalGasStationIcon /></div>
+            <div className='schedule__text'>
+              <p>Confirmar</p>
+              <p>Combustivel</p>
+            </div>
+            </Link>
+        </li>
+          </div></>
       }
       {user.email === Users[0].email &&   
       <div className='add-schedule'>

@@ -32,14 +32,16 @@
       width: 90%;
       flex-wrap: wrap;
       justify-content: space-around;
-      padding: 1.5rem 0;
+      padding: 0.5rem 0;
       gap: 4rem;
 
       &:first-child {
-        padding: 3rem 0 1.5rem 0;
+        padding-top: 2rem;
       }
 
-      .alert {background-color: #111;}
+      .visits{background-color: #006633;}
+      .finance{background-color: #3163eb;}
+      .alert {background-color: #f39200;}
       .fuel {background-color: #ad1717;}
 
       .card {
@@ -95,15 +97,20 @@
       .schedule {
         display: flex;
         align-items: center;
-        flex-direction: column;
-        width: 15rem;
+        width: 90%;
+        max-width: 300px;
         border-radius: 10px;
         list-style: none;
-        height: 15rem;
+        height: 6rem;
         color: #fff;
-        background-color: #006633;
+        background-color: #111;
         cursor: pointer;
         transition: cubic-bezier(0.075, 0.82, 0.165, 1) 0.3s;
+
+        a {
+          color: #fff;
+          text-decoration: none;
+        }
 
         &:hover {
           transform: scale(1.1);
@@ -127,16 +134,24 @@
           width: 100%;
           height: 100%;
           display: flex;
-          flex-direction: column;
-          justify-content: center;
-          gap: 1rem;
           align-items: center;
         }
 
+        &__text-box {
+          display: flex;
+          width: 100%;
+          height: 100%;
+        }
+
         &__text {
+          display: flex;
+          width: 100%;
+          justify-content: center;
+          align-items: center;
+          flex-direction: column;
           p {
             display: flex;
-            font-size: 1.7rem;
+            font-size: 1.2rem;
             justify-content: center;
           }
         }
@@ -148,10 +163,17 @@
         }
 
         &__icon {
-          width: 3rem;
-          height: 3rem;
-          background: url(../../images/icons/Schedule.svg) no-repeat;
+          display: flex;
+          width: 8rem;
+          height: 100%;
+          border-radius: 10px;
           background-size: 3rem;
+
+          svg {
+            width: 60%;
+            height: 60%;
+            margin: auto;
+          }
         }
       }
     }

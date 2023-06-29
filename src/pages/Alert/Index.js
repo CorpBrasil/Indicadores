@@ -3,7 +3,7 @@ import { deleteDoc, doc } from "firebase/firestore";
 import Header from "../../components/Header/Index";
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import Button from '@mui/material/Button';
-import Swal from 'sweetalert2/dist/sweetalert2.js';
+import  Swal  from "sweetalert2/dist/sweetalert2";
 import axios from 'axios';
 import Rating from '@mui/material/Rating';
 import { dataBase } from "../../firebase/database";
@@ -152,7 +152,7 @@ const Alert = ({user,  userRef, alerts}) => {
       <div className="content-panel">
         <div className="content-alerts">
           {alerts && alerts.map((alert, index) => (
-          <><div key={index} className="alert">
+          <div key={index} className="alert">
               <div className="alert__header">
                 <p>{alert.data}</p>
                 <h2>Confirmação de Lead</h2>
@@ -171,14 +171,16 @@ const Alert = ({user,  userRef, alerts}) => {
                 {/* <Button onClick={() => denyLead(alert)} color="error" sx={{padding: '0.7rem' }} variant="contained" startIcon={<CloseIcon />}>Não Respondeu</Button> */}
               </div>
             </div>
-            <Dialog
-              //fullScreen={fullScreen}
+          ))}
+          {alerts && alerts.length === 0 &&
+          <h1 className="alert-none">Nenhum Lead</h1>
+          }
+                      <Dialog
               open={open}
               onClose={handleClose}
-              aria-labelledby="responsive-dialog-title"
             >
-                <DialogTitle id="responsive-dialog-title">
-                  {"Qualifique o Lead"}
+                <DialogTitle>
+                  Qualifique o Lead
                 </DialogTitle>
                 <DialogContent>
                   <DialogContentText>
@@ -203,18 +205,14 @@ const Alert = ({user,  userRef, alerts}) => {
                   </div>
                 </DialogContent>
                 <DialogActions>
-                  <Button autoFocus onClick={() => confirmLead(alert)}>
+                  <Button autoFocus onClick={() => confirmLead()}>
                     Confirmar
                   </Button>
                   <Button onClick={handleClose} autoFocus>
                     Cancelar
                   </Button>
                 </DialogActions>
-              </Dialog></>
-          ))}
-          {alerts && alerts.length === 0 &&
-          <h1 className="alert-none">Nenhum Lead</h1>
-          }
+              </Dialog>
         </div>
       </div>
     </div>
