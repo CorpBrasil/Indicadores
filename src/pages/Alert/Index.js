@@ -15,6 +15,8 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 
+import Meetime from '../../images/icons/Logo_Meetime.png';
+
 // Css
 import "cooltipz-css";
 import "./_style.scss";
@@ -155,14 +157,17 @@ const Alert = ({user,  userRef, alerts}) => {
           <div key={index} className="alert">
               <div className="alert__header">
                 <p>{alert.data}</p>
-                <h2>Confirmação de Lead</h2>
-                <AccountCircleIcon />
+                {alert.campanha === 'Meetime' ?
+                 <><h2>Confirmação de Lead <b style={{ color: "#00a443" }}>(Meetime)</b></h2><img src={Meetime} alt="" /></> :
+                 <><h2>Confirmação de Lead</h2><AccountCircleIcon /></>
+                 }
               </div>
               <div className="alert__info">
                 <p>Nome: <b>{alert.nome}</b></p>
                 <p>Telefone: <b>{alert.telefone}</b></p>
                 <p>Cidade: <b>{alert.cidade}</b></p>
                 <p>Valor da Energia: <b>{alert.valor}</b></p>
+                <p>Promoção: <b>{alert.promocao}</b></p>
                 <p>Campanha: <b>{alert.campanha}</b></p>
                 <a href={`https://wa.me/+${alert.telefone}`}>Visualizar Conversa</a>
               </div>
