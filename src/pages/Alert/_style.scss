@@ -40,8 +40,10 @@
       .alert {
         background-color: #fff;
         border-radius: 5px;
-        padding: 1rem 2rem 2rem 2rem;
+        padding: 1rem 1rem 2rem 1rem;
         box-shadow: 0 0 20px 3px #ececec;
+        max-width: 330px;
+        width: 85%;
 
         &__header {
           margin-bottom: 1rem;
