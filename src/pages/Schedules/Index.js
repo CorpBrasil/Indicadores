@@ -157,10 +157,10 @@ const Schedules = ({ userRef, alerts }) => {
     setLitro(value);
   };
 
-  const handleOnValueChange2 = (value) => {
-    setRawValue(value === undefined ? "undefined" : value || " ");
-    setTotal(value);
-  };
+  // const handleOnValueChange2 = (value) => {
+  //   setRawValue(value === undefined ? "undefined" : value || " ");
+  //   setTotal(value);
+  // };
 
   useEffect( () => {
     if(!cidade && lng) {
