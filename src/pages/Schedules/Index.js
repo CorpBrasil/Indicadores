@@ -178,11 +178,14 @@ const Schedules = ({ userRef, alerts }) => {
   },[cidade,lat,lng, open])
 
   const sendData = (e) => {
-    e.preventDefault();
+     e.preventDefault();
     if(cidade) {
       const totalFormat = total.replace(',',".");
       const litroFormat = litro.replace(',',".");
-      const litros = (totalFormat/litroFormat).toFixed(2);
+      const precoTotal = (totalFormat * litroFormat).toFixed(2);
+      const precoTotalFormat = precoTotal.replace('.',",");
+      console.log(precoTotalFormat)
+      //const litros = (totalFormat/litroFormat).toFixed(2);
       setOpen(false);
         Swal.fire({
           title: 'Atenção',
@@ -190,7 +193,8 @@ const Schedules = ({ userRef, alerts }) => {
           `Nome do Posto: <b>${posto}</b> </br>` +
           `Quilometragem: <b>${km}</b> </br>` +
           `Preço por Litro: <b>R$ ${litro}</b> </br>` +
-          `Preço Total: <b>R$ ${total}</b> </br>` +
+          `Quantidade de Litro: <b>${total}</b> </br>` +
+          `Preço Total: <b>R$ ${precoTotalFormat}</b> </br>` +
           `Combustivel: <b>${combustivel}</b> </br>` +
           `Veiculo: <b>${findTec.veiculo}</b>`,
           icon: "warning",
@@ -207,7 +211,7 @@ const Schedules = ({ userRef, alerts }) => {
               nome: posto,
               km: km,
               litro: litro,
-              QtdeLitro: litros,
+              QtdeLitro: `R$ ${precoTotalFormat}`,
               total: total,
               lat: lat,
               lng: lng,
@@ -373,7 +377,7 @@ const Schedules = ({ userRef, alerts }) => {
           required
           fullWidth
           />
-          <CurrencyInput
+          {/* <CurrencyInput
           customInput={TextField}
           style={{ margin: '0.4rem 0rem 0.7rem 0' }}
           className="label__text"
@@ -385,6 +389,17 @@ const Schedules = ({ userRef, alerts }) => {
           value={total || ''}
           required
           fullWidth
+          /> */}
+          <TextField
+            margin="dense"
+            id="name"
+            label="Quantidade Total de Litro"
+            type="number"
+            onChange={(e) => setTotal(e.target.value)}
+            value={total  || ''}
+            fullWidth
+            required
+            variant="outlined"
           />
           <FormControl sx={{ margin: '0.3rem 0' }} fullWidth>
             <InputLabel id="demo-simple-select-label">Combustível</InputLabel>
