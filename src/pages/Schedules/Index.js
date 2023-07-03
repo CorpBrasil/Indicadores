@@ -206,7 +206,7 @@ const Schedules = ({ userRef, alerts }) => {
           cancelButtonText: "Cancelar",
         }).then(async (result) => {
           if(result.isConfirmed) {
-            axios.post('https://hook.us1.make.com/7158so5nvctf4a2wkpnfc2s59h9acpnk', {
+            axios.post('https://n8n.corpbrasil.cloud/webhook/2223e180-0daa-4d5d-90f6-e2cd29aef7d6', {
               data: moment(new Date()).format('DD/MM/YYYY HH:mm'),
               nome: posto,
               km: km,
