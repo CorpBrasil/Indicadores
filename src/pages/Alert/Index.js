@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, forwardRef } from "react";
 import { deleteDoc, doc } from "firebase/firestore";
 import Header from "../../components/Header/Index";
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
@@ -14,6 +14,8 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
+import Snackbar from '@mui/material/Snackbar';
+import MuiAlert from '@mui/material/Alert';
 
 import Meetime from '../../images/icons/Logo_Meetime.png';
 
@@ -21,12 +23,14 @@ import Meetime from '../../images/icons/Logo_Meetime.png';
 import "cooltipz-css";
 import "./_style.scss";
 
-const Alert = ({user,  userRef, alerts}) => {
+const Alert = ({user,  userRef, alerts, check}) => {
   const [value, setValue] = useState(2);
   const [hover, setHover] = useState(-1);
   const [open, setOpen] = useState(false);
   const [lead, setLead] = useState(null);
-  //const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
+  const Alert = forwardRef(function Alert(props, ref) {
+    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+  });
   const qualificacao = {
     1: 'Não Respondeu',
     2: 'Curioso',
@@ -46,8 +50,19 @@ const Alert = ({user,  userRef, alerts}) => {
   };
 
   const handleClickOpen = (alert) => {
-    setOpen(true);
-    setLead(alert);
+    if(check) {
+      Swal.fire({
+        title: 'Sem Conexão',
+        icon: "error",
+        html: `Não é possível Confirmar Lead <b>sem internet.</b> Verifique a sua conexão.`,
+        confirmButtonText: "Fechar",
+        showCloseButton: true,
+        confirmButtonColor: "#d33"  
+      })
+    } else {
+      setOpen(true);
+      setLead(alert);
+    }
   };
 
 
@@ -220,6 +235,11 @@ const Alert = ({user,  userRef, alerts}) => {
               </Dialog>
         </div>
       </div>
+      <Snackbar open={check} autoHideDuration={6000}>
+          <Alert severity="error" sx={{ width: '100%' }}>
+            Você está sem conexão. Verifique a sua conexão com a internet.
+          </Alert>
+      </Snackbar>
     </div>
   );
 };

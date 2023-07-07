@@ -26,8 +26,6 @@ const EditVisit = ({
   monthNumber,
   monthSelect,
   year,
-  type,
-  checkNet
 }) => {
   // const chegadaFormatadaTec = useRef();
   // const saidaFormatadaTec = useRef();
@@ -48,9 +46,7 @@ const EditVisit = ({
   const [tecRefUID, setTecRefUID] = useState(); // Procura os tecnicos que vem da pagina 'Schedule'
   const [veiculo, setVeiculo] = useState();
   const [city, setCity] = useState();
-  const [driver, setDriver] = useState(); // Para escolher o motorista/tecnico de acordo com o tipo de visita
-  const [visits, setVisits] = useState();
-  //const [visits, setVisits] = useState(schedule);
+  const [visits, setVisits] = useState(schedule);
   const [hoursLimit, setHoursLimit] = useState(false);
 
   const { register, handleSubmit, reset } = useForm();
@@ -76,7 +72,7 @@ const EditVisit = ({
       }
       setVeiculo(visitRef.veiculo);
       setCity(visitRef.cidade);
-      if (visitRef.consultora === "lunch") {
+      if (visitRef.consultora === "Almoço Téc.") {
         setHorarioTexto(visitRef.saidaEmpresa);
       } else {
         setHorarioTexto(visitRef.chegadaCliente);
@@ -85,44 +81,6 @@ const EditVisit = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visitRef]);
 
-  useEffect(() => { // Seleciona a visita de acordo com o tipo escolhido
-    const init = () => {
-      switch (type) {
-        case 'lunch':
-          setDriver(tecs.filter((ref) => ref.nome === userRef.nome))
-          //setVisits(schedule.filter((ref) => ref.data === visitRef.data && (ref.tecnico === "Bruna" || ref.tecnico === "Lia")))
-          setTecnicoTexto(userRef.nome);
-          //driverRef.current = 'Bruna';
-          break
-        case 'comercial':
-          setDriver(tecs.filter((ref) => ref.nome === "Bruna" || ref.nome === "Lia"))
-          //setVisits(schedule.filter((ref) => ref.data === visitRef.data && (ref.tecnico === "Bruna" || ref.tecnico === "Lia")))
-          setTecnicoTexto('Bruna');
-          //driverRef.current = 'Bruna';
-          break
-        case 'comercial_tecnica':
-          setDriver(tecs.filter((ref) => ref.nome === "Lucas" || ref.nome === "Luis"))
-          //setVisits(schedule.filter((ref) => ref.data === visitRef.data && (ref.tecnico === "Lucas" || ref.tecnico === "Luis")))
-          setTecnicoTexto('Lucas');
-          //driverRef.current = 'Lucas';
-          break
-        case 'pos_venda':
-          setDriver(tecs.filter((ref) => ref.nome === "Lucas" || ref.nome === "Luis"))
-          //setVisits(schedule.filter((ref) =>ref.data === visitRef.data &&  (ref.tecnico === "Lucas" || ref.tecnico === "Luis")))
-          setTecnicoTexto('Lucas');
-          //driverRef.current = 'Lucas';
-          setConsultoraTexto('Pós-Venda')
-          break
-        default:
-          setDriver(tecs)
-          setVisits(schedule)
-      }
-      // console.log(consultora)
-    };
-    init();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   useEffect(() => {
     if(tecRefUID && tecRefUID.nome !== 'Nenhum') {
       if(tecnicoTexto && tecnicoTexto === 'Nenhum') return setTecRefUID({nome: 'Nenhum', uid: '000'})
@@ -130,43 +88,15 @@ const EditVisit = ({
   },[tecRefUID, tecnicoTexto])
 
   useEffect(() => {
-    // let visitsType = schedule.filter((visit) => visit.tecnico === "Lucas" && visit.tecnico === "Luis");
-    let visitsData;
-    let visitsType;
-    switch (type) {
-      case 'comercial':
-        visitsData = schedule.filter((visit) => visit.data === dataTexto && (visit.tecnico !== "Lucas" && visit.tecnico !== "Luis"));
-        visitsType = schedule.filter((visit) => (visit.tecnico !== "Lucas" && visit.tecnico !== "Luis") || visit.categoria === 'lunch')
-        break
-      case 'lunch':
-        visitsData = schedule.filter((visit) => visit.data === dataTexto);
-        visitsType = schedule;
-        break
-      default:
-        visitsData = schedule.filter((visit) => visit.data === dataTexto && (visit.tecnico === "Lucas" || visit.tecnico === "Luis" || visit.categoria === 'lunch'));// Parei aqui
-        visitsType = schedule.filter((visit) => visit.tecnico === "Lucas" || visit.tecnico === "Luis" || visit.categoria === 'lunch')
-    }
     if(dataTexto) {
+      const visitsData = schedule.filter((visit) => visit.data === dataTexto);
       if (visitsData && dataTexto.substring(8,10) !== "00") {
         setVisits(visitsData);
       }
     } else {
-      setVisits(visitsType);
-      console.log(schedule.filter((visit) => visit.tecnico !== "Lucas" && visit.tecnico !== "Luis"))
-      console.log(dataTexto)
+      setVisits(schedule);
     }
-  },[dataTexto, schedule, type])
-
-  // useEffect(() => {
-  //   if(dataTexto) {
-  //     const visitsData = schedule.filter((visit) => visit.data === dataTexto);
-  //     if (visitsData && dataTexto.substring(8,10) !== "00") {
-  //       setVisits(visitsData);
-  //     }
-  //   } else {
-  //     setVisits(schedule);
-  //   }
-  // },[dataTexto, schedule])
+  },[dataTexto, schedule])
 
   useEffect(() => {
     if (dataTexto) {
@@ -292,355 +222,341 @@ const EditVisit = ({
 
   const onSubmit = async (userData) => {
     try {
-      if(checkNet) {
-        Swal.fire({
-          title: 'Sem Conexão',
-          icon: "error",
-          html: `Não é possível Editar uma Visita <b>sem internet.</b> Verifique a sua conexão.`,
-          confirmButtonText: "Fechar",
-          showCloseButton: true,
-          confirmButtonColor: "#d33"  
-        })
-      } else {
-        let diaRef,
-          saidaEmpresaRef,
-          chegadaClienteRef,
-          TempoVisita,
-          SaidaClienteRef,
-          ChegadaEmpresaRef;
-          //tempoRotaRef;
-        const chegada = horarioTexto;
-        const tempo = moment("00:00", "HH:mm");
-        moment.locale("pt-br");
-        chegadaClienteRef = chegada;
-  
-        const chegadaCliente = moment(chegada, "hh:mm"); //Horario de chegada
-        const day = moment(dataTexto); // Pega o dia escolhido
-  
-        diaRef = day.format("YYYY MM DD");
-  
-        TempoVisita = tempo.add(visitaNumero, "seconds").format("HH:mm");
-  
-        saidaEmpresaRef = saidaTexto;
-  
-        console.log(saidaTexto)
-  
-        SaidaClienteRef = saidaCliente;
-  
-        chegadaCliente.add(rotaTempo, "seconds").format("hh:mm"); //Adiciona tempo de viagem volta
-        //chegadaCliente.add(rotaTempo, "seconds").format("hh:mm"); //Adiciona tempo de viagem volta
-        ChegadaEmpresaRef = chegadaTexto;
-        //tempoRotaRef = rotaTempo;
-  
-        // console.log({
-        //   // dia: diaRef,
-        //   saidaEmpresa: saidaEmpresaRef,
-        //   // chegadaCliente: chegadaClienteRef,
-        //   // visita: TempoVisita,
-        //   // saidaDoCliente: SaidaClienteRef,
-        //   chegadaEmpresa: ChegadaEmpresaRef,
-        //   // consultora: userData.consultora,
-        //   // tecnico: tecnicoTexto,
-        //   // cidade: city,
-        // });
-  
-        // const dataRef = schedule.filter(
-        //   (dia) => dia.data === dataTexto && dia.tecnico === tecnicoTexto && dia.chegadaCliente !== visitRef.chegadaCliente
-        // );
-  
-        const saidaFormatada = moment(saidaEmpresaRef, "hh:mm");
-        const chegadaFormatada = moment(ChegadaEmpresaRef, "hh:mm");
-        saidaFormatada.add(1, "minutes").format("hh:mm");
-        chegadaFormatada.subtract(1, "minutes").format("hh:mm");
-  
-        console.log(saidaEmpresaRef);
-        //console.log(chegadaFormatada)
-  
-        let check = [];
-        let visitsFind = [];
-  
-          dataRef.map((ref) => {
-            // console.log("eae");
-            if (
-              saidaFormatada <= moment(ref.saidaEmpresa, "hh:mm") &&
-              chegadaFormatada <= moment(ref.saidaEmpresa, "hh:mm")
-            ) {
+      let diaRef,
+        saidaEmpresaRef,
+        chegadaClienteRef,
+        TempoVisita,
+        SaidaClienteRef,
+        ChegadaEmpresaRef;
+        //tempoRotaRef;
+      const chegada = horarioTexto;
+      const tempo = moment("00:00", "HH:mm");
+      moment.locale("pt-br");
+      chegadaClienteRef = chegada;
+
+      const chegadaCliente = moment(chegada, "hh:mm"); //Horario de chegada
+      const day = moment(dataTexto); // Pega o dia escolhido
+
+      diaRef = day.format("YYYY MM DD");
+
+      TempoVisita = tempo.add(visitaNumero, "seconds").format("HH:mm");
+
+      saidaEmpresaRef = saidaTexto;
+
+      console.log(saidaTexto)
+
+      SaidaClienteRef = saidaCliente;
+
+      chegadaCliente.add(rotaTempo, "seconds").format("hh:mm"); //Adiciona tempo de viagem volta
+      //chegadaCliente.add(rotaTempo, "seconds").format("hh:mm"); //Adiciona tempo de viagem volta
+      ChegadaEmpresaRef = chegadaTexto;
+      //tempoRotaRef = rotaTempo;
+
+      // console.log({
+      //   // dia: diaRef,
+      //   saidaEmpresa: saidaEmpresaRef,
+      //   // chegadaCliente: chegadaClienteRef,
+      //   // visita: TempoVisita,
+      //   // saidaDoCliente: SaidaClienteRef,
+      //   chegadaEmpresa: ChegadaEmpresaRef,
+      //   // consultora: userData.consultora,
+      //   // tecnico: tecnicoTexto,
+      //   // cidade: city,
+      // });
+
+      // const dataRef = schedule.filter(
+      //   (dia) => dia.data === dataTexto && dia.tecnico === tecnicoTexto && dia.chegadaCliente !== visitRef.chegadaCliente
+      // );
+
+      const saidaFormatada = moment(saidaEmpresaRef, "hh:mm");
+      const chegadaFormatada = moment(ChegadaEmpresaRef, "hh:mm");
+      saidaFormatada.add(1, "minutes").format("hh:mm");
+      chegadaFormatada.subtract(1, "minutes").format("hh:mm");
+
+      console.log(saidaEmpresaRef);
+      //console.log(chegadaFormatada)
+
+      let check = [];
+      let visitsFind = [];
+
+        dataRef.map((ref) => {
+          // console.log("eae");
+          if (
+            saidaFormatada <= moment(ref.saidaEmpresa, "hh:mm") &&
+            chegadaFormatada <= moment(ref.saidaEmpresa, "hh:mm")
+          ) {
+            check.push(ref);
+          } else {
+            if (saidaFormatada >= moment(ref.chegadaEmpresa, "hh:mm"))
               check.push(ref);
-            } else {
-              if (saidaFormatada >= moment(ref.chegadaEmpresa, "hh:mm"))
-                check.push(ref);
-            }
-            return dataRef;
-          });
-        
-  
-        // dataRef.map((ref) => {
-        //   console.log('eae')
-        //   if(saidaFormatada < moment(ref.saidaEmpresa, 'hh:mm') && chegadaFormatada < moment(ref.saidaEmpresa, 'hh:mm')) {
-        //       check.push(ref);
-        //     } else {
-        //       if(saidaFormatada > moment(ref.chegadaEmpresa, 'hh:mm'))
-        //       check.push(ref);
-        //     }
-        //     return dataRef;
-        //   })
-  
-        // console.log(">>", check, dataRef);
-        // console.log(lunch.length);
-        const visitsFindCount = dataRef.length - check.length;
-        // console.log(visitsFindCount);
-  
-        dataRef.map((a) => {
-          //Percorre todos os arrays de 'dataRef' e compara se os arrays são iguais
-          if (check.includes(a) === false) {
-            visitsFind.push(a);
           }
-          return visitsFind;
+          return dataRef;
         });
-        // console.log(visitsFind);
-  
-        let c = 1;
-        if (visitsFindCount < 0 || visitsFindCount > 0) {
-          const visits = visitsFind.map(
-            (e) =>
-              `Visita <b>` +
-              c++ +
-              "</b> - Saida: <b>" +
-              e.saidaEmpresa +
-              "</b> Chegada: <b>" +
-              e.chegadaEmpresa +
-              "</b></br>"
-          );
-          Swal.fire({
-            title: Company,
-            html:
-              `Foram encontrado(s) <b>${visitsFindCount}</b> visita(s) marcada(s) nesse periodo.</br></br>` +
-              visits,
-            icon: "error",
-            showConfirmButton: true,
-            showCloseButton: true,
-            confirmButtonColor: "#F39200",
-          });
-        } else {
-          let msg1, msg2;
-          if (visitRef.categoria === "lunch") {
-            msg1 = 'o <b>horário de almoço?</b>'
-            msg2 = 'O <b>horário de almoço</b> foi alterado'
-          } else { 
-            msg1 = 'essa <b>Visita?</b>'
-            msg2 = `A visita em <b>${visitRef.cidade}</b> foi alterada`
-           }
-          Swal.fire({
-            title: Company,
-            html: `Você deseja alterar ${msg1}`,
-            icon: "question",
-            showCancelButton: true,
-            showCloseButton: true,
-            confirmButtonColor: "#F39200",
-            cancelButtonColor: "#d33",
-            confirmButtonText: "Sim",
-            cancelButtonText: "Não",
-          }).then(async (result) => {
-            if (result.isConfirmed) {
-              if (visitRef.data !== dataTexto) {
-              const visitsAntes = schedule.filter(
-                  (ref) =>
-                    ref.data === visitRef.data &&
-                    ref.chegadaEmpresa === visitRef.saidaEmpresa &&
-                    ref.tipo !== "Almoço" &&
-                    !ref.visitaAlmoco
-  
-                );
-               const visitsDepois = schedule.filter(
-                  (ref) =>
-                    ref.data === visitRef.data &&
-                    ref.saidaEmpresa === visitRef.chegadaEmpresa &&
-                    ref.tipo !== "Almoço" &&
-                    !ref.visitaAlmoco
-                );
-                // console.log(visitsAntes, visitsDepois);
-            if(visitsAntes.length > 0) {
-              visitsAntes.map(async (ref) => {
-                const visitBefore =  schedule.filter(before => (before.data === ref.data && before.chegadaEmpresa === ref.saidaEmpresa && ref.categoria !== 'lunch' && before.tipo === "Visita Conjunta" && !before.visitaAlmoco));
-                if(ref.cidade === visitRef.cidade) {
-                  if(visitBefore) {
-                    visitBefore.map(async (ref) => {
-                      await updateDoc(doc(dataBase, "Agendas", year, monthSelect, ref.id),
-                                  {
-                                    chegadaEmpresa: moment(ref.saidaDoCliente, "hh:mm").add(ref.tempoRota, 'seconds').format('kk:mm'),
-                                    groupRef: "",
-                                    group: "",
-                                    visitaConjunta: false,
-                                    tipo: "Visita"
-                                  })
+      
+
+      // dataRef.map((ref) => {
+      //   console.log('eae')
+      //   if(saidaFormatada < moment(ref.saidaEmpresa, 'hh:mm') && chegadaFormatada < moment(ref.saidaEmpresa, 'hh:mm')) {
+      //       check.push(ref);
+      //     } else {
+      //       if(saidaFormatada > moment(ref.chegadaEmpresa, 'hh:mm'))
+      //       check.push(ref);
+      //     }
+      //     return dataRef;
+      //   })
+
+      // console.log(">>", check, dataRef);
+      // console.log(lunch.length);
+      const visitsFindCount = dataRef.length - check.length;
+      // console.log(visitsFindCount);
+
+      dataRef.map((a) => {
+        //Percorre todos os arrays de 'dataRef' e compara se os arrays são iguais
+        if (check.includes(a) === false) {
+          visitsFind.push(a);
+        }
+        return visitsFind;
+      });
+      // console.log(visitsFind);
+
+      let c = 1;
+      if (visitsFindCount < 0 || visitsFindCount > 0) {
+        const visits = visitsFind.map(
+          (e) =>
+            `Visita <b>` +
+            c++ +
+            "</b> - Saida: <b>" +
+            e.saidaEmpresa +
+            "</b> Chegada: <b>" +
+            e.chegadaEmpresa +
+            "</b></br>"
+        );
+        Swal.fire({
+          title: Company,
+          html:
+            `Foram encontrado(s) <b>${visitsFindCount}</b> visita(s) marcada(s) nesse periodo.</br></br>` +
+            visits,
+          icon: "error",
+          showConfirmButton: true,
+          showCloseButton: true,
+          confirmButtonColor: "#F39200",
+        });
+      } else {
+        let msg1, msg2;
+        if (visitRef.consultora === "Almoço Téc.") {
+          msg1 = 'o <b>horário de almoço?</b>'
+          msg2 = 'O <b>horário de almoço</b> foi alterado'
+        } else { 
+          msg1 = 'essa <b>Visita?</b>'
+          msg2 = `A visita em <b>${visitRef.cidade}</b> foi alterada`
+         }
+        Swal.fire({
+          title: Company,
+          html: `Você deseja alterar ${msg1}`,
+          icon: "question",
+          showCancelButton: true,
+          showCloseButton: true,
+          confirmButtonColor: "#F39200",
+          cancelButtonColor: "#d33",
+          confirmButtonText: "Sim",
+          cancelButtonText: "Não",
+        }).then(async (result) => {
+          if (result.isConfirmed) {
+            if (visitRef.data !== dataTexto) {
+            const visitsAntes = schedule.filter(
+                (ref) =>
+                  ref.data === visitRef.data &&
+                  ref.chegadaEmpresa === visitRef.saidaEmpresa &&
+                  ref.tipo !== "Almoço" &&
+                  !ref.visitaAlmoco
+
+              );
+             const visitsDepois = schedule.filter(
+                (ref) =>
+                  ref.data === visitRef.data &&
+                  ref.saidaEmpresa === visitRef.chegadaEmpresa &&
+                  ref.tipo !== "Almoço" &&
+                  !ref.visitaAlmoco
+              );
+              // console.log(visitsAntes, visitsDepois);
+          if(visitsAntes.length > 0) {
+            visitsAntes.map(async (ref) => {
+              const visitBefore =  schedule.filter(before => (before.data === ref.data && before.chegadaEmpresa === ref.saidaEmpresa && ref.consultora !== 'Almoço Téc.' && before.tipo === "Visita Conjunta" && !before.visitaAlmoco));
+              if(ref.cidade === visitRef.cidade) {
+                if(visitBefore) {
+                  visitBefore.map(async (ref) => {
+                    await updateDoc(doc(dataBase, "Agendas", year, monthSelect, ref.id),
+                                {
+                                  chegadaEmpresa: moment(ref.saidaDoCliente, "hh:mm").add(ref.tempoRota, 'seconds').format('kk:mm'),
+                                  groupRef: "",
+                                  group: "",
+                                  visitaConjunta: false,
+                                  tipo: "Visita"
                                 })
-                    }
-                  await deleteDoc(
-                    doc(dataBase, "Agendas", year, monthSelect, ref.id)
-                  );
-                } else {
-                  await updateDoc(doc(dataBase, "Agendas", year, monthSelect, ref.id),
-                              {
-                                chegadaEmpresa: moment(ref.saidaDoCliente, "hh:mm").add(ref.tempoRota, 'seconds').format('kk:mm'),
-                                groupRef: "",
-                                group: "",
-                                visitaConjunta: false,
-                                tipo: "Visita"
                               })
-                }
-                  // console.log(ref.chegadaEmpresa ,moment(ref.chegadaEmpresa, "hh:mm").add(ref.tempoRota, 'seconds').format('kk:mm'))
-            })
-            }
-            if (visitsDepois.length > 0) {
-              visitsDepois.map(async (ref) => {
-               const visitNext =  schedule.filter(next => (next.data === ref.data && next.saidaEmpresa === ref.chegadaEmpresa && ref.categoria !== 'lunch' && next.tipo === "Visita Conjunta" && !next.visitaAlmoco));
-                if(ref.cidade === visitRef.cidade) {
-                  if(visitNext) {
-                    visitNext.map(async (ref) => {
-                      await updateDoc(doc(dataBase, "Agendas", year, monthSelect, ref.id),
-                                  {
-                                    saidaEmpresa: moment(ref.chegadaCliente, "hh:mm").subtract(ref.tempoRota, 'seconds').format('kk:mm'),
-                                    groupRef: "",
-                                    group: "",
-                                    visitaConjunta: false,
-                                    tipo: "Visita"
-                                  })
-                                })
-                    }
-                 await deleteDoc(
+                  }
+                await deleteDoc(
                   doc(dataBase, "Agendas", year, monthSelect, ref.id)
                 );
-                } else {
-                  await updateDoc(doc(dataBase, "Agendas", year, monthSelect, ref.id),
+              } else {
+                await updateDoc(doc(dataBase, "Agendas", year, monthSelect, ref.id),
                             {
-                              saidaEmpresa: moment(ref.chegadaCliente, "hh:mm").subtract(ref.tempoRota, 'seconds').format('kk:mm'),
+                              chegadaEmpresa: moment(ref.saidaDoCliente, "hh:mm").add(ref.tempoRota, 'seconds').format('kk:mm'),
                               groupRef: "",
                               group: "",
                               visitaConjunta: false,
                               tipo: "Visita"
                             })
-                }
-                
-                // console.log(ref.saidaEmpresa ,moment(ref.chegadaCliente, "hh:mm").subtract(ref.tempoRota, 'seconds').format('kk:mm'))
-              })
               }
+                // console.log(ref.chegadaEmpresa ,moment(ref.chegadaEmpresa, "hh:mm").add(ref.tempoRota, 'seconds').format('kk:mm'))
+          })
+          }
+          if (visitsDepois.length > 0) {
+            visitsDepois.map(async (ref) => {
+             const visitNext =  schedule.filter(next => (next.data === ref.data && next.saidaEmpresa === ref.chegadaEmpresa && ref.consultora !== 'Almoço Téc.' && next.tipo === "Visita Conjunta" && !next.visitaAlmoco));
+              if(ref.cidade === visitRef.cidade) {
+                if(visitNext) {
+                  visitNext.map(async (ref) => {
+                    await updateDoc(doc(dataBase, "Agendas", year, monthSelect, ref.id),
+                                {
+                                  saidaEmpresa: moment(ref.chegadaCliente, "hh:mm").subtract(ref.tempoRota, 'seconds').format('kk:mm'),
+                                  groupRef: "",
+                                  group: "",
+                                  visitaConjunta: false,
+                                  tipo: "Visita"
+                                })
+                              })
+                  }
+               await deleteDoc(
+                doc(dataBase, "Agendas", year, monthSelect, ref.id)
+              );
+              } else {
+                await updateDoc(doc(dataBase, "Agendas", year, monthSelect, ref.id),
+                          {
+                            saidaEmpresa: moment(ref.chegadaCliente, "hh:mm").subtract(ref.tempoRota, 'seconds').format('kk:mm'),
+                            groupRef: "",
+                            group: "",
+                            visitaConjunta: false,
+                            tipo: "Visita"
+                          })
+              }
+              
+              // console.log(ref.saidaEmpresa ,moment(ref.chegadaCliente, "hh:mm").subtract(ref.tempoRota, 'seconds').format('kk:mm'))
+            })
             }
-  
-              if (visitRef.categoria === "lunch") {
-                await updateDoc(scheduleRefUID, {
-                  dia: diaRef,
-                  saidaEmpresa: saidaEmpresaRef,
-                  chegadaCliente: saidaEmpresaRef,
-                  visita: "01:00",
-                  visitaNumero: 3600,
-                  saidaDoCliente: ChegadaEmpresaRef,
-                  chegadaEmpresa: ChegadaEmpresaRef,
-                  consultora: tecRefUID.nome,
-                  tecnico: tecRefUID.nome,
-                  tecnicoUID: tecRefUID.uid,
-                  cidade: "",
-                  tempoRota: "",
-                  tempo: "",
-                  cliente: "",
-                  observacao: userData.observacao,
-                  data: dataTexto,
-                  uid: visitRef.uid,
-                  cor: tecRefUID.cor,
-                  confirmar: false,
-                  categoria: 'lunch',
-                  corTec: tecRefUID.cor
-                });
-              }
-              if (
-                visitRef.data !== dataTexto && // Visita editada para outro dia
-                visitRef.categoria !== "lunch"
-              ) {
-                await updateDoc(
-                  doc(dataBase, "Agendas", year, monthSelect, visitRef.id),
-                  {
-                    dia: diaRef,
-                    data: dataTexto,
-                    saidaEmpresa: saidaEmpresaRef,
-                    chegadaCliente: chegadaClienteRef,
-                    visita: TempoVisita,
-                    visitaNumero: visitaNumero,
-                    saidaDoCliente: SaidaClienteRef,
-                    chegadaEmpresa: ChegadaEmpresaRef,
-                    tecnico: tecRefUID.nome,
-                    tecnicoUID: tecRefUID.uid,
-                    veiculo: veiculo,
-                    cidade: visitRef.cidade,
-                    cliente: userData.cliente,
-                    observacao: userData.observacao,
-                    consultora: consultoraTexto,
-                    uid: sellerRef.id,
-                    cor: sellerRef.cor,
-                    visitaConjunta: false,
-                    groupRef: "",
-                    group: "",
-                    tipo: "Visita",
-                    categoria: visitRef.categoria,
-                    corTec: tecRefUID.cor
-                  }
-                );
-              } else if (
-                visitRef.data === dataTexto && // Visita editada para o mesmo dia
-                visitRef.categoria !== "lunch"
-              ) {
-                // console.log(userData.consultora)
-                await updateDoc(
-                  doc(dataBase, "Agendas", year, monthSelect, visitRef.id),
-                  {
-                    dia: diaRef,
-                    data: dataTexto,
-                    saidaEmpresa: saidaEmpresaRef,
-                    chegadaCliente: chegadaClienteRef,
-                    visita: TempoVisita,
-                    visitaNumero: visitaNumero,
-                    saidaDoCliente: SaidaClienteRef,
-                    chegadaEmpresa: ChegadaEmpresaRef,
-                    tecnico: tecRefUID.nome,
-                    tecnicoUID: tecRefUID.uid,
-                    veiculo: veiculo,
-                    cidade: visitRef.cidade,
-                    cliente: userData.cliente,
-                    observacao: userData.observacao,
-                    consultora: consultoraTexto,
-                    uid: sellerRef.id,
-                    cor: sellerRef.cor,
-                    categoria: visitRef.categoria, //Alterar
-                    corTec: tecRefUID.cor
-                  }
-                );
-              }
-              if(visitRef.categoria !== "lunch") {
-                const date = new Date(visitRef.data);
-                axios.post('https://hook.us1.make.com/tmfl4xr8g9tk9qoi9jdpo1d7istl8ksd', {
-                  data: moment(visitRef.data).format("DD/MM/YYYY"),
-                  nome: tecRefUID.nome,
-                  cliente: userData.cliente,
-                  marcado: chegadaClienteRef,
-                  consultora: consultoraTexto,
-                  city: visitRef.cidade,
-                  semana: getMonthlyWeekNumber(date),
-                  mes: moment(visitRef.data).format("M"),
-                  ende: visitRef.endereco,
-                  confirmada: 'Não'
-                })
-              }
-              Swal.fire({
-                title: Company,
-                html: `${msg2} com sucesso.`,
-                icon: "success",
-                showConfirmButton: true,
-                showCloseButton: true,
-                confirmButtonColor: "#F39200",
-              }).then(() => {
-                  return returnSchedule();
+          }
+
+            if (visitRef.consultora === "Almoço Téc.") {
+              await updateDoc(scheduleRefUID, {
+                dia: diaRef,
+                saidaEmpresa: saidaEmpresaRef,
+                chegadaCliente: saidaEmpresaRef,
+                visita: "01:00",
+                visitaNumero: 3600,
+                saidaDoCliente: ChegadaEmpresaRef,
+                chegadaEmpresa: ChegadaEmpresaRef,
+                consultora: "Almoço Téc.",
+                tecnico: tecRefUID.nome,
+                tecnicoUID: tecRefUID.uid,
+                cidade: "",
+                tempoRota: "",
+                tempo: "",
+                cliente: "",
+                observacao: userData.observacao,
+                data: dataTexto,
+                uid: visitRef.uid,
+                cor: "#111111",
+                confirmar: false,
+                categoria: 'lunch'
               });
             }
-          });
-        }
+            if (
+              visitRef.data !== dataTexto && // Visita editada para outro dia
+              visitRef.consultora !== "Almoço Téc."
+            ) {
+              await updateDoc(
+                doc(dataBase, "Agendas", year, monthSelect, visitRef.id),
+                {
+                  dia: diaRef,
+                  data: dataTexto,
+                  saidaEmpresa: saidaEmpresaRef,
+                  chegadaCliente: chegadaClienteRef,
+                  visita: TempoVisita,
+                  visitaNumero: visitaNumero,
+                  saidaDoCliente: SaidaClienteRef,
+                  chegadaEmpresa: ChegadaEmpresaRef,
+                  tecnico: tecRefUID.nome,
+                  tecnicoUID: tecRefUID.uid,
+                  veiculo: veiculo,
+                  cidade: visitRef.cidade,
+                  cliente: userData.cliente,
+                  observacao: userData.observacao,
+                  consultora: consultoraTexto,
+                  uid: sellerRef.id,
+                  cor: sellerRef.cor,
+                  visitaConjunta: false,
+                  groupRef: "",
+                  group: "",
+                  tipo: "Visita",
+                  categoria: 'comercial'
+                }
+              );
+            } else if (
+              visitRef.data === dataTexto && // Visita editada para o mesmo dia
+              visitRef.consultora !== "Almoço Téc."
+            ) {
+              // console.log(userData.consultora)
+              await updateDoc(
+                doc(dataBase, "Agendas", year, monthSelect, visitRef.id),
+                {
+                  dia: diaRef,
+                  data: dataTexto,
+                  saidaEmpresa: saidaEmpresaRef,
+                  chegadaCliente: chegadaClienteRef,
+                  visita: TempoVisita,
+                  visitaNumero: visitaNumero,
+                  saidaDoCliente: SaidaClienteRef,
+                  chegadaEmpresa: ChegadaEmpresaRef,
+                  tecnico: tecRefUID.nome,
+                  tecnicoUID: tecRefUID.uid,
+                  veiculo: veiculo,
+                  cidade: visitRef.cidade,
+                  cliente: userData.cliente,
+                  observacao: userData.observacao,
+                  consultora: consultoraTexto,
+                  uid: sellerRef.id,
+                  cor: sellerRef.cor,
+                  categoria: 'pos_venda'
+                }
+              );
+            }
+            if(visitRef.consultora !== "Almoço Téc.") {
+              const date = new Date(visitRef.data);
+              axios.post('https://hook.us1.make.com/tmfl4xr8g9tk9qoi9jdpo1d7istl8ksd', {
+                data: moment(visitRef.data).format("DD/MM/YYYY"),
+                nome: tecRefUID.nome,
+                cliente: userData.cliente,
+                marcado: chegadaClienteRef,
+                consultora: consultoraTexto,
+                city: visitRef.cidade,
+                semana: getMonthlyWeekNumber(date),
+                mes: moment(visitRef.data).format("M"),
+                ende: visitRef.endereco,
+                confirmada: 'Não'
+              })
+            }
+            Swal.fire({
+              title: Company,
+              html: `${msg2} com sucesso.`,
+              icon: "success",
+              showConfirmButton: true,
+              showCloseButton: true,
+              confirmButtonColor: "#F39200",
+            }).then(() => {
+                return returnSchedule();
+            });
+          }
+        });
       }
     } catch (error) {
       // console.log(error);
@@ -683,13 +599,16 @@ const EditVisit = ({
         <div className="box-visit__close">
           <button onClick={returnSchedule} className="btn-close" />
         </div>
-        {type === 'lunch' && <h4>Editar Almoço</h4>}
-        {type === "comercial" && <h4>Editar Visita Comercial</h4>}
-        {type === "comercial_tecnica" && <h4>Editar Visita Comercial + Técnica</h4>}
-        {type === "pos_venda" && <h4>Editar Visita de Pós-Venda</h4>}
+        {(visitRef.tipo === "Visita Conjunta" && (
+          <h4>Editar Visita Conjunta</h4>)) || 
+        (visitRef.tipo === "Almoço" && (
+          <h4>Editar Almoço</h4>))  ||
+        (visitRef.tipo === "Visita" && (
+          <h4>Editar Visita</h4>))}
+          {/* <h4>Editar Visita</h4> */}
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="box-visit__container">
-          {visitRef.categoria !== "lunch" && (
+          {visitRef.consultora !== "Almoço Téc." && (
             <>
               <label className="label">
               <p data-cooltipz-size="fit"
@@ -706,7 +625,7 @@ const EditVisit = ({
           )}
             <label className="label">
               <p>Dia *</p>
-              {visitRef.categoria === "lunch" ? (
+              {visitRef.consultora === "Almoço Téc." ? (
                 <input
                   value={dataTexto || ""}
                   className="label__input"
@@ -757,12 +676,12 @@ const EditVisit = ({
                 <></>
               )}
               {(visitRef.visitaConjunta && checkInput) ||
-              visitRef.categoria === "lunch" ||
+              visitRef.consultora === "Almoço Téc." ||
               (!visitRef.visitaConjunta &&
-                visitRef.categoria !== "lunch" &&
+                visitRef.consultora !== "Almoço Téc." &&
                 checkInput) ||
               (!visitRef.visitaConjunta &&
-                visitRef.categoria !== "lunch" &&
+                visitRef.consultora !== "Almoço Téc." &&
                 !visitRef.group) ? (
                 <input
                   className="label__input time"
@@ -790,7 +709,7 @@ const EditVisit = ({
             </label>
             <label className="label">
               <p>Tempo de Visita *</p>
-              {visitRef.categoria === "lunch" || !checkInput ? (
+              {visitRef.consultora === "Almoço Téc." || !checkInput ? (
                 <select
                   value={3600}
                   className="label__select"
@@ -819,7 +738,7 @@ const EditVisit = ({
               )}
             </label>
             {visits && visits.length > 0 ? 
-            <><h2 className="title-visits">{dataTexto ? 'Visita(s) do Dia' : 'Visitas do Mês'}</h2><List
+            <List
             sx={{
               width: '90%',
               maxWidth: 500,            
@@ -834,13 +753,11 @@ const EditVisit = ({
                   <p><b>{visita.dia.substring(8,10)}</b></p>
                   <p className="saida">{visita.saidaEmpresa}</p>
                   <p className="chegada">{visita.chegadaEmpresa}</p>
-                  {visita.categoria !== 'lunch' && 
-                    <p className="tecnico">{visita.tecnico}</p>
-                  }
+                  <p className="tecnico">{visita.tecnico}</p>
                   <p className="cidade">{visita.cidade ? visita.cidade : 'ALMOÇO'}</p>
                 </ListItem>
               ))}
-             </List></>:
+             </List>:
              <div style={{ display: 'none!impoortant' }} className="visit-aviso">
               <h1>Nenhuma Visita Encontrada</h1>
              </div>
@@ -848,10 +765,10 @@ const EditVisit = ({
               <div className="box-visit__info prev">
               <span className="">Previsão de Visita</span>
               <p className="notice">
-                Saindo às <b className="saida">{saidaTexto}</b>
+                Saindo da Empresa: <b>{saidaTexto}</b>
               </p>
               <p className="notice">
-                Chegando às <b className="chegada">{chegadaTexto}</b>
+                Chegando na Empresa: <b>{chegadaTexto}</b>
               </p>
             </div>
             {(user.email === Users[0].email || userRef.cargo === "Administrador") && visitRef.tipo !== "Almoço" &&
@@ -875,7 +792,7 @@ const EditVisit = ({
                       ))}
                   </select>
                 </div></>}
-        {type !== 'lunch' &&
+        {userRef.cargo === 'Vendedor(a)' &&
             <label className="label">
                   <p>Consultora *</p>
                   <input
@@ -888,40 +805,43 @@ const EditVisit = ({
                 </label>
         }
             <div className="label margin-top">
-            {type === "lunch" && <p>Responsável</p>}
-            {type === "comercial" && <p>Motorista</p>}
-            {(type === "comercial_tecnica" || type === "pos_venda") && <p>Técnico</p>}
+              <p>Técnico/Motorista *</p>
               <div className="radio">
-                {visitRef.categoria === "lunch" ? (
+                {visitRef.consultora === "Almoço Téc." ? (
                   <select
-                    value={visitRef.tecnico}
+                    value={tecnicoTexto}
                     className="label__select"
                     name="tec"
                     disabled
-                    //onChange={(e) => setTecnicoTexto(e.target.value)}
+                    onChange={(e) => setTecnicoTexto(e.target.value)}
                   >
-                        <option defaultValue={visitRef.tecnico}>
-                          {visitRef.tecnico}
-                        </option>  
+                    {tecs &&
+                      tecs.map((tec, index) => (
+                        <option key={index} value={tec.nome}>
+                          {tec.nome}
+                        </option>
+                      ))}
                   </select>
                 ) : (
                   <select
                     value={tecnicoTexto}
                     className="label__select"
                     name="tec"
+                    required
                     onChange={(e) => setTecnicoTexto(e.target.value)}
                   >
-                    {driver &&
-                      driver.map((tec, index) => (
+                    {tecs &&
+                      tecs.map((tec, index) => (
                         <option key={index} value={tec.nome}>
                           {tec.nome}
                         </option>
                       ))}
+                      <option value='Nenhum'>Nenhum</option>
                   </select>
                 )}
               </div>
             </div>
-            {visitRef.categoria !== "lunch" && 
+            {visitRef.consultora !== "Almoço Téc." && 
             <label className="label">
             <p>Veículo *</p>
             {veiculo && tecnicoTexto !== 'Nenhum' ? 

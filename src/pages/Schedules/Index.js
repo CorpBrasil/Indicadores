@@ -1,4 +1,4 @@
-import { useEffect, useState, memo } from 'react';
+import { useEffect, useState, memo, forwardRef } from 'react';
 import moment from "moment";
 import Geocode from "react-geocode";
 import axios from 'axios';
@@ -27,15 +27,24 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+import Snackbar from '@mui/material/Snackbar';
+import MuiAlert from '@mui/material/Alert';
+import { useNavigatorOnline } from '@oieduardorabelo/use-navigator-online';
+
 
 import './_style.scss';
 
-const Schedules = ({ userRef, alerts }) => {
+const Schedules = ({ userRef, alerts, check }) => {
   Geocode.setLanguage("pt-BR");
   Geocode.setRegion("br");
   Geocode.setApiKey(KeyMaps);
   Geocode.setLocationType("ROOFTOP");
 
+  const Alert = forwardRef(function Alert(props, ref) {
+    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+  });
+
+    let { status } = useNavigatorOnline();
     const { user } = useAuth();
     const [schedules, setSchedules] = useState();
     const [posto, setPosto] = useState();
@@ -141,11 +150,22 @@ const Schedules = ({ userRef, alerts }) => {
   // }
 
   const handleClickOpen = () => {
-    navigator.geolocation.getCurrentPosition(function (position) {
-        setLat(position.coords.latitude);
-        setLng(position.coords.longitude);
+    if(check) {
+      Swal.fire({
+        title: 'Sem Conexão',
+        icon: "error",
+        html: `Não é possível Confirmar Combustivel <b>sem internet.</b> Verifique a sua conexão.`,
+        confirmButtonText: "Fechar",
+        showCloseButton: true,
+        confirmButtonColor: "#d33"  
       })
-    setOpen(true);
+    } else {
+      navigator.geolocation.getCurrentPosition(function (position) {
+          setLat(position.coords.latitude);
+          setLng(position.coords.longitude);
+        })
+      setOpen(true);
+    }
   };
 
   const handleClose = () => {
@@ -157,10 +177,10 @@ const Schedules = ({ userRef, alerts }) => {
     setLitro(value);
   };
 
-  const handleOnValueChange2 = (value) => {
-    setRawValue(value === undefined ? "undefined" : value || " ");
-    setTotal(value);
-  };
+  // const handleOnValueChange2 = (value) => {
+  //   setRawValue(value === undefined ? "undefined" : value || " ");
+  //   setTotal(value);
+  // };
 
   useEffect( () => {
     if(!cidade && lng) {
@@ -182,7 +202,10 @@ const Schedules = ({ userRef, alerts }) => {
     if(cidade) {
       const totalFormat = total.replace(',',".");
       const litroFormat = litro.replace(',',".");
-      const litros = (totalFormat/litroFormat).toFixed(2);
+      const precoTotal = (totalFormat * litroFormat).toFixed(2);
+      const precoTotalFormat = precoTotal.replace('.',",");
+      console.log(precoTotalFormat)
+      //const litros = (totalFormat/litroFormat).toFixed(2);
       setOpen(false);
         Swal.fire({
           title: 'Atenção',
@@ -190,7 +213,8 @@ const Schedules = ({ userRef, alerts }) => {
           `Nome do Posto: <b>${posto}</b> </br>` +
           `Quilometragem: <b>${km}</b> </br>` +
           `Preço por Litro: <b>R$ ${litro}</b> </br>` +
-          `Preço Total: <b>R$ ${total}</b> </br>` +
+          `Quantidade de Litro: <b>${total}</b> </br>` +
+          `Preço Total: <b>R$ ${precoTotalFormat}</b> </br>` +
           `Combustivel: <b>${combustivel}</b> </br>` +
           `Veiculo: <b>${findTec.veiculo}</b>`,
           icon: "warning",
@@ -202,12 +226,12 @@ const Schedules = ({ userRef, alerts }) => {
           cancelButtonText: "Cancelar",
         }).then(async (result) => {
           if(result.isConfirmed) {
-            axios.post('https://hook.us1.make.com/7158so5nvctf4a2wkpnfc2s59h9acpnk', {
+            axios.post('https://n8n.corpbrasil.cloud/webhook/2223e180-0daa-4d5d-90f6-e2cd29aef7d6', {
               data: moment(new Date()).format('DD/MM/YYYY HH:mm'),
               nome: posto,
               km: km,
               litro: litro,
-              QtdeLitro: litros,
+              QtdeLitro: `R$ ${precoTotalFormat}`,
               total: total,
               lat: lat,
               lng: lng,
@@ -373,7 +397,7 @@ const Schedules = ({ userRef, alerts }) => {
           required
           fullWidth
           />
-          <CurrencyInput
+          {/* <CurrencyInput
           customInput={TextField}
           style={{ margin: '0.4rem 0rem 0.7rem 0' }}
           className="label__text"
@@ -385,6 +409,17 @@ const Schedules = ({ userRef, alerts }) => {
           value={total || ''}
           required
           fullWidth
+          /> */}
+          <TextField
+            margin="dense"
+            id="name"
+            label="Quantidade Total de Litro"
+            type="number"
+            onChange={(e) => setTotal(e.target.value)}
+            value={total  || ''}
+            fullWidth
+            required
+            variant="outlined"
           />
           <FormControl sx={{ margin: '0.3rem 0' }} fullWidth>
             <InputLabel id="demo-simple-select-label">Combustível</InputLabel>
@@ -397,7 +432,7 @@ const Schedules = ({ userRef, alerts }) => {
               onChange={(e) => setCombustivel(e.target.value)}
             >
               <MenuItem value='Gasolina'>Gasolina</MenuItem>
-              <MenuItem value='Álcool'>Álcool</MenuItem>
+              <MenuItem value='Etanol'>Etanol</MenuItem>
             </Select>
           </FormControl>
           <TextField
@@ -417,6 +452,11 @@ const Schedules = ({ userRef, alerts }) => {
         </DialogActions>
           </form>
       </Dialog>
+      <Snackbar open={check} autoHideDuration={6000}>
+          <Alert severity="error" sx={{ width: '100%' }}>
+            Você está sem conexão. Verifique a sua conexão com a internet.
+          </Alert>
+      </Snackbar>
     </div>
 
   )

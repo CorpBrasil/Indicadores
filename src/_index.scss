@@ -1,3 +1,5 @@
+@import './styles/mixins.scss';
+
 @media (min-width: 900px) and (max-width: 1360px) {
   html {
     font-size: 15px!important;
@@ -90,4 +92,63 @@ input:disabled {
   margin: 0 .4em;
   color: #f27474;
   font-size: 1.4em;
+}
+
+.list-visit {
+  width: 100%;
+  gap: 0.6rem!important;
+
+  @media (max-width: 900px) {
+    width: 140%!important;
+  } 
+
+  .btn-add {
+    @include btnTable("./images/icons/Add.svg", #f39200, 25px);
+    border: 1px solid #f39200 !important;
+    height: 35px;
+    padding: 0 0.2rem;
+  }
+
+  .btn-confirm {
+    @include btnTable("./images/icons/Confirm.svg", #0eb05f, 25px);
+    border: 1px solid #0eb05f !important;
+    height: 35px;
+    padding: 0 0.2rem;
+  }
+
+  .btn-cancel {
+    @include btnTable("./images/icons/CloseW.svg", #474747, 25px);
+    border: 1px solid #474747 !important;
+    height: 35px;
+    padding: 0 0.2rem;
+  }
+
+  .saida {background-color: #72e9ae;}
+  .chegada {background-color: #efbec3;}
+  .tecnico {background-color: #171717; color: #fff;}
+  .cidade {background-color: #b00505; color: #fff;}
+
+  .saida, .chegada, .tecnico, .cidade {
+    border-radius: 5px;
+    padding: 0.5rem;
+    font-weight: bold;
+  }
+}
+
+.visit-aviso {
+  width: 90%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  max-width: 500px;
+  height: 200px;
+  color: #cdcdcd;
+}
+
+.conjunta {
+  background-color: #f2fabf;
+}
+
+.confirmar {
+  background-color: #7cebb4a3;
 }

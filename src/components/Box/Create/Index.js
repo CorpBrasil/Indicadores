@@ -1,5 +1,5 @@
 import { addDoc } from "firebase/firestore";
-import { memo, useEffect, useState } from "react";
+import { memo, useEffect, useState, useRef } from "react";
 import { useForm } from "react-hook-form"; // cria formulário personalizado
 import Swal from 'sweetalert2/dist/sweetalert2.js';
 import * as moment from "moment";
@@ -16,6 +16,10 @@ import { Company, KeyMaps, Users } from "../../../data/Data";
 
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
+import RequestQuoteIcon from '@mui/icons-material/RequestQuote'; // Visita Comercial
+import PeopleIcon from '@mui/icons-material/People'; // Tecnica + Comercial
+import RestaurantIcon from '@mui/icons-material/Restaurant'; // Almoço
+import EngineeringIcon from '@mui/icons-material/Engineering'; // Pós Venda
 //import ListItemText from '@mui/material/ListItemText';
 
 import "../style.scss";
@@ -30,7 +34,8 @@ const CreateVisit = ({
   schedule,
   monthNumber,
   type,
-  createVisitGroupChoice
+  createVisitGroupChoice,
+  checkNet
 }) => {
   const { user } = useAuth();
   // const chegadaFormatadaTec = useRef();
@@ -49,22 +54,26 @@ const CreateVisit = ({
   const [saidaTexto, setSaidaTexto] = useState(undefined);
   const [chegadaTexto, setChegadaTexto] = useState(undefined);
   const [dataTexto, setDataTexto] = useState(undefined);
-  const [tecnicoTexto, setTecnicoTexto] = useState(tecs[0].nome);
+  const [tecnicoTexto, setTecnicoTexto] = useState('Nenhum');
   const [consultoraTexto, setConsultoraTexto] = useState(userRef.cargo === "Vendedor(a)" ? userRef.nome : sellers[0].nome);
   const [hoursLimit, setHoursLimit] = useState(false);
   const [city, setCity] = useState(undefined);
   const [numberAddress, setNumberAddress] = useState(undefined);
   const [addressComplete, setAddressComplete] = useState(undefined);
-  const [visits, setVisits] = useState(schedule);
+  const [visits, setVisits] = useState();
+  const [typeVisit, setTypeVisit] = useState(type); // Escolhe o tipo de visita
+  const [driver, setDriver] = useState(); // Para escolher o motorista/tecnico de acordo com o tipo de visita
   const [libraries] = useState(["places"]);
   const { register, handleSubmit } = useForm(); 
   
+  console.log(schedule)
+
   useEffect(() => {
-    if(dataTexto) {
-      filterSchedule(dataTexto, tecnicoTexto)
-    } else {
-      filterSchedule(null)
-    }
+    // if(dataTexto || driver) {
+    //   filterSchedule(dataTexto, tecnicoTexto)
+    // } else {
+    //   filterSchedule(null)
+    // }
     if(tecnicoTexto !== 'Nenhum') {
       setTecRefUID(tecs.find((tec) => tec.nome === tecnicoTexto)); 
     }
@@ -74,11 +83,42 @@ const CreateVisit = ({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dataTexto, tecnicoTexto, consultoraTexto]);
 
-  useEffect(() => {
+  useEffect(() => { // Seleciona a visita de acordo com o tipo escolhido
     const lunch = () => {
-      if(type) {
+      if(type === 'lunch') {
         setCheckInput(true);
         setVisitaNumero(3600);
+        //setTecnicoTexto(tecs[0].nome);
+      }
+      switch (type) {
+        case 'lunch':
+          setDriver(tecs.filter((ref) => ref.nome === userRef.nome))
+          //setVisits(schedule.filter((ref) => ref.tecnico === "Bruna" || ref.tecnico === "Lia"))
+          setTecnicoTexto(userRef.nome);
+          //driverRef.current = 'Bruna';
+          break
+        case 'comercial':
+          setDriver(tecs.filter((ref) => ref.nome === "Bruna" || ref.nome === "Lia"))
+          //setVisits(schedule.filter((ref) => ref.tecnico === "Bruna" || ref.tecnico === "Lia"))
+          setTecnicoTexto('Bruna');
+          //driverRef.current = 'Bruna';
+          break
+        case 'comercial_tecnica':
+          setDriver(tecs.filter((ref) => ref.nome === "Lucas" || ref.nome === "Luis"))
+          //setVisits(schedule.filter((ref) => ref.tecnico === "Lucas"))
+          setTecnicoTexto('Lucas');
+          //driverRef.current = 'Lucas';
+          break
+        case 'pos_venda':
+          setDriver(tecs.filter((ref) => ref.nome === "Lucas" || ref.nome === "Luis"))
+          //setVisits(schedule.filter((ref) => ref.tecnico === "Lucas" || ref.tecnico === "Luis"))
+          setTecnicoTexto('Lucas');
+          //driverRef.current = 'Lucas';
+          setConsultoraTexto('Pós-Venda')
+          break
+        default:
+          setDriver(tecs)
+          setVisits(schedule)
       }
       // console.log(consultora)
     };
@@ -86,16 +126,44 @@ const CreateVisit = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // useEffect(() => {
+  //   if(dataTexto) {
+  //     const visitsData = schedule.filter((visit) => visit.data === dataTexto);
+  //     if (visitsData && dataTexto.substring(8,10) !== "00") {
+  //       setVisits(visitsData);
+  //     }
+  //   } else {
+  //     setVisits(schedule);
+  //   }
+  // },[dataTexto, schedule])
+
   useEffect(() => {
+    // let visitsType = schedule.filter((visit) => visit.tecnico === "Lucas" && visit.tecnico === "Luis");
+    let visitsData;
+    let visitsType;
+    switch (type) {
+      case 'comercial':
+        visitsData = schedule.filter((visit) => visit.data === dataTexto && (visit.tecnico !== "Lucas" && visit.tecnico !== "Luis"));
+        visitsType = schedule.filter((visit) => visit.tecnico !== "Lucas" && visit.tecnico !== "Luis")
+        break
+      case 'lunch':
+        visitsData = schedule.filter((visit) => visit.data === dataTexto);
+        visitsType = schedule;
+        break
+      default:
+        visitsData = schedule.filter((visit) => visit.data === dataTexto && (visit.tecnico === "Lucas" || visit.tecnico === "Luis" || visit.categoria === 'lunch'));
+        visitsType = schedule.filter((visit) => visit.tecnico === "Lucas" || visit.tecnico === "Luis" || visit.categoria === 'lunch')
+    }
     if(dataTexto) {
-      const visitsData = schedule.filter((visit) => visit.data === dataTexto);
       if (visitsData && dataTexto.substring(8,10) !== "00") {
         setVisits(visitsData);
       }
     } else {
-      setVisits(schedule);
+      setVisits(visitsType);
+      console.log(schedule.filter((visit) => visit.tecnico !== "Lucas" && visit.tecnico !== "Luis"))
+      console.log(dataTexto)
     }
-  },[dataTexto, schedule])
+  },[dataTexto, schedule, type])
 
   useEffect(() => {
     // console.log(visitaNumero);
@@ -176,7 +244,7 @@ const CreateVisit = ({
       SaidaClienteRef = saidaCliente;
 
       chegadaCliente.add(rotaTempo, "seconds").format("hh:mm"); //Adiciona tempo de viagem volta
-      chegadaCliente.add(rotaTempo, "seconds").format("hh:mm"); //Adiciona tempo de viagem volta
+      //chegadaCliente.add(rotaTempo, "seconds").format("hh:mm"); //Adiciona tempo de viagem volta
       ChegadaEmpresaRef = chegadaTexto;
       tempoRotaRef = rotaTempo;
 
@@ -193,19 +261,20 @@ const CreateVisit = ({
       // });
 
       const dataRef = schedule.filter(
-        (dia) => dia.data === dataTexto && dia.tecnico === tecnicoTexto
+        (dia) => dia.data === dataTexto && (dia.tecnico === tecnicoTexto || (type === 'lunch' && dia.consultora === tecnicoTexto))
       );
+
+        console.log(dataRef)
+
       const lunch = schedule.filter(
         (dia) =>
           dia.data === dataTexto &&
-          dia.consultora === "Almoço Téc." &&
+          dia.categoria === "lunch" &&
           dia.tecnico === tecnicoTexto
       );
       const saidaFormatada = moment(saidaEmpresaRef, "hh:mm");
-      const chegadaFormatada = moment(SaidaClienteRef, "hh:mm");
+      const chegadaFormatada = moment(ChegadaEmpresaRef, "hh:mm");
 
-      console.log(saidaFormatada);
-      console.log(chegadaFormatada);
       let check = [];
       let visitsFind = [];
 
@@ -240,6 +309,7 @@ const CreateVisit = ({
       //     return dataRef;
       //   });
       // } else {
+
         dataRef.map((ref) => {
           // console.log("eae");
           if (
@@ -255,7 +325,7 @@ const CreateVisit = ({
         });
 
       const visitsFindCount = dataRef.length - check.length;
-      //console.log(visitsFindCount);
+      console.log(visitsFindCount);
 
       dataRef.map((a) => {
         //Percorre todos os arrays de 'dataRef' e compara se os arrays são iguais
@@ -264,9 +334,9 @@ const CreateVisit = ({
         }
         return visitsFind;
       });
-      //console.log(visitsFind);
-      let c = 1;
+      console.log(visitsFind);
 
+      let c = 1;
       if (visitsFindCount < 0 || visitsFindCount > 0) {
         const visits = visitsFind.map(
           (e) =>
@@ -310,7 +380,7 @@ const CreateVisit = ({
                 visitaNumero: 3600,
                 saidaDoCliente: SaidaClienteRef,
                 chegadaEmpresa: SaidaClienteRef,
-                consultora: "Almoço Téc.",
+                consultora: tecRefUID.nome,
                 tecnico: tecRefUID.nome,
                 tecnicoUID: tecRefUID.uid,
                 cidade: '',
@@ -322,13 +392,15 @@ const CreateVisit = ({
                 observacao: userData.observacao,
                 data: dataTexto,
                 uid: user.id,
-                cor: "#111111",
+                cor: tecRefUID.cor,
                 confirmar: false,
-                tipo: "Almoço"
+                tipo: "Almoço",
+                categoria: type,
+                corTec: tecRefUID.cor,
               });
               Swal.fire({
                 title: Company,
-                html: `O horário de almoço do Técnico <b>${tecRefUID.nome}</b> foi criado com sucesso.`,
+                html: `O horário de almoço foi criado com sucesso.`,
                 icon: "success",
                 showConfirmButton: true,
                 showCloseButton: true,
@@ -362,6 +434,8 @@ const CreateVisit = ({
                 data: dataTexto,
                 confirmar: false,
                 tipo: 'Visita',
+                categoria: type,
+                corTec: tecRefUID.cor,
               };
                   createVisitDay(visita)
             }
@@ -402,63 +476,76 @@ const CreateVisit = ({
 }
 
   const createVisitDay = async (data) => {
-     await addDoc(scheduleRef, data);
-     console.log(data)
-     const date = new Date(data.data);
-     Swal.fire({
-      title: Company,
-      html: `A visita em <b>${city}</b> foi criada com sucesso!`,
-      icon: "success",
-      showConfirmButton: true,
-      showCloseButton: true,
-      confirmButtonColor: "#F39200",
-    })
-    if(data.tecnico === "Lucas") {
-      axios.post('https://backend.botconversa.com.br/api/v1/webhooks-automation/catch/43469/qiwZHdtY6dK1/', {
-        data: moment(data.data).format("DD.MM.YYYY"),
-        nome: data.tecnico,
-        cliente: data.cliente,
-        endereco: data.endereco,
-        saida: data.saidaEmpresa,
-        marcado: data.chegadaCliente,
-        chegada: data.chegadaEmpresa,
-        tipo: data.tipo,
-        consultora: data.consultora,
-        telefone: "5515991907957",
-        lat: data.lat,
-        lng: data.lng,
-        duracao: data.visita,
-        saidaCliente: data.saidaDoCliente,
-      })
+    try {
+      if(checkNet) {
+        Swal.fire({
+          title: 'Sem Conexão',
+          icon: "error",
+          html: `Não é possível Criar uma Visita <b>sem internet.</b> Verifique a sua conexão.`,
+          confirmButtonText: "Fechar",
+          showCloseButton: true,
+          confirmButtonColor: "#d33"  
+        })
+      } else {
+        await addDoc(scheduleRef, data);
+        console.log(data)
+        const date = new Date(data.data);
+        Swal.fire({
+         title: Company,
+         html: `A visita em <b>${city}</b> foi criada com sucesso!`,
+         icon: "success",
+         showConfirmButton: true,
+         showCloseButton: true,
+         confirmButtonColor: "#F39200",
+       })
+       // if(data.categoria !== 'lunch') {
+       //   axios.post('https://backend.botconversa.com.br/api/v1/webhooks-automation/catch/43469/qiwZHdtY6dK1/', {
+       //     data: moment(data.data).format("DD.MM.YYYY"),
+       //     nome: data.tecnico,
+       //     cliente: data.cliente,
+       //     endereco: data.endereco,
+       //     saida: data.saidaEmpresa,
+       //     marcado: data.chegadaCliente,
+       //     chegada: data.chegadaEmpresa,
+       //     tipo: data.tipo,
+       //     consultora: data.consultora,
+       //     telefone: "5515991573088",
+       //     lat: data.lat,
+       //     lng: data.lng,
+       //     duracao: data.visita,
+       //     saidaCliente: data.saidaDoCliente,
+       //   })
+       // }
+       // axios.post('https://hook.us1.make.com/tmfl4xr8g9tk9qoi9jdpo1d7istl8ksd', {
+       //     data: moment(data.data).format("DD/MM/YYYY"),
+       //     nome: data.tecnico,
+       //     cliente: data.cliente,
+       //     saida: data.saidaEmpresa,
+       //     marcado: data.chegadaCliente,
+       //     consultora: data.consultora,
+       //     city: city,
+       //     duracao: data.visita,
+       //     saidaCliente: data.saidaDoCliente,
+       //     semana: getMonthlyWeekNumber(date),
+       //     mes: moment(data.data).format("M"),
+       //     ende: data.endereco,
+       //     confirmada: 'Não'
+       //   })
+   
+      return returnSchedule();
+      }
+    } catch (e) {
+      console.error('SEM CONEXÃO', e)
     }
-
-    axios.post('https://hook.us1.make.com/tmfl4xr8g9tk9qoi9jdpo1d7istl8ksd', {
-        data: moment(data.data).format("DD/MM/YYYY"),
-        nome: data.tecnico,
-        cliente: data.cliente,
-        saida: data.saidaEmpresa,
-        marcado: data.chegadaCliente,
-        consultora: data.consultora,
-        city: city,
-        duracao: data.visita,
-        saidaCliente: data.saidaDoCliente,
-        semana: getMonthlyWeekNumber(date),
-        mes: moment(data.data).format("M"),
-        ende: data.endereco,
-        confirmada: 'Não'
-      })
-
-    return returnSchedule();
   }
 
   const verifyLunch = () => {
-
-    const lunchDay = schedule.find((lunch) => lunch.data === dataTexto && lunch.tipo === "Almoço" && lunch.tecnico === tecnicoTexto)
-        if(lunchDay && type) {
+    const lunchDay = schedule.find((lunch) => lunch.data === dataTexto && lunch.categoria === "lunch" && lunch.tecnico === tecnicoTexto)
+        if(lunchDay && type === 'lunch') {
           Swal.fire({
             title: Company,
             icon: "warning",
-            html: `Já existe um horário de almoço do técnico <b>${tecnicoTexto}</b> criado nesse dia.<br/><br/>` + 
+            html: `<b>${tecnicoTexto}</b>, já existe um horário de almoço criado por você nesse dia.<br/><br/>Não é possivel ter <b>2</b> almoço da mesma pessoa no mesmo dia.<br/><br/>` + 
             `Hórario: <b>${lunchDay.chegadaCliente} - ${lunchDay.saidaDoCliente}</b>`,
             confirmButtonText: "Fechar",
             showCloseButton: true,
@@ -475,8 +562,10 @@ const CreateVisit = ({
         <div className="box-visit__close">
           <button onClick={returnSchedule} className="btn-close" />
         </div>
-        {checkInput ? <h4>Criar Almoço</h4> : <h4>Criar Visita</h4>}
-        
+        {checkInput && <h4>Criar Almoço</h4>}
+        {typeVisit === "comercial" && <h4>Criar Visita Comercial</h4>}
+        {typeVisit === "comercial_tecnica" && <h4>Criar Visita Comercial + Técnica</h4>}
+        {typeVisit === "pos_venda" && <h4>Criar Visita de Pós-Venda</h4>}
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="box-visit__container">
           {!checkInput &&
@@ -507,6 +596,7 @@ const CreateVisit = ({
                 required
               />
             </label>
+            {type === 'comercial_tecnica' ? 
             <label className="label">
               <p>Hórario Marcado  *</p>
               <input
@@ -520,8 +610,21 @@ const CreateVisit = ({
                 onChange={(e) => setHorarioTexto(e.target.value)}
                 required
               />
+                {hoursLimit && <p className="notice red">Limite de hórario: 07:00 - 18:00</p>}
+            </label>
+             : 
+              <label className="label">
+              <p>Hórario Marcado  *</p>
+              <input
+                className="label__input time"
+                type="time"
+                placeholder="Digite o hórario marcado"
+                //value={horarioTexto || ''}
+                onChange={(e) => setHorarioTexto(e.target.value)}
+                required />
               {hoursLimit && <p className="notice red">Limite de hórario: 07:00 - 18:00</p>}
             </label>
+              }
             <label className="label">
               <p>Tempo de Visita *</p>
               {checkInput ? (
@@ -552,36 +655,80 @@ const CreateVisit = ({
                 </select>
               )}
             </label>
-            {visits && visits.length > 0 ? 
-            <List
-            sx={{
-              width: '90%',
-              maxWidth: 500,            
-              bgcolor: 'background.paper',
-              position: 'relative',
-              overflow: 'auto',
-              maxHeight: 200,
-              '& ul': { padding: 0 },
-            }}>
-              {visits.map((visita, index) => (
-                <ListItem className="list-visit" sx={{ borderLeft: `10px solid ${visita.cor}` }} key={index}>
-                  <p><b>{visita.dia.substring(8,10)}</b></p>
-                  <div className="btn-add"
-                  aria-label="Criar Visita Conjunta"
-                  data-cooltipz-dir="right"
-                   onClick={() => createVisitGroupChoice(visita)}
-                  ></div>
-                  <p className="saida">{visita.saidaEmpresa}</p>
-                  <p className="chegada">{visita.chegadaEmpresa}</p>
-                  <p className="tecnico">{visita.tecnico}</p>
-                  <p className="cidade">{visita.cidade ? visita.cidade : 'ALMOÇO'}</p>
-                </ListItem>
-              ))}
-             </List>:
+            <div>
+              
+            </div>
+            {visits && visits.length > 0  ? 
+            <><h2 className="title-visits">{dataTexto ? 'Visita(s) do Dia' : 'Visitas do Mês'}</h2><List
+                sx={{
+                  width: '90%',
+                  maxWidth: 500,
+                  bgcolor: 'background.paper',
+                  position: 'relative',
+                  overflow: 'auto',
+                  maxHeight: 200,
+                  '& ul': { padding: 0 },
+                }}>
+                {visits.map((visita, index) => (
+                  <ListItem className="list-visit" sx={{ borderLeft: `10px solid ${visita.cor}` }} key={index}>
+                    <p><b>{visita.dia.substring(8, 10)}</b></p>
+                    {visita.categoria === "lunch" && <div style={{ filter: 'contrast', padding: '0.2rem' }} className="type-icon lunch" aria-label="Almoço" data-cooltipz-dir="right"><RestaurantIcon /></div>}
+                    {visita.categoria === "comercial" && <div style={{ padding: '0.2rem' }} className="type-icon comercial" aria-label="Visita Comercial" data-cooltipz-dir="right"><RequestQuoteIcon /></div>}
+                    {visita.categoria === "comercial_tecnica" && <div style={{ padding: '0.2rem' }} className="type-icon comercial_tec" aria-label="Comercial + Técnica" data-cooltipz-dir="right"><PeopleIcon /></div>}
+                    {visita.categoria === "pos_venda" && <div style={{ padding: '0.2rem' }} className="type-icon pos_venda" aria-label="Pós-Venda" data-cooltipz-dir="right"><EngineeringIcon /></div>}
+                    {visita.categoria !== 'lunch' && visita.categoria !== 'pos_venda' && type !== 'lunch' &&
+                    <div className="btn-add"
+                        aria-label="Criar Visita Conjunta"
+                        data-cooltipz-dir="right"
+                        onClick={() => createVisitGroupChoice({ visit: visita, type: type })}
+                      ></div>}
+                    {visita.categoria === 'pos_venda' && userRef && userRef.nome === 'Pós-Venda' && type !== 'lunch' && <div className="btn-add"
+                        aria-label="Criar Visita Conjunta"
+                        data-cooltipz-dir="right"
+                        onClick={() => createVisitGroupChoice({ visit: visita, type: type })}
+                      ></div>}
+                      <p className="saida">{visita.saidaEmpresa}</p>
+                      <p className="chegada">{visita.chegadaEmpresa}</p>
+                    {visita.categoria !== 'lunch' &&
+                      <p className="tecnico">{visita.tecnico}</p>}
+                      <p className="cidade">{visita.cidade ? visita.cidade : 'ALMOÇO'}</p>
+                  </ListItem>
+                ))}
+              </List></>:
              <div style={{ display: 'none!impoortant' }} className="visit-aviso">
               <h1>Nenhuma Visita Encontrada</h1>
              </div>
              }
+             {type === "lunch" ? 
+             (visitaNumero && horarioTexto ? 
+               <div className="box-visit__info prev">
+               <span className="">Previsão de Visita</span>
+               <p className="notice">
+                 Saindo às <b className="saida">{saidaTexto}</b>
+               </p>
+               <p className="notice">
+                 Chegando às <b className="chegada">{chegadaTexto}</b>
+               </p>
+             </div> :
+               <div className="visit-aviso">
+               <h2>Preencha o Horário Marcado para visualizar a Previsão de Horário</h2>
+              </div>
+             ) : 
+             (city && visitaNumero && horarioTexto ? 
+              <div className="box-visit__info prev">
+              <span className="">Previsão de Visita</span>
+              <p className="notice">
+                Saindo às <b className="saida">{saidaTexto}</b>
+              </p>
+              <p className="notice">
+                Chegando às <b className="chegada">{chegadaTexto}</b>
+              </p>
+            </div> :
+              <div className="visit-aviso">
+              <h2>Preencha o Endereço e Horário Marcado para visualizar a Previsão de Horário</h2>
+             </div>
+             )}
+            {/* {checkInput && city && visitaNumero && horarioTexto ? 
               <div className="box-visit__info prev">
               <span className="">Previsão de Visita</span>
               <p className="notice">
@@ -590,7 +737,11 @@ const CreateVisit = ({
               <p className="notice">
                 Chegando na Empresa: <b>{chegadaTexto}</b>
               </p>
-            </div>
+            </div> :
+              <div className="visit-aviso">
+              <h2>Preencha o Endereço e Horário Marcado para visualizar a previsão de horário</h2>
+             </div>
+            } */}
               {!checkInput && 
               <label className="label">
               <p>Cliente *</p>
@@ -604,7 +755,7 @@ const CreateVisit = ({
               />
             </label>
               }
-            {(user.email === Users[0].email && !type) || (userRef.cargo === "Administrador" && !type) ?
+            {(user.email === Users[0].email && !type) || (userRef.cargo === "Administrador" && type !== "lunch") ?
           <div className="label margin-top">
           <p>Consultora *</p>
           <select
@@ -618,7 +769,7 @@ const CreateVisit = ({
               ))}
           </select>
         </div> : <></>}
-        {userRef.cargo === 'Vendedor(a)' && !type &&
+        {/* {userRef.cargo === 'Vendedor(a)' && type !== "lunch" &&
           <label className="label">
           <p>Consultora *</p>
           <input
@@ -630,44 +781,47 @@ const CreateVisit = ({
             disabled
           />
         </label> 
-        }
+        } */}
           <div className="label margin-top">
-            <p>Técnico/Motorista *</p>
-            <select
-              value={tecnicoTexto || ''}
-              className="label__select"
-              name="tec"
-              onBlur={() => verifyLunch()}
-              onChange={(e) => setTecnicoTexto(e.target.value)}>
-                {tecs &&
-                tecs.map((tec, index) => (
-                  <option key={index} value={tec.nome}>{tec.nome}</option>
-                ))}
-                <option value='Nenhum'>Nenhum</option>
-            </select>
+          {checkInput && <p>Responsável</p>}
+          {typeVisit === "comercial" && <p>Motorista</p>}
+          {(typeVisit === "comercial_tecnica" || typeVisit === "pos_venda") && <p>Técnico</p>}
+           {typeVisit === 'lunch' ? 
+           <select
+           value={tecnicoTexto || ''}
+           className="label__select"
+           name="tec"
+           disabled
+           onBlur={() => verifyLunch()}
+           onChange={(e) => setTecnicoTexto(e.target.value)}>
+             {driver &&
+             driver.map((tec, index) => (
+               <option key={index} value={tec.nome}>{tec.nome}</option>
+             ))}
+         </select> : 
+         <select
+         value={tecnicoTexto || ''}
+         className="label__select"
+         name="tec"
+         onBlur={() => verifyLunch()}
+         onChange={(e) => setTecnicoTexto(e.target.value)}>
+           {driver &&
+           driver.map((tec, index) => (
+             <option key={index} value={tec.nome}>{tec.nome}</option>
+           ))}
+       </select>
+          } 
           </div>
           {!checkInput && 
           <label className="label">
             <p>Veículo *</p>
-          {tecnicoTexto !== 'Nenhum' ? 
           <input
             className="label__input"
             type="text"
             autoComplete="off"
             value={tecRefUID.veiculo || ''}
             disabled
-          /> :
-          <input
-          className="label__input"
-          type="text"
-          autoComplete="off"
-          onChange={(e) => setTecRefUID({
-            nome: 'Nenhum',
-            uid: '000',
-            veiculo: e.target.value
-          })}
-          value={tecRefUID.veiculo || ''}
-        />  }
+          />
         </label>}
           <label className="label">
             <p>Observação</p>

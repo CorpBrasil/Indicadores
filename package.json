@@ -9,6 +9,7 @@
     "@hookform/resolvers": "^2.9.10",
     "@mui/icons-material": "^5.11.16",
     "@mui/material": "^5.13.5",
+    "@oieduardorabelo/use-navigator-online": "^6.2.2",
     "@react-google-maps/api": "^2.17.1",
     "@sweetalert2/theme-material-ui": "^5.0.15",
     "@testing-library/jest-dom": "^5.16.5",
@@ -37,6 +38,7 @@
     "sass": "^1.57.1",
     "sweetalert2": "^11.7.12",
     "tippy.js": "^6.3.7",
+    "use-navigator-online": "^3.2.4",
     "web-vitals": "^2.1.4",
     "yup": "^0.32.11"
   },
