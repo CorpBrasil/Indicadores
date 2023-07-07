@@ -413,7 +413,6 @@ const CreateVisit = ({
       showCloseButton: true,
       confirmButtonColor: "#F39200",
     })
-    if(data.tecnico === "Lucas") {
       axios.post('https://backend.botconversa.com.br/api/v1/webhooks-automation/catch/43469/qiwZHdtY6dK1/', {
         data: moment(data.data).format("DD.MM.YYYY"),
         nome: data.tecnico,
@@ -424,13 +423,12 @@ const CreateVisit = ({
         chegada: data.chegadaEmpresa,
         tipo: data.tipo,
         consultora: data.consultora,
-        telefone: "5515991907957",
+        telefone: "5515991573088",
         lat: data.lat,
         lng: data.lng,
         duracao: data.visita,
         saidaCliente: data.saidaDoCliente,
       })
-    }
 
     axios.post('https://hook.us1.make.com/tmfl4xr8g9tk9qoi9jdpo1d7istl8ksd', {
         data: moment(data.data).format("DD/MM/YYYY"),
