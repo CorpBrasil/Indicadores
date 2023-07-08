@@ -9,7 +9,7 @@
 }
 
 .box-visit {
-    //width: 100vw;
+    
     display: flex;
     justify-content: center;
     margin-bottom: 1rem;
@@ -90,13 +90,13 @@
             }
 
             .time {
-                padding: 0.9rem;
+              padding: 0.9rem 1rem;
             }
 
             &__select {
-                width: 90%;
+                width: 98%;
                 margin: 1rem 0;
-                padding: 1rem;
+                padding: 1rem 0;
                 border: none;
                 border-radius: 5px;
                 color: #60666d;
@@ -120,6 +120,14 @@
           }
             }
         }
+    }
+
+    &__form {
+      width: 100%;
+      display: flex;
+      gap: 0.7rem;
+      flex-wrap: wrap;
+      justify-content: center;
     }
 
     &__info{

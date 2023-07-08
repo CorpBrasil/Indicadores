@@ -261,14 +261,14 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts, check }) => {
               const visitsDepois = visitsFind("depois", visit);
               if (visitsAntes.length > 0) {
                 visitsAntes.map(async (ref) => {
-                  const visitBefore = schedule.filter(
-                    (before) =>
-                      before.data === ref.data &&
-                      before.chegadaEmpresa === ref.saidaEmpresa &&
-                      ref.consultora !== "Almoço Téc." &&
-                      before.tipo === "Visita Conjunta" &&
-                      !before.visitaAlmoco
-                  );
+                  // const visitBefore = schedule.filter(
+                  //   (before) =>
+                  //     before.data === ref.data &&
+                  //     before.chegadaEmpresa === ref.saidaEmpresa &&
+                  //     ref.consultora !== "Almoço Téc." &&
+                  //     before.tipo === "Visita Conjunta" &&
+                  //     !before.visitaAlmoco
+                  // );
                   // if (ref.cidade === visit.cidade) {
                   //   if (visitBefore) {
                   //     visitBefore.map(async (ref) => {
@@ -306,14 +306,14 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts, check }) => {
                }
               if (visitsDepois.length > 0) {
                 visitsDepois.map(async (ref) => {
-                  const visitNext = schedule.filter(
-                    (next) =>
-                      next.data === ref.data &&
-                      next.saidaEmpresa === ref.chegadaEmpresa &&
-                      ref.consultora !== "Almoço Téc." &&
-                      next.tipo === "Visita Conjunta" &&
-                      !next.visitaAlmoco
-                  );
+                  // const visitNext = schedule.filter(
+                  //   (next) =>
+                  //     next.data === ref.data &&
+                  //     next.saidaEmpresa === ref.chegadaEmpresa &&
+                  //     ref.consultora !== "Almoço Téc." &&
+                  //     next.tipo === "Visita Conjunta" &&
+                  //     !next.visitaAlmoco
+                  // );
                   // if (ref.cidade === visit.cidade) {
                   //   if (visitNext) {
                   //     visitNext.map(async (ref) => {
@@ -447,7 +447,7 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts, check }) => {
       const visitRef = doc(dataBase, "Agendas", year, monthSelect, ref.id);
       const financeCol = collection(dataBase, "Financeiro", year, monthSelect);
       const financeRef = doc(financeCol, ref.id);
-      const date = new Date(ref.data);
+      //const date = new Date(ref.data);
       if (type === "confirm") {
         Swal.fire({
           title: Company,

@@ -29,7 +29,6 @@ import Select from '@mui/material/Select';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
-import { useNavigatorOnline } from '@oieduardorabelo/use-navigator-online';
 
 
 import './_style.scss';
@@ -44,7 +43,6 @@ const Schedules = ({ userRef, alerts, check }) => {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
   });
 
-    let { status } = useNavigatorOnline();
     const { user } = useAuth();
     const [schedules, setSchedules] = useState();
     const [posto, setPosto] = useState();

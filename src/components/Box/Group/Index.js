@@ -581,7 +581,7 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, sellers, userR
     }
 
     const createVisitDay = async (data) => {
-      //let endereco;
+      let endereco;
       await addDoc(scheduleRef, data);
       Swal.fire({
        title: Company,
@@ -591,45 +591,43 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, sellers, userR
        showCloseButton: true,
        confirmButtonColor: "#F39200",
      })
-    //  if(data.endereco.length < 3) {
-    //   endereco = city;
-    //  } else {
-    //   endereco = data.endereco;
-    //  }
-    //  if(data.tecnico === "Lucas") {
-    //   axios.post('https://backend.botconversa.com.br/api/v1/webhooks-automation/catch/43469/qiwZHdtY6dK1/', {
-    //     data: moment(data.data).format("DD.MM.YYYY"),
-    //     nome: data.tecnico,
-    //     cliente: data.cliente,
-    //     endereco: endereco,
-    //     saida: data.saidaEmpresa,
-    //     marcado: data.chegadaCliente,
-    //     chegada: data.chegadaEmpresa,
-    //     tipo: data.tipo,
-    //     consultora: data.consultora,
-    //     telefone: "5515991907957",
-    //     lat: data.lat,
-    //     lng: data.lng,
-    //     duracao: data.visita,
-    //     saidaCliente: data.saidaDoCliente
-    //   })
-    // }
-    // const date = new Date(data.data);
-    // axios.post('https://hook.us1.make.com/tmfl4xr8g9tk9qoi9jdpo1d7istl8ksd', {
-    //     data: moment(data.data).format("DD/MM/YYYY"),
-    //     nome: data.tecnico,
-    //     cliente: data.cliente,
-    //     saida: data.saidaEmpresa,
-    //     marcado: data.chegadaCliente,
-    //     consultora: data.consultora,
-    //     city: city,
-    //     duracao: data.visita,
-    //     saidaCliente: data.saidaDoCliente,
-    //     semana: getMonthlyWeekNumber(date),
-    //     mes: moment(data.data).format("M"),
-    //     ende: data.endereco,
-    //     confirmada: 'Não'
-    //   })
+     if(data.endereco.length < 3) {
+      endereco = city;
+     } else {
+      endereco = data.endereco;
+     }
+      axios.post('https://backend.botconversa.com.br/api/v1/webhooks-automation/catch/43469/qiwZHdtY6dK1/', {
+        data: moment(data.data).format("DD.MM.YYYY"),
+        nome: data.tecnico,
+        cliente: data.cliente,
+        endereco: endereco,
+        saida: data.saidaEmpresa,
+        marcado: data.chegadaCliente,
+        chegada: data.chegadaEmpresa,
+        tipo: data.tipo,
+        consultora: data.consultora,
+        telefone: "5515991907957",
+        lat: data.lat,
+        lng: data.lng,
+        duracao: data.visita,
+        saidaCliente: data.saidaDoCliente
+      })
+    const date = new Date(data.data);
+    axios.post('https://hook.us1.make.com/tmfl4xr8g9tk9qoi9jdpo1d7istl8ksd', {
+        data: moment(data.data).format("DD/MM/YYYY"),
+        nome: data.tecnico,
+        cliente: data.cliente,
+        saida: data.saidaEmpresa,
+        marcado: data.chegadaCliente,
+        consultora: data.consultora,
+        city: city,
+        duracao: data.visita,
+        saidaCliente: data.saidaDoCliente,
+        semana: getMonthlyWeekNumber(date),
+        mes: moment(data.data).format("M"),
+        ende: data.endereco,
+        confirmada: 'Não'
+      })
      return returnSchedule();
    }
 
@@ -673,6 +671,7 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, sellers, userR
         {typeRef === "pos_venda" && <h4>Visita Conjunta (Pós-Venda)</h4>}
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="box-visit__container">
+          <div className="box-visit__form">
             <label className="label">
             <p data-cooltipz-size="fit"
                  aria-label={tempoTexto1 && tempoTexto2 && `Tempo da Rota: ${tempoTexto1} | Cidade: ${city} | N° ${numberAddress ? numberAddress + ' ✅' : '❌'}`}
@@ -725,6 +724,7 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, sellers, userR
                   <option value={7200}>02:00</option>
             </select>
             </label>
+            </div>
             {visits && visits.length > 0 ? 
             <><h2 className="title-visits">Visita(s) do Dia</h2><List
                 sx={{
@@ -740,10 +740,10 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, sellers, userR
                 {visits.map((visita, index) => (
                   <ListItem className="list-visit" sx={{ borderLeft: `10px solid ${visita.cor}` }} key={index}>
                     <p><b>{visita.dia.substring(8, 10)}</b></p>
-                    {visita.categoria === "lunch" && <td style={{ filter: 'contrast' }} className="type-icon lunch" aria-label="Almoço" data-cooltipz-dir="right"><RestaurantIcon /></td>}
-                    {visita.categoria === "comercial" && <td className="type-icon comercial" aria-label="Visita Comercial" data-cooltipz-dir="right"><RequestQuoteIcon /></td>}
-                    {visita.categoria === "comercial_tecnica" && <td className="type-icon comercial_tec" aria-label="Comercial + Técnica" data-cooltipz-dir="right"><PeopleIcon /></td>}
-                    {visita.categoria === "pos_venda" && <td className="type-icon pos_venda" aria-label="Pós-Venda" data-cooltipz-dir="right"><EngineeringIcon /></td>}
+                    {visita.categoria === "lunch" && <div style={{ filter: 'contrast' }} className="type-icon lunch" aria-label="Almoço" data-cooltipz-dir="right"><RestaurantIcon /></div>}
+                    {visita.categoria === "comercial" && <div className="type-icon comercial" aria-label="Visita Comercial" data-cooltipz-dir="right"><RequestQuoteIcon /></div>}
+                    {visita.categoria === "comercial_tecnica" && <div className="type-icon comercial_tec" aria-label="Comercial + Técnica" data-cooltipz-dir="right"><PeopleIcon /></div>}
+                    {visita.categoria === "pos_venda" && <div className="type-icon pos_venda" aria-label="Pós-Venda" data-cooltipz-dir="right"><EngineeringIcon /></div>}
                     <p className="saida">{type === 'antes' && visitRef.id === visita.id ? visitRef.chegadaCliente : visita.saidaEmpresa}</p>
                     <p className="chegada">{type === 'depois' && visitRef.id === visita.id ? visitRef.saidaDoCliente : visita.chegadaEmpresa}</p>
                     {visita.categoria !== "lunch" &&
@@ -770,6 +770,7 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, sellers, userR
             <h2>Preencha o endereço para visualizar a Previsão de Horário</h2>
            </div>
           }
+            <div className="box-visit__form">
             <label className="label">
               <p>Cliente *</p>
               <input
@@ -854,6 +855,7 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, sellers, userR
               {...register("observacao")}
             />
           </label>
+          </div>
           </div>
           <input className="box-visit__btn" type="submit" value="CRIAR" />
         </form>

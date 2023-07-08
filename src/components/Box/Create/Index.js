@@ -1,5 +1,5 @@
 import { addDoc } from "firebase/firestore";
-import { memo, useEffect, useState, useRef } from "react";
+import { memo, useEffect, useState } from "react";
 import { useForm } from "react-hook-form"; // cria formulário personalizado
 import Swal from 'sweetalert2/dist/sweetalert2.js';
 import * as moment from "moment";
@@ -61,7 +61,7 @@ const CreateVisit = ({
   const [numberAddress, setNumberAddress] = useState(undefined);
   const [addressComplete, setAddressComplete] = useState(undefined);
   const [visits, setVisits] = useState();
-  const [typeVisit, setTypeVisit] = useState(type); // Escolhe o tipo de visita
+  const [typeVisit] = useState(type); // Escolhe o tipo de visita
   const [driver, setDriver] = useState(); // Para escolher o motorista/tecnico de acordo com o tipo de visita
   const [libraries] = useState(["places"]);
   const { register, handleSubmit } = useForm(); 
@@ -498,39 +498,39 @@ const CreateVisit = ({
          showCloseButton: true,
          confirmButtonColor: "#F39200",
        })
-       // if(data.categoria !== 'lunch') {
-       //   axios.post('https://backend.botconversa.com.br/api/v1/webhooks-automation/catch/43469/qiwZHdtY6dK1/', {
-       //     data: moment(data.data).format("DD.MM.YYYY"),
-       //     nome: data.tecnico,
-       //     cliente: data.cliente,
-       //     endereco: data.endereco,
-       //     saida: data.saidaEmpresa,
-       //     marcado: data.chegadaCliente,
-       //     chegada: data.chegadaEmpresa,
-       //     tipo: data.tipo,
-       //     consultora: data.consultora,
-       //     telefone: "5515991573088",
-       //     lat: data.lat,
-       //     lng: data.lng,
-       //     duracao: data.visita,
-       //     saidaCliente: data.saidaDoCliente,
-       //   })
-       // }
-       // axios.post('https://hook.us1.make.com/tmfl4xr8g9tk9qoi9jdpo1d7istl8ksd', {
-       //     data: moment(data.data).format("DD/MM/YYYY"),
-       //     nome: data.tecnico,
-       //     cliente: data.cliente,
-       //     saida: data.saidaEmpresa,
-       //     marcado: data.chegadaCliente,
-       //     consultora: data.consultora,
-       //     city: city,
-       //     duracao: data.visita,
-       //     saidaCliente: data.saidaDoCliente,
-       //     semana: getMonthlyWeekNumber(date),
-       //     mes: moment(data.data).format("M"),
-       //     ende: data.endereco,
-       //     confirmada: 'Não'
-       //   })
+       if(data.categoria !== 'lunch') {
+         axios.post('https://backend.botconversa.com.br/api/v1/webhooks-automation/catch/43469/qiwZHdtY6dK1/', {
+           data: moment(data.data).format("DD.MM.YYYY"),
+           nome: data.tecnico,
+           cliente: data.cliente,
+           endereco: data.endereco,
+           saida: data.saidaEmpresa,
+           marcado: data.chegadaCliente,
+           chegada: data.chegadaEmpresa,
+           tipo: data.tipo,
+           consultora: data.consultora,
+           telefone: "5515991573088",
+           lat: data.lat,
+           lng: data.lng,
+           duracao: data.visita,
+           saidaCliente: data.saidaDoCliente,
+         })
+       }
+       axios.post('https://hook.us1.make.com/tmfl4xr8g9tk9qoi9jdpo1d7istl8ksd', {
+           data: moment(data.data).format("DD/MM/YYYY"),
+           nome: data.tecnico,
+           cliente: data.cliente,
+           saida: data.saidaEmpresa,
+           marcado: data.chegadaCliente,
+           consultora: data.consultora,
+           city: city,
+           duracao: data.visita,
+           saidaCliente: data.saidaDoCliente,
+           semana: getMonthlyWeekNumber(date),
+           mes: moment(data.data).format("M"),
+           ende: data.endereco,
+           confirmada: 'Não'
+         })
    
       return returnSchedule();
       }
@@ -568,6 +568,7 @@ const CreateVisit = ({
         {typeVisit === "pos_venda" && <h4>Criar Visita de Pós-Venda</h4>}
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="box-visit__container">
+          <div className="box-visit__form">
           {!checkInput &&
                 <label className="label">
                 <p data-cooltipz-size="fit"
@@ -625,6 +626,7 @@ const CreateVisit = ({
               {hoursLimit && <p className="notice red">Limite de hórario: 07:00 - 18:00</p>}
             </label>
               }
+              {type !== 'lunch' && 
             <label className="label">
               <p>Tempo de Visita *</p>
               {checkInput ? (
@@ -655,8 +657,7 @@ const CreateVisit = ({
                 </select>
               )}
             </label>
-            <div>
-              
+              }
             </div>
             {visits && visits.length > 0  ? 
             <><h2 className="title-visits">{dataTexto ? 'Visita(s) do Dia' : 'Visitas do Mês'}</h2><List
@@ -742,6 +743,7 @@ const CreateVisit = ({
               <h2>Preencha o Endereço e Horário Marcado para visualizar a previsão de horário</h2>
              </div>
             } */}
+            <div className="box-visit__form">
               {!checkInput && 
               <label className="label">
               <p>Cliente *</p>
@@ -833,6 +835,7 @@ const CreateVisit = ({
               {...register("observacao")}
             />
           </label>
+          </div>
           </div>
           <input className="box-visit__btn" type="submit" value="CRIAR" />
         </form>

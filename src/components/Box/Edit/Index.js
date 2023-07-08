@@ -689,6 +689,7 @@ const EditVisit = ({
         {type === "pos_venda" && <h4>Editar Visita de Pós-Venda</h4>}
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="box-visit__container">
+          <div className="box-visit__form">
           {visitRef.categoria !== "lunch" && (
             <>
               <label className="label">
@@ -818,6 +819,7 @@ const EditVisit = ({
                 </select>
               )}
             </label>
+            </div>
             {visits && visits.length > 0 ? 
             <><h2 className="title-visits">{dataTexto ? 'Visita(s) do Dia' : 'Visitas do Mês'}</h2><List
             sx={{
@@ -854,6 +856,7 @@ const EditVisit = ({
                 Chegando às <b className="chegada">{chegadaTexto}</b>
               </p>
             </div>
+            <div className="box-visit__form">
             {(user.email === Users[0].email || userRef.cargo === "Administrador") && visitRef.tipo !== "Almoço" &&
             <><label className="label">
                 <p>Cliente *</p>
@@ -955,6 +958,7 @@ const EditVisit = ({
                 {...register("observacao")}
               />
             </label>
+            </div>
           </div>
           <input className="box-visit__btn" type="submit" value="EDITAR" />
         </form>
