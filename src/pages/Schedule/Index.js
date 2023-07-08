@@ -1362,7 +1362,7 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts, check }) => {
                   </ListItem>
                 ))}
                </List>:
-               <div style={{ display: 'none!important' }} className="visit-aviso">
+               <div style={{ display: 'none!important', margin: 'auto' }} className="visit-aviso">
                 <h1>Nenhuma Visita Encontrada</h1>
                </div>
           }
