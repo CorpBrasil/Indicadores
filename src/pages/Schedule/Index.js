@@ -841,7 +841,7 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts, check }) => {
     <div className="container-schedule">
       <Header user={user} userRef={userRef} alerts={alerts}></Header>
       <div className="title-schedule">
-        <h2>Visita - Agenda {year} </h2>
+        <h2>Agenda {year} </h2>
       </div>
       <div className="content-schedule-visit">
         <div className="box-schedule-visit" ref={boxVisitRef}>

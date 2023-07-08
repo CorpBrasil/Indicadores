@@ -789,6 +789,8 @@ const EditVisit = ({
                 <p className="notice red">Limite de hórario: 07:00 - 18:00</p>
               )}
             </label>
+            {visitRef.categoria !== 'lunch' && 
+            
             <label className="label">
               <p>Tempo de Visita *</p>
               {visitRef.categoria === "lunch" || !checkInput ? (
@@ -819,6 +821,7 @@ const EditVisit = ({
                 </select>
               )}
             </label>
+            }
             </div>
             {visits && visits.length > 0 ? 
             <><h2 className="title-visits">{dataTexto ? 'Visita(s) do Dia' : 'Visitas do Mês'}</h2><List
