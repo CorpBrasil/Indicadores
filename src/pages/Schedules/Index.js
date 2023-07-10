@@ -175,10 +175,10 @@ const Schedules = ({ userRef, alerts, check }) => {
     setLitro(value);
   };
 
-  const handleOnValueChange2 = (value) => {
-    setRawValue(value === undefined ? "undefined" : value || " ");
-    setTotal(value);
-  };
+  // const handleOnValueChange2 = (value) => {
+  //   setRawValue(value === undefined ? "undefined" : value || " ");
+  //   setTotal(value);
+  // };
 
   useEffect( () => {
     if(!cidade && lng) {
@@ -196,14 +196,21 @@ const Schedules = ({ userRef, alerts, check }) => {
   },[cidade,lat,lng, open])
 
   const sendData = (e) => {
-    e.preventDefault();
+     e.preventDefault();
     if(cidade) {
       const totalFormat = total.replace(',',".");
       const litroFormat = litro.replace(',',".");
+<<<<<<< HEAD
       // const precoTotal = (totalFormat * litroFormat).toFixed(2);
       // const precoTotalFormat = precoTotal.replace('.',",");
       // console.log(precoTotalFormat)
       const litros = (totalFormat/litroFormat).toFixed(2);
+=======
+      const precoTotal = (totalFormat * litroFormat).toFixed(2);
+      const precoTotalFormat = precoTotal.replace('.',",");
+      console.log(precoTotalFormat)
+      //const litros = (totalFormat/litroFormat).toFixed(2);
+>>>>>>> 4e3b873d69efb5bfe022964ae699702fcda4c9ed
       setOpen(false);
         Swal.fire({
           title: 'Atenção',
@@ -211,8 +218,13 @@ const Schedules = ({ userRef, alerts, check }) => {
           `Nome do Posto: <b>${posto}</b> </br>` +
           `Quilometragem: <b>${km}</b> </br>` +
           `Preço por Litro: <b>R$ ${litro}</b> </br>` +
+<<<<<<< HEAD
           `Quantidade de Litro: <b>${litros}</b> </br>` +
           `Preço Total: <b>R$ ${total}</b> </br>` +
+=======
+          `Quantidade de Litro: <b>${total}</b> </br>` +
+          `Preço Total: <b>R$ ${precoTotalFormat}</b> </br>` +
+>>>>>>> 4e3b873d69efb5bfe022964ae699702fcda4c9ed
           `Combustivel: <b>${combustivel}</b> </br>` +
           `Veiculo: <b>${findTec.veiculo}</b>`,
           icon: "warning",
@@ -229,8 +241,13 @@ const Schedules = ({ userRef, alerts, check }) => {
               nome: posto,
               km: km,
               litro: litro,
+<<<<<<< HEAD
               QtdeLitro: `R$ ${total}`,
               total: litros,
+=======
+              QtdeLitro: `R$ ${precoTotalFormat}`,
+              total: total,
+>>>>>>> 4e3b873d69efb5bfe022964ae699702fcda4c9ed
               lat: lat,
               lng: lng,
               cidade: cidade.long_name,
@@ -395,7 +412,7 @@ const Schedules = ({ userRef, alerts, check }) => {
           required
           fullWidth
           />
-          <CurrencyInput
+          {/* <CurrencyInput
           customInput={TextField}
           style={{ margin: '0.4rem 0rem 0.7rem 0' }}
           className="label__text"
@@ -407,6 +424,17 @@ const Schedules = ({ userRef, alerts, check }) => {
           value={total || ''}
           required
           fullWidth
+          /> */}
+          <TextField
+            margin="dense"
+            id="name"
+            label="Quantidade Total de Litro"
+            type="number"
+            onChange={(e) => setTotal(e.target.value)}
+            value={total  || ''}
+            fullWidth
+            required
+            variant="outlined"
           />
           {/* <TextField
             margin="dense"
