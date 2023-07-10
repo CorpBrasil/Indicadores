@@ -168,7 +168,7 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts, check }) => {
   };
 
   const permission = (visit) => { //Permissão
-    console.log(visit)
+    // console.log(visit)
     if(visit.categoria === 'lunch') {
       if(visit.consultora === userRef.nome || userRef.cargo === 'Administrador') return true;
     }
@@ -447,7 +447,7 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts, check }) => {
       const visitRef = doc(dataBase, "Agendas", year, monthSelect, ref.id);
       const financeCol = collection(dataBase, "Financeiro", year, monthSelect);
       const financeRef = doc(financeCol, ref.id);
-      //const date = new Date(ref.data);
+      const date = new Date(ref.data);
       if (type === "confirm") {
         Swal.fire({
           title: Company,
@@ -479,18 +479,19 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts, check }) => {
                 veiculo: ref.veiculo,
               });
             }
-            // axios.post('https://hook.us1.make.com/tmfl4xr8g9tk9qoi9jdpo1d7istl8ksd', {
-            //   data: moment(ref.data).format("DD/MM/YYYY"),
-            //   nome: ref.tecnico,
-            //   cliente: ref.cliente,
-            //   marcado: ref.chegadaCliente,
-            //   consultora: ref.consultora,
-            //   city: ref.cidade,
-            //   semana: getMonthlyWeekNumber(date),
-            //   mes: moment(ref.data).format("M"),
-            //   ende: ref.endereco,
-            //   confirmada: 'Sim'
-            // })
+            axios.post('https://hook.us1.make.com/tmfl4xr8g9tk9qoi9jdpo1d7istl8ksd', {
+              data: moment(ref.data).format("DD/MM/YYYY"),
+              nome: ref.tecnico,
+              cliente: ref.cliente,
+              marcado: ref.chegadaCliente,
+              consultora: ref.consultora,
+              city: ref.cidade,
+              semana: getMonthlyWeekNumber(date),
+              mes: moment(ref.data).format("M"),
+              ende: ref.endereco,
+              confirmada: 'Sim',
+              categoria: ref.categoria
+            })
             Swal.fire({
               title: Company,
               html: `A Visita em <b>${ref.cidade}</b> foi confirmada com sucesso.`,
@@ -514,18 +515,19 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts, check }) => {
           cancelButtonText: "Não",
         }).then(async (result) => {
           if (result.isConfirmed) {
-            // axios.post('https://hook.us1.make.com/tmfl4xr8g9tk9qoi9jdpo1d7istl8ksd', {
-            //   data: moment(ref.data).format("DD/MM/YYYY"),
-            //   nome: ref.tecnico,
-            //   cliente: ref.cliente,
-            //   marcado: ref.chegadaCliente,
-            //   consultora: ref.consultora,
-            //   city: ref.cidade,
-            //   semana: getMonthlyWeekNumber(date),
-            //   mes: moment(ref.data).format("M"),
-            //   ende: ref.endereco,
-            //   confirmada: 'Não'
-            // })
+            axios.post('https://hook.us1.make.com/tmfl4xr8g9tk9qoi9jdpo1d7istl8ksd', {
+              data: moment(ref.data).format("DD/MM/YYYY"),
+              nome: ref.tecnico,
+              cliente: ref.cliente,
+              marcado: ref.chegadaCliente,
+              consultora: ref.consultora,
+              city: ref.cidade,
+              semana: getMonthlyWeekNumber(date),
+              mes: moment(ref.data).format("M"),
+              ende: ref.endereco,
+              confirmada: 'Não',
+              categoria: ref.categoria
+            })
             Swal.fire({
               title: Company,
               html: `A Visita em <b>${ref.cidade}</b> foi cancelada com sucesso.`,
@@ -550,7 +552,7 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts, check }) => {
   };
 
   const createVisitGroupChoice = (ref) => {
-    console.log(ref)
+    // console.log(ref)
     Swal.fire({
       title: Company,
       html: `Você deseja criar a visita conjunta <b>antes</b> ou <b>depois</b> da visita escolhida? </br></br>
@@ -659,7 +661,7 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts, check }) => {
   };
 
   const viewVisita = (visit, type) => {
-    console.log(visit);
+    // console.log(visit);
     let visitType, visitInfo;
     let observacao = ''; 
     if (visit.observacao) {
@@ -696,7 +698,7 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts, check }) => {
     ;
   }
     if(type === 'lunch') {
-      console.log(userRef)
+      // console.log(userRef)
       Swal.fire({
         title: visitType.tittle,
         html: visitInfo,

@@ -12,7 +12,7 @@ import {
   useLoadScript,
 } from "@react-google-maps/api";
 import "moment/locale/pt-br";
-import { Company, KeyMaps, Users } from "../../../data/Data";
+import { Company, KeyMaps } from "../../../data/Data";
 
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
@@ -66,7 +66,7 @@ const CreateVisit = ({
   const [libraries] = useState(["places"]);
   const { register, handleSubmit } = useForm(); 
   
-  console.log(schedule)
+  // console.log(schedule)
 
   useEffect(() => {
     // if(dataTexto || driver) {
@@ -160,8 +160,8 @@ const CreateVisit = ({
       }
     } else {
       setVisits(visitsType);
-      console.log(schedule.filter((visit) => visit.tecnico !== "Lucas" && visit.tecnico !== "Luis"))
-      console.log(dataTexto)
+      // console.log(schedule.filter((visit) => visit.tecnico !== "Lucas" && visit.tecnico !== "Luis"))
+      // console.log(dataTexto)
     }
   },[dataTexto, schedule, type])
 
@@ -264,7 +264,7 @@ const CreateVisit = ({
         (dia) => dia.data === dataTexto && (dia.tecnico === tecnicoTexto || (type === 'lunch' && dia.consultora === tecnicoTexto))
       );
 
-        console.log(dataRef)
+        // console.log(dataRef)
 
       const lunch = schedule.filter(
         (dia) =>
@@ -325,7 +325,7 @@ const CreateVisit = ({
         });
 
       const visitsFindCount = dataRef.length - check.length;
-      console.log(visitsFindCount);
+      // console.log(visitsFindCount);
 
       dataRef.map((a) => {
         //Percorre todos os arrays de 'dataRef' e compara se os arrays são iguais
@@ -334,7 +334,7 @@ const CreateVisit = ({
         }
         return visitsFind;
       });
-      console.log(visitsFind);
+      // console.log(visitsFind);
 
       let c = 1;
       if (visitsFindCount < 0 || visitsFindCount > 0) {
@@ -488,7 +488,7 @@ const CreateVisit = ({
         })
       } else {
         await addDoc(scheduleRef, data);
-        console.log(data)
+        // console.log(data)
         const date = new Date(data.data);
         Swal.fire({
          title: Company,
@@ -514,6 +514,7 @@ const CreateVisit = ({
            lng: data.lng,
            duracao: data.visita,
            saidaCliente: data.saidaDoCliente,
+           categoria: data.categoria
          })
        }
        axios.post('https://hook.us1.make.com/tmfl4xr8g9tk9qoi9jdpo1d7istl8ksd', {
@@ -529,7 +530,8 @@ const CreateVisit = ({
            semana: getMonthlyWeekNumber(date),
            mes: moment(data.data).format("M"),
            ende: data.endereco,
-           confirmada: 'Não'
+           confirmada: 'Não',
+           categoria: data.categoria
          })
    
       return returnSchedule();
@@ -757,7 +759,7 @@ const CreateVisit = ({
               />
             </label>
               }
-            {(user.email === Users[0].email && !type) || (userRef.cargo === "Administrador" && type !== "lunch") ?
+          {(userRef.cargo === "Administrador" && type !== "lunch" && type !== 'pos_venda') ?
           <div className="label margin-top">
           <p>Consultora *</p>
           <select

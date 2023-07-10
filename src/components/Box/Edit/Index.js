@@ -152,8 +152,8 @@ const EditVisit = ({
       }
     } else {
       setVisits(visitsType);
-      console.log(schedule.filter((visit) => visit.tecnico !== "Lucas" && visit.tecnico !== "Luis"))
-      console.log(dataTexto)
+      // console.log(schedule.filter((visit) => visit.tecnico !== "Lucas" && visit.tecnico !== "Luis"))
+      // console.log(dataTexto)
     }
   },[dataTexto, schedule, type])
 
@@ -323,7 +323,7 @@ const EditVisit = ({
   
         saidaEmpresaRef = saidaTexto;
   
-        console.log(saidaTexto)
+        // console.log(saidaTexto)
   
         SaidaClienteRef = saidaCliente;
   
@@ -353,7 +353,7 @@ const EditVisit = ({
         saidaFormatada.add(1, "minutes").format("hh:mm");
         chegadaFormatada.subtract(1, "minutes").format("hh:mm");
   
-        console.log(saidaEmpresaRef);
+        // console.log(saidaEmpresaRef);
         //console.log(chegadaFormatada)
   
         let check = [];
@@ -881,18 +881,28 @@ const EditVisit = ({
                       ))}
                   </select>
                 </div></>}
-        {type !== 'lunch' &&
-            <label className="label">
-                  <p>Consultora *</p>
-                  <input
-                    className="label__input"
-                    type="text"
-                    value={consultoraTexto || ''}
-                    placeholder="Digite o nome do Cliente"
-                    autoComplete="off"
-                    disabled />
-                </label>
-        }
+                {type !== 'lunch' && userRef && userRef.cargo !== 'Administrador' &&
+                <label className="label">
+                <p>Cliente *</p>
+                <input
+                  className="label__input"
+                  placeholder="Digite a cidade"
+                  {...register("cliente")}
+                  required />
+              </label>
+                }
+              {/* {userRef && userRef.cargo !== 'Administrador' &&
+                  <label className="label">
+                        <p>Consultora *</p>
+                        <input
+                          className="label__input"
+                          type="text"
+                          value={consultoraTexto || ''}
+                          placeholder="Digite o nome do Cliente"
+                          autoComplete="off"
+                          disabled />
+                      </label>
+              } */}
             <div className="label margin-top">
             {type === "lunch" && <p>Responsável</p>}
             {type === "comercial" && <p>Motorista</p>}

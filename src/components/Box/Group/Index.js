@@ -67,7 +67,7 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, sellers, userR
   } = useForm();
 
   //console.log(visitRef);
-  console.log(typeRef);
+  // console.log(typeRef);
 
 
   const { isLoaded } = useLoadScript({
@@ -170,7 +170,7 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, sellers, userR
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  console.log(driver)
+  // console.log(driver)
 
   useEffect(() => {
     if(dataTexto) {
@@ -271,7 +271,7 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, sellers, userR
           (dia.tecnicoUID === visitRef.tecnicoUID || (dia.categoria === 'lunch' && dia.tecnico === consultoraTexto))
         );
   
-        console.log(dataRef);
+        // console.log(dataRef);
         // const lunch = schedule.filter(
         //   (dia) =>
         //     dia.data === dataTexto &&
@@ -610,7 +610,8 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, sellers, userR
         lat: data.lat,
         lng: data.lng,
         duracao: data.visita,
-        saidaCliente: data.saidaDoCliente
+        saidaCliente: data.saidaDoCliente,
+        categoria: data.categoria
       })
     const date = new Date(data.data);
     axios.post('https://hook.us1.make.com/tmfl4xr8g9tk9qoi9jdpo1d7istl8ksd', {
@@ -626,7 +627,8 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, sellers, userR
         semana: getMonthlyWeekNumber(date),
         mes: moment(data.data).format("M"),
         ende: data.endereco,
-        confirmada: 'Não'
+        confirmada: 'Não',
+        categoria: data.categoria
       })
      return returnSchedule();
    }
