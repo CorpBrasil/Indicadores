@@ -780,7 +780,7 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts, check }) => {
         cancelButtonText: 'Excluir',
       }).then((result) => {
         if(result.isConfirmed) {
-            window.open(`https://maps.google.com/?q=${visit.lat},${visit.lng}`, "_blank");
+            window.open(`https://waze.com/ul?ll=${visit.lat},${visit.lng}`, "_blank");
             //return handleBoxVisitRef();
         } else if(result.isDenied) {
           if(check) {
