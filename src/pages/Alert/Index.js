@@ -36,7 +36,7 @@ const Alert = ({user,  userRef, alerts, check}) => {
     2: 'Não tem Interesse',
     3: 'Curioso',
     4: 'Em Atendimento',
-    5: 'Tem interesse',
+    5: 'Tem interesse Futuro',
     6: 'Potencial',
   };
 
