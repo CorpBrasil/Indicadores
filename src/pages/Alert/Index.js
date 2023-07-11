@@ -24,7 +24,7 @@ import "cooltipz-css";
 import "./_style.scss";
 
 const Alert = ({user,  userRef, alerts, check}) => {
-  const [value, setValue] = useState(2);
+  const [value, setValue] = useState(1);
   const [hover, setHover] = useState(-1);
   const [open, setOpen] = useState(false);
   const [lead, setLead] = useState(null);
