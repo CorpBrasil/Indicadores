@@ -32,11 +32,12 @@ const Alert = ({user,  userRef, alerts, check}) => {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
   });
   const qualificacao = {
-    1: 'Não Respondeu',
-    2: 'Curioso',
-    3: 'Em Atendimento',
-    4: 'Tem Interesse',
-    5: 'Potencial',
+    1: 'Não Qualificado',
+    2: 'Não tem Interesse',
+    3: 'Curioso',
+    4: 'Em Atendimento',
+    5: 'Tem interesse',
+    6: 'Potencial',
   };
 
   const getLabelText = (value) => {
@@ -213,6 +214,7 @@ const Alert = ({user,  userRef, alerts, check}) => {
                       name="hover-feedback"
                       value={value}
                       precision={1}
+                      max={6}
                       getLabelText={getLabelText}
                       onChange={(event, newValue) => {
                         setValue(newValue);

@@ -627,7 +627,7 @@ const EditVisit = ({
                   ende: visitRef.endereco,
                   confirmada: 'Não'
                 })
-              }
+              } 
               Swal.fire({
                 title: Company,
                 html: `${msg2} com sucesso.`,
