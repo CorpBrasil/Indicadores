@@ -1312,7 +1312,7 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts, check }) => {
                 '& ul': { padding: 0 },
               }}>
                 {schedule.map((visita, index) => (
-                  <ListItem className={`list-visit ${visita.tipo === 'Visita Conjunta' && !visita.confirmar ? 'conjunta' : ''} ${visita.confirmar ? 'confirmar' : ''}`} sx={{ borderLeft: `10px solid ${visita.cor}` }} key={index}>
+                  <ListItem className={`list-visit ${visita.tipo === 'Visita Conjunta' && !visita.confirmar ? 'conjunta' : ''} ${visita.confirmar ? 'confirmar' : ''}`} sx={{ borderLeft: `20px solid ${visita.cor}` }} key={index}>
                     <p><b>{visita.dia.substring(8,10)}</b></p>
                     {visita.categoria === "lunch" && <div onClick={() => viewVisita(visita, visita.categoria)} style={{ filter: 'contrast', padding: '0.2rem' }} className="type-icon lunch" aria-label="Almoço" data-cooltipz-dir="right"><RestaurantIcon /></div>}
                     {visita.categoria === "comercial" && <div onClick={() => viewVisita(visita, visita.categoria)} style={{ padding: '0.2rem' }} className="type-icon comercial" aria-label="Visita Comercial" data-cooltipz-dir="right"><RequestQuoteIcon /></div>}
