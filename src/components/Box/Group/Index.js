@@ -606,7 +606,7 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, sellers, userR
         chegada: data.chegadaEmpresa,
         tipo: data.tipo,
         consultora: data.consultora,
-        telefone: "5515991907957",
+        telefone: "5515991832181",
         lat: data.lat,
         lng: data.lng,
         duracao: data.visita,
