@@ -5,9 +5,12 @@ import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import Button from '@mui/material/Button';
 import  Swal  from "sweetalert2/dist/sweetalert2";
 import axios from 'axios';
-import Rating from '@mui/material/Rating';
 import { dataBase } from "../../firebase/database";
 import StarIcon from '@mui/icons-material/Star';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import Select from '@mui/material/Select';
 
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
@@ -24,30 +27,25 @@ import "cooltipz-css";
 import "./_style.scss";
 
 const Alert = ({user,  userRef, alerts, check}) => {
-  const [value, setValue] = useState(1);
-  const [hover, setHover] = useState(-1);
+  // const [value, setValue] = useState(1);
+  // const [hover, setHover] = useState(-1);
+  
+  const [qualificacao, setQualificacao] = useState('');
   const [open, setOpen] = useState(false);
   const [lead, setLead] = useState(null);
   const Alert = forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
   });
-  const qualificacao = {
-    1: 'Não Qualificado',
-    2: 'Não tem Interesse',
-    3: 'Curioso',
-    4: 'Em Atendimento',
-    5: 'Tem interesse Futuro',
-    6: 'Potencial',
-  };
 
-  const getLabelText = (value) => {
-    return `${value} Star${value !== 1 ? 's' : ''}, ${qualificacao[value]}`;
-  }
+  // const getLabelText = (value) => {
+  //   return `${value} Star${value !== 1 ? 's' : ''}, ${qualificacao[value]}`;
+  // }
 
   const handleClose = () => {
     setOpen(false);
     setLead(null);
-    setValue(1);
+    setQualificacao('');
+    // setValue(1);
   };
 
   const handleClickOpen = (alert) => {
@@ -84,7 +82,7 @@ const Alert = ({user,  userRef, alerts, check}) => {
         axios.post('https://n8n.corpbrasil.cloud/webhook/00907265-b3e8-4fab-84f4-a7dc2e40ee4a', {
         Data: new Date(),
         Nome: lead.nome,
-        qualificacao: qualificacao[value],
+        qualificacao: qualificacao,
         Telefone: lead.telefone,
         Email: lead.email,
         Cidade: lead.cidade,
@@ -101,7 +99,7 @@ const Alert = ({user,  userRef, alerts, check}) => {
           showConfirmButton: false,
           timer: 2000
         })
-        setValue(1);
+        setQualificacao('')
       })
       } else {
         setOpen(true);
@@ -204,11 +202,35 @@ const Alert = ({user,  userRef, alerts, check}) => {
                   Qualifique o Lead
                 </DialogTitle>
                 <DialogContent>
-                  <DialogContentText>
-                    Escolha a quantidade de estrela de acordo com a qualidade do Lead.
+                  <DialogContentText className="dialog-content">
+                    <p>Qualifique o Lead de acordo com a sua experiência.</p><br />
+                    {qualificacao && qualificacao === 'Não Qualificado' && <span><b>Não Qualificado</b> - Lead que busca sistema offgrid, tem nome sujo ou é distribuidor.<br /></span>}
+                    {qualificacao && qualificacao === 'Não Tem Interesse' && <span><b>Não Tem Interesse</b> - Lead que não responde mensagem.<br /></span>}
+                     {qualificacao && qualificacao === 'Curioso' &&<span><b>Curioso</b> - Lead que está com dúvidas, mas não tem interesse em comprar.<br /></span>}
+                     {qualificacao && qualificacao === 'Em Atendimento' &&<span><b>Em Atendimento</b> - Lead que possui interesse, mas está em negociação.<br /></span>}
+                     {qualificacao && qualificacao === 'Tem Interesse Futuro' &&<span><b>Tem Interesse Futuro</b> - Lead que possui interesse, mas não pode comprar no momento (Obra, não pode financiar no momento, etc).<br /></span>}
+                     {qualificacao && qualificacao === 'Potencial' &&<span><b>Potencial</b> - Lead com potencial interesse em compra e não possui restrição.</span>}
                   </DialogContentText>
-                  <div style={{ margin: '1rem' }}>
-                    <Rating
+                  <div classname="alert-message" style={{ margin: '1rem' }}>
+                  <FormControl sx={{ margin: '0.3rem 0' }} fullWidth>
+                  <InputLabel id="demo-simple-select-label">Qualificação</InputLabel>
+                  <Select
+                    labelId="demo-simple-select-label"
+                    id="demo-simple-select"
+                    value={qualificacao}
+                    label="Qualificação"
+                    required
+                    onChange={(e) => setQualificacao(e.target.value)}
+                  >
+                    <MenuItem value='Não Qualificado'>Não Qualificado</MenuItem>
+                    <MenuItem value='Não Tem Interesse'>Não Tem Interesse</MenuItem>
+                    <MenuItem value='Curioso'>Curioso</MenuItem>
+                    <MenuItem value='Em Atendimento'>Em Atendimento</MenuItem>
+                    <MenuItem value='Tem Interesse Futuro'>Tem Interesse Futuro</MenuItem>
+                    <MenuItem value='Potencial'>Potencial</MenuItem>
+                  </Select>
+                </FormControl>
+                    {/* <Rating
                       //sx={{ padding: '1rem' }}
                       size="large"
                       name="hover-feedback"
@@ -223,7 +245,7 @@ const Alert = ({user,  userRef, alerts, check}) => {
                         setHover(newHover);
                       } }
                       emptyIcon={<StarIcon style={{ opacity: 0.55 }} fontSize="inherit" />} />
-                    <p style={{ margin: '0.5rem' }}>{qualificacao[hover !== -1 ? hover : value]}</p>
+                    <p style={{ margin: '0.5rem' }}>{qualificacao[hover !== -1 ? hover : value]}</p> */}
                   </div>
                 </DialogContent>
                 <DialogActions>

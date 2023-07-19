@@ -1,5 +1,14 @@
 @import '../../styles/mixins.scss';
 
+.dialog-content {
+  max-width: 350px;
+  
+  span {
+    font-size: 0.9rem;
+    margin: 0.5rem 0;
+  }
+}
+
 .container-panel {
   height: 100%;
   display: flex;
@@ -20,6 +29,7 @@
       font-size: 2rem;
     }
   }
+
 
   .content-panel {
     width: 100%;
