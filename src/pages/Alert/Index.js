@@ -107,6 +107,8 @@ const Alert = ({user,  userRef, alerts, check}) => {
     })
   }
 
+  console.log(qualificacao)
+
   // const denyLead = async (alert) => {
   //   const { value: text } = await Swal.fire({
   //     input: 'textarea',
@@ -203,15 +205,15 @@ const Alert = ({user,  userRef, alerts, check}) => {
                 </DialogTitle>
                 <DialogContent>
                   <DialogContentText className="dialog-content">
-                    <p>Qualifique o Lead de acordo com a sua experiência.</p><br />
-                    {qualificacao && qualificacao === 'Não Qualificado' && <span><b>Não Qualificado</b> - Lead que busca sistema offgrid, tem nome sujo ou é distribuidor.<br /></span>}
+                    Qualifique o Lead de acordo com a sua experiência.<br />
+                    {qualificacao && qualificacao === 'Não Qualificado' && <span><b>Não Qualificado</b> - Lead que busca sistema offgrid, tem nome sujo, é distribuidor ou já possui energia solar.<br /></span>}
                     {qualificacao && qualificacao === 'Não Tem Interesse' && <span><b>Não Tem Interesse</b> - Lead que não responde mensagem.<br /></span>}
                      {qualificacao && qualificacao === 'Curioso' &&<span><b>Curioso</b> - Lead que está com dúvidas, mas não tem interesse em comprar.<br /></span>}
                      {qualificacao && qualificacao === 'Em Atendimento' &&<span><b>Em Atendimento</b> - Lead que possui interesse, mas está em negociação.<br /></span>}
                      {qualificacao && qualificacao === 'Tem Interesse Futuro' &&<span><b>Tem Interesse Futuro</b> - Lead que possui interesse, mas não pode comprar no momento (Obra, não pode financiar no momento, etc).<br /></span>}
                      {qualificacao && qualificacao === 'Potencial' &&<span><b>Potencial</b> - Lead com potencial interesse em compra e não possui restrição.</span>}
                   </DialogContentText>
-                  <div classname="alert-message" style={{ margin: '1rem' }}>
+                  <div className="alert-message" style={{ margin: '1rem' }}>
                   <FormControl sx={{ margin: '0.3rem 0' }} fullWidth>
                   <InputLabel id="demo-simple-select-label">Qualificação</InputLabel>
                   <Select

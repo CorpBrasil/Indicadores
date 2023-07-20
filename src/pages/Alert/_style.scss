@@ -2,10 +2,12 @@
 
 .dialog-content {
   max-width: 350px;
+  display: flex;
+  flex-direction: column;
   
   span {
     font-size: 0.9rem;
-    margin: 0.5rem 0;
+    margin: 1rem 0;
   }
 }
 
