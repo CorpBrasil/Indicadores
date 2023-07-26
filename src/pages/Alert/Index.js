@@ -48,6 +48,9 @@ const Alert = ({user,  userRef, alerts, check}) => {
     // setValue(1);
   };
 
+  console.log(alerts)
+
+
   const handleClickOpen = (alert) => {
     if(check) {
       Swal.fire({
@@ -90,6 +93,7 @@ const Alert = ({user,  userRef, alerts, check}) => {
         Promocao: lead.promocao,
         Campanha: lead.campanha,
         Consultora: lead.consultora,
+        Reenviado: lead.reenviado
       }).then(async response => {
         await deleteDoc(doc(dataBase, "Membros", userRef.uid, "Avisos", lead.id));
         Swal.fire({
