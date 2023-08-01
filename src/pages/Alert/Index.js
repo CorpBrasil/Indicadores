@@ -13,6 +13,7 @@ import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 
 import Dialog from '@mui/material/Dialog';
+import TextField from '@mui/material/TextField';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
@@ -31,6 +32,7 @@ const Alert = ({user,  userRef, alerts, check}) => {
   // const [hover, setHover] = useState(-1);
   
   const [qualificacao, setQualificacao] = useState('');
+  const [motivo, setMotivo] = useState('');
   const [open, setOpen] = useState(false);
   const [lead, setLead] = useState(null);
   const Alert = forwardRef(function Alert(props, ref) {
@@ -93,7 +95,8 @@ const Alert = ({user,  userRef, alerts, check}) => {
         Promocao: lead.promocao,
         Campanha: lead.campanha,
         Consultora: lead.consultora,
-        Reenviado: lead.reenviado
+        Reenviado: lead.reenviado,
+        motivo: motivo
       }).then(async response => {
         await deleteDoc(doc(dataBase, "Membros", userRef.uid, "Avisos", lead.id));
         Swal.fire({
@@ -110,60 +113,6 @@ const Alert = ({user,  userRef, alerts, check}) => {
       }
     })
   }
-
-  console.log(qualificacao)
-
-  // const denyLead = async (alert) => {
-  //   const { value: text } = await Swal.fire({
-  //     input: 'textarea',
-  //     title: '<b>Deixe uma nota</b>',
-  //     inputPlaceholder: 'Digite a mensagem aqui...',
-  //     inputAttributes: {
-  //       'aria-label': 'Digita a mensagem aqui...'
-  //     },
-  //     customClass: {
-  //       validationMessage: 'my-validation-message'
-  //     },
-  //     preConfirm: (value) => {
-  //       if (!value) {
-  //         Swal.showValidationMessage(
-  //           '<i class="fa fa-info-circle"></i> Informe uma nota'
-  //         )
-  //       }
-  //     },
-  //     showCancelButton: true,
-  //     confirmButtonColor: "#F39200",
-  //     cancelButtonColor: "#d33",
-  //     confirmButtonText: "Confirmar",
-  //     cancelButtonText: "Cancelar",
-  //   })
-    
-  //   if (text) {
-  //   axios.post('https://n8n.corpbrasil.cloud/webhook/00907265-b3e8-4fab-84f4-a7dc2e40ee4a', {
-  //     Data: new Date(),
-  //     Nome: alert.nome,
-  //     Telefone: alert.telefone,
-  //     Email: alert.email,
-  //     Cidade: alert.cidade,
-  //     Valor: alert.valor,
-  //     Promocao: alert.promocao,
-  //     Campanha: alert.campanha,
-  //     Consultora: alert.consultora,
-  //     Motivo: text
-  //   })
-  //   .then(async response => {
-  //     await deleteDoc(doc(dataBase, "Membros", userRef.uid, "Avisos", alert.id));
-  //     Swal.fire({
-  //       position: 'top-center',
-  //       icon: 'success',
-  //       title: 'Lead confirmado com Sucesso!',
-  //       showConfirmButton: false,
-  //       timer: 2000
-  //     })
-  //   })
-  //   }
-  // }
-
 
   return (
     <div className="container-panel">
@@ -236,6 +185,21 @@ const Alert = ({user,  userRef, alerts, check}) => {
                     <MenuItem value='Potencial'>Potencial</MenuItem>
                   </Select>
                 </FormControl>
+                <TextField
+                  autoFocus
+                  margin="dense"
+                  id="name"
+                  label="Motivo"
+                  type="text"
+                  onChange={(e) => setMotivo(e.target.value)}
+                  value={motivo || ''}
+                  fullWidth
+                  required
+                  multiline
+                  rows={2}
+                  maxRows={4}
+                  variant="outlined"
+                />
                     {/* <Rating
                       //sx={{ padding: '1rem' }}
                       size="large"
