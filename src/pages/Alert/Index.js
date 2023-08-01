@@ -71,47 +71,62 @@ const Alert = ({user,  userRef, alerts, check}) => {
 
 
   const confirmLead = async () => {
-    setOpen(false);
-    Swal.fire({
-      title: 'Aviso',
-      html: `Você deseja confirmar o <b>Lead?</b>`,
-      //icon: "question",
-      showCancelButton: true,
-      showCloseButton: true,
-      confirmButtonColor: "#F39200",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "Sim",
-      cancelButtonText: "Não",
-    }).then(async (result) => {
-      if(result.isConfirmed) {
-        axios.post('https://n8n.corpbrasil.cloud/webhook/00907265-b3e8-4fab-84f4-a7dc2e40ee4a', {
-        Data: new Date(),
-        Nome: lead.nome,
-        qualificacao: qualificacao,
-        Telefone: lead.telefone,
-        Email: lead.email,
-        Cidade: lead.cidade,
-        Valor: lead.valor,
-        Promocao: lead.promocao,
-        Campanha: lead.campanha,
-        Consultora: lead.consultora,
-        Reenviado: lead.reenviado,
-        motivo: motivo
-      }).then(async response => {
-        await deleteDoc(doc(dataBase, "Membros", userRef.uid, "Avisos", lead.id));
-        Swal.fire({
-          position: 'top-center',
-          icon: 'success',
-          title: 'Lead confirmado com Sucesso!',
-          showConfirmButton: false,
-          timer: 2000
+    if(motivo && qualificacao) {
+      setOpen(false);
+      Swal.fire({
+        title: 'Aviso',
+        html: `Você deseja confirmar o <b>Lead?</b>`,
+        //icon: "question",
+        showCancelButton: true,
+        showCloseButton: true,
+        confirmButtonColor: "#F39200",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Sim",
+        cancelButtonText: "Não",
+      }).then(async (result) => {
+        if(result.isConfirmed) {
+          axios.post('https://n8n.corpbrasil.cloud/webhook/00907265-b3e8-4fab-84f4-a7dc2e40ee4a', {
+          Data: new Date(),
+          Nome: lead.nome,
+          qualificacao: qualificacao,
+          Telefone: lead.telefone,
+          Email: lead.email,
+          Cidade: lead.cidade,
+          Valor: lead.valor,
+          Promocao: lead.promocao,
+          Campanha: lead.campanha,
+          Consultora: lead.consultora,
+          Reenviado: lead.reenviado,
+          motivo: motivo
+        }).then(async response => {
+          await deleteDoc(doc(dataBase, "Membros", userRef.uid, "Avisos", lead.id));
+          Swal.fire({
+            position: 'top-center',
+            icon: 'success',
+            title: 'Lead confirmado com Sucesso!',
+            showConfirmButton: false,
+            timer: 2000
+          })
+          setQualificacao('')
         })
-        setQualificacao('')
+        } else {
+          setOpen(true);
+        }
       })
-      } else {
+    } else {
+      setOpen(false);
+      Swal.fire({
+        title: 'Aviso',
+        html: `Preencha todos os campos para poder qualificar o lead.`,
+        icon: "warning",
+        showCloseButton: true,
+        confirmButtonColor: "#F39200",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Ok",
+      }).then(async (result) => {
         setOpen(true);
-      }
-    })
+      })
+    }
   }
 
   return (
