@@ -14,13 +14,22 @@ import {
 import "moment/locale/pt-br";
 import { Company, KeyMaps } from "../../../data/Data";
 
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
+// import List from '@mui/material/List';
+// import ListItem from '@mui/material/ListItem';
 import RequestQuoteIcon from '@mui/icons-material/RequestQuote'; // Visita Comercial
 import PeopleIcon from '@mui/icons-material/People'; // Tecnica + Comercial
 import RestaurantIcon from '@mui/icons-material/Restaurant'; // Almoço
 import EngineeringIcon from '@mui/icons-material/Engineering'; // Pós Venda
+import ArrowCircleRightIcon from '@mui/icons-material/ArrowCircleRight';
+import ArrowCircleLeftIcon from '@mui/icons-material/ArrowCircleLeft';
 //import ListItemText from '@mui/material/ListItemText';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import Paper from '@mui/material/Paper';
 
 import "../style.scss";
 
@@ -111,9 +120,7 @@ const CreateVisit = ({
           break
         case 'pos_venda':
           setDriver(tecs.filter((ref) => ref.nome === "Lucas" || ref.nome === "Luis"))
-          //setVisits(schedule.filter((ref) => ref.tecnico === "Lucas" || ref.tecnico === "Luis"))
           setTecnicoTexto('Lucas');
-          //driverRef.current = 'Lucas';
           setConsultoraTexto('Pós-Venda')
           break
         default:
@@ -374,16 +381,16 @@ const CreateVisit = ({
             if(checkInput === true && lunch.length === 0) {
               await addDoc(scheduleRef, {
                 dia: diaRef,
-                saidaEmpresa: chegadaClienteRef,
-                chegadaCliente: chegadaClienteRef,
+                saidaEmpresa: horarioTexto,
+                chegadaCliente: horarioTexto,
                 visita: "01:00",
                 visitaNumero: 3600,
-                saidaDoCliente: SaidaClienteRef,
-                chegadaEmpresa: SaidaClienteRef,
+                saidaDoCliente: saidaCliente,
+                chegadaEmpresa: saidaCliente,
                 consultora: tecRefUID.nome,
                 tecnico: tecRefUID.nome,
                 tecnicoUID: tecRefUID.uid,
-                cidade: '',
+                cidade: city,
                 lat: -23.109731, 
                 lng: -47.715045,
                 tempoRota: '',
@@ -446,8 +453,7 @@ const CreateVisit = ({
     }
   };
 
-  function getMonthlyWeekNumber(dt)
-{
+  function getMonthlyWeekNumber(dt) {
     // como função interna, permite reuso
     var getmonweek = function(myDate) {
         var today = new Date(myDate.getFullYear(),myDate.getMonth(),myDate.getDate(),0,0,0);
@@ -571,11 +577,22 @@ const CreateVisit = ({
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="box-visit__container">
           <div className="box-visit__form">
-          {!checkInput &&
+          {!checkInput ?
                 <label className="label">
                 <p data-cooltipz-size="fit"
                  aria-label={tempoTexto && `Tempo da Rota: ${tempoTexto} | Cidade: ${city} | N° ${numberAddress ? numberAddress + ' ✅' : '❌'}`}
                   className="notice cooltipz--top cooltipz--visible">Endereço *</p>
+                <input
+                  className="label__input"
+                  placeholder="Digite a cidade"
+                  ref={ref}
+                  required
+                />
+              </label> : 
+                <label className="label">
+                <p data-cooltipz-size="fit"
+                 aria-label={tempoTexto && `Cidade: ${city} ✅`}
+                  className="notice cooltipz--top cooltipz--visible">Cidade *</p>
                 <input
                   className="label__input"
                   placeholder="Digite a cidade"
@@ -662,7 +679,73 @@ const CreateVisit = ({
               }
             </div>
             {visits && visits.length > 0  ? 
-            <><h2 className="title-visits">{dataTexto ? 'Visita(s) do Dia' : 'Visitas do Mês'}</h2><List
+            <><h2 className="title-visits">{dataTexto ? 'Visita(s) do Dia' : 'Visitas do Mês'}</h2>
+            <TableContainer className="table-visits" component={Paper} sx={{ maxHeight: 240 }}>
+            <Table size="small" stickyHeader aria-label="sticky table">
+              <TableHead>
+                <TableRow className="table-visits_header">
+                  <TableCell align="center"></TableCell>
+                  <TableCell align="center" padding="none">Visita</TableCell>
+                  <TableCell align="center">Ação</TableCell>
+                  <TableCell align="center">Dia</TableCell>
+                  <TableCell align="center">Saida</TableCell>
+                  <TableCell align="center">Chegada</TableCell>
+                  <TableCell align="center">Motorista</TableCell>
+                  <TableCell align="center">Cidade</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {visits.map((visita) => (
+                  <TableRow
+                    hover
+                    key={visita.id}
+                    sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                  >
+                    <TableCell
+                    aria-label={visita.consultora}
+                    data-cooltipz-dir="right"
+                    sx={{ backgroundColor: `${visita.cor}`, color: '#fff', width: 30 }} 
+                    align="center" component="th" scope="row">
+                      {visita.consultora.substring(0, 1)}
+                    </TableCell>
+                    {visita.categoria === "lunch" && <TableCell style={{ filter: 'contrast' }} className="type-icon lunch" aria-label="Almoço" data-cooltipz-dir="right"><RestaurantIcon /></TableCell>}
+                    {visita.categoria === "comercial" && <TableCell className="type-icon comercial" aria-label="Visita Comercial" data-cooltipz-dir="right"><RequestQuoteIcon /></TableCell>}
+                    {visita.categoria === "comercial_tecnica" && <TableCell className="type-icon comercial_tec" aria-label="Comercial + Técnica" data-cooltipz-dir="right"><PeopleIcon /></TableCell>}
+                    {visita.categoria === "pos_venda" && <TableCell className="type-icon pos_venda" aria-label="Pós-Venda" data-cooltipz-dir="right"><EngineeringIcon /></TableCell>}
+                    {visita.categoria !== 'lunch' && visita.categoria !== 'pos_venda' && type !== 'lunch' &&
+                    <TableCell sx={{ width: 30 }} className="btn-add"
+                        aria-label="Criar Visita Conjunta"
+                        data-cooltipz-dir="right"
+                        onClick={() => createVisitGroupChoice({ visit: visita, type: type })}
+                      ></TableCell>}
+                    {visita.categoria === 'pos_venda' && userRef && userRef.nome === 'Pós-Venda' && type !== 'lunch' &&
+                    <TableCell sx={{ width: 30 }} className="btn-add"
+                        aria-label="Criar Visita Conjunta"
+                        data-cooltipz-dir="right"
+                        onClick={() => createVisitGroupChoice({ visit: visita, type: type })}
+                      ></TableCell>}
+                    {(visita.categoria === 'lunch' || visita.confirmar || visita.categoria === 'pos_venda') && userRef && userRef.cargo === 'Vendedor(a)' &&
+                    <TableCell className="btn-add disabled"
+                    ></TableCell>
+                    }
+                    <TableCell sx={{ width: 30 }} align="center" scope="row">
+                      {visita.dia.substring(8, 10)}
+                    </TableCell>
+                    <TableCell align="center">{visita.saidaEmpresa}</TableCell>
+                    <TableCell align="center">{visita.chegadaEmpresa}</TableCell>
+                    <TableCell align="center">{visita.tecnico}</TableCell>
+                    {visita.categoria !== "lunch" && 
+                      <TableCell align="center">{visita.cidade && visita.cidade}</TableCell>
+                    }
+                    {visita.categoria === 'lunch' && 
+                    <TableCell />
+                    }
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+            {/* <List
                 sx={{
                   width: '90%',
                   maxWidth: 500,
@@ -697,8 +780,9 @@ const CreateVisit = ({
                       <p className="cidade">{visita.cidade ? visita.cidade : 'ALMOÇO'}</p>
                   </ListItem>
                 ))}
-              </List></>:
-             <div style={{ display: 'none!impoortant' }} className="visit-aviso">
+              </List> */}
+              </>:
+             <div style={{ display: 'none!important' }} className="visit-aviso">
               <h1>Nenhuma Visita Encontrada</h1>
              </div>
              }
@@ -707,10 +791,10 @@ const CreateVisit = ({
                <div className="box-visit__info prev">
                <span className="">Previsão de Visita</span>
                <p className="notice">
-                 Saindo às <b className="saida">{saidaTexto}</b>
+               <ArrowCircleRightIcon className="saida" />Saindo às <b>{horarioTexto}</b>
                </p>
                <p className="notice">
-                 Chegando às <b className="chegada">{chegadaTexto}</b>
+               <ArrowCircleLeftIcon className="saida" />Chegando às <b>{saidaCliente}</b>
                </p>
              </div> :
                <div className="visit-aviso">
@@ -721,30 +805,16 @@ const CreateVisit = ({
               <div className="box-visit__info prev">
               <span className="">Previsão de Visita</span>
               <p className="notice">
-                Saindo às <b className="saida">{saidaTexto}</b>
+              <ArrowCircleRightIcon className="saida" />Saindo às <b>{saidaTexto}</b>
               </p>
               <p className="notice">
-                Chegando às <b className="chegada">{chegadaTexto}</b>
+              <ArrowCircleLeftIcon className="saida" />Chegando às <b>{chegadaTexto}</b>
               </p>
             </div> :
               <div className="visit-aviso">
               <h2>Preencha o Endereço e Horário Marcado para visualizar a Previsão de Horário</h2>
              </div>
              )}
-            {/* {checkInput && city && visitaNumero && horarioTexto ? 
-              <div className="box-visit__info prev">
-              <span className="">Previsão de Visita</span>
-              <p className="notice">
-                Saindo da Empresa: <b>{saidaTexto}</b>
-              </p>
-              <p className="notice">
-                Chegando na Empresa: <b>{chegadaTexto}</b>
-              </p>
-            </div> :
-              <div className="visit-aviso">
-              <h2>Preencha o Endereço e Horário Marcado para visualizar a previsão de horário</h2>
-             </div>
-            } */}
             <div className="box-visit__form">
               {!checkInput && 
               <label className="label">

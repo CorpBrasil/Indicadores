@@ -179,7 +179,7 @@
         justify-content: flex-end;
         align-items: center;
         gap: 0.5rem;
-        width: 95%;
+        width: 100%;
 
         .toggle {
           position: absolute;
@@ -462,17 +462,46 @@
   }
 }
 
+.table-visits {
+  width: 80%!important;
+  overflow: auto;
+
+  @media screen and (max-width: 700px) {
+    width: 100%!important;
+  }
+
+  &_header {
+    background-color: #111;
+    
+    th {
+      background-color: #313131;
+      color: #fff;
+      padding: 1rem 7px!important;
+    }
+  }
+
+  td {
+    border: 0.5px solid #aaa!important;
+    border-top: none!important;
+    border-right: none!important;
+    font-weight: bold;
+    white-space: nowrap;
+  }
+}
+
 // ============= Icones da visita ================== //
 .type-icon {
   justify-content: center;
   align-items: center;
+  max-width: 2rem;
+  width: 25px;
 
   svg {
     color: #fff;
     display: flex;
     align-items: center;
     margin: auto;
-    padding: 0.2rem 0.1rem;
+    //padding: 0.2rem 0.1rem;
   }
 }
 

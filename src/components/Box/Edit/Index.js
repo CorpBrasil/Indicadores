@@ -6,8 +6,22 @@ import { useForm } from "react-hook-form"; // cria formulário personalizado
 import Swal from 'sweetalert2/dist/sweetalert2.js';
 import * as moment from "moment";
 import "moment/locale/pt-br";
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
+// import List from '@mui/material/List';
+// import ListItem from '@mui/material/ListItem';
+import RequestQuoteIcon from '@mui/icons-material/RequestQuote'; // Visita Comercial
+import PeopleIcon from '@mui/icons-material/People'; // Tecnica + Comercial
+import RestaurantIcon from '@mui/icons-material/Restaurant'; // Almoço
+import EngineeringIcon from '@mui/icons-material/Engineering'; // Pós Venda
+import ArrowCircleRightIcon from '@mui/icons-material/ArrowCircleRight';
+import ArrowCircleLeftIcon from '@mui/icons-material/ArrowCircleLeft';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import Paper from '@mui/material/Paper';
+
 import { Company, Users } from "../../../data/Data";
 import useAuth from "../../../hooks/useAuth";
 
@@ -824,7 +838,52 @@ const EditVisit = ({
             }
             </div>
             {visits && visits.length > 0 ? 
-            <><h2 className="title-visits">{dataTexto ? 'Visita(s) do Dia' : 'Visitas do Mês'}</h2><List
+            <><h2 className="title-visits">{dataTexto ? 'Visita(s) do Dia' : 'Visitas do Mês'}</h2>
+             <TableContainer className="table-visits" component={Paper} sx={{ maxHeight: 200 }}>
+            <Table size="small" stickyHeader aria-label="sticky table">
+              <TableHead>
+                <TableRow className="table-visits_header">
+                  <TableCell align="center"></TableCell>
+                  <TableCell align="center">Visita</TableCell>
+                  <TableCell align="center">Dia</TableCell>
+                  <TableCell align="center">Saida</TableCell>
+                  <TableCell align="center">Chegada</TableCell>
+                  <TableCell align="center">Motorista</TableCell>
+                  <TableCell align="center">Cidade</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {visits.map((visita) => (
+                  <TableRow
+                    key={visita.id}
+                    sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                  >
+                    <TableCell
+                    aria-label={visita.consultora}
+                    data-cooltipz-dir="right"
+                    sx={{ backgroundColor: `${visita.cor}`, color: '#fff', width: 30 }} 
+                    align="center" component="th" scope="row">
+                      {visita.consultora.substring(0, 1)}
+                    </TableCell>
+                    {visita.categoria === "lunch" && <TableCell style={{ filter: 'contrast' }} className="type-icon lunch" aria-label="Almoço" data-cooltipz-dir="right"><RestaurantIcon /></TableCell>}
+                    {visita.categoria === "comercial" && <TableCell className="type-icon comercial" aria-label="Visita Comercial" data-cooltipz-dir="right"><RequestQuoteIcon /></TableCell>}
+                    {visita.categoria === "comercial_tecnica" && <TableCell className="type-icon comercial_tec" aria-label="Comercial + Técnica" data-cooltipz-dir="right"><PeopleIcon /></TableCell>}
+                    {visita.categoria === "pos_venda" && <TableCell className="type-icon pos_venda" aria-label="Pós-Venda" data-cooltipz-dir="right"><EngineeringIcon /></TableCell>}
+                    <TableCell sx={{ width: 30 }} align="center" scope="row">
+                      {visita.dia.substring(8, 10)}
+                    </TableCell>
+                    <TableCell align="center">{type === 'antes' && visitRef.id === visita.id ? visitRef.chegadaCliente : visita.saidaEmpresa}</TableCell>
+                    <TableCell align="center">{type === 'depois' && visitRef.id === visita.id ? visitRef.saidaDoCliente : visita.chegadaEmpresa}</TableCell>
+                    <TableCell align="center">{visita.tecnico}</TableCell>
+                    {visita.categoria !== "lunch" && 
+                      <TableCell align="center">{visita.cidade && visita.cidade}</TableCell>
+                    }
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+            {/* <List
             sx={{
               width: '90%',
               maxWidth: 500,            
@@ -845,18 +904,19 @@ const EditVisit = ({
                   <p className="cidade">{visita.cidade ? visita.cidade : 'ALMOÇO'}</p>
                 </ListItem>
               ))}
-             </List></>:
-             <div style={{ display: 'none!impoortant' }} className="visit-aviso">
+             </List> */}
+             </>:
+             <div style={{ display: 'none!important' }} className="visit-aviso">
               <h1>Nenhuma Visita Encontrada</h1>
              </div>
              }
               <div className="box-visit__info prev">
               <span className="">Previsão de Visita</span>
               <p className="notice">
-                Saindo às <b className="saida">{saidaTexto}</b>
+                <ArrowCircleRightIcon className="saida" />Saindo às <b>{saidaTexto}</b>
               </p>
               <p className="notice">
-                Chegando às <b className="chegada">{chegadaTexto}</b>
+                <ArrowCircleLeftIcon className="saida" />Chegando às <b>{chegadaTexto}</b>
               </p>
             </div>
             <div className="box-visit__form">

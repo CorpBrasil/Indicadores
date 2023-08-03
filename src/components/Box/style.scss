@@ -9,7 +9,6 @@
 }
 
 .box-visit {
-    
     display: flex;
     justify-content: center;
     margin-bottom: 1rem;
@@ -135,14 +134,11 @@
         flex-direction: column;
         justify-content: center;
         margin: 0 0.5rem;
-        padding: 2rem;
+        padding: 1rem 0;
         border-radius: 5px;
-        border: 1px solid;
-        width: 90%;
-        max-width: 400px;
-        background-color: #313131;
-        color: #fff;
-        border-color: #111;
+        border: 1px solid #eee;
+        width: 80%;
+        background-color: whitesmoke;
   
         span {
           margin-bottom: 1rem;
@@ -150,14 +146,19 @@
 
         .notice {
           margin-bottom: 0.5rem;
+          display: flex;
+          justify-content: center;
+          gap: 0.4rem;
+          align-items: center;
         }
 
-        .saida {background-color: #189c5a;}
-        .chegada {background-color: #bf2a39;}
+        .saida {fill: #189c5a;}
+        .chegada {fill: #bf2a39;}
 
         .saida, .chegada {
           padding: 0.2rem;
           border-radius: 5px;
+          background: none;
         }
   
       }
@@ -169,10 +170,5 @@
 
     .title-visits {
       width: 100%;
-      margin-right: 45%;
-
-      @media (max-width: 999px) {
-        margin: 0;
-      }
     }
 }

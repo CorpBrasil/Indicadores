@@ -14,8 +14,15 @@ import RequestQuoteIcon from '@mui/icons-material/RequestQuote'; // Visita Comer
 import PeopleIcon from '@mui/icons-material/People'; // Tecnica + Comercial
 import RestaurantIcon from '@mui/icons-material/Restaurant'; // Almoço
 import EngineeringIcon from '@mui/icons-material/Engineering'; // Pós Venda
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
+// import List from '@mui/material/List';
+// import ListItem from '@mui/material/ListItem';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import Paper from '@mui/material/Paper';
 
 import {
   doc,
@@ -1301,69 +1308,164 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts, check }) => {
           <div className="box-mobile">
             <h1 className="mobile-title">Visitas do Mês</h1>
           {schedule && schedule.length > 0  ?
-            <List
-              sx={{
-                width: '100%',
-                maxWidth: 750,            
-                bgcolor: 'background.paper',
-                position: 'relative',
-                overflow: 'auto',
-                maxHeight: 400,
-                '& ul': { padding: 0 },
-              }}>
-                {schedule.map((visita, index) => (
-                  <ListItem className={`list-visit ${visita.tipo === 'Visita Conjunta' && !visita.confirmar ? 'conjunta' : ''} ${visita.confirmar ? 'confirmar' : ''}`} sx={{ borderLeft: `20px solid ${visita.cor}` }} key={index}>
-                    <p><b>{visita.dia.substring(8,10)}</b></p>
-                    {visita.categoria === "lunch" && <div onClick={() => viewVisita(visita, visita.categoria)} style={{ filter: 'contrast', padding: '0.2rem' }} className="type-icon lunch" aria-label="Almoço" data-cooltipz-dir="right"><RestaurantIcon /></div>}
-                    {visita.categoria === "comercial" && <div onClick={() => viewVisita(visita, visita.categoria)} style={{ padding: '0.2rem' }} className="type-icon comercial" aria-label="Visita Comercial" data-cooltipz-dir="right"><RequestQuoteIcon /></div>}
-                    {visita.categoria === "comercial_tecnica" && <div onClick={() => viewVisita(visita, visita.categoria)} style={{ padding: '0.2rem' }} className="type-icon comercial_tec" aria-label="Comercial + Técnica" data-cooltipz-dir="right"><PeopleIcon /></div>}
-                    {visita.categoria === "pos_venda" && <div onClick={() => viewVisita(visita, visita.categoria)} style={{ padding: '0.2rem' }} className="type-icon pos_venda" aria-label="Pós-Venda" data-cooltipz-dir="right"><EngineeringIcon /></div>}
+            <TableContainer className="table-visits" component={Paper} 
+            sx={{ maxHeight: 600 }}>
+            <Table size="small" stickyHeader aria-label="sticky table">
+              <TableHead>
+                <TableRow className="table-visits_header">
+                  <TableCell align="center"></TableCell>
+                  <TableCell align="center" padding="none">Visita</TableCell>
+                  {userRef && userRef.cargo !== 'Técnico' && 
+                    <TableCell align="center">Ação</TableCell>
+                  }
+                  <TableCell align="center">Dia</TableCell>
+                  <TableCell align="center">Saida</TableCell>
+                  <TableCell align="center">Chegada</TableCell>
+                  <TableCell align="center">Motorista</TableCell>
+                  <TableCell align="center">Cidade</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {schedule.map((visita) => (
+                  <TableRow
+                    hover
+                    key={visita.id}
+                    className={`list-visit ${visita.tipo === 'Visita Conjunta' && !visita.confirmar ? 'conjunta' : ''} ${visita.confirmar ? 'confirmar' : ''}`}
+                    sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                  >
+                    <TableCell
+                    aria-label={visita.consultora}
+                    data-cooltipz-dir="right"
+                    sx={{ backgroundColor: `${visita.cor}`, color: '#fff', fontWeight: 'bold' }} 
+                    align="center" scope="row">
+                      {visita.consultora.substring(0, 1)}
+                    </TableCell>
+                    {visita.categoria === "lunch" && <TableCell onClick={() => viewVisita(visita, visita.categoria)} style={{ filter: 'contrast', padding: '0.2rem' }} className="type-icon lunch" aria-label="Almoço" data-cooltipz-dir="right"><RestaurantIcon /></TableCell>}
+                    {visita.categoria === "comercial" && <TableCell onClick={() => viewVisita(visita, visita.categoria)} style={{ padding: '0.2rem' }} className="type-icon comercial" aria-label="Visita Comercial" data-cooltipz-dir="right"><RequestQuoteIcon /></TableCell>}
+                    {visita.categoria === "comercial_tecnica" && <TableCell onClick={() => viewVisita(visita, visita.categoria)} style={{ padding: '0.2rem' }} className="type-icon comercial_tec" aria-label="Comercial + Técnica" data-cooltipz-dir="right"><PeopleIcon /></TableCell>}
+                    {visita.categoria === "pos_venda" && <TableCell onClick={() => viewVisita(visita, visita.categoria)} style={{ padding: '0.2rem' }} className="type-icon pos_venda" aria-label="Pós-Venda" data-cooltipz-dir="right"><EngineeringIcon /></TableCell>}
                     {!visita.confirmar && (visita.categoria === 'comercial' || visita.categoria === 'comercial_tecnica') && 
                     userRef && userRef.cargo === 'Vendedor(a)' && userRef.nome !== 'Pós-Venda' &&
-                    <div className="btn-add"
+                    <TableCell className="btn-add"
                     aria-label="Criar Visita Conjunta"
                     data-cooltipz-dir="right"
                      onClick={() => createVisitGroupChoice({visit: visita, type: visita.categoria})}
-                    ></div>
+                    ></TableCell>
                     }
                     {!visita.confirmar && visita.categoria === 'pos_venda' && 
                     userRef && userRef.nome === 'Pós-Venda' &&
-                    <div className="btn-add"
+                    <TableCell className="btn-add"
                     aria-label="Criar Visita Conjunta"
                     data-cooltipz-dir="right"
                      onClick={() => createVisitGroupChoice({visit: visita, type: visita.categoria})}
-                    ></div>
+                    ></TableCell>
                     }
                     {visita.confirmar === false &&
                     (user.email === Users[0].email || (userRef && userRef.cargo === "Administrador") || (userRef && userRef.nome === 'Pós-Venda')) ? (
-                      <div className="btn-confirm"
+                      <TableCell className="btn-confirm"
                       aria-label="Confirmar Visita"
                       data-cooltipz-dir="right"
                       onClick={() => confirmVisit(visita, "confirm")}
-                      ></div>
+                      ></TableCell>
                     ) : 
                     (
                     <></>
                     )}
                     {visita.confirmar === true &&
                     (user.email === Users[0].email || (userRef && userRef.cargo === "Administrador") || (userRef && userRef.nome === 'Pós-Venda')) ? (
-                     <div className="btn-cancel"
+                     <TableCell className="btn-cancel"
                     aria-label="Cancelar Visita"
                     data-cooltipz-dir="right"
                     onClick={() => confirmVisit(visita, "cancel")}
-                    ></div>
+                    ></TableCell>
                             ) : (
                               <></>
-                            )}
-                    <p className="saida">{visita.saidaEmpresa}</p>
-                    <p className="chegada">{visita.chegadaEmpresa}</p>
-                    {visita.categoria !== 'lunch' &&
-                      <p className="tecnico" style={{ backgroundColor: visita.corTec }}>{visita.tecnico}</p>
+                    )}
+                    {(visita.confirmar || visita.categoria === 'pos_venda' || visita.categoria === 'lunch' ) && userRef && userRef.cargo === 'Vendedor(a)' && 
+                      <TableCell className="btn-add disabled"
+                      ></TableCell>
                     }
-                    <p className="cidade">{visita.cidade ? visita.cidade : 'ALMOÇO'}</p>
-                  </ListItem>
+                    <TableCell sx={{ width: 30 }} align="center" scope="row">
+                      {visita.dia.substring(8, 10)}
+                    </TableCell>
+                    <TableCell align="center">{visita.saidaEmpresa}</TableCell>
+                    <TableCell align="center">{visita.chegadaEmpresa}</TableCell>
+                    <TableCell align="center">{visita.tecnico}</TableCell>
+                    {visita.categoria !== "lunch" && 
+                      <TableCell align="center">{visita.cidade && visita.cidade}</TableCell>
+                    }
+                    {visita.categoria === 'lunch' && 
+                      <TableCell />
+                    }
+                  </TableRow>
                 ))}
-               </List>:
+              </TableBody>
+            </Table>
+          </TableContainer>
+            // <List
+            //   sx={{
+            //     width: '100%',
+            //     maxWidth: 750,            
+            //     bgcolor: 'background.paper',
+            //     position: 'relative',
+            //     overflow: 'auto',
+            //     maxHeight: 400,
+            //     '& ul': { padding: 0 },
+            //   }}>
+            //     {schedule.map((visita, index) => (
+            //       <ListItem className={`list-visit ${visita.tipo === 'Visita Conjunta' && !visita.confirmar ? 'conjunta' : ''} ${visita.confirmar ? 'confirmar' : ''}`} sx={{ borderLeft: `20px solid ${visita.cor}` }} key={index}>
+            //         <p><b>{visita.dia.substring(8,10)}</b></p>
+            //         {visita.categoria === "lunch" && <div onClick={() => viewVisita(visita, visita.categoria)} style={{ filter: 'contrast', padding: '0.2rem' }} className="type-icon lunch" aria-label="Almoço" data-cooltipz-dir="right"><RestaurantIcon /></div>}
+            //         {visita.categoria === "comercial" && <div onClick={() => viewVisita(visita, visita.categoria)} style={{ padding: '0.2rem' }} className="type-icon comercial" aria-label="Visita Comercial" data-cooltipz-dir="right"><RequestQuoteIcon /></div>}
+            //         {visita.categoria === "comercial_tecnica" && <div onClick={() => viewVisita(visita, visita.categoria)} style={{ padding: '0.2rem' }} className="type-icon comercial_tec" aria-label="Comercial + Técnica" data-cooltipz-dir="right"><PeopleIcon /></div>}
+            //         {visita.categoria === "pos_venda" && <div onClick={() => viewVisita(visita, visita.categoria)} style={{ padding: '0.2rem' }} className="type-icon pos_venda" aria-label="Pós-Venda" data-cooltipz-dir="right"><EngineeringIcon /></div>}
+            //         {!visita.confirmar && (visita.categoria === 'comercial' || visita.categoria === 'comercial_tecnica') && 
+            //         userRef && userRef.cargo === 'Vendedor(a)' && userRef.nome !== 'Pós-Venda' &&
+            //         <div className="btn-add"
+            //         aria-label="Criar Visita Conjunta"
+            //         data-cooltipz-dir="right"
+            //          onClick={() => createVisitGroupChoice({visit: visita, type: visita.categoria})}
+            //         ></div>
+            //         }
+            //         {!visita.confirmar && visita.categoria === 'pos_venda' && 
+            //         userRef && userRef.nome === 'Pós-Venda' &&
+            //         <div className="btn-add"
+            //         aria-label="Criar Visita Conjunta"
+            //         data-cooltipz-dir="right"
+            //          onClick={() => createVisitGroupChoice({visit: visita, type: visita.categoria})}
+            //         ></div>
+            //         }
+            //         {visita.confirmar === false &&
+            //         (user.email === Users[0].email || (userRef && userRef.cargo === "Administrador") || (userRef && userRef.nome === 'Pós-Venda')) ? (
+            //           <div className="btn-confirm"
+            //           aria-label="Confirmar Visita"
+            //           data-cooltipz-dir="right"
+            //           onClick={() => confirmVisit(visita, "confirm")}
+            //           ></div>
+            //         ) : 
+            //         (
+            //         <></>
+            //         )}
+            //         {visita.confirmar === true &&
+            //         (user.email === Users[0].email || (userRef && userRef.cargo === "Administrador") || (userRef && userRef.nome === 'Pós-Venda')) ? (
+            //          <div className="btn-cancel"
+            //         aria-label="Cancelar Visita"
+            //         data-cooltipz-dir="right"
+            //         onClick={() => confirmVisit(visita, "cancel")}
+            //         ></div>
+            //                 ) : (
+            //                   <></>
+            //                 )}
+            //         <p className="saida">{visita.saidaEmpresa}</p>
+            //         <p className="chegada">{visita.chegadaEmpresa}</p>
+            //         {visita.categoria !== 'lunch' &&
+            //           <p className="tecnico" style={{ backgroundColor: visita.corTec }}>{visita.tecnico}</p>
+            //         }
+            //         <p className="cidade">{visita.cidade ? visita.cidade : 'ALMOÇO'}</p>
+            //       </ListItem>
+            //     ))}
+            //    </List>
+               :
                <div style={{ display: 'none!important', margin: 'auto' }} className="visit-aviso">
                 <h1>Nenhuma Visita Encontrada</h1>
                </div>

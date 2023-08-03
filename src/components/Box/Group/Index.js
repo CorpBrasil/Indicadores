@@ -13,12 +13,19 @@ import {
   useLoadScript,
 } from "@react-google-maps/api";
 
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
 import RequestQuoteIcon from '@mui/icons-material/RequestQuote'; // Visita Comercial
 import PeopleIcon from '@mui/icons-material/People'; // Tecnica + Comercial
 import RestaurantIcon from '@mui/icons-material/Restaurant'; // Almoço
 import EngineeringIcon from '@mui/icons-material/Engineering'; // Pós Venda
+import ArrowCircleRightIcon from '@mui/icons-material/ArrowCircleRight';
+import ArrowCircleLeftIcon from '@mui/icons-material/ArrowCircleLeft';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import Paper from '@mui/material/Paper';
 
 import { Company, KeyMaps, Users } from "../../../data/Data";
 
@@ -29,6 +36,7 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, sellers, userR
   const { user } = useAuth();
   // const chegadaFormatadaTec = useRef();
   // const saidaFormatadaTec = useRef();
+  const [automatic, setAutomatic] = useState(true);
   const [lat, setLat] = useState(0);
   const [lng, setLng] = useState(0);
   const [lat2, setLat2] = useState(0);
@@ -65,6 +73,16 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, sellers, userR
     handleSubmit,
     reset
   } = useForm();
+
+  // const createInfo = (nome, dia, tipo, acao, saida, chegada, motorista, cidade) => {
+  //   return {nome, dia, tipo, acao, saida, chegada, motorista, cidade};
+  // }
+
+  // const rows = [
+  //   visits.map((visita, index) => {
+  //     createInfo(visita.consultora, visita.dia, visita.tipo, visita.saidaEmpresa, visita.chegadaEmpresa, visita.tecnico, visita.cidade)
+  //   })
+  // ]
 
   //console.log(visitRef);
   // console.log(typeRef);
@@ -111,14 +129,13 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, sellers, userR
       setChegadaTexto(visitRef.chegadaEmpresa);
       setDataTexto(moment(new Date(visitRef.dia)).format('YYYY-MM-DD'));
       setTecnicoTexto(visitRef.tecnico);
-      setCity(visitRef.cidade);
+      //setCity(visitRef.cidade);
       if(type === 'antes') {
         setLatRef(-23.109731);
         setLngRef(-47.715045);
         setLat2(visitRef.lat);
         setLng2(visitRef.lng);
       } else {
-        
         if(visitRef.visitaAlmoco) {
           setHorarioTexto(moment(visitRef.chegadaEmpresa, "hh:mm").add(rotaTempo1, 'seconds').format('kk:mm'));
           setLatRef(-23.109731);
@@ -185,21 +202,22 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, sellers, userR
   }, [dataTexto, tecnicoTexto, consultoraTexto]);
 
   useEffect(() => {
-
-    if((type === 'antes' && visitaNumero) || (type === 'antes' && rotaTempo2)) {
-      setHorarioTexto(moment(visitRef.chegadaCliente, "hh:mm").subtract(Number(visitaNumero) + rotaTempo2, 'seconds').format('kk:mm'));
-      //setCheckRef(true);
-    }
-    if((type === 'depois' && visitaNumero) || (type === 'depois' && rotaTempo1)) {
-      if(visitRef.visitaAlmoco) {
-        setHorarioTexto(moment(visitRef.chegadaEmpresa, "hh:mm").add(rotaTempo1, 'seconds').format('kk:mm'));
-      } else {
-        setHorarioTexto(moment(visitRef.saidaDoCliente, "hh:mm").add(rotaTempo1, 'seconds').format('kk:mm'));
+    if(automatic) {
+      if((type === 'antes' && visitaNumero) || (type === 'antes' && rotaTempo2)) {
+        setHorarioTexto(moment(visitRef.chegadaCliente, "hh:mm").subtract(Number(visitaNumero) + rotaTempo2, 'seconds').format('kk:mm'));
+        //setCheckRef(true);
+      }
+      if((type === 'depois' && visitaNumero) || (type === 'depois' && rotaTempo1)) {
+        if(visitRef.visitaAlmoco) {
+          setHorarioTexto(moment(visitRef.chegadaEmpresa, "hh:mm").add(rotaTempo1, 'seconds').format('kk:mm'));
+        } else {
+          setHorarioTexto(moment(visitRef.saidaDoCliente, "hh:mm").add(rotaTempo1, 'seconds').format('kk:mm'));
+        }
       }
     }
     
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  },[visitaNumero, rotaTempo1, city, rotaTempo2, schedule])
+  },[visitaNumero, rotaTempo1, city, rotaTempo2, schedule, automatic])
 
   useEffect(() => {
     moment.locale("pt-br");
@@ -270,6 +288,15 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, sellers, userR
           (dia) => dia.data === dataTexto && dia.chegadaEmpresa !== visitRef.chegadaEmpresa &&
           (dia.tecnicoUID === visitRef.tecnicoUID || (dia.categoria === 'lunch' && dia.tecnico === consultoraTexto))
         );
+
+        const dataRefVisit = schedule.filter(
+          (dia) => dia.data === dataTexto && dia.chegadaEmpresa === visitRef.chegadaEmpresa &&
+          (dia.tecnicoUID === visitRef.tecnicoUID || (dia.categoria === 'lunch' && dia.tecnico === consultoraTexto))
+        );
+
+        console.log(dataRef)
+        console.log(dataRefVisit)
+
   
         // console.log(dataRef);
         // const lunch = schedule.filter(
@@ -314,6 +341,20 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, sellers, userR
         //     return dataRef;
         //   });
         // } else {
+          dataRefVisit.map((ref) => {
+            // console.log("eae");
+            if (
+              saidaFormatada <= moment(ref.saidaCliente, "hh:mm") &&
+              chegadaFormatada <= moment(ref.saidaCliente, "hh:mm")
+            ) {
+              check.push(ref);
+            } else {
+              if (saidaFormatada >= moment(ref.chegadaCliente, "hh:mm"))
+                check.push(ref);
+            }
+            return dataRefVisit;
+          });
+
           dataRef.map((ref) => {
             // console.log("eae");
             if (
@@ -342,7 +383,7 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, sellers, userR
           }
           return visitsFind;
         });
-        // console.log(visitsFind);
+        console.log(visitsFind);
   
         // console.log({
         //   dia: diaRef,
@@ -633,6 +674,8 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, sellers, userR
      return returnSchedule();
    }
 
+   console.log(city)
+
    function getMonthlyWeekNumber(dt)
   {
       // como função interna, permite reuso
@@ -657,13 +700,13 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, sellers, userR
        *  Caso positivo, retorna 1 "de pronto".
        */
       else if ((dt.getDate()>(udm-6)) && ((dt.getDate()-dt.getDay())>(udm-3)))
-          return 1;
+      return 1;
       else
-          return getmonweek(dt);
-  }
+      return getmonweek(dt);
+    }
 
-  return (
-    <div className="box-visit">
+    return (
+      <div className="box-visit">
       <div className="box-visit__box">
         <div className="box-visit__close">
           <button onClick={returnSchedule} className="btn-close" />
@@ -671,6 +714,40 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, sellers, userR
         {typeRef === "comercial" && <h4>Visita Conjunta (Comercial)</h4>}
         {typeRef === "comercial_tecnica" && <h4>Visita Conjunta (Comercial + Técnica)</h4>}
         {typeRef === "pos_venda" && <h4>Visita Conjunta (Pós-Venda)</h4>}
+        <div className="toggle-box center-flex background-grey">
+              {city && city ? 
+              <div className={'center-flex'} style={{ gap: '0.5rem' }}>
+              <p>Ativar Horário Automático</p>
+              <input
+                type="checkbox"
+                id="toggle"
+                className="toggle toggle--shadow"
+                checked={automatic}
+                onChange={() => setAutomatic(!automatic)}
+              /> 
+              <label
+               className={city ? undefined : 'block'}
+               htmlFor="toggle"></label>
+              </div> :
+ <div className={'center-flex block --cooltipz-small'} style={{ gap: '0.5rem' }}
+              aria-label={'Para desativar o Horário Automático, preencha o campo de Endereço'}
+              data-cooltipz-dir="top"
+              >
+              <p>Ativar Horário Automático</p>
+              <input
+                type="checkbox"
+                id="toggle"
+                disabled
+                className="toggle toggle--shadow"
+                checked={automatic}
+                onChange={() => setAutomatic(!automatic)}
+              />
+              <label
+               className={'block'}
+               htmlFor="toggle"></label>
+              </div>
+            }
+            </div>
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="box-visit__container">
           <div className="box-visit__form">
@@ -698,7 +775,23 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, sellers, userR
                 disabled
               /> 
             </label>
-            <label className="label">
+            {automatic && automatic ? 
+              <label className="label">
+                <p>Hórario Marcado *</p>
+                <input
+                  className="label__input time"
+                  type="time"
+                  value={horarioTexto || ''}
+                  placeholder="Digite o hórario marcado"
+                  min="07:00"
+                  max="18:00"
+                  onBlur={(e) => moment(e.target.value, 'hh:mm') < moment('07:00', 'hh:mm') || moment(e.target.value, 'hh:mm') > moment('18:00', 'hh:mm') ? setHoursLimit(true) : setHoursLimit(false)}
+                  onChange={(e) => setHorarioTexto(e.target.value)}
+                  disabled
+                />
+                {hoursLimit && <p className="notice red">Limite de hórario: 07:00 - 18:00</p>}
+              </label> : 
+              <label className="label">
               <p>Hórario Marcado *</p>
               <input
                 className="label__input time"
@@ -709,10 +802,10 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, sellers, userR
                 max="18:00"
                 onBlur={(e) => moment(e.target.value, 'hh:mm') < moment('07:00', 'hh:mm') || moment(e.target.value, 'hh:mm') > moment('18:00', 'hh:mm') ? setHoursLimit(true) : setHoursLimit(false)}
                 onChange={(e) => setHorarioTexto(e.target.value)}
-                disabled
               />
               {hoursLimit && <p className="notice red">Limite de hórario: 07:00 - 18:00</p>}
             </label>
+          }
             <label className="label">
               <p>Tempo de Visita *</p>
               <select
@@ -728,7 +821,52 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, sellers, userR
             </label>
             </div>
             {visits && visits.length > 0 ? 
-            <><h2 className="title-visits">Visita(s) do Dia</h2><List
+            <><h2 className="title-visits">Visita(s) do Dia</h2>
+            <TableContainer className="table-visits" component={Paper} sx={{ maxHeight: 200 }}>
+            <Table size="small" stickyHeader aria-label="sticky table">
+              <TableHead>
+                <TableRow className="table-visits_header">
+                  <TableCell align="center"></TableCell>
+                  <TableCell align="center">Dia</TableCell>
+                  <TableCell align="center">Visita</TableCell>
+                  <TableCell align="center">Saida</TableCell>
+                  <TableCell align="center">Chegada</TableCell>
+                  <TableCell align="center">Motorista</TableCell>
+                  <TableCell align="center">Cidade</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {visits.map((visita) => (
+                  <TableRow
+                    key={visita.id}
+                    sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                  >
+                    <TableCell
+                    aria-label={visita.consultora}
+                    data-cooltipz-dir="right"
+                    sx={{ backgroundColor: `${visita.cor}`, color: '#fff', width: 30 }} 
+                    align="center" component="th" scope="row">
+                      {visita.consultora.substring(0, 1)}
+                    </TableCell>
+                    <TableCell sx={{ width: 30 }} align="center" component="th" scope="row">
+                      {visita.dia.substring(8, 10)}
+                    </TableCell>
+                    {visita.categoria === "lunch" && <TableCell style={{ filter: 'contrast' }} className="type-icon lunch" aria-label="Almoço" data-cooltipz-dir="right"><RestaurantIcon /></TableCell>}
+                    {visita.categoria === "comercial" && <TableCell className="type-icon comercial" aria-label="Visita Comercial" data-cooltipz-dir="right"><RequestQuoteIcon /></TableCell>}
+                    {visita.categoria === "comercial_tecnica" && <TableCell className="type-icon comercial_tec" aria-label="Comercial + Técnica" data-cooltipz-dir="right"><PeopleIcon /></TableCell>}
+                    {visita.categoria === "pos_venda" && <TableCell className="type-icon pos_venda" aria-label="Pós-Venda" data-cooltipz-dir="right"><EngineeringIcon /></TableCell>}
+                    <TableCell align="center">{type === 'antes' && visitRef.id === visita.id ? visitRef.chegadaCliente : visita.saidaEmpresa}</TableCell>
+                    <TableCell align="center">{type === 'depois' && visitRef.id === visita.id ? visitRef.saidaDoCliente : visita.chegadaEmpresa}</TableCell>
+                    <TableCell align="center">{visita.tecnico}</TableCell>
+                    {visita.categoria !== "lunch" && 
+                      <TableCell align="center">{visita.cidade && visita.cidade}</TableCell>
+                    }
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+            {/* <List
                 sx={{
                   width: '90%',
                   maxWidth: 500,
@@ -753,7 +891,8 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, sellers, userR
                     <p className="cidade">{visita.cidade ? visita.cidade : 'ALMOÇO'}</p>
                   </ListItem>
                 ))}
-              </List></>:
+              </List> */}
+              </>:
              <div className="visit-aviso">
               <h1>Nenhuma Visita Encontrada</h1>
              </div>
@@ -762,10 +901,10 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, sellers, userR
             <div className="box-visit__info prev">
               <span className="">Previsão de Visita</span>
               <p className="notice">
-                Saindo às <b className="saida">{visitRef.tipo === "Almoço" ? visitRef.saidaDoCliente : saidaTexto}</b>
+                <ArrowCircleRightIcon className="saida" />Saindo às <b>{visitRef.tipo === "Almoço" ? visitRef.saidaDoCliente : saidaTexto}</b>
               </p>
               <p className="notice">
-                Chegando às <b className="chegada">{chegadaTexto}</b>
+                <ArrowCircleLeftIcon className="saida" />Chegando às <b>{chegadaTexto}</b>
               </p>
             </div> :
             <div className="visit-aviso">
@@ -796,7 +935,7 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, sellers, userR
               ))}
           </select>
         </div>}
-        {userRef.cargo === 'Vendedor(a)' &&
+        {/* {userRef.cargo === 'Vendedor(a)' &&
           <label className="label">
           <p>Consultora *</p>
           <input
@@ -808,7 +947,7 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, sellers, userR
             disabled
           />
         </label> 
-        }
+        } */}
           <div className="label margin-top">
             {typeRef === "comercial" && <p>Motorista</p>}
             {(typeRef === "comercial_tecnica" || typeRef === "pos_venda") && <p>Técnico</p>}
