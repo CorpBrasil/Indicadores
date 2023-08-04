@@ -36,7 +36,7 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, sellers, userR
   const { user } = useAuth();
   // const chegadaFormatadaTec = useRef();
   // const saidaFormatadaTec = useRef();
-  const [automatic, setAutomatic] = useState(true);
+  const [automatic] = useState(true);
   const [lat, setLat] = useState(0);
   const [lng, setLng] = useState(0);
   const [lat2, setLat2] = useState(0);
@@ -73,19 +73,6 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, sellers, userR
     handleSubmit,
     reset
   } = useForm();
-
-  // const createInfo = (nome, dia, tipo, acao, saida, chegada, motorista, cidade) => {
-  //   return {nome, dia, tipo, acao, saida, chegada, motorista, cidade};
-  // }
-
-  // const rows = [
-  //   visits.map((visita, index) => {
-  //     createInfo(visita.consultora, visita.dia, visita.tipo, visita.saidaEmpresa, visita.chegadaEmpresa, visita.tecnico, visita.cidade)
-  //   })
-  // ]
-
-  //console.log(visitRef);
-  // console.log(typeRef);
 
 
   const { isLoaded } = useLoadScript({
@@ -714,7 +701,7 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, sellers, userR
         {typeRef === "comercial" && <h4>Visita Conjunta (Comercial)</h4>}
         {typeRef === "comercial_tecnica" && <h4>Visita Conjunta (Comercial + Técnica)</h4>}
         {typeRef === "pos_venda" && <h4>Visita Conjunta (Pós-Venda)</h4>}
-        <div className="toggle-box center-flex background-grey">
+        {/* <div className="toggle-box center-flex background-grey">
               {city && city ? 
               <div className={'center-flex'} style={{ gap: '0.5rem' }}>
               <p>Ativar Horário Automático</p>
@@ -747,7 +734,7 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, sellers, userR
                htmlFor="toggle"></label>
               </div>
             }
-            </div>
+            </div> */}
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="box-visit__container">
           <div className="box-visit__form">

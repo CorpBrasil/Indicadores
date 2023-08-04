@@ -228,14 +228,14 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts, check }) => {
     if (type === "antes")
       return schedule.filter(
         (ref) =>
-          ref.data === visit.data && ref.chegadaEmpresa === visit.saidaEmpresa
-          && ref.tipo !== "Almoço" && !ref.visitaAlmoco
+          ref.data === visit.data && ref.chegadaEmpresa === visit.saidaEmpresa &&
+          ref.tecnico === visit.tecnico && ref.tipo !== "Almoço" && !ref.visitaAlmoco
       );
     if (type === "depois")
       return schedule.filter(
         (ref) =>
-          ref.data === visit.data && ref.saidaEmpresa === visit.chegadaEmpresa
-          && ref.tipo !== "Almoço" && !ref.visitaAlmoco
+          ref.data === visit.data && ref.saidaEmpresa === visit.chegadaEmpresa &&
+          ref.tecnico === visit.tecnico && ref.tipo !== "Almoço" && !ref.visitaAlmoco
       );
   };
 

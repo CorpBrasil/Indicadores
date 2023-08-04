@@ -391,8 +391,8 @@ const CreateVisit = ({
                 tecnico: tecRefUID.nome,
                 tecnicoUID: tecRefUID.uid,
                 cidade: city,
-                lat: -23.109731, 
-                lng: -47.715045,
+                lat: lat, 
+                lng: lng,
                 tempoRota: '',
                 tempo: '',
                 cliente: '',
@@ -686,7 +686,9 @@ const CreateVisit = ({
                 <TableRow className="table-visits_header">
                   <TableCell align="center"></TableCell>
                   <TableCell align="center" padding="none">Visita</TableCell>
-                  <TableCell align="center">Ação</TableCell>
+                  {type !== 'lunch' && 
+                    <TableCell align="center">Ação</TableCell>
+                  }
                   <TableCell align="center">Dia</TableCell>
                   <TableCell align="center">Saida</TableCell>
                   <TableCell align="center">Chegada</TableCell>
@@ -724,8 +726,13 @@ const CreateVisit = ({
                         data-cooltipz-dir="right"
                         onClick={() => createVisitGroupChoice({ visit: visita, type: type })}
                       ></TableCell>}
-                    {(visita.categoria === 'lunch' || visita.confirmar || visita.categoria === 'pos_venda') && userRef && userRef.cargo === 'Vendedor(a)' &&
+                    {(visita.categoria === 'lunch' || visita.categoria === 'pos_venda') &&
+                     userRef && visita.confirmar && (userRef.cargo === 'Vendedor(a)' || userRef.cargo === 'Administrador') &&
                     <TableCell className="btn-add disabled"
+                    ></TableCell>
+                    }
+                    {((type !== 'lunch' && visita.categoria === 'lunch') || visita.categoria === 'pos_venda') &&
+                    <TableCell
                     ></TableCell>
                     }
                     <TableCell sx={{ width: 30 }} align="center" scope="row">
