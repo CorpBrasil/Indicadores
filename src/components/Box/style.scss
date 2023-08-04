@@ -141,7 +141,11 @@
         background-color: whitesmoke;
   
         span {
-          margin-bottom: 1rem;
+          margin-bottom: 0.5rem;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          gap: 0.3rem;
         }
 
         .notice {
@@ -170,5 +174,10 @@
 
     .title-visits {
       width: 100%;
+    }
+
+    .error-aviso {
+     background-color:#ffe6e6!important;
+     border: 1px solid red!important;
     }
 }
