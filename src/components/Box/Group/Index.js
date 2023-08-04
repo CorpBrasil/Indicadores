@@ -276,13 +276,13 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, sellers, userR
           (dia.tecnicoUID === visitRef.tecnicoUID || (dia.categoria === 'lunch' && dia.tecnico === consultoraTexto))
         );
 
-        const dataRefVisit = schedule.filter(
-          (dia) => dia.data === dataTexto && dia.chegadaEmpresa === visitRef.chegadaEmpresa &&
-          (dia.tecnicoUID === visitRef.tecnicoUID || (dia.categoria === 'lunch' && dia.tecnico === consultoraTexto))
-        );
+        // const dataRefVisit = schedule.filter(
+        //   (dia) => dia.data === dataTexto && dia.chegadaEmpresa === visitRef.chegadaEmpresa &&
+        //   (dia.tecnicoUID === visitRef.tecnicoUID || (dia.categoria === 'lunch' && dia.tecnico === consultoraTexto))
+        // );
 
         console.log(dataRef)
-        console.log(dataRefVisit)
+        //console.log(dataRefVisit)
 
   
         // console.log(dataRef);
@@ -328,19 +328,19 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, sellers, userR
         //     return dataRef;
         //   });
         // } else {
-          dataRefVisit.map((ref) => {
-            // console.log("eae");
-            if (
-              saidaFormatada <= moment(ref.saidaCliente, "hh:mm") &&
-              chegadaFormatada <= moment(ref.saidaCliente, "hh:mm")
-            ) {
-              check.push(ref);
-            } else {
-              if (saidaFormatada >= moment(ref.chegadaCliente, "hh:mm"))
-                check.push(ref);
-            }
-            return dataRefVisit;
-          });
+          // dataRefVisit.map((ref) => {
+          //   // console.log("eae");
+          //   if (
+          //     saidaFormatada <= moment(ref.saidaCliente, "hh:mm") &&
+          //     chegadaFormatada <= moment(ref.saidaCliente, "hh:mm")
+          //   ) {
+          //     check.push(ref);
+          //   } else {
+          //     if (saidaFormatada >= moment(ref.chegadaCliente, "hh:mm"))
+          //       check.push(ref);
+          //   }
+          //   return dataRefVisit;
+          // });
 
           dataRef.map((ref) => {
             // console.log("eae");
@@ -716,7 +716,7 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, sellers, userR
                className={city ? undefined : 'block'}
                htmlFor="toggle"></label>
               </div> :
- <div className={'center-flex block --cooltipz-small'} style={{ gap: '0.5rem' }}
+              <div className={'center-flex block --cooltipz-small'} style={{ gap: '0.5rem' }}
               aria-label={'Para desativar o Horário Automático, preencha o campo de Endereço'}
               data-cooltipz-dir="top"
               >
