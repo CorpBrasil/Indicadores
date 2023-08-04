@@ -731,7 +731,7 @@ const CreateVisit = ({
                     <TableCell className="btn-add disabled"
                     ></TableCell>
                     }
-                    {((type !== 'lunch' && visita.categoria === 'lunch') || visita.categoria === 'pos_venda') &&
+                    {(type !== 'lunch' && (visita.categoria === 'lunch' || visita.categoria === 'pos_venda')) &&
                     <TableCell
                     ></TableCell>
                     }
