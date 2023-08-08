@@ -22,6 +22,8 @@ import RestaurantIcon from '@mui/icons-material/Restaurant'; // Almoço
 import EngineeringIcon from '@mui/icons-material/Engineering'; // Pós Venda
 import ArrowCircleRightIcon from '@mui/icons-material/ArrowCircleRight';
 import ArrowCircleLeftIcon from '@mui/icons-material/ArrowCircleLeft';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 //import ListItemText from '@mui/material/ListItemText';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -74,6 +76,8 @@ const CreateVisit = ({
   const [driver, setDriver] = useState(); // Para escolher o motorista/tecnico de acordo com o tipo de visita
   const [libraries] = useState(["places"]);
   const { register, handleSubmit } = useForm(); 
+  const [visitsFindCount, setVisitsFindCount] = useState();
+  const [visitsFind, setVisitsFind] = useState();
   
   // console.log(schedule)
 
@@ -190,7 +194,51 @@ const CreateVisit = ({
       // console.log(chegadaCliente)
       setChegadaTexto(chegadaCliente.format("kk:mm"));
     }
-  }, [horarioTexto, visitaNumero, chegadaTexto, saidaTexto, rotaTempo]);
+
+    let saidaEmpresaRef, ChegadaEmpresaRef;
+      moment.locale("pt-br");
+      saidaEmpresaRef = saidaTexto;
+      ChegadaEmpresaRef = chegadaTexto;
+
+      const saidaFormatada = moment(saidaEmpresaRef, "hh:mm");
+      const chegadaFormatada = moment(ChegadaEmpresaRef, "hh:mm");
+      let check = [];
+      let visitsFindData = [];
+
+
+      const dataRef = schedule.filter(
+        (dia) => dia.data === dataTexto && (dia.tecnico === tecnicoTexto || (type === 'lunch' && dia.consultora === tecnicoTexto))
+      );
+
+        // console.log(dataRef)
+
+
+        dataRef.map((ref) => {
+          // console.log("eae");
+          if (
+            saidaFormatada <= moment(ref.saidaEmpresa, "hh:mm") &&
+            chegadaFormatada <= moment(ref.saidaEmpresa, "hh:mm")
+          ) {
+            check.push(ref);
+          } else {
+            if (saidaFormatada >= moment(ref.chegadaEmpresa, "hh:mm"))
+              check.push(ref);
+          }
+          return dataRef;
+        });
+      // console.log(visitsFindCount);
+
+      dataRef.map((a) => {
+        //Percorre todos os arrays de 'dataRef' e compara se os arrays são iguais
+        if (check.includes(a) === false) {
+          visitsFindData.push(a);
+        }
+        return setVisitsFind(visitsFindData);
+      });
+      setVisitsFindCount(dataRef.length - check.length)
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [horarioTexto, visitaNumero, chegadaTexto, saidaTexto, rotaTempo, city]);
 
   let isLoaded;
   window.onload = { isLoaded } = useLoadScript({
@@ -226,122 +274,13 @@ const CreateVisit = ({
 
   const onSubmit = async (userData) => {
     try {
-      let diaRef,
-      saidaEmpresaRef,
-      chegadaClienteRef,
-      TempoVisita,
-      SaidaClienteRef,
-      ChegadaEmpresaRef,
-      tempoRotaRef;
-
-      const chegada = horarioTexto;
-      moment.locale("pt-br");
-      const tempo = moment('00:00', "HH:mm");
-      chegadaClienteRef = chegada;
-
-      const chegadaCliente = moment(chegada, "hh:mm"); //Horario de chegada
-      const day = moment(dataTexto); // Pega o dia escolhido
-
-      diaRef = day.format("YYYY MM DD");
-
-      TempoVisita = tempo.add(visitaNumero, 'seconds').format('HH:mm');
-
-      saidaEmpresaRef = saidaTexto;
-
-      SaidaClienteRef = saidaCliente;
-
-      chegadaCliente.add(rotaTempo, "seconds").format("hh:mm"); //Adiciona tempo de viagem volta
-      //chegadaCliente.add(rotaTempo, "seconds").format("hh:mm"); //Adiciona tempo de viagem volta
-      ChegadaEmpresaRef = chegadaTexto;
-      tempoRotaRef = rotaTempo;
-
-      // console.log({
-      //   dia: diaRef,
-      //   saidaEmpresa: saidaEmpresaRef,
-      //   chegadaCliente: chegadaClienteRef,
-      //   visita: TempoVisita,
-      //   saidaDoCliente: SaidaClienteRef,
-      //   chegadaEmpresa: ChegadaEmpresaRef,
-      //   consultora: userData.consultora,
-      //   tecnico: tecnicoTexto,
-      //   cidade: city,
-      // });
-
-      const dataRef = schedule.filter(
-        (dia) => dia.data === dataTexto && (dia.tecnico === tecnicoTexto || (type === 'lunch' && dia.consultora === tecnicoTexto))
-      );
-
-        // console.log(dataRef)
-
+      // console.log(visitsFind);
       const lunch = schedule.filter(
         (dia) =>
           dia.data === dataTexto &&
           dia.categoria === "lunch" &&
           dia.tecnico === tecnicoTexto
       );
-      const saidaFormatada = moment(saidaEmpresaRef, "hh:mm");
-      const chegadaFormatada = moment(ChegadaEmpresaRef, "hh:mm");
-
-      let check = [];
-      let visitsFind = [];
-
-      // //Almoço
-      // if ((lunch.length < 1 || lunch === undefined) && !checkInput) {
-      //   if (
-      //     chegadaFormatada > moment("10:59", "hh:mm") &&
-      //     chegadaFormatada < moment("13:01", "hh:mm")
-      //   ) {
-      //     chegadaFormatadaTec.current = chegadaFormatada.add(1, "h");
-      //     saidaFormatadaTec.current = null; // UseRef não recebe renderização. emtão o valor antigo fica associado ainda
-      //     // console.log(chegadaFormatadaTec.current.format("kk:mm"));
-      //   } else if (
-      //     saidaFormatada > moment("11:59", "hh:mm") &&
-      //     saidaFormatada < moment("14:01", "hh:mm")
-      //   ) {
-      //     saidaFormatadaTec.current = saidaFormatada.subtract(1, "h");
-      //     chegadaFormatadaTec.current = null;
-      //     // console.log(saidaFormatadaTec.current);
-      //   }
-
-      //   dataRef.map((ref) => {
-      //     if (
-      //       saidaFormatada <= moment(ref.saidaEmpresa, "hh:mm") &&
-      //       chegadaFormatadaTec.current <= moment(ref.saidaEmpresa, "hh:mm")
-      //     ) {
-      //       check.push(ref);
-      //     } else {
-      //       if (saidaFormatada >= moment(ref.chegadaEmpresa, "hh:mm"))
-      //         check.push(ref);
-      //     }
-      //     return dataRef;
-      //   });
-      // } else {
-
-        dataRef.map((ref) => {
-          // console.log("eae");
-          if (
-            saidaFormatada <= moment(ref.saidaEmpresa, "hh:mm") &&
-            chegadaFormatada <= moment(ref.saidaEmpresa, "hh:mm")
-          ) {
-            check.push(ref);
-          } else {
-            if (saidaFormatada >= moment(ref.chegadaEmpresa, "hh:mm"))
-              check.push(ref);
-          }
-          return dataRef;
-        });
-
-      const visitsFindCount = dataRef.length - check.length;
-      // console.log(visitsFindCount);
-
-      dataRef.map((a) => {
-        //Percorre todos os arrays de 'dataRef' e compara se os arrays são iguais
-        if (check.includes(a) === false) {
-          visitsFind.push(a);
-        }
-        return visitsFind;
-      });
-      // console.log(visitsFind);
 
       let c = 1;
       if (visitsFindCount < 0 || visitsFindCount > 0) {
@@ -380,7 +319,7 @@ const CreateVisit = ({
             // console.log(checkInput)
             if(checkInput === true && lunch.length === 0) {
               await addDoc(scheduleRef, {
-                dia: diaRef,
+                dia: moment(dataTexto).format("YYYY MM DD"),
                 saidaEmpresa: horarioTexto,
                 chegadaCliente: horarioTexto,
                 visita: "01:00",
@@ -417,13 +356,13 @@ const CreateVisit = ({
               })
             } else {
               const visita = {
-                dia: diaRef,
-                saidaEmpresa: saidaEmpresaRef,
-                chegadaCliente: chegadaClienteRef,
-                visita: TempoVisita,
+                dia: moment(dataTexto).format("YYYY MM DD"),
+                saidaEmpresa: saidaTexto,
+                chegadaCliente: horarioTexto,
+                visita: moment('00:00', "HH:mm").add(visitaNumero, 'seconds').format('HH:mm'),
                 visitaNumero: visitaNumero,
-                saidaDoCliente: SaidaClienteRef,
-                chegadaEmpresa: ChegadaEmpresaRef,
+                saidaDoCliente: saidaCliente,
+                chegadaEmpresa: chegadaTexto,
                 consultora: consultoraTexto,
                 uid: sellerRef.id,
                 cor: sellerRef.cor,
@@ -436,7 +375,7 @@ const CreateVisit = ({
                 lng: lng,
                 cliente: userData.cliente,
                 observacao: userData.observacao,
-                tempoRota: tempoRotaRef,
+                tempoRota: rotaTempo,
                 tempo: tempoTexto,
                 data: dataTexto,
                 confirmar: false,
@@ -492,7 +431,8 @@ const CreateVisit = ({
           showCloseButton: true,
           confirmButtonColor: "#d33"  
         })
-      } else {
+      }
+       else {
         await addDoc(scheduleRef, data);
         // console.log(data)
         const date = new Date(data.data);
@@ -579,22 +519,26 @@ const CreateVisit = ({
           <div className="box-visit__form">
           {!checkInput ?
                 <label className="label">
-                <p data-cooltipz-size="fit"
+                <p className="notice">Endereço* 
+                <span data-cooltipz-size="medium"
                  aria-label={tempoTexto && `Tempo da Rota: ${tempoTexto} | Cidade: ${city} | N° ${numberAddress ? numberAddress + ' ✅' : '❌'}`}
-                  className="notice cooltipz--top cooltipz--visible">Endereço *</p>
+                  className='cooltipz--top' ><InfoOutlinedIcon className={tempoTexto && 'check-icon' } /></span>
+                </p>
                 <input
-                  className="label__input"
+                  className={tempoTexto ? 'label__input check-input' : 'label__input'}
                   placeholder="Digite a cidade"
                   ref={ref}
                   required
                 />
               </label> : 
                 <label className="label">
-                <p data-cooltipz-size="fit"
+                  <p className="notice">Endereço* 
+                <span data-cooltipz-size="medium"
                  aria-label={tempoTexto && `Cidade: ${city} ✅`}
-                  className="notice cooltipz--top cooltipz--visible">Cidade *</p>
+                  className='cooltipz--top' ><InfoOutlinedIcon className={tempoTexto && 'check-icon' } /></span>
+                </p>
                 <input
-                  className="label__input"
+                  className={tempoTexto ? 'label__input check-input' : 'label__input'}
                   placeholder="Digite a cidade"
                   ref={ref}
                   required
@@ -795,8 +739,10 @@ const CreateVisit = ({
              }
              {type === "lunch" ? 
              (visitaNumero && horarioTexto ? 
-               <div className="box-visit__info prev">
-               <span className="">Previsão de Visita</span>
+               <div className={visitsFindCount < 0 || visitsFindCount > 0 ? "box-visit__info prev error-aviso" : "box-visit__info prev check"}>
+               <span className="">Previsão de Visita {(visitsFindCount < 0 || visitsFindCount > 0) &&
+               <div aria-label="Essa Visita ultrapassa o horário de uma Visita já existente. Verifique os horários disponiveis."
+                data-cooltipz-dir="top" data-cooltipz-size="large" ><ErrorOutlineIcon  sx={{ fill: 'red' }} /></div>}</span>
                <p className="notice">
                <ArrowCircleRightIcon className="saida" />Saindo às <b>{horarioTexto}</b>
                </p>
@@ -809,8 +755,10 @@ const CreateVisit = ({
               </div>
              ) : 
              (city && visitaNumero && horarioTexto ? 
-              <div className="box-visit__info prev">
-              <span className="">Previsão de Visita</span>
+              <div className={visitsFindCount < 0 || visitsFindCount > 0 ? "box-visit__info prev error-aviso" : "box-visit__info prev check"}>
+              <span className="">Previsão de Visita {(visitsFindCount < 0 || visitsFindCount > 0) &&
+               <div aria-label="Essa Visita ultrapassa o horário de uma Visita já existente. Verifique os horários disponiveis."
+                data-cooltipz-dir="top" data-cooltipz-size="large" ><ErrorOutlineIcon  sx={{ fill: 'red' }} /></div>}</span>
               <p className="notice">
               <ArrowCircleRightIcon className="saida" />Saindo às <b>{saidaTexto}</b>
               </p>
