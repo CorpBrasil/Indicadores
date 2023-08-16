@@ -171,3 +171,40 @@ input:disabled {
   background-color: #e8e8e8;
   border-bottom: 1px solid #ccc;
 }
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #313131 #DFE9EB;
+}
+
+/* Chrome, Edge and Safari */
+*::-webkit-scrollbar {
+  width: 10px;
+  width: 10px;
+}
+*::-webkit-scrollbar-track {
+  border-radius: 5px;
+  background-color: #DFE9EB;
+}
+
+*::-webkit-scrollbar-track:hover {
+  background-color: #B8C0C2;
+}
+
+*::-webkit-scrollbar-track:active {
+  background-color: #B8C0C2;
+}
+
+*::-webkit-scrollbar-thumb {
+  border-radius: 5px;
+  background-color: #313131;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background-color: #3f3f3f;
+}
+
+*::-webkit-scrollbar-thumb:active {
+  background-color: #3c3c3c;
+}

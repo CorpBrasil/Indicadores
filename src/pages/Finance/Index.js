@@ -4,6 +4,14 @@ import { dataBase } from "../../firebase/database";
 import Header from "../../components/Header/Index";
 import useAuth from "../../hooks/useAuth";
 
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import Paper from '@mui/material/Paper';
+
 import {
   onSnapshot,
   collection,
@@ -232,50 +240,49 @@ useEffect(() => {
                 </div>        
             <div>
             </div>
-            <table className="table-finance table-center last">
-              <thead>
-                <tr>
-                  <th>Dia</th>
-                  <th>Cidade</th>
-                  <th>Cliente</th>
-                  <th>Horário Marcado</th>
-                  <th>Consultora</th>
-                  <th>Técnico/Motorista</th>
-                  <th>Veículo</th>
-                </tr>
-              </thead>
-              <tbody>
-                {schedule &&
-                  schedule.map((info, index) => (
-                      <tr
-                        className="table"
-                        key={index}>
-                        <td className="bold">
-                          {info.dia.substring(info.dia.length - 2)}
-                        </td>
-                        <td>{info.cidade}</td>
-                        <td>{info.cliente}</td>
-                        <td className="bold bg-important">
-                          {info.horario}
-                        </td>
-                        <td
-                          style={info.cor && {
-                            backgroundColor: info.cor,
-                            borderBottom: `1px solid ${info.cor}`,
-                            borderRight: `1px solid ${info.cor}`,
-                            borderLeft: `1px solid ${info.cor}`,
-                            color: "#fff",
-                            textShadow: '#5a5a5a -1px 0px 5px',
-                          }}
-                        >
-                          {info.consultora}
-                        </td>
-                        <td>{info.tecnico}</td>
-                        <td>{info.veiculo}</td>
-                      </tr>
-                  ))}
-              </tbody>
-            </table>
+            <TableContainer className="table-visits table-center" component={Paper}>
+            <Table size="small" stickyHeader aria-label="sticky table">
+              <TableHead>
+                <TableRow className="table-visits_header">
+                  <TableCell align="center">Dia</TableCell>
+                  <TableCell align="center">Cidade</TableCell>
+                  <TableCell align="center" padding="none">Cliente</TableCell>
+                  <TableCell align="center">Horário Marcado</TableCell>
+                  <TableCell align="center">Consultora</TableCell>
+                  <TableCell align="center">Técnico / Motorista</TableCell>
+                  <TableCell align="center">Veiculo</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {schedule.map((visita) => (
+                  <TableRow
+                    hover
+                    key={visita.id}
+                    className={`list-visit`}
+                    sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                  >
+                    <TableCell sx={{ width: 30 }} align="center" scope="row">
+                      {visita.dia.substring(8, 10)}
+                    </TableCell>
+                    <TableCell align="center">{visita.cidade}</TableCell>
+                    <TableCell align="center">{visita.cliente}</TableCell>
+                    <TableCell 
+                     aria-label={visita.saida && `Saida: ${visita.saida} - Chegada: ${visita.chegada}`}
+                     data-cooltipz-dir="top"
+                    align="center"
+                    >{visita.horario}</TableCell>
+                    <TableCell
+                    sx={{ backgroundColor: `${visita.cor}`, color: '#fff', fontWeight: 'bold' }} 
+                    align="center" scope="row">
+                      {visita.consultora}
+                    </TableCell>
+                    <TableCell align="center">{visita.tecnico}</TableCell>
+                    <TableCell align="center">{visita.veiculo}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
             <div className="print">
             <button className="btn-print" onClick={() => window.print()}>Imprimir / Salvar PDF</button>
           </div>

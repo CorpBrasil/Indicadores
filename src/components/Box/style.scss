@@ -100,7 +100,9 @@
                 border-radius: 5px;
                 color: #60666d;
                 font-size: 1rem;
-                appearance: none;
+                -webkit-appearance: none!important;
+                -moz-appearance: none!important;
+                appearance: none!important;
                 background: url(../../images/icons/Arrow.svg) #eee 90% no-repeat;
                 background-size: 1rem;
                 text-align: center;

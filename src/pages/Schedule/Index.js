@@ -479,6 +479,8 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts, check }) => {
                 cidade: ref.cidade,
                 cliente: ref.cliente,
                 horario: ref.chegadaCliente,
+                saida: ref.saidaEmpresa,
+                chegada: ref.chegadaEmpresa,
                 consultora: ref.consultora,
                 cor: ref.cor,
                 tecnico: ref.tecnico,

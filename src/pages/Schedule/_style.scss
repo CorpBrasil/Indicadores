@@ -17,6 +17,12 @@
   }
 }
 
+@media (max-width: 580px) {
+  .container-info {
+    justify-content: start!important;
+  }
+}
+
 @media print {
   .schedule-month,
   .box-schedule-visit,
@@ -66,7 +72,6 @@
 
   .content-schedule-visit {
     width: 100%;
-    max-width: 1300px;
     display: flex;
     flex-direction: column;
     margin: auto;
@@ -156,9 +161,9 @@
           border-radius: 5px;
           color: #60666d;
           font-size: 1.2rem;
-          -webkit-appearance: none;
-          -moz-appearance: none;
-          appearance: none;
+          -webkit-appearance: none!important;
+          -moz-appearance: none!important;
+          appearance: none!important;
           background: url(../../images/icons/Arrow.svg) #fff 90% no-repeat;
           background-size: 1rem;
           text-align: center;
@@ -179,7 +184,7 @@
         justify-content: flex-end;
         align-items: center;
         gap: 0.5rem;
-        width: 100%;
+        width: 97%;
 
         .toggle {
           position: absolute;
@@ -235,9 +240,11 @@
       }
 
       .container-table {
-        width: 100%;
+        width: 97%;
+        display: flex;
         overflow-x: auto;
         z-index: 0;
+        margin: auto;
         //==============================//
       }
 
@@ -255,9 +262,8 @@
 
       .table-visit { // ============= Tabela de Visita ================== //
         border-collapse: collapse;
-        display: block;
         position: relative;
-        margin: 1rem;
+        margin: 1rem 0;
         box-shadow: 0 4px 4px rgb(0 0 0 / 25%);
 
         thead {
@@ -338,15 +344,14 @@
 
       .container-info {
         display: flex;
-        min-width: 610px;
         max-width: 610px;
         justify-content: center;
         margin: 2rem auto;
+        overflow-y: auto;
       }
 
       .table-center {
         margin: auto;
-        min-width: 700px;
       }
 
       .end {
@@ -375,6 +380,7 @@
 
       .table-finance {
         border-collapse: collapse;
+        font-size: 0.875rem;
 
         thead {
           border: 1px solid #313131;
@@ -382,6 +388,10 @@
           height: 3rem;
           color: #fff;
           border-right: none;
+
+          th {
+            font-weight: normal;
+          }
 
           th,
           td {
@@ -391,7 +401,6 @@
 
         tbody {
           td {
-            //font-weight: 100;
             height: 40px;
             max-height: 40px;
             border: 1px solid #ccc;
