@@ -82,6 +82,17 @@
 
             .notice {
               --cooltipz-font-size: 0.8rem;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              gap: 0.2rem;
+              height: 1.2rem;
+
+              svg {
+                scale: 0.8;
+                opacity: 0.3;
+                fill: #111;
+              }
             }
 
             .red {
@@ -181,5 +192,19 @@
     .error-aviso {
      background-color:#ffe6e6!important;
      border: 1px solid red!important;
+    }
+
+    .check { // Estilo de confirmação
+      border: 1px solid #4cb817;
+      background-color: #f3ffed;
+
+        &-icon {
+          opacity: 1!important;
+          fill: #42a312!important;
+        }
+
+        &-input {
+          border: 1px solid #4cb817;
+        }
     }
 }

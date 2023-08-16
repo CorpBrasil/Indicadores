@@ -20,6 +20,8 @@ import EngineeringIcon from '@mui/icons-material/Engineering'; // Pós Venda
 import ArrowCircleRightIcon from '@mui/icons-material/ArrowCircleRight';
 import ArrowCircleLeftIcon from '@mui/icons-material/ArrowCircleLeft';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -263,7 +265,6 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, sellers, userR
             }
             return setVisitsFind(visitsFindData);
           });
-          console.log('raaa')
           setVisitsFindCount(dataRef.length - check.length)
 
         } else {
@@ -303,97 +304,33 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, sellers, userR
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [horarioTexto, visitaNumero, chegadaTexto, saidaTexto, rotaTempo1, rotaTempo2, city, schedule]);
 
+  
+
   const onSubmit = async (userData) => {
     try {
-      if(checkNet) {
+      if(!city) {
         Swal.fire({
-          title: 'Sem Conexão',
-          icon: "error",
-          html: `Não é possível Criar uma Visita Conjunta <b>sem internet.</b> Verifique a sua conexão.`,
+          title: 'Endereço Não Encontrado',
+          icon: "warning",
+          html: `Verifique se o endereço foi preenchido <b>corretamente.</b>`,
           confirmButtonText: "Fechar",
           showCloseButton: true,
-          confirmButtonColor: "#d33"  
+          confirmButtonColor: "#313131"  
         })
-      } else {
+      }
 
-        // console.log(dataRef)
-        // console.log(dataRefVisit)
-
-  
-        // console.log(dataRef);
-        // const lunch = schedule.filter(
-        //   (dia) =>
-        //     dia.data === dataTexto &&
-        //     dia.consultora === "Almoço Téc." &&
-        //     dia.tecnico === tecnicoTexto
-        // );
-  
-        // if (lunch.length < 1 || lunch === undefined) {
-        //   if (
-        //     chegadaFormatada > moment("10:59", "hh:mm") &&
-        //     chegadaFormatada < moment("14:01", "hh:mm")
-        //   ) {
-        //     chegadaFormatadaTec.current = chegadaFormatada.add(1, "h");
-        //     saidaFormatadaTec.current = null; // UseRef não recebe renderização. emtão o valor antigo fica associado ainda
-        //     // console.log(chegadaFormatadaTec.current.format("kk:mm"));
-        //   } else if (
-        //     saidaFormatada > moment("10:59", "hh:mm") &&
-        //     saidaFormatada < moment("14:01", "hh:mm")
-        //   ) {
-        //     saidaFormatadaTec.current = saidaFormatada.subtract(1, "h");
-        //     chegadaFormatadaTec.current = null;
-        //     // console.log(saidaFormatadaTec.current);
-        //   }
-  
-        //   dataRef.map((ref) => {
-        //     if (
-        //       saidaFormatada <= moment(ref.saidaEmpresa, "hh:mm") &&
-        //       chegadaFormatadaTec.current <= moment(ref.saidaEmpresa, "hh:mm")
-        //     ) {
-        //       check.push(ref);
-        //     } else {
-        //       if (saidaFormatada >= moment(ref.chegadaEmpresa, "hh:mm"))
-        //         check.push(ref);
-        //     }
-        //     return dataRef;
-        //   });
-        // } else {  
-        // console.log(chegadaFormatadaTec.current, saidaFormatadaTec.current);
-        // console.log(">>", check, dataRef);
-        // console.log(lunch.length);
-        // console.log(visitsFindCount);
-  
-  
-        // console.log({
-        //   dia: diaRef,
-        //         saidaEmpresa: saidaEmpresaRef,
-        //         chegadaCliente: chegadaClienteRef,
-        //         visita: TempoVisita,
-        //         visitaNumero: visitaNumero,
-        //         saidaDoCliente: SaidaClienteRef,
-        //         chegadaEmpresa: saidaCliente,
-        //         saidaEmpresaRef: visitRef.saidaEmpresa,
-        //         consultora: userData.consultora,
-        //         tecnico: tecRefUID.nome,
-        //         tecnicoUID: tecRefUID.uid,
-        //         cidade: city,
-        //         cliente: userData.cliente,
-        //         observacao: userData.observacao,
-        //         tempoRota: rotaTempo1,
-        //         tempo: tempoTexto1,
-        //         tempoRotaConjunta: rotaTempo2,
-        //         tempoConjunta: tempoTexto2,
-        //         lng: lng,
-        //         lat: lat,
-        //         data: dataTexto,
-        //         uid: user.id,
-        //         idRef: visitRef.id,
-        //         group: 'antes',
-        //         cor: userRef.cor,
-        //         confirmar: false,
-        // });
-
-  
+      // if(checkNet) {
+      //   Swal.fire({
+      //     title: 'Sem Conexão',
+      //     icon: "error",
+      //     html: `Não é possível Criar uma Visita Conjunta <b>sem internet.</b> Verifique a sua conexão.`,
+      //     confirmButtonText: "Fechar",
+      //     showCloseButton: true,
+      //     confirmButtonColor: "#d33"  
+      //   })
+      // } 
+      
+      else {
         let c = 1;
         let SaidaClienteRef2;
         console.log(visitsFindCount);
@@ -737,20 +674,23 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, sellers, userR
           <div className="box-visit__container">
           <div className="box-visit__form">
             <label className="label">
-            <p data-cooltipz-size="fit"
+            <p className="notice">Endereço* 
+            <span data-cooltipz-size="medium"
                  aria-label={tempoTexto1 && tempoTexto2 && `Tempo da Rota: ${tempoTexto1} | Cidade: ${city} | N° ${numberAddress ? numberAddress + ' ✅' : '❌'}`}
-                  className="notice cooltipz--top cooltipz--visible">Endereço *</p>
+                  className='cooltipz--top' ><InfoOutlinedIcon className={tempoTexto1 && tempoTexto2 && 'check-icon' } /></span>
+            </p>
               <input
-                className="label__input"
+                className={tempoTexto1 && tempoTexto2 ? 'label__input check-input' : 'label__input'}
                 placeholder="Digite a cidade"
                 ref={ref}
+                required
               />
             </label>
             <label className="label">
               <p>Dia *</p>
               <input
                 value={dataTexto || ''}
-                className="label__input"
+                className='label__input'
                 type="date"
                 min={monthNumber && monthNumber.min}
                 max={monthNumber && monthNumber.max}
@@ -812,8 +752,8 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, sellers, userR
               <TableHead>
                 <TableRow className="table-visits_header">
                   <TableCell align="center"></TableCell>
-                  <TableCell align="center">Dia</TableCell>
                   <TableCell align="center">Visita</TableCell>
+                  <TableCell align="center">Dia</TableCell>
                   <TableCell align="center">Saida</TableCell>
                   <TableCell align="center">Chegada</TableCell>
                   <TableCell align="center">Motorista</TableCell>
@@ -830,16 +770,16 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, sellers, userR
                     aria-label={visita.consultora}
                     data-cooltipz-dir="right"
                     sx={{ backgroundColor: `${visita.cor}`, color: '#fff', width: 30 }} 
-                    align="center" component="th" scope="row">
+                    align="center" scope="row">
                       {visita.consultora.substring(0, 1)}
-                    </TableCell>
-                    <TableCell sx={{ width: 30 }} align="center" component="th" scope="row">
-                      {visita.dia.substring(8, 10)}
                     </TableCell>
                     {visita.categoria === "lunch" && <TableCell style={{ filter: 'contrast' }} className="type-icon lunch" aria-label="Almoço" data-cooltipz-dir="right"><RestaurantIcon /></TableCell>}
                     {visita.categoria === "comercial" && <TableCell className="type-icon comercial" aria-label="Visita Comercial" data-cooltipz-dir="right"><RequestQuoteIcon /></TableCell>}
                     {visita.categoria === "comercial_tecnica" && <TableCell className="type-icon comercial_tec" aria-label="Comercial + Técnica" data-cooltipz-dir="right"><PeopleIcon /></TableCell>}
                     {visita.categoria === "pos_venda" && <TableCell className="type-icon pos_venda" aria-label="Pós-Venda" data-cooltipz-dir="right"><EngineeringIcon /></TableCell>}
+                    <TableCell sx={{ width: 30 }} align="center" scope="row">
+                      {visita.dia.substring(8, 10)}
+                    </TableCell>
                     <TableCell align="center">{type === 'antes' && visitRef.id === visita.id ? visitRef.chegadaCliente : visita.saidaEmpresa}</TableCell>
                     <TableCell align="center">{type === 'depois' && visitRef.id === visita.id ? visitRef.saidaDoCliente : visita.chegadaEmpresa}</TableCell>
                     <TableCell align="center">{visita.tecnico}</TableCell>
@@ -883,7 +823,7 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, sellers, userR
              </div>
              }
              {tempoTexto1 && tempoTexto2 && chegadaTexto && horarioTexto ? 
-            <div className={visitsFindCount < 0 || visitsFindCount > 0 ? "box-visit__info prev error-aviso" : "box-visit__info prev"}>
+            <div className={visitsFindCount < 0 || visitsFindCount > 0 ? "box-visit__info prev error-aviso" : "box-visit__info prev check"}>
               <span className="">Previsão de Visita {(visitsFindCount < 0 || visitsFindCount > 0) &&
                <div aria-label="Essa Visita ultrapassa o horário de uma Visita já existente. Verifique os horários disponiveis." data-cooltipz-dir="top" data-cooltipz-size="large" ><ErrorOutlineIcon  sx={{ fill: 'red' }} /></div>}</span>
               <p className="notice">
