@@ -14,6 +14,8 @@ import RestaurantIcon from '@mui/icons-material/Restaurant'; // Almoço
 import EngineeringIcon from '@mui/icons-material/Engineering'; // Pós Venda
 import ArrowCircleRightIcon from '@mui/icons-material/ArrowCircleRight';
 import ArrowCircleLeftIcon from '@mui/icons-material/ArrowCircleLeft';
+//import { ReactComponent as CheckIcon } from "../../../images/icons/Check.svg";
+
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -43,8 +45,7 @@ const EditVisit = ({
   type,
   checkNet
 }) => {
-  // const chegadaFormatadaTec = useRef();
-  // const saidaFormatadaTec = useRef();
+  
   const { user } = useAuth();
   const [rotaTempo, setRotaTempo] = useState();
   const [tempoTexto, setTempoTexto] = useState();

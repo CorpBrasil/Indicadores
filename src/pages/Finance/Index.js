@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import { dataBase } from "../../firebase/database";
 import Header from "../../components/Header/Index";
 import useAuth from "../../hooks/useAuth";
+import Dashboard from "../../components/Dashboard/Index";
 
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -11,6 +12,8 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
+
+import { ReactComponent as ScheduleIcon } from "../../images/icons/Schedule1.svg";
 
 import {
   onSnapshot,
@@ -31,6 +34,7 @@ const Finance = ({ userRef, alerts }) => {
   const [members, setMembers] = useState();
   const [tecs, setTecs] = useState();
   const [sales, setSales] = useState();
+  const [total, setTotal] = useState();
   const [monthSelect, setMonthSelect] = useState(
     String(data.getMonth() + 1).padStart(2, "0")
   );
@@ -91,6 +95,9 @@ useEffect(() => {
         }
         return setTecs(docs.sort());
       })
+      tecs && tecs.map((tec, index) => (
+        setTotal(schedule.filter((ref) => ref.tecnico && ref.tecnico !== 'Nenhum' && ref.tecnico !== 'Bruna' && ref.tecnico !== 'Lia').length * 20)
+      ))
     }
     // console.log(tecs);
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -122,11 +129,9 @@ useEffect(() => {
     <div className="container-schedule">
       <Header user={user} userRef={userRef} alerts={alerts}></Header>
       <div className="title-schedule">
+        <ScheduleIcon />
         <h2>Agenda {year} </h2>
         <h2>Relátorio Mensal - {month[parseFloat(monthSelect)]} </h2>
-      </div>
-      <div className="content-schedule-visit">
-        <div className="box-schedule-visit">
             <div className="schedule-month">
             <select
               value={monthSelect}
@@ -148,6 +153,10 @@ useEffect(() => {
               <option value="12">Dezembro</option>
             </select>
           </div>
+      </div>
+      <div className="content-schedule-visit">
+        <Dashboard schedule={schedule} monthSelect={monthSelect} type={'financeiro'} total={total} />
+        <div className="box-schedule-visit" style={{  }}>
           {tecs && tecs.length > 0 &&
           <div className="container-table">
             <div className="container-info">
@@ -240,7 +249,7 @@ useEffect(() => {
                 </div>        
             <div>
             </div>
-            <TableContainer className="table-visits table-center" component={Paper}>
+            <TableContainer className="table-visit table-center" component={Paper} sx={{ maxWidth: '1000px' }}>
             <Table size="small" stickyHeader aria-label="sticky table">
               <TableHead>
                 <TableRow className="table-visits_header">
@@ -261,23 +270,23 @@ useEffect(() => {
                     className={`list-visit`}
                     sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                   >
-                    <TableCell sx={{ width: 30 }} align="center" scope="row">
+                    <TableCell className="td-finance" sx={{ width: 30 }} align="center" scope="row">
                       {visita.dia.substring(8, 10)}
                     </TableCell>
-                    <TableCell align="center">{visita.cidade}</TableCell>
-                    <TableCell align="center">{visita.cliente}</TableCell>
-                    <TableCell 
+                    <TableCell className="td-finance" align="center">{visita.cidade}</TableCell>
+                    <TableCell className="td-finance" align="center">{visita.cliente}</TableCell>
+                    <TableCell className="td-finance"
                      aria-label={visita.saida && `Saida: ${visita.saida} - Chegada: ${visita.chegada}`}
                      data-cooltipz-dir="top"
                     align="center"
                     >{visita.horario}</TableCell>
-                    <TableCell
+                    <TableCell className="td-finance"
                     sx={{ backgroundColor: `${visita.cor}`, color: '#fff', fontWeight: 'bold' }} 
                     align="center" scope="row">
                       {visita.consultora}
                     </TableCell>
-                    <TableCell align="center">{visita.tecnico}</TableCell>
-                    <TableCell align="center">{visita.veiculo}</TableCell>
+                    <TableCell className="td-finance" align="center">{visita.tecnico}</TableCell>
+                    <TableCell className="td-finance" align="center">{visita.veiculo}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>

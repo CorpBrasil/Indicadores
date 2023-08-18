@@ -14,8 +14,6 @@ import {
 import "moment/locale/pt-br";
 import { Company, KeyMaps } from "../../../data/Data";
 
-// import List from '@mui/material/List';
-// import ListItem from '@mui/material/ListItem';
 import RequestQuoteIcon from '@mui/icons-material/RequestQuote'; // Visita Comercial
 import PeopleIcon from '@mui/icons-material/People'; // Tecnica + Comercial
 import RestaurantIcon from '@mui/icons-material/Restaurant'; // Almoço
@@ -24,7 +22,8 @@ import ArrowCircleRightIcon from '@mui/icons-material/ArrowCircleRight';
 import ArrowCircleLeftIcon from '@mui/icons-material/ArrowCircleLeft';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
-//import ListItemText from '@mui/material/ListItemText';
+import { ReactComponent as CheckIcon } from "../../../images/icons/Check.svg";
+
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -740,9 +739,14 @@ const CreateVisit = ({
              {type === "lunch" ? 
              (visitaNumero && horarioTexto ? 
                <div className={visitsFindCount < 0 || visitsFindCount > 0 ? "box-visit__info prev error-aviso" : "box-visit__info prev check"}>
-               <span className="">Previsão de Visita {(visitsFindCount < 0 || visitsFindCount > 0) &&
-               <div aria-label="Essa Visita ultrapassa o horário de uma Visita já existente. Verifique os horários disponiveis."
-                data-cooltipz-dir="top" data-cooltipz-size="large" ><ErrorOutlineIcon  sx={{ fill: 'red' }} /></div>}</span>
+               <span className="">Previsão de Visita {(visitsFindCount < 0 || visitsFindCount > 0) ?
+               <div aria-label="Essa Visita ultrapassa o horário de uma Visita já existente. Verifique os horários disponiveis"
+                data-cooltipz-dir="top" data-cooltipz-size="large" ><ErrorOutlineIcon  sx={{ fill: 'red' }} /></div> 
+              :
+              <div aria-label="A Visita pode ser criada"
+                data-cooltipz-dir="top" ><CheckIcon className="check-icon" /></div>
+              }
+                </span>
                <p className="notice">
                <ArrowCircleRightIcon className="saida" />Saindo às <b>{horarioTexto}</b>
                </p>
@@ -756,9 +760,14 @@ const CreateVisit = ({
              ) : 
              (city && visitaNumero && horarioTexto ? 
               <div className={visitsFindCount < 0 || visitsFindCount > 0 ? "box-visit__info prev error-aviso" : "box-visit__info prev check"}>
-              <span className="">Previsão de Visita {(visitsFindCount < 0 || visitsFindCount > 0) &&
-               <div aria-label="Essa Visita ultrapassa o horário de uma Visita já existente. Verifique os horários disponiveis."
-                data-cooltipz-dir="top" data-cooltipz-size="large" ><ErrorOutlineIcon  sx={{ fill: 'red' }} /></div>}</span>
+              <span className="">Previsão de Visita {(visitsFindCount < 0 || visitsFindCount > 0) ?
+               <div aria-label="Essa Visita ultrapassa o horário de uma Visita já existente. Verifique os horários disponiveis"
+                data-cooltipz-dir="top" data-cooltipz-size="large" ><ErrorOutlineIcon  sx={{ fill: 'red' }} /></div>
+              :
+              <div aria-label="A Visita pode ser criada"
+                data-cooltipz-dir="top" ><CheckIcon className="check-icon" /></div>
+              }
+              </span>
               <p className="notice">
               <ArrowCircleRightIcon className="saida" />Saindo às <b>{saidaTexto}</b>
               </p>

@@ -21,6 +21,7 @@ import ArrowCircleRightIcon from '@mui/icons-material/ArrowCircleRight';
 import ArrowCircleLeftIcon from '@mui/icons-material/ArrowCircleLeft';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import { ReactComponent as CheckIcon } from "../../../images/icons/Check.svg";
 
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -824,8 +825,13 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, sellers, userR
              }
              {tempoTexto1 && tempoTexto2 && chegadaTexto && horarioTexto ? 
             <div className={visitsFindCount < 0 || visitsFindCount > 0 ? "box-visit__info prev error-aviso" : "box-visit__info prev check"}>
-              <span className="">Previsão de Visita {(visitsFindCount < 0 || visitsFindCount > 0) &&
-               <div aria-label="Essa Visita ultrapassa o horário de uma Visita já existente. Verifique os horários disponiveis." data-cooltipz-dir="top" data-cooltipz-size="large" ><ErrorOutlineIcon  sx={{ fill: 'red' }} /></div>}</span>
+              <span className="">Previsão de Visita {(visitsFindCount < 0 || visitsFindCount > 0) ?
+               <div aria-label="Essa Visita ultrapassa o horário de uma Visita já existente. Verifique os horários disponiveis" data-cooltipz-dir="top" data-cooltipz-size="large" ><ErrorOutlineIcon  sx={{ fill: 'red' }} /></div>
+               :
+               <div aria-label="A Visita pode ser criada"
+                 data-cooltipz-dir="top" ><CheckIcon className="check-icon" /></div>
+               }
+              </span>
               <p className="notice">
                 <ArrowCircleRightIcon className="saida" />Saindo às <b>{visitRef.tipo === "Almoço" ? visitRef.saidaDoCliente : saidaTexto}</b>
               </p>

@@ -22,6 +22,7 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import PeopleIcon from '@mui/icons-material/People';
 import LocalGasStationIcon from '@mui/icons-material/LocalGasStation';
+import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
@@ -276,7 +277,8 @@ const Schedules = ({ userRef, alerts, check }) => {
     <div className='container-schedules'>
       <Header user={user} userRef={userRef} alerts={alerts}></Header>
       <div className='title-schedule'>
-        <h2>Inicio</h2>
+        <HomeOutlinedIcon sx={{ width: '50px', height: '50px' }} />
+        <h1>Inicio</h1>
       </div>
        <div className='content-schedule'>
        {(user.email !== Users[1].email) &&

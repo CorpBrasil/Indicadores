@@ -22,6 +22,7 @@ import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 
 import Meetime from '../../images/icons/Logo_Meetime.png';
+import { ReactComponent as Leads } from '../../images/icons/Leads.svg';
 
 // Css
 import "cooltipz-css";
@@ -133,6 +134,7 @@ const Alert = ({user,  userRef, alerts, check}) => {
     <div className="container-panel">
       <Header user={user} userRef={userRef} alerts={alerts}></Header>
       <div className="title-panel">
+        <Leads style={{ width: '42px', height: '42px', marginBottom: '0.5rem' }} />
         <h2>Leads</h2>
       </div>
       <div className="content-panel">

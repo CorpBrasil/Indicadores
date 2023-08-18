@@ -6,16 +6,23 @@ import { useParams } from "react-router-dom";
 import { dataBase } from "../../firebase/database";
 import Header from "../../components/Header/Index";
 import useAuth from "../../hooks/useAuth";
+import Dashboard from "../../components/Dashboard/Index";
+
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
+import IconButton from '@mui/material/IconButton';
 
 //import EventNoteIcon from '@mui/icons-material/EventNote';
 import RequestQuoteIcon from '@mui/icons-material/RequestQuote'; // Visita Comercial
 import PeopleIcon from '@mui/icons-material/People'; // Tecnica + Comercial
 import RestaurantIcon from '@mui/icons-material/Restaurant'; // Almoço
 import EngineeringIcon from '@mui/icons-material/Engineering'; // Pós Venda
-// import List from '@mui/material/List';
-// import ListItem from '@mui/material/ListItem';
+import { ReactComponent as ScheduleIcon } from "../../images/icons/Schedule1.svg";
+import { ReactComponent as CheckIcon } from "../../images/icons/Check.svg";
+import { ReactComponent as BlockIcon } from "../../images/icons/Block.svg";
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -65,6 +72,7 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts, check }) => {
   const [scheduleRef, setScheduleRef] = useState();
   const [monthNumber, setMonthNumber] = useState();
   const [sellersOrder, setSellersOrder] = useState();
+
   const schedulesCollectionRef = collection(
     dataBase,
     "Agendas",
@@ -124,10 +132,8 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts, check }) => {
             if (a.saidaEmpresa > b.saidaEmpresa) return 1;
           }
           return 0;
-        })
-      );
-    }
-    // console.log(scheduleNew);
+        }));
+      }
   }, [monthSelect, schedule, scheduleNew]);
 
   // useEffect(
@@ -187,30 +193,30 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts, check }) => {
     }
   }
 
-  const showAddress = (visit) => {
-    if(visit) {
-      Swal.fire({
-        title: Company,
-        html: `Endereço: </br>` + 
-        `<b>${visit}</b>`,
-        showCloseButton: true,
-        confirmButtonColor: "#F39200",
-        confirmButtonText: "Copiar Endereço",
-      }).then((result) => {
-        if(result.isConfirmed) {
-          Swal.fire({
-            title: Company,
-            html: `<b>Endereço</b> copiado com sucesso.`,
-            icon: "success",
-            showConfirmButton: true,
-            showCloseButton: true,
-            confirmButtonColor: "#F39200",
-          });
-          navigator.clipboard.writeText(visit) // Copia o texto 'visit'
-        }
-      })
-    }
-  }
+  // const showAddress = (visit) => {
+  //   if(visit) {
+  //     Swal.fire({
+  //       title: Company,
+  //       html: `Endereço: </br>` + 
+  //       `<b>${visit}</b>`,
+  //       showCloseButton: true,
+  //       confirmButtonColor: "#F39200",
+  //       confirmButtonText: "Copiar Endereço",
+  //     }).then((result) => {
+  //       if(result.isConfirmed) {
+  //         Swal.fire({
+  //           title: Company,
+  //           html: `<b>Endereço</b> copiado com sucesso.`,
+  //           icon: "success",
+  //           showConfirmButton: true,
+  //           showCloseButton: true,
+  //           confirmButtonColor: "#F39200",
+  //         });
+  //         navigator.clipboard.writeText(visit) // Copia o texto 'visit'
+  //       }
+  //     })
+  //   }
+  // }
 
   const filterSchedule = (data, tec) => {
     if (data) {
@@ -486,6 +492,7 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts, check }) => {
                 tecnico: ref.tecnico,
                 tecnicoUID: ref.tecnicoUID,
                 veiculo: ref.veiculo,
+                categoria: ref.categoria
               });
             }
             axios.post('https://hook.us1.make.com/tmfl4xr8g9tk9qoi9jdpo1d7istl8ksd', {
@@ -852,9 +859,34 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts, check }) => {
     <div className="container-schedule">
       <Header user={user} userRef={userRef} alerts={alerts}></Header>
       <div className="title-schedule">
+        <ScheduleIcon />
         <h2>Agenda {year} </h2>
+        {dayVisits === undefined && (
+            <div className="schedule-month">
+              <select
+                value={monthSelect}
+                className="schedule-month__select"
+                name="month"
+                onChange={(e) => setMonthSelect(e.target.value)}
+              >
+                <option value="01">Janeiro</option>
+                <option value="02">Fevereiro</option>
+                <option value="03">Março</option>
+                <option value="04">Abril</option>
+                <option value="05">Maio</option>
+                <option value="06">Junho</option>
+                <option value="07">Julho</option>
+                <option value="08">Agosto</option>
+                <option value="09">Setembro</option>
+                <option value="10">Outubro</option>
+                <option value="11">Novembro</option>
+                <option value="12">Dezembro</option>
+              </select>
+            </div>
+          )}
       </div>
       <div className="content-schedule-visit">
+        <Dashboard schedule={schedule} monthSelect={monthSelect} />
         <div className="box-schedule-visit" ref={boxVisitRef}>
             {
               (box.name === "create" && (
@@ -930,7 +962,7 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts, check }) => {
           {(userRef && userRef.cargo === "Vendedor(a)" && !box.name) ||
           (userRef && userRef.cargo === "Administrador" && !box.name) ||
           (user.email === Users[0].email && !box.name) ? (
-            <><h1>Criar</h1>
+            <><h2>Criar Visita</h2>
             <div className="box-schedule-visit__content">
             {userRef && (userRef.cargo === 'Vendedor(a)' || userRef.cargo === 'Administrador') && userRef.nome !== 'Pós-Venda' &&
                 <><div className="box-schedule-visit__add">
@@ -940,7 +972,7 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts, check }) => {
                           return handleBoxVisitRef();
                         } }
                       >
-                        <span className="visit-icon comercial"><RequestQuoteIcon /></span>
+                        <span className="visit-icon comercial-fill"><RequestQuoteIcon /></span>
                         <div className="visit-text"><p>Visita Comercial</p></div>
                       </button>
                     </div><div className="box-schedule-visit__add">
@@ -950,7 +982,7 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts, check }) => {
                             return handleBoxVisitRef();
                           } }
                         >
-                          <span className="visit-icon comercial_tec"><PeopleIcon /></span>
+                          <span className="visit-icon comercial_tec-fill"><PeopleIcon /></span>
                           <div className="visit-text"><p>Comercial + Tecnica</p></div>
                         </button>
                       </div></>
@@ -963,7 +995,7 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts, check }) => {
                       return handleBoxVisitRef();
                     } }
                   >
-                    <span className="visit-icon pos_venda"><EngineeringIcon /></span>
+                    <span className="visit-icon pos_venda-fill"><EngineeringIcon /></span>
                     <div className="visit-text"><p>Pós-Venda</p></div>
                   </button>
                 </div>
@@ -976,7 +1008,7 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts, check }) => {
                       return handleBoxVisitRef();
                     } }
                   >
-                    <span className="visit-icon lunch"><RestaurantIcon /></span>
+                    <span className="visit-icon lunch-fill"><RestaurantIcon /></span>
                     <div className="visit-text"><p>Almoço</p></div>
                   </button>
                 </div>}
@@ -984,30 +1016,6 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts, check }) => {
           ) : (
             <></>
           )}
-          {dayVisits === undefined && (
-            <div className="schedule-month">
-              <select
-                value={monthSelect}
-                className="schedule-month__select"
-                name="month"
-                onChange={(e) => setMonthSelect(e.target.value)}
-              >
-                <option value="01">Janeiro</option>
-                <option value="02">Fevereiro</option>
-                <option value="03">Março</option>
-                <option value="04">Abril</option>
-                <option value="05">Maio</option>
-                <option value="06">Junho</option>
-                <option value="07">Julho</option>
-                <option value="08">Agosto</option>
-                <option value="09">Setembro</option>
-                <option value="10">Outubro</option>
-                <option value="11">Novembro</option>
-                <option value="12">Dezembro</option>
-              </select>
-            </div>
-          )}
-
           {schedule && schedule.length > 0 && (
               <div className="toggle-box desktop">
                 <p>Modo foco</p>
@@ -1022,289 +1030,208 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts, check }) => {
               </div>
             )}
           <div className="container-table desktop">
-            {schedule && schedule.length > 0 && (
-              <table
-                className={focoCheck ? "table-visit table-foco" : "table-visit"}
-              >
-                <thead>
-                  <tr>
-                    <th></th>
-                    <th></th>
-                    <th></th>
-                    {/* <th className="icons"></th> */}
-                    {/* {userRef && userRef.cargo === "Técnico" ? (
-                      <th></th>
-                    ) : (
-                      <th>V.C</th>
-                    )} */}
-                    <th>Dia</th>
-                    <th>Cidade</th>
-                    <th>Cliente</th>
-                    <th>Hórario de Saida</th>
-                    <th>Chegada no Cliente</th>
-                    <th>Tempo de Visita</th>
-                    <th>Saída no Cliente</th>
-                    <th>Chegada na Empresa</th>
-                    <th>Responsável</th>
-                    <th>Motorista</th>
-                    <th>Observação</th>
-                    <th>Ação</th>  
-                  </tr>
-                </thead>
-                <tbody>
-                  {schedule &&
-                    schedule.map((info, index) => (
-                      <tr className={"table"} key={index}>
-                        {/* {(info.confirmar === false &&
-                          info.tipo === "Visita" && (
-                            <td
-                              className="visits-icon cursor-help"
-                              aria-label="Visita"
-                              data-cooltipz-dir="right"
-                            ></td>
-                            )) ||
-                          (info.confirmar === false &&
-                            info.tipo === "Visita Conjunta" && (
-                              <td
-                                className="group-icon cursor-help"
-                                aria-label="Visita Conjunta"
-                                data-cooltipz-dir="right"
-                              ></td>
-                            )) ||
-                          (info.confirmar === false &&
-                            info.tipo === "Almoço" && (
-                              <td
-                                className="lunch-icon cursor-help"
-                                aria-label="Almoço"
-                                data-cooltipz-dir="right"
-                              ></td>
-                            )) ||
-                          (info.confirmar === true && (
-                            <td
-                              className="confirm-icon cursor-help"
-                              aria-label="Visita Confirmada"
-                              data-cooltipz-dir="right"
-                            ></td>
-                          ))} */}
-                        {/* {info.confirmar === true ||
-                        (userRef && userRef.cargo === "Técnico") ? (
-                          <td></td>
-                        ) : (
-                          <td
-                            aria-label="Criar Visita Conjunta"
-                            data-cooltipz-dir="right"
-                          >
-                            <button
-                              className="btn-add"
-                              onClick={() => createVisitGroupChoice(info)}
-                            ></button>
-                          </td>
-                        )} */}
-                        {!info.confirmar && info.categoria === 'lunch' && 
-                        <td></td>}
-                        {!info.confirmar && info.tipo === 'Visita Conjunta' &&
-                        <td
+          <TableContainer className={focoCheck ? "table-visit table-foco" : "table-visit"} component={Paper} >
+            <Table size="small" stickyHeader aria-label="sticky table">
+              <TableHead>
+                <TableRow className="table-visits_header">
+                  <TableCell align="center"></TableCell>
+                  <TableCell align="center" padding="none">Visita</TableCell>
+                  <TableCell align="center"></TableCell>
+                  <TableCell align="center">Dia</TableCell>
+                  <TableCell align="center">Cidade</TableCell>
+                  <TableCell align="center">Cliente</TableCell>
+                  <TableCell align="center">Saida</TableCell>
+                  <TableCell align="center">Horário Marcado</TableCell>
+                  <TableCell align="center">Duração</TableCell>
+                  <TableCell align="center">Fim da Visita</TableCell>
+                  <TableCell align="center">Chegada</TableCell>
+                  <TableCell align="center">Responsável</TableCell>
+                  <TableCell align="center">Motorista</TableCell>
+                  <TableCell align="center">Observação</TableCell>
+                  <TableCell align="center">Ação</TableCell>
+                  
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {schedule && schedule.map((visita) => (
+                  <TableRow
+                    hover
+                    key={visita.id}
+                    className={`list-visit`}
+                    sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                  >
+                    {!visita.confirmar && visita.categoria === 'lunch' && 
+                        <TableCell></TableCell>}
+                        {!visita.confirmar && visita.tipo === 'Visita Conjunta' &&
+                        <TableCell
                         className="group-icon cursor-help"
                         aria-label="Visita Conjunta"
                         data-cooltipz-dir="right"
-                      ></td>
+                      ></TableCell>
                         }
-                        {!info.confirmar && info.tipo === 'Visita' &&
-                        <td
+                        {!visita.confirmar && visita.tipo === 'Visita' &&
+                        <TableCell
                         className="visits-icon cursor-help"
                         aria-label="Visita Única"
                         data-cooltipz-dir="right"
-                      ></td>
+                      ></TableCell>
                         }
-                        {info.confirmar &&
-                        <td
+                        {visita.confirmar &&
+                        <TableCell
                               className="confirm-icon cursor-help"
                               aria-label="Visita Confirmada"
                               data-cooltipz-dir="right"
-                            ></td>
+                            ></TableCell>
                         }
-                        {info.categoria === "lunch" && <td style={{ filter: 'contrast' }} className="type-icon lunch" aria-label="Almoço" data-cooltipz-dir="right"><RestaurantIcon /></td>}
-                        {info.categoria === "comercial" && <td className="type-icon comercial" aria-label="Visita Comercial" data-cooltipz-dir="right"><RequestQuoteIcon /></td>}
-                        {info.categoria === "comercial_tecnica" && <td className="type-icon comercial_tec" aria-label="Comercial + Técnica" data-cooltipz-dir="right"><PeopleIcon /></td>}
-                        {info.categoria === "pos_venda" && <td className="type-icon pos_venda" aria-label="Pós-Venda" data-cooltipz-dir="right"><EngineeringIcon /></td>}
-                        {/* Para quem é vendedor */}
-                        {!info.confirmar && (info.categoria === "comercial" || info.categoria === "comercial_tecnica") &&
+                    {visita.categoria === "lunch" && <TableCell onClick={() => viewVisita(visita, visita.categoria)} style={{ filter: 'contrast', padding: '0.2rem' }} className="type-icon lunch" aria-label="Almoço" data-cooltipz-dir="right"><RestaurantIcon /></TableCell>}
+                    {visita.categoria === "comercial" && <TableCell onClick={() => viewVisita(visita, visita.categoria)} style={{ padding: '0.2rem' }} className="type-icon comercial" aria-label="Visita Comercial" data-cooltipz-dir="right"><RequestQuoteIcon /></TableCell>}
+                    {visita.categoria === "comercial_tecnica" && <TableCell onClick={() => viewVisita(visita, visita.categoria)} style={{ padding: '0.2rem' }} className="type-icon comercial_tec" aria-label="Comercial + Técnica" data-cooltipz-dir="right"><PeopleIcon /></TableCell>}
+                    {visita.categoria === "pos_venda" && <TableCell onClick={() => viewVisita(visita, visita.categoria)} style={{ padding: '0.2rem' }} className="type-icon pos_venda" aria-label="Pós-Venda" data-cooltipz-dir="right"><EngineeringIcon /></TableCell>}
+                    {/* Para quem é vendedor */}
+                    {!visita.confirmar && (visita.categoria === "comercial" || visita.categoria === "comercial_tecnica") &&
                          userRef && userRef.cargo === "Vendedor(a)" && 
-                        <td>
-                          <div className="btn-add"
-                          aria-label="Criar Visita Conjunta"
-                          data-cooltipz-dir="right"
-                          onClick={() => createVisitGroupChoice({visit: info, type: info.categoria})}
-                          ></div>
-                        </td>
+                        <TableCell className="btn-add"
+                        aria-label="Criar Visita Conjunta"
+                        data-cooltipz-dir="right"
+                        onClick={() => createVisitGroupChoice({visit: visita, type: visita.categoria})}>
+                        </TableCell>
                         }
                         {/* Para quem não é vendedor */}
-                        {!info.confirmar && (info.categoria === "comercial" || info.categoria === "comercial_tecnica") &&
+                        {!visita.confirmar && (visita.categoria === "comercial" || visita.categoria === "comercial_tecnica") &&
                          userRef && ( userRef.cargo !== "Vendedor(a)") &&
-                        <td>
-                        <div className="btn-add disabled"
-                        ></div>
-                      </td>
+                        <TableCell className="btn-add disabled">
+                        </TableCell>
                         }
                         {/* Para quem é Pós-Venda */}
-                        {!info.confirmar && (info.categoria === "pos_venda") && userRef  && userRef.nome === "Pós-Venda" &&
-                        <td>
-                          <div className="btn-add"
-                          aria-label="Criar Visita Conjunta"
-                          data-cooltipz-dir="right"
-                          onClick={() => createVisitGroupChoice({visit: info, type: info.categoria})}
-                          ></div>
-                        </td>}
+                        {!visita.confirmar && (visita.categoria === "pos_venda") && userRef  && userRef.nome === "Pós-Venda" &&
+                        <TableCell className="btn-add"
+                        aria-label="Criar Visita Conjunta"
+                        data-cooltipz-dir="right"
+                        onClick={() => createVisitGroupChoice({visit: visita, type: visita.categoria})}>
+                        </TableCell>}
                         {/* Para quem não é Pós-Venda */}
-                        {!info.confirmar && (info.categoria === "pos_venda") && userRef  && userRef.nome !== "Pós-Venda" &&
-                        <td>
-                        <div className="btn-add disabled"
-                        ></div>
-                      </td>}
+                        {!visita.confirmar && (visita.categoria === "pos_venda") && userRef  && userRef.nome !== "Pós-Venda" &&
+                        <TableCell className="btn-add disabled">
+                      </TableCell>}
                         {/* Almoço */}
-                        {!info.confirmar && (info.categoria === "lunch") &&
-                        <td>
-                        <div className="btn-add disabled"
-                        ></div>
-                      </td>}
+                        {!visita.confirmar && (visita.categoria === "lunch") &&
+                        <TableCell className="btn-add disabled">
+                      </TableCell>}
                         {/* Confirmado */}
-                        {info.confirmar &&
-                        <td>
-                        <div className="btn-add disabled"
-                        ></div>
-                      </td>}
-                        <td className="bold">
-                          {/* {moment.utc(info.dia).local().format('D')} */}
-                          {info.dia.substring(info.dia.length - 2)}
-                        </td>
-                        <td onClick={() => showAddress(info.endereco)}
-                        className="no-wrap" 
-                            aria-label={info.endereco}
-                            data-cooltipz-dir="top">{info.cidade}</td>
-                        <td className="no-wrap">{info.cliente}</td>
-                        {info.tipo === "Almoço" ? (
-                          <td></td>
+                        {visita.confirmar &&
+                        <TableCell className="btn-add disabled">
+                      </TableCell>}
+                    <TableCell sx={{ width: 30, fontWeight: 'bold' }} align="center" scope="row">
+                      {visita.dia.substring(8, 10)}
+                    </TableCell>
+                    <TableCell align="center">{visita.cidade && visita.cidade}</TableCell>
+                    <TableCell align="center">{visita.cliente}</TableCell>
+                    {visita.tipo === "Almoço" ? (
+                          <TableCell></TableCell>
                         ) : (
-                          <td className="bold bg-important">
-                            {info.saidaEmpresa}
-                          </td>
+                          <TableCell align="center" className="bold bg-important">
+                            {visita.saidaEmpresa}
+                          </TableCell>
                         )}
-                        <td>{info.chegadaCliente}</td>
-                        <td>{info.visita}</td>
-                        <td className={"bg-important-2"}>
-                          {info.saidaDoCliente}
-                        </td>
-                        {info.tipo === "Almoço" ? (
-                          <td></td>
+                        <TableCell align="center">{visita.chegadaCliente}</TableCell>
+                        <TableCell align="center">{visita.visita}</TableCell>
+                        <TableCell align="center" className={"bg-important-2"}>
+                          {visita.saidaDoCliente}
+                        </TableCell>
+                        {visita.tipo === "Almoço" ? (
+                          <TableCell></TableCell>
                         ) : (
-                          <td className="bold bg-important">
-                            {info.chegadaEmpresa}
-                          </td>
+                          <TableCell align="center" className="bold bg-important">
+                            {visita.chegadaEmpresa}
+                          </TableCell>
                         )}
-                        <td
-                          style={
-                            info.cor && {
-                              backgroundColor: info.cor,
-                              borderBottom: `1px solid ${info.cor}`,
-                              borderRight: `1px solid ${info.cor}`,
-                              borderLeft: `1px solid ${info.cor}`,
-                              color: "#fff",
-                              textShadow: "#5a5a5a -1px 0px 5px",
-                            }
-                          }
+                    <TableCell
+                    sx={{ backgroundColor: `${visita.cor}`, color: '#fff', fontWeight: 'bold' }} 
+                    align="center" scope="row">
+                      {visita.consultora}
+                    </TableCell>
+                    <TableCell align="center">{visita.tecnico}</TableCell>
+                    <TableCell align="center" className="observation">{visita.observacao}</TableCell>
+                    <TableCell
+                        sx={{ display: 'flex' }}
                         >
-                          {info.consultora}
-                        </td>
-                        <td>{info.tecnico}</td>
-                        <td className="observation">{info.observacao}</td>
-                        <td
-                          className="action"
-                          style={info.observacao ? {} : null}
-                        >
-                          {(info.confirmar === false && info.uid === user.id) ||
+                          {(visita.confirmar === false && visita.uid === user.id) ||
                           user.email === Users[0].email ||
                           (userRef && userRef.cargo === "Administrador") ||
-                          info.consultora === "Vendedor(a)" ? (
+                          visita.consultora === "Vendedor(a)" ? (
                             <>
-                              <div
-                                style={info.confirmar ? {pointerEvents: 'none', opacity: '0.5'} : {pointerEvents: 'initial'}}
-                                aria-label="Editar Visita"
-                                data-cooltipz-dir="left"
-                              >
-                                <button
-                                  className='btn-edit'
-                                  id="edit-visit"
+                                <IconButton
+                                  id="basic-button"
+                                  aria-label="Editar Visita"
+                                  data-cooltipz-dir="left"
                                   onClick={() => {
                                     setBox({name: "edit"});
                                     setEditVisit({
-                                      info: info,
+                                      info: visita,
                                       ref: doc(
                                         dataBase,
                                         "Agendas",
                                         year,
                                         monthSelect,
-                                        info.id
+                                        visita.id
                                       ),
-                                      type: info.categoria
+                                      type: visita.categoria
                                     });
                                     return handleBoxVisitRef();
                                   }}
-                                ></button>
-                              </div>
-                              <div
-                                aria-label="Excluir Visita"
-                                data-cooltipz-dir="left"
-                              >
-                                <button
-                                  className="btn-delete"
-                                  id="edit-visit"
-                                  onClick={() => deleteVisit(info)}
-                                ></button>
-                              </div>
+                                >
+                                  <EditIcon />
+                                </IconButton>
+                                <IconButton
+                                  id="basic-button"
+                                  aria-label="Excluir Visita"
+                                  data-cooltipz-dir="left"
+                                  onClick={() => deleteVisit(visita)}
+                                >
+                                  <DeleteIcon />
+                                </IconButton>
                             </>
                           ) : (
                             <></>
                           )}
 
-                          {info.confirmar === false &&
+                          {visita.confirmar === false &&
                           (user.email === Users[0].email || (userRef && userRef.cargo === "Administrador") || (userRef && userRef.nome === 'Pós-Venda')) ? (
                             <>
-                              <div
-                                aria-label="Confirmar Visita"
-                                data-cooltipz-dir="left"
-                              >
-                                <button
-                                  className="btn-confirm"
-                                  onClick={() => confirmVisit(info, "confirm")}
-                                ></button>
-                              </div>
+                                <IconButton
+                                  aria-label="Confirmar Visita"
+                                  data-cooltipz-dir="left"
+                                  sx={{ width: '40px', height: '40px' }}
+                                  onClick={() => confirmVisit(visita, "confirm")}
+                                >
+                                  <CheckIcon />
+                                </IconButton>
                             </>
                           ) : (
                             <></>
                           )}
 
-                          {info.confirmar === true &&
+                          {visita.confirmar === true &&
                           (user.email === Users[0].email || (userRef && userRef.cargo === "Administrador") || (userRef && userRef.nome === 'Pós-Venda')) ? (
                             <>
-                              <div
-                                aria-label="Cancelar Visita"
-                                data-cooltipz-dir="left"
-                              >
-                                <button
-                                  className="btn-cancel"
-                                  onClick={() => confirmVisit(info, "cancel")}
-                                ></button>
-                              </div>
+                                <IconButton
+                                  aria-label="Cancelar Visita"
+                                  data-cooltipz-dir="left"
+                                  sx={{ width: '36px', height: '36px' }}
+                                  onClick={() => confirmVisit(visita, "cancel")}
+                                >
+                                  <BlockIcon />
+                                </IconButton>
                             </>
                           ) : (
                             <></>
                           )}
-                        </td>
-                      </tr>
-                    ))}
-                </tbody>
-              </table>
-            )}
+                        </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
           </div>
           {/* MOBILE */}
           <div className="box-mobile">

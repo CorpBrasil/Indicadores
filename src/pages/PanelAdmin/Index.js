@@ -10,8 +10,20 @@ import "./_style.scss";
 // Components
 import CreateAdmin from "../../components/Modal/Admin/Create/Index";
 import EditAdmin from "../../components/Modal/Admin/Edit/Index";
+import { ReactComponent as Admin } from '../../images/icons/Admin.svg';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import EditIcon from '@mui/icons-material/Edit';
 
-const PanelAdmin = ({ user, alerts }) => {
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import Paper from '@mui/material/Paper';
+import IconButton from '@mui/material/IconButton';
+
+const PanelAdmin = ({ user, alerts, userRef }) => {
   const [members, setMembers] = useState();
   const [memberRef, setMemberRef] = useState();
   const [createAdmin, setCreateAdmin] = useState(undefined);
@@ -42,69 +54,81 @@ const PanelAdmin = ({ user, alerts }) => {
 
   return (
     <div className="container-panel">
-      <Header user={user} alerts={alerts}></Header>
+      <Header user={user} alerts={alerts} userRef={userRef}></Header>
       <div className="title-panel">
+        <Admin style={{ width: '42px', height: '42px', marginBottom: '0.5rem' }} />
         <h2>Área Administrativa</h2>
       </div>
       <div className="content-panel">
         <div className="box-panel">
+            <h1>Colaboradores</h1>
           <div className="box-panel__add">
             <button onClick={() => setCreateAdmin(true)}>
-              <span className="icon-user"></span> Cadastrar novo Colaborador
+              <AccountCircleIcon className="icon-user" /> 
+              <p>Cadastrar novo Colaborador</p>
             </button>
           </div>
-            <h1>Colaboradores</h1>
           <div className="box-panel__users">
-            <table>
-              <thead>
-                <tr>
-                  <th>Nome</th>
-                  <th>Cor</th>
-                  <th>Email</th>
-                  <th>Senha</th>
-                  <th>Cargo</th>
-                  <th>Veiculo</th>
-                  <th>Ação</th>
-                </tr>
-              </thead>
-              <tbody>
-                {members &&
-                  members.map((member, index) => (
-                    <tr key={index}>
-                      <td>{member.nome}</td>
-                      <td style={member.cor && {
+          <TableContainer className="table-center" component={Paper}>
+            <Table stickyHeader aria-label="sticky table">
+              <TableHead>
+                <TableRow>
+                  <TableCell align="center">Nome</TableCell>
+                  <TableCell align="center">Cor</TableCell>
+                  <TableCell align="center" padding="none">Email</TableCell>
+                  <TableCell align="center">Senha</TableCell>
+                  <TableCell align="center">Cargo</TableCell>
+                  <TableCell align="center">Veiculo</TableCell>
+                  <TableCell align="center">Ação</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {members && members.map((member) => (
+                  <TableRow
+                    hover
+                    key={member.id}
+                    className={`list-visit`}
+                    sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                  >
+                     <TableCell align="center">{member.nome}</TableCell>
+                      <TableCell style={member.cor && {
                             backgroundColor: member.cor
-                          }}></td>
-                      <td>{member.email}</td>
-                      <td>{member.senha}</td>
-                      <td>{member.cargo}</td>
-                      <td>{member.veiculo}</td>
-                      <td>{member.veiculo ? 
-                          (<button
+                          }}></TableCell>
+                      <TableCell align="center">{member.email}</TableCell>
+                      <TableCell align="center">{member.senha}</TableCell>
+                      <TableCell align="center">{member.cargo}</TableCell>
+                      <TableCell align="center">{member.veiculo}</TableCell>
+                      <TableCell align="center">{member.veiculo ? 
+                          (<IconButton
+                            id="basic-button"
                             onClick={() => {
                               setMemberRef(member);
                               return setEditAdmin(true);
                             }}
-                            className="btn-edit"
                             aria-label="Editar Veiculo"
                             data-cooltipz-dir="left"
-                          ></button>) : null
+                          >
+                            <EditIcon sx={{ fill: '#000' }} />
+                          </IconButton>) : null
                         }
                         {member.cargo !== "Técnico" ? 
-                          (<button
+                          (<IconButton
+                            id="basic-button"
                             onClick={() => {
                               setMemberRef(member);
                               return setEditAdmin(true);
                             }}
-                            className="btn-edit-color"
                             aria-label="Editar Cor"
                             data-cooltipz-dir="left"
-                          ></button>) : null
-                        }</td>
-                    </tr>
-                  ))}
-              </tbody>
-            </table>
+                          >
+                            <EditIcon />
+                          </IconButton>) : null
+                        }</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
           </div>
         </div>
       </div>

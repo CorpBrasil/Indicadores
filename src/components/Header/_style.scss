@@ -1,3 +1,9 @@
+@media (max-width: 650px) {
+  .container-header__nav {
+    gap: 1rem!important;
+  }
+}
+
 .container-header {
   display: flex;
   flex-direction: row;
@@ -5,8 +11,9 @@
   justify-content: space-between;
   height: 5rem;
   max-height: 5rem;
-  background-color: #f3f3f3;
-  border-bottom: 1px solid #b8b8b8;
+  border: 1px solid #E9EAF3;
+  background: #FFF;
+  box-shadow: 0px 2px 10px 0px rgba(25, 93, 194, 0.07);
 
   &__logo {
     margin-left: 1rem;
@@ -48,20 +55,10 @@
 
       svg {
         margin: auto;
-        width: 90%;
-        height: 90%;
+        width: 80%;
+        height: 80%;
         fill: #111;
       }
-    }
-
-    .admin {
-      background: url(../../images/icons/Admin.svg) 50% no-repeat;
-      background-size: 80%;
-    }
-
-    .loggout {
-      background: url(../../images/icons/Loggout.svg) 50% no-repeat;
-      background-size: 80%;
     }
   }
 }
