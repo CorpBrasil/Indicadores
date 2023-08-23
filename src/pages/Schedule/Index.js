@@ -225,8 +225,6 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts, check }) => {
       );
     } else {
       setDayVisits(undefined);
-      // console.log(dayVisits);
-      // console.log(data);
     }
   };
 
@@ -274,35 +272,6 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts, check }) => {
               const visitsDepois = visitsFind("depois", visit);
               if (visitsAntes.length > 0) {
                 visitsAntes.map(async (ref) => {
-                  // const visitBefore = schedule.filter(
-                  //   (before) =>
-                  //     before.data === ref.data &&
-                  //     before.chegadaEmpresa === ref.saidaEmpresa &&
-                  //     ref.consultora !== "Almoço Téc." &&
-                  //     before.tipo === "Visita Conjunta" &&
-                  //     !before.visitaAlmoco
-                  // );
-                  // if (ref.cidade === visit.cidade) {
-                  //   if (visitBefore) {
-                  //     visitBefore.map(async (ref) => {
-                  //       await updateDoc(
-                  //         doc(dataBase, "Agendas", year, monthSelect, ref.id),
-                  //         {
-                  //           chegadaEmpresa: moment(ref.saidaDoCliente, "hh:mm")
-                  //             .add(ref.tempoRota, "seconds")
-                  //             .format("kk:mm"),
-                  //           groupRef: "",
-                  //           group: "",
-                  //           visitaConjunta: false,
-                  //           tipo: "Visita",
-                  //         }
-                  //       );
-                  //     });
-                  //   }
-                  //   // await deleteDoc(
-                  //   //   doc(dataBase, "Agendas", year, monthSelect, ref.id)
-                  //   // );
-                  // } else {
                     await updateDoc(
                       doc(dataBase, "Agendas", year, monthSelect, ref.id),
                       {
@@ -319,37 +288,6 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts, check }) => {
                }
               if (visitsDepois.length > 0) {
                 visitsDepois.map(async (ref) => {
-                  // const visitNext = schedule.filter(
-                  //   (next) =>
-                  //     next.data === ref.data &&
-                  //     next.saidaEmpresa === ref.chegadaEmpresa &&
-                  //     ref.consultora !== "Almoço Téc." &&
-                  //     next.tipo === "Visita Conjunta" &&
-                  //     !next.visitaAlmoco
-                  // );
-                  // if (ref.cidade === visit.cidade) {
-                  //   if (visitNext) {
-                  //     visitNext.map(async (ref) => {
-                  //       await updateDoc(
-                  //         doc(dataBase, "Agendas", year, monthSelect, ref.id),
-                  //         {
-                  //           saidaEmpresa: moment(ref.chegadaCliente, "hh:mm")
-                  //             .subtract(ref.tempoRota, "seconds")
-                  //             .format("kk:mm"),
-                  //           groupRef: "",
-                  //           group: "",
-                  //           visitaConjunta: false,
-                  //           tipo: "Visita",
-                  //         }
-                  //       );
-                  //     });
-                  //   }
-                  //   // await deleteDoc(
-                  //   //   doc(dataBase, "Agendas", year, monthSelect, ref.id)
-                  //   // );
-                  // } else {
-                    // console.log("cidade diferente");
-    
                     await updateDoc(
                       doc(dataBase, "Agendas", year, monthSelect, ref.id),
                       {
@@ -362,17 +300,8 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts, check }) => {
                         tipo: "Visita",
                       }
                     );
-                  // }
-    
-                  // console.log(
-                  //   ref.saidaEmpresa,
-                  //   moment(ref.chegadaCliente, "hh:mm")
-                  //     .subtract(ref.tempoRota, "seconds")
-                  //     .format("kk:mm")
-                  // );
                 });
               }
-              // console.log(visitsAntes, visitsDepois);
               await deleteDoc(
                 doc(dataBase, "Agendas", year, monthSelect, visit.id)
               );
@@ -492,7 +421,8 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts, check }) => {
                 tecnico: ref.tecnico,
                 tecnicoUID: ref.tecnicoUID,
                 veiculo: ref.veiculo,
-                categoria: ref.categoria
+                categoria: ref.categoria,
+                createConfirm: new Date()
               });
             }
             axios.post('https://hook.us1.make.com/tmfl4xr8g9tk9qoi9jdpo1d7istl8ksd', {

@@ -31,6 +31,7 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import { Company, KeyMaps, Users } from "../../../data/Data";
+// import useVisit from "../../../hooks/useVisit";
 
 import '../style.scss';
 
@@ -72,7 +73,7 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, sellers, userR
   const [visits, setVisits] = useState();
   const [visitsFindCount, setVisitsFindCount] = useState();
   const [visitsFind, setVisitsFind] = useState();
-
+  // const { createVisit } = useVisit(checkNet, scheduleRef, returnSchedule);
 
   const {
     register,
@@ -319,17 +320,6 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, sellers, userR
           confirmButtonColor: "#313131"  
         })
       }
-
-      // if(checkNet) {
-      //   Swal.fire({
-      //     title: 'Sem Conexão',
-      //     icon: "error",
-      //     html: `Não é possível Criar uma Visita Conjunta <b>sem internet.</b> Verifique a sua conexão.`,
-      //     confirmButtonText: "Fechar",
-      //     showCloseButton: true,
-      //     confirmButtonColor: "#d33"  
-      //   })
-      // } 
       
       else {
         let c = 1;
@@ -418,6 +408,7 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, sellers, userR
                 tipo: "Visita Conjunta",
                 categoria: typeRef,
                 corTec: tecRefUID.cor,
+                createVisit: new Date()
               })
             } else {
               if(visitRef.categoria !== "lunch") {
@@ -462,6 +453,7 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, sellers, userR
                   tipo: 'Visita Conjunta',
                   categoria: typeRef,
                   corTec: tecRefUID.cor,
+                  createVisit: new Date()
                 };
   
                 // const visitaConjunta = {
@@ -533,6 +525,7 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, sellers, userR
                 //             })
                 //           }  
                 createVisitDay(visita)
+                // createVisit(visita)
             }
           }
         })

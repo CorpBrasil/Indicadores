@@ -13,6 +13,7 @@ import {
 } from "@react-google-maps/api";
 import "moment/locale/pt-br";
 import { Company, KeyMaps } from "../../../data/Data";
+// import useVisit from "../../../hooks/useVisit";
 
 import RequestQuoteIcon from '@mui/icons-material/RequestQuote'; // Visita Comercial
 import PeopleIcon from '@mui/icons-material/People'; // Tecnica + Comercial
@@ -36,7 +37,6 @@ import "../style.scss";
 
 const CreateVisit = ({
   returnSchedule,
-  filterSchedule,
   scheduleRef,
   tecs,
   sellers,
@@ -77,6 +77,7 @@ const CreateVisit = ({
   const { register, handleSubmit } = useForm(); 
   const [visitsFindCount, setVisitsFindCount] = useState();
   const [visitsFind, setVisitsFind] = useState();
+  // const { createVisit } = useVisit(checkNet, scheduleRef, returnSchedule); // Custom Hook para Criar Visitas
   
   // console.log(schedule)
 
@@ -342,6 +343,7 @@ const CreateVisit = ({
                 tipo: "Almoço",
                 categoria: type,
                 corTec: tecRefUID.cor,
+                createVisit: new Date() 
               });
               Swal.fire({
                 title: Company,
@@ -381,8 +383,10 @@ const CreateVisit = ({
                 tipo: 'Visita',
                 categoria: type,
                 corTec: tecRefUID.cor,
+                createVisit: new Date() 
               };
-                  createVisitDay(visita)
+                  createVisitDay(visita);
+                  // createVisit(visita)
             }
           } else return null
         });
