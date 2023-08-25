@@ -6,15 +6,16 @@ import { useForm } from "react-hook-form"; // cria formulário personalizado
 import Swal from 'sweetalert2/dist/sweetalert2.js';
 import * as moment from "moment";
 import "moment/locale/pt-br";
-// import List from '@mui/material/List';
-// import ListItem from '@mui/material/ListItem';
+
+
 import RequestQuoteIcon from '@mui/icons-material/RequestQuote'; // Visita Comercial
 import PeopleIcon from '@mui/icons-material/People'; // Tecnica + Comercial
 import RestaurantIcon from '@mui/icons-material/Restaurant'; // Almoço
 import EngineeringIcon from '@mui/icons-material/Engineering'; // Pós Venda
 import ArrowCircleRightIcon from '@mui/icons-material/ArrowCircleRight';
 import ArrowCircleLeftIcon from '@mui/icons-material/ArrowCircleLeft';
-//import { ReactComponent as CheckIcon } from "../../../images/icons/Check.svg";
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
+import { ReactComponent as CheckIcon } from "../../../images/icons/Check.svg";
 
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -67,7 +68,8 @@ const EditVisit = ({
   const [visits, setVisits] = useState();
   //const [visits, setVisits] = useState(schedule);
   const [hoursLimit, setHoursLimit] = useState(false);
-
+  const [visitsFindCount, setVisitsFindCount] = useState();
+  const [visitsFind, setVisitsFind] = useState();
   const { register, handleSubmit, reset } = useForm();
 
   useLayoutEffect(() => {
@@ -293,6 +295,48 @@ const EditVisit = ({
         setChegadaTexto(chegadaCliente.format("kk:mm"));
       }
     }
+
+  moment.locale("pt-br");
+  const chegadaCliente = moment(horarioTexto, "hh:mm"); //Horario de chegada
+  chegadaCliente.add(rotaTempo, "seconds").format("hh:mm"); //Adiciona tempo de viagem volta
+
+  const saidaFormatada = moment(saidaTexto, "hh:mm");
+  const chegadaFormatada = moment(chegadaTexto, "hh:mm");
+  saidaFormatada.add(1, "minutes").format("hh:mm");
+  chegadaFormatada.subtract(1, "minutes").format("hh:mm");
+
+  // console.log(saidaEmpresaRef);
+  //console.log(chegadaFormatada)
+
+  let check = [];
+  let visitsFindData = [];
+
+    dataRef && dataRef.map((ref) => {
+      // console.log("eae");
+      if (
+        saidaFormatada <= moment(ref.saidaEmpresa, "hh:mm") &&
+        chegadaFormatada <= moment(ref.saidaEmpresa, "hh:mm")
+      ) {
+        check.push(ref);
+      } else {
+        if (saidaFormatada >= moment(ref.chegadaEmpresa, "hh:mm"))
+          check.push(ref);
+      }
+      return dataRef;
+    });
+  
+
+    // console.log(visitsFindCount);
+    
+    dataRef && dataRef.map((a) => {
+      //Percorre todos os arrays de 'dataRef' e compara se os arrays são iguais
+      if (check.includes(a) === false) {
+        visitsFindData.push(a);
+      }
+      return setVisitsFind(visitsFindData);
+    });
+
+    setVisitsFindCount(dataRef && dataRef.length - check.length);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     horarioTexto,
@@ -317,103 +361,6 @@ const EditVisit = ({
           confirmButtonColor: "#d33"  
         })
       } else {
-        let diaRef,
-          saidaEmpresaRef,
-          chegadaClienteRef,
-          TempoVisita,
-          SaidaClienteRef,
-          ChegadaEmpresaRef;
-          //tempoRotaRef;
-        const chegada = horarioTexto;
-        const tempo = moment("00:00", "HH:mm");
-        moment.locale("pt-br");
-        chegadaClienteRef = chegada;
-  
-        const chegadaCliente = moment(chegada, "hh:mm"); //Horario de chegada
-        const day = moment(dataTexto); // Pega o dia escolhido
-  
-        diaRef = day.format("YYYY MM DD");
-  
-        TempoVisita = tempo.add(visitaNumero, "seconds").format("HH:mm");
-  
-        saidaEmpresaRef = saidaTexto;
-  
-        // console.log(saidaTexto)
-  
-        SaidaClienteRef = saidaCliente;
-  
-        chegadaCliente.add(rotaTempo, "seconds").format("hh:mm"); //Adiciona tempo de viagem volta
-        //chegadaCliente.add(rotaTempo, "seconds").format("hh:mm"); //Adiciona tempo de viagem volta
-        ChegadaEmpresaRef = chegadaTexto;
-        //tempoRotaRef = rotaTempo;
-  
-        // console.log({
-        //   // dia: diaRef,
-        //   saidaEmpresa: saidaEmpresaRef,
-        //   // chegadaCliente: chegadaClienteRef,
-        //   // visita: TempoVisita,
-        //   // saidaDoCliente: SaidaClienteRef,
-        //   chegadaEmpresa: ChegadaEmpresaRef,
-        //   // consultora: userData.consultora,
-        //   // tecnico: tecnicoTexto,
-        //   // cidade: city,
-        // });
-  
-        // const dataRef = schedule.filter(
-        //   (dia) => dia.data === dataTexto && dia.tecnico === tecnicoTexto && dia.chegadaCliente !== visitRef.chegadaCliente
-        // );
-  
-        const saidaFormatada = moment(saidaEmpresaRef, "hh:mm");
-        const chegadaFormatada = moment(ChegadaEmpresaRef, "hh:mm");
-        saidaFormatada.add(1, "minutes").format("hh:mm");
-        chegadaFormatada.subtract(1, "minutes").format("hh:mm");
-  
-        // console.log(saidaEmpresaRef);
-        //console.log(chegadaFormatada)
-  
-        let check = [];
-        let visitsFind = [];
-  
-          dataRef.map((ref) => {
-            // console.log("eae");
-            if (
-              saidaFormatada <= moment(ref.saidaEmpresa, "hh:mm") &&
-              chegadaFormatada <= moment(ref.saidaEmpresa, "hh:mm")
-            ) {
-              check.push(ref);
-            } else {
-              if (saidaFormatada >= moment(ref.chegadaEmpresa, "hh:mm"))
-                check.push(ref);
-            }
-            return dataRef;
-          });
-        
-  
-        // dataRef.map((ref) => {
-        //   console.log('eae')
-        //   if(saidaFormatada < moment(ref.saidaEmpresa, 'hh:mm') && chegadaFormatada < moment(ref.saidaEmpresa, 'hh:mm')) {
-        //       check.push(ref);
-        //     } else {
-        //       if(saidaFormatada > moment(ref.chegadaEmpresa, 'hh:mm'))
-        //       check.push(ref);
-        //     }
-        //     return dataRef;
-        //   })
-  
-        // console.log(">>", check, dataRef);
-        // console.log(lunch.length);
-        const visitsFindCount = dataRef.length - check.length;
-        // console.log(visitsFindCount);
-  
-        dataRef.map((a) => {
-          //Percorre todos os arrays de 'dataRef' e compara se os arrays são iguais
-          if (check.includes(a) === false) {
-            visitsFind.push(a);
-          }
-          return visitsFind;
-        });
-        // console.log(visitsFind);
-  
         let c = 1;
         if (visitsFindCount < 0 || visitsFindCount > 0) {
           const visits = visitsFind.map(
@@ -543,13 +490,13 @@ const EditVisit = ({
   
               if (visitRef.categoria === "lunch") {
                 await updateDoc(scheduleRefUID, {
-                  dia: diaRef,
-                  saidaEmpresa: saidaEmpresaRef,
-                  chegadaCliente: saidaEmpresaRef,
+                  dia: moment(dataTexto).format("YYYY MM DD"),
+                  saidaEmpresa: saidaTexto,
+                  chegadaCliente: saidaTexto,
                   visita: "01:00",
                   visitaNumero: 3600,
-                  saidaDoCliente: ChegadaEmpresaRef,
-                  chegadaEmpresa: ChegadaEmpresaRef,
+                  saidaDoCliente: chegadaTexto,
+                  chegadaEmpresa: chegadaTexto,
                   consultora: tecRefUID.nome,
                   tecnico: tecRefUID.nome,
                   tecnicoUID: tecRefUID.uid,
@@ -574,14 +521,14 @@ const EditVisit = ({
                 await updateDoc(
                   doc(dataBase, "Agendas", year, monthSelect, visitRef.id),
                   {
-                    dia: diaRef,
+                    dia: moment(dataTexto).format("YYYY MM DD"),
                     data: dataTexto,
-                    saidaEmpresa: saidaEmpresaRef,
-                    chegadaCliente: chegadaClienteRef,
-                    visita: TempoVisita,
+                    saidaEmpresa: saidaTexto,
+                    chegadaCliente: horarioTexto,
+                    visita: moment("00:00", "HH:mm").add(visitaNumero, "seconds").format("HH:mm"),
                     visitaNumero: visitaNumero,
-                    saidaDoCliente: SaidaClienteRef,
-                    chegadaEmpresa: ChegadaEmpresaRef,
+                    saidaDoCliente: saidaCliente,
+                    chegadaEmpresa: chegadaTexto,
                     tecnico: tecRefUID.nome,
                     tecnicoUID: tecRefUID.uid,
                     veiculo: veiculo,
@@ -608,14 +555,14 @@ const EditVisit = ({
                 await updateDoc(
                   doc(dataBase, "Agendas", year, monthSelect, visitRef.id),
                   {
-                    dia: diaRef,
+                    dia: moment(dataTexto).format("YYYY MM DD"),
                     data: dataTexto,
-                    saidaEmpresa: saidaEmpresaRef,
-                    chegadaCliente: chegadaClienteRef,
-                    visita: TempoVisita,
+                    saidaEmpresa: saidaTexto,
+                    chegadaCliente: horarioTexto,
+                    visita: moment("00:00", "HH:mm").add(visitaNumero, "seconds").format("HH:mm"),
                     visitaNumero: visitaNumero,
-                    saidaDoCliente: SaidaClienteRef,
-                    chegadaEmpresa: ChegadaEmpresaRef,
+                    saidaDoCliente: saidaCliente,
+                    chegadaEmpresa: chegadaTexto,
                     tecnico: tecRefUID.nome,
                     tecnicoUID: tecRefUID.uid,
                     veiculo: veiculo,
@@ -637,7 +584,7 @@ const EditVisit = ({
                   data: moment(visitRef.data).format("DD/MM/YYYY"),
                   nome: tecRefUID.nome,
                   cliente: userData.cliente,
-                  marcado: chegadaClienteRef,
+                  marcado: horarioTexto,
                   consultora: consultoraTexto,
                   city: visitRef.cidade,
                   semana: getMonthlyWeekNumber(date),
@@ -914,8 +861,15 @@ const EditVisit = ({
               <h1>Nenhuma Visita Encontrada</h1>
              </div>
              }
-              <div className="box-visit__info prev">
-              <span className="">Previsão de Visita</span>
+              <div className={visitsFindCount < 0 || visitsFindCount > 0 ? "box-visit__info prev error-aviso" : "box-visit__info prev check"}>
+              <span className="">Previsão de Visita {(visitsFindCount < 0 || visitsFindCount > 0) ?
+               <div aria-label="Essa Visita ultrapassa o horário de uma Visita já existente. Verifique os horários disponiveis"
+                data-cooltipz-dir="top" data-cooltipz-size="large" ><ErrorOutlineIcon  sx={{ fill: 'red' }} /></div>
+              :
+              <div aria-label="A Visita pode ser criada"
+                data-cooltipz-dir="top" ><CheckIcon className="check-icon" /></div>
+              }
+              </span>
               <p className="notice">
                 <ArrowCircleRightIcon className="saida" />Saindo às <b>{saidaTexto}</b>
               </p>
