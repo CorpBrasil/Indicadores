@@ -1,7 +1,6 @@
-import { updateDoc, addDoc } from "firebase/firestore";
+import { updateDoc } from "firebase/firestore";
 import { useLayoutEffect, useState, useEffect } from 'react'
 import { useForm } from "react-hook-form"; // cria formulário personalizado
-import axios from 'axios';
 import Swal from 'sweetalert2/dist/sweetalert2.js';
 import * as moment from 'moment';
 import 'moment/locale/pt-br';
@@ -31,6 +30,7 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import { Company, KeyMaps, Users } from "../../../data/Data";
+import useVisit from "../../../hooks/useVisit";
 
 import '../style.scss';
 
@@ -72,7 +72,7 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, sellers, userR
   const [visits, setVisits] = useState();
   const [visitsFindCount, setVisitsFindCount] = useState();
   const [visitsFind, setVisitsFind] = useState();
-
+  const { createVisit } = useVisit(checkNet, scheduleRef, returnSchedule);
 
   const {
     register,
@@ -319,17 +319,6 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, sellers, userR
           confirmButtonColor: "#313131"  
         })
       }
-
-      // if(checkNet) {
-      //   Swal.fire({
-      //     title: 'Sem Conexão',
-      //     icon: "error",
-      //     html: `Não é possível Criar uma Visita Conjunta <b>sem internet.</b> Verifique a sua conexão.`,
-      //     confirmButtonText: "Fechar",
-      //     showCloseButton: true,
-      //     confirmButtonColor: "#d33"  
-      //   })
-      // } 
       
       else {
         let c = 1;
@@ -385,7 +374,7 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, sellers, userR
                  })
                  SaidaClienteRef2 = saidaCliente;
               }
-              createVisitDay({
+              createVisit({
                 dia: moment(dataTexto).format("YYYY MM DD"),
                 saidaEmpresa: saidaTexto,
                 chegadaCliente: horarioTexto,
@@ -418,6 +407,7 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, sellers, userR
                 tipo: "Visita Conjunta",
                 categoria: typeRef,
                 corTec: tecRefUID.cor,
+                createVisit: new Date()
               })
             } else {
               if(visitRef.categoria !== "lunch") {
@@ -462,6 +452,7 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, sellers, userR
                   tipo: 'Visita Conjunta',
                   categoria: typeRef,
                   corTec: tecRefUID.cor,
+                  createVisit: new Date()
                 };
   
                 // const visitaConjunta = {
@@ -532,7 +523,8 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, sellers, userR
                 //               tipo: 'Visita Conjunta',
                 //             })
                 //           }  
-                createVisitDay(visita)
+                //createVisitDay(visita)
+                createVisit(visita)
             }
           }
         })
@@ -543,89 +535,89 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, sellers, userR
     } 
     }
 
-    const createVisitDay = async (data) => {
-      let endereco;
-      await addDoc(scheduleRef, data);
-      Swal.fire({
-       title: Company,
-       html: `A visita em <b>${city}</b> foi criada com sucesso!`,
-       icon: "success",
-       showConfirmButton: true,
-       showCloseButton: true,
-       confirmButtonColor: "#F39200",
-     })
-     if(data.endereco.length < 3) {
-      endereco = city;
-     } else {
-      endereco = data.endereco;
-     }
-      axios.post('https://backend.botconversa.com.br/api/v1/webhooks-automation/catch/45898/Z8sTf2Pi46I1/', {
-        data: moment(data.data).format("DD.MM.YYYY"),
-        nome: data.tecnico,
-        cliente: data.cliente,
-        endereco: endereco,
-        saida: data.saidaEmpresa,
-        marcado: data.chegadaCliente,
-        chegada: data.chegadaEmpresa,
-        tipo: data.tipo,
-        consultora: data.consultora,
-        telefone: "5515991832181",
-        lat: data.lat,
-        lng: data.lng,
-        duracao: data.visita,
-        saidaCliente: data.saidaDoCliente,
-        categoria: data.categoria
-      })
-    const date = new Date(data.data);
-    axios.post('https://hook.us1.make.com/tmfl4xr8g9tk9qoi9jdpo1d7istl8ksd', {
-        data: moment(data.data).format("DD/MM/YYYY"),
-        nome: data.tecnico,
-        cliente: data.cliente,
-        saida: data.saidaEmpresa,
-        marcado: data.chegadaCliente,
-        consultora: data.consultora,
-        city: city,
-        duracao: data.visita,
-        saidaCliente: data.saidaDoCliente,
-        semana: getMonthlyWeekNumber(date),
-        mes: moment(data.data).format("M"),
-        ende: data.endereco,
-        confirmada: 'Não',
-        categoria: data.categoria
-      })
-     return returnSchedule();
-   }
+  //   const createVisitDay = async (data) => {
+  //     let endereco;
+  //     await addDoc(scheduleRef, data);
+  //     Swal.fire({
+  //      title: Company,
+  //      html: `A visita em <b>${city}</b> foi criada com sucesso!`,
+  //      icon: "success",
+  //      showConfirmButton: true,
+  //      showCloseButton: true,
+  //      confirmButtonColor: "#F39200",
+  //    })
+  //    if(data.endereco.length < 3) {
+  //     endereco = city;
+  //    } else {
+  //     endereco = data.endereco;
+  //    }
+  //     axios.post('https://backend.botconversa.com.br/api/v1/webhooks-automation/catch/45898/Z8sTf2Pi46I1/', {
+  //       data: moment(data.data).format("DD.MM.YYYY"),
+  //       nome: data.tecnico,
+  //       cliente: data.cliente,
+  //       endereco: endereco,
+  //       saida: data.saidaEmpresa,
+  //       marcado: data.chegadaCliente,
+  //       chegada: data.chegadaEmpresa,
+  //       tipo: data.tipo,
+  //       consultora: data.consultora,
+  //       telefone: "5515991832181",
+  //       lat: data.lat,
+  //       lng: data.lng,
+  //       duracao: data.visita,
+  //       saidaCliente: data.saidaDoCliente,
+  //       categoria: data.categoria
+  //     })
+  //   const date = new Date(data.data);
+  //   axios.post('https://hook.us1.make.com/tmfl4xr8g9tk9qoi9jdpo1d7istl8ksd', {
+  //       data: moment(data.data).format("DD/MM/YYYY"),
+  //       nome: data.tecnico,
+  //       cliente: data.cliente,
+  //       saida: data.saidaEmpresa,
+  //       marcado: data.chegadaCliente,
+  //       consultora: data.consultora,
+  //       city: city,
+  //       duracao: data.visita,
+  //       saidaCliente: data.saidaDoCliente,
+  //       semana: getMonthlyWeekNumber(date),
+  //       mes: moment(data.data).format("M"),
+  //       ende: data.endereco,
+  //       confirmada: 'Não',
+  //       categoria: data.categoria
+  //     })
+  //    return returnSchedule();
+  //  }
 
-   console.log(city)
+  //  console.log(city)
 
-   function getMonthlyWeekNumber(dt)
-  {
-      // como função interna, permite reuso
-      var getmonweek = function(myDate) {
-          var today = new Date(myDate.getFullYear(),myDate.getMonth(),myDate.getDate(),0,0,0);
-          var first_of_month = new Date(myDate.getFullYear(),myDate.getMonth(),1,0,0,0);
-          var p = Math.floor((today.getTime()-first_of_month.getTime())/1000/60/60/24/7);
-          // ajuste de contagem
-          if (today.getDay()<first_of_month.getDay()) ++p;
-          // ISO 8601.
-          if (first_of_month.getDay()<=3) p++;
-          return p;
-      }
-      // último dia do mês
-      var udm = (new Date(dt.getFullYear(),dt.getMonth()+1,0,0,0,0)).getDate();
-      /*  Nos seis primeiros dias de um mês: verifica se estamos antes do primeiro Domingo.
-       *  Caso positivo, usa o último dia do mês anterior para o cálculo.
-       */
-      if ((dt.getDate()<7) && ((dt.getDate()-dt.getDay())<-2))
-          return getmonweek(new Date(dt.getFullYear(),dt.getMonth(),0));
-      /*  Nos seis últimos dias de um mês: verifica se estamos dentro ou depois do último Domingo.
-       *  Caso positivo, retorna 1 "de pronto".
-       */
-      else if ((dt.getDate()>(udm-6)) && ((dt.getDate()-dt.getDay())>(udm-3)))
-      return 1;
-      else
-      return getmonweek(dt);
-    }
+  //  function getMonthlyWeekNumber(dt)
+  // {
+  //     // como função interna, permite reuso
+  //     var getmonweek = function(myDate) {
+  //         var today = new Date(myDate.getFullYear(),myDate.getMonth(),myDate.getDate(),0,0,0);
+  //         var first_of_month = new Date(myDate.getFullYear(),myDate.getMonth(),1,0,0,0);
+  //         var p = Math.floor((today.getTime()-first_of_month.getTime())/1000/60/60/24/7);
+  //         // ajuste de contagem
+  //         if (today.getDay()<first_of_month.getDay()) ++p;
+  //         // ISO 8601.
+  //         if (first_of_month.getDay()<=3) p++;
+  //         return p;
+  //     }
+  //     // último dia do mês
+  //     var udm = (new Date(dt.getFullYear(),dt.getMonth()+1,0,0,0,0)).getDate();
+  //     /*  Nos seis primeiros dias de um mês: verifica se estamos antes do primeiro Domingo.
+  //      *  Caso positivo, usa o último dia do mês anterior para o cálculo.
+  //      */
+  //     if ((dt.getDate()<7) && ((dt.getDate()-dt.getDay())<-2))
+  //         return getmonweek(new Date(dt.getFullYear(),dt.getMonth(),0));
+  //     /*  Nos seis últimos dias de um mês: verifica se estamos dentro ou depois do último Domingo.
+  //      *  Caso positivo, retorna 1 "de pronto".
+  //      */
+  //     else if ((dt.getDate()>(udm-6)) && ((dt.getDate()-dt.getDay())>(udm-3)))
+  //     return 1;
+  //     else
+  //     return getmonweek(dt);
+  //   }
 
     return (
       <div className="box-visit">

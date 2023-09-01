@@ -31,7 +31,7 @@ import MuiAlert from '@mui/material/Alert';
 import PeopleIcon from '@mui/icons-material/People';
 import LocalGasStationIcon from '@mui/icons-material/LocalGasStation';
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
-import { ReactComponent as Prospection } from '../../images/icons/Prospection.svg';
+// import { ReactComponent as Prospection } from '../../images/icons/Prospection.svg';
 
 
 
