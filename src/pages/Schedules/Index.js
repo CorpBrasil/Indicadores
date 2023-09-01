@@ -20,9 +20,6 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
-import PeopleIcon from '@mui/icons-material/People';
-import LocalGasStationIcon from '@mui/icons-material/LocalGasStation';
-import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
@@ -30,6 +27,12 @@ import Select from '@mui/material/Select';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
+
+import PeopleIcon from '@mui/icons-material/People';
+import LocalGasStationIcon from '@mui/icons-material/LocalGasStation';
+import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
+import { ReactComponent as Prospection } from '../../images/icons/Prospection.svg';
+
 
 
 import './_style.scss';
@@ -322,6 +325,18 @@ const Schedules = ({ userRef, alerts, check }) => {
             ))}
           </div></>
       }
+         {userRef && (user.email === Users[0].email || userRef.cargo === "Vendedor(a)" || userRef.cargo === "Administrador") && userRef.nome !== 'Pós-Venda' &&
+         <><div className='box-schedule'>
+           <li className='schedule'>
+             <Link className='schedule__content' to="/prospeccao">
+               <div className='schedule__icon prospection'><Prospection /></div>
+               <div className='schedule__text'>
+                 <p>Prospecção</p>
+               </div>
+               </Link>
+           </li>
+             </div></>
+        }
        {userRef && (user.email === Users[0].email || userRef.cargo === "Vendedor(a)" || userRef.cargo === "Administrador") && userRef.nome !== 'Pós-Venda' &&
        <><div className='box-schedule'>
          <li className='schedule'>

@@ -98,6 +98,8 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts, check }) => {
     [monthSelect]
   );
 
+  console.log(dayVisits)
+
   useEffect(() => {
     if(sellers) {
       setSellersOrder(sellers.sort((a,b) => {
@@ -111,9 +113,9 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts, check }) => {
     [sellers]
   );
 
-  useEffect(() => {
-    setDayVisits(dayVisits);
-  }, [dayVisits]);
+  // useEffect(() => {
+  //   setDayVisits(dayVisits);
+  // }, [dayVisits]);
 
   useEffect(() => {
     if (checked === true) {
@@ -133,7 +135,9 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts, check }) => {
           }
           return 0;
         }));
+        filterSchedule(schedule);
       }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [monthSelect, schedule, scheduleNew]);
 
   // useEffect(
@@ -221,7 +225,7 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts, check }) => {
   const filterSchedule = (data, tec) => {
     if (data) {
       setDayVisits(
-        schedule.filter((dia) => dia.data === data && dia.tecnico === tec)
+        schedule.filter((dia) => dia.consultora === 'Bruna')
       );
     } else {
       setDayVisits(undefined);
@@ -861,7 +865,6 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts, check }) => {
       <div className="title-schedule">
         <ScheduleIcon />
         <h2>Agenda {year} </h2>
-        {dayVisits === undefined && (
             <div className="schedule-month">
               <select
                 value={monthSelect}
@@ -883,7 +886,6 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts, check }) => {
                 <option value="12">Dezembro</option>
               </select>
             </div>
-          )}
       </div>
       <div className="content-schedule-visit">
         <Dashboard schedule={schedule} monthSelect={monthSelect} />

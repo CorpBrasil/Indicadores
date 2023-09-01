@@ -15,6 +15,7 @@
 
 .box-visit {
     display: flex;
+    width: 100%;
     justify-content: center;
     margin-bottom: 1rem;
 
@@ -62,29 +63,58 @@
 
         .label {
             width: 20%;
+
             @include responsive(0, 1024px) {
                 width: 45%;
             }
 
+            .select {
+              margin: 1rem 0;
+              
+              &>div {
+                padding: 0.35rem 0;
+                transition: cubic-bezier(0.075, 0.82, 0.165, 1) 0.3s;
+              }
+            }
+
+            &-max {
+              width: 100%;
+              margin: 1rem;
+            }
+
             &__input {
+              width: 80%;
+            }
+
+            &__textarea {
+              width: 100%;
+              padding: 1rem 0;
+              height: 5rem;
+              min-height: 5rem;
+              max-height: 5rem;
+              max-width: 26rem;
+              font-family: Arial, Helvetica, sans-serif;
+            }
+
+            &__input, &__textarea {
                 margin: 1rem 0;
-                width: 80%;
                 padding: 1rem;
+                font-size: 16px;
                 border-radius: 5px;
                 background-color: #eee;
-                border: none;
+                border: 1px solid hsl(0, 0%, 80%);
                 transition: cubic-bezier(0.075, 0.82, 0.165, 1) 0.1s;
-                text-align: center;
+                
         
                 &:disabled {
                   color: #000;
                   background-color: #d1d1d1;
                 }
-        
+
                 &:focus {
-                  border-bottom: 2px solid #f39200;
+                  border: none;
+                  outline: none;
                 }
-        
             }
 
             .notice {

@@ -1,12 +1,24 @@
 @import '../../styles/mixins.scss';
 
-.container-panel {
-  height: 100vh;
+.prospecction_icon {
+  width: 50px;
+  height: 50px;
+
+  path {
+    fill: #000;
+  }
+}
+
+.table-center {
+  margin: auto;
+}
+
+.container_panel {
   display: flex;
   flex-direction: column;
   overflow-x: hidden;
 
-  .title-panel {
+  .title_panel {
     padding: 4rem 0 1rem 0;
 
     h2 {
@@ -14,7 +26,7 @@
     }
   }
 
-  .content-panel {
+  .content_panel {
     width: 100%;
     max-width: 1300px;
     display: flex;
@@ -22,34 +34,36 @@
     margin: auto;
     height: 100%;
 
-    .box-panel {
+    .box_panel {
       display: flex;
       flex-direction: column;
       flex-wrap: wrap;
       justify-content: space-around;
       padding: 3rem 0;
-      gap: 2rem;
+      gap: 0.5rem;
 
-      &__add {
+      &_add {
         display: flex;
         justify-content: center;
 
-        button {
+        &_activity {
+          margin: 0;
+          cursor: pointer;
           display: flex;
           align-items: center;
           gap: 1rem;
           padding: 1.5rem;
-          border: none;
           border-radius: 5px;
           transition: cubic-bezier(0.075, 0.82, 0.165, 1) 0.3s;
           border: 1px solid #E9EAF3;
           background: #FFF;
           box-shadow: 0px 2px 10px 0px rgba(25, 93, 194, 0.07);
 
-          .icon-user {
+          svg {
             width: 2.5rem;
             height: 2.5rem;
           }
+        }
 
           p {
             font-size: 17.6px;
@@ -61,7 +75,7 @@
         }
       }
 
-      &__users {
+      .box_activity {
         display: flex;
         flex-direction: column;
         gap: 1.5rem;
@@ -72,7 +86,6 @@
         
         table {
           background: #FFF;
-          box-shadow: 0px 2px 10px 0px rgba(25, 93, 194, 0.7)!important;
           border-collapse: collapse;
 
           thead {
@@ -85,10 +98,6 @@
               padding: 0 0.5rem;
               color: #fff;
               background-color: #313131!important;
-
-              &:last-child {
-                width: 4rem;
-              }
             }
           }
 
@@ -97,6 +106,13 @@
               height: 39px;
               font-weight: 100;
               padding: 0;
+              white-space: nowrap;
+
+              .circle {
+                border-radius: 50%;
+                padding: 0.7rem;
+                margin: 0.2rem 0;
+              }
 
               button {
                 width: 35px;
@@ -109,8 +125,42 @@
               }
             }
           }
+
+          .info_anotacao {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+
+            h3 {
+              text-align: center;
+            }
+
+            .anotacao {
+              background-color: #ffd;
+            }
+
+            .edit_anotacao {
+              outline: none;
+              max-width: 90%;
+              min-height: 20px;
+            }
+
+            .anotacao, .edit_anotacao {
+              width: 90%;
+              padding: 1rem;
+              text-align: center;
+              border-radius: 10px;
+              white-space: normal;
+              border: 1px solid #ddd;
+            }
+
+            .edit, .delete {
+              border: none;
+              border-radius: 50%;
+            }
+          }
         }
       }
     }
   }
-}

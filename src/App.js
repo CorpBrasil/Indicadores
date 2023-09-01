@@ -12,16 +12,19 @@ import { collection, onSnapshot, query, orderBy } from "firebase/firestore";
 import { dataBase } from "./firebase/database";
 import { Users } from "./data/Data";
 import { useNavigatorOnline } from '@oieduardorabelo/use-navigator-online';
+import Prospecction from "./pages/Prospection/Index";
 
 function App() {
   const { user } = useAuth();
   const [members, setMembers] = useState();
   const [userRef, setUserRef] = useState();
   const [userAlerts, setUserAlerts] = useState();
+  const [activity, setActivity] = useState();
   const [tecs, setTecs] = useState();
   const [sellers, setSellers] = useState();
   const [check, setCheck] = useState(false);
   const membersCollectionRef = collection(dataBase, "Membros");
+  const ActivityCollectionRef = collection(dataBase, "Atividades");
   let { status } = useNavigatorOnline();
 
   useEffect(() => {
@@ -43,6 +46,14 @@ function App() {
           // Atualiza os dados em tempo real
           setUserAlerts(member.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
         });
+          onSnapshot(query(ActivityCollectionRef, orderBy("createAt", 'desc')), (activity) => {
+            // Atualiza os dados em tempo real
+            setActivity(activity.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
+          });
+          // onSnapshot(query(collection(dataBase, "Atividades/" + user.id + "/Registro"), orderBy("data")), (activity) => {
+          //   // Atualiza os dados em tempo real
+          //   setActivity(activity.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
+          // });
       };
       fetchData();
     },
@@ -78,6 +89,7 @@ function App() {
               <Route exact path="/financeiro/:year" element={<Finance userRef={userRef} alerts={userAlerts} />} />
             }
             <Route exact path="/leads" element={<Alert user={user} userRef={userRef} alerts={userAlerts} check={check} />} />
+            <Route exact path="/prospeccao" element={<Prospecction user={user} userRef={userRef} activity={activity} members={members} check={check} />} />
             <Route path="/agenda/:year" element={<Schedule userRef={userRef} members={members} tecs={tecs} sellers={sellers} alerts={userAlerts} check={check} />} />
             <Route path="*" element={<Schedules userRef={userRef} alerts={userAlerts} check={check} />} />
           </Route>

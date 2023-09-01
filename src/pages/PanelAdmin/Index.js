@@ -5,7 +5,7 @@ import { onSnapshot, collection } from "firebase/firestore";
 
 // Css
 import "cooltipz-css";
-import "./_style.scss";
+import styles from "./style.module.scss";
 
 // Components
 import CreateAdmin from "../../components/Modal/Admin/Create/Index";
@@ -53,23 +53,23 @@ const PanelAdmin = ({ user, alerts, userRef }) => {
   };
 
   return (
-    <div className="container-panel">
+    <div className={styles.container_panel}>
       <Header user={user} alerts={alerts} userRef={userRef}></Header>
-      <div className="title-panel">
+      <div className={styles.title_panel}>
         <Admin style={{ width: '42px', height: '42px', marginBottom: '0.5rem' }} />
         <h2>Área Administrativa</h2>
       </div>
-      <div className="content-panel">
-        <div className="box-panel">
+      <div className={styles.content_panel}>
+        <div className={styles.box_panel}>
             <h1>Colaboradores</h1>
-          <div className="box-panel__add">
+          <div className={styles.box_panel__add}>
             <button onClick={() => setCreateAdmin(true)}>
-              <AccountCircleIcon className="icon-user" /> 
+              <AccountCircleIcon className={styles.icon_user} /> 
               <p>Cadastrar novo Colaborador</p>
             </button>
           </div>
-          <div className="box-panel__users">
-          <TableContainer className="table-center" component={Paper}>
+          <div className={styles.box_panel__users}>
+          <TableContainer className={styles.table_center} component={Paper}>
             <Table stickyHeader aria-label="sticky table">
               <TableHead>
                 <TableRow>

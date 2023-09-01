@@ -156,6 +156,46 @@ input:disabled {
   border-bottom: 1px solid #ccc;
 }
 
+//Icones Prospecção
+.circle-icon {
+  border-radius: 50%;
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  
+  svg {
+    padding: 0.3rem;
+    border-radius: 50%;
+  }
+
+  .mail {
+    background-color: #8A8A8A;
+  }
+  .phone {
+    background-color: #576AF5;
+  }
+  .whatsapp {
+    background-color: #44BF2B;
+  }
+}
+
+.loading {
+  position: fixed;
+  background-color: #1717173d;
+  display: flex;
+  width: 100vw;
+  height: 100vh;
+  top: 0;
+  bottom: 0;
+  justify-content: center;
+  align-items: center;
+  z-index: 11111;
+
+  svg {
+    color: #057e41;
+  }
+}
+
 /* Firefox */
 * {
   scrollbar-width: thin;
