@@ -1,0 +1,138 @@
+.prospecction_icon {
+  width: 50px;
+  height: 50px;
+}
+.prospecction_icon path {
+  fill: #000;
+}
+
+.table-center {
+  margin: auto;
+}
+
+.container_panel {
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+}
+.container_panel .title_panel {
+  padding: 4rem 0 1rem 0;
+}
+.container_panel .title_panel h2 {
+  font-size: 2rem;
+}
+.container_panel .content_panel {
+  width: 100%;
+  max-width: 1300px;
+  display: flex;
+  flex-direction: column;
+  margin: auto;
+  height: 100%;
+}
+.container_panel .content_panel .box_panel {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  padding: 3rem 0;
+  gap: 0.5rem;
+}
+.container_panel .content_panel .box_panel_add {
+  display: flex;
+  justify-content: center;
+}
+.container_panel .content_panel .box_panel_add_activity {
+  margin: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.5rem;
+  border-radius: 5px;
+  transition: cubic-bezier(0.075, 0.82, 0.165, 1) 0.3s;
+  border: 1px solid #E9EAF3;
+  background: #FFF;
+  box-shadow: 0px 2px 10px 0px rgba(25, 93, 194, 0.07);
+}
+.container_panel .content_panel .box_panel_add_activity svg {
+  width: 2.5rem;
+  height: 2.5rem;
+}
+.container_panel .content_panel .box_panel_add p {
+  font-size: 17.6px;
+}
+.container_panel .content_panel .box_panel_add:hover {
+  filter: saturate(1.5);
+}
+.container_panel .content_panel .box_activity {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: 100%;
+  overflow-x: auto;
+  z-index: 0;
+  padding: 0.1rem;
+}
+.container_panel .content_panel .box_activity table {
+  background: #FFF;
+  border-collapse: collapse;
+}
+.container_panel .content_panel .box_activity table thead {
+  border: 1px solid #313131 !important;
+  height: 3rem;
+  border-right: none;
+  height: 70px;
+}
+.container_panel .content_panel .box_activity table thead th {
+  padding: 0 0.5rem;
+  color: #fff;
+  background-color: #313131 !important;
+}
+.container_panel .content_panel .box_activity table tbody td {
+  height: 39px;
+  font-weight: 100;
+  padding: 0;
+  white-space: nowrap;
+}
+.container_panel .content_panel .box_activity table tbody td .circle {
+  border-radius: 50%;
+  padding: 0.7rem;
+  margin: 0.2rem 0;
+}
+.container_panel .content_panel .box_activity table tbody td button {
+  width: 35px;
+  height: 35px;
+}
+.container_panel .content_panel .box_activity table tbody td:nth-child(-n+6) {
+  border: 1px solid #ccc;
+  padding: 0 0.5rem;
+}
+.container_panel .content_panel .box_activity table .info_anotacao {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+.container_panel .content_panel .box_activity table .info_anotacao h3 {
+  text-align: center;
+}
+.container_panel .content_panel .box_activity table .info_anotacao .anotacao {
+  background-color: #ffd;
+}
+.container_panel .content_panel .box_activity table .info_anotacao .edit_anotacao {
+  outline: none;
+  max-width: 90%;
+  min-height: 20px;
+}
+.container_panel .content_panel .box_activity table .info_anotacao .anotacao, .container_panel .content_panel .box_activity table .info_anotacao .edit_anotacao {
+  width: 90%;
+  padding: 1rem;
+  text-align: center;
+  border-radius: 10px;
+  white-space: normal;
+  border: 1px solid #ddd;
+}
+.container_panel .content_panel .box_activity table .info_anotacao .edit, .container_panel .content_panel .box_activity table .info_anotacao .delete {
+  border: none;
+  border-radius: 50%;
+}/*# sourceMappingURL=style.module.css.map */

@@ -31,7 +31,7 @@ import MuiAlert from '@mui/material/Alert';
 import PeopleIcon from '@mui/icons-material/People';
 import LocalGasStationIcon from '@mui/icons-material/LocalGasStation';
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
-// import { ReactComponent as Prospection } from '../../images/icons/Prospection.svg';
+import { ReactComponent as Prospection } from '../../images/icons/Prospection.svg';
 
 
 
@@ -325,7 +325,7 @@ const Schedules = ({ userRef, alerts, check }) => {
             ))}
           </div></>
       }
-         {/* {userRef && (user.email === Users[0].email || userRef.cargo === "Vendedor(a)" || userRef.cargo === "Administrador") && userRef.nome !== 'Pós-Venda' &&
+         {userRef && (user.email === Users[0].email || userRef.cargo === "Vendedor(a)" || userRef.cargo === "Administrador") && userRef.nome !== 'Pós-Venda' &&
          <><div className='box-schedule'>
            <li className='schedule'>
              <Link className='schedule__content' to="/prospeccao">
@@ -336,7 +336,7 @@ const Schedules = ({ userRef, alerts, check }) => {
                </Link>
            </li>
              </div></>
-        } */}
+        }
        {userRef && (user.email === Users[0].email || userRef.cargo === "Vendedor(a)" || userRef.cargo === "Administrador") && userRef.nome !== 'Pós-Venda' &&
        <><div className='box-schedule'>
          <li className='schedule'>

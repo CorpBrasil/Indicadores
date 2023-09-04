@@ -10,6 +10,8 @@ import "cooltipz-css";
 import styles from "./style.module.scss";
 import '../../styles/_filter.scss';
 import { theme } from "../../data/theme"
+import '@wojtekmaj/react-daterange-picker/dist/DateRangePicker.css';
+import 'react-calendar/dist/Calendar.css';
 
 // Components
 import CreateProspection from "../../components/Box/CreateProspection/Index";
@@ -44,6 +46,13 @@ import Popover from '@mui/material/Popover';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import { ThemeProvider } from '@mui/material/styles';
+import MenuItem from '@mui/material/MenuItem';
+import Select from '@mui/material/Select';
+import InputLabel from '@mui/material/InputLabel';
+import FormControl from '@mui/material/FormControl';
+import moment from "moment";
+
+import DateRangePicker from '@wojtekmaj/react-daterange-picker';
 
 
 const Prospection = ({ user, activity, userRef, members }) => {
@@ -55,32 +64,91 @@ const Prospection = ({ user, activity, userRef, members }) => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [activityUser, setActivityUser] = useState(undefined);
-  const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
   const [viewPopover, setviewPopover] = useState(false);
+  const [searchValue, setSearchValue] = useState('');
+  const [searchParams, setSearchParams] = useState([]);
+  const [searchType, setSearchType] = useState('');
+  const [sellers, setSellers] = useState(null);
+  //const [value, onChange] = useState([new Date(), new Date()]);
   
-
   const openFilter = Boolean(anchorEl);
   const id = open ? 'simple-popover' : undefined;
 
-  // useEffect(() => {
-  //   if (collection && userRef && userRef.cargo === 'Administrador') {
-  //     const unsub = onSnapshot(activityCollectionRef, (schedules) => {
-  //       // Atualiza os dados em tempo real
-  //       let documents = [];
-  //       schedules.forEach((doc) => {
-  //         documents.push({ ...doc.data(), id: doc.id });
-  //       });
-  //       setAllActivity(documents); // puxa a coleção 'Chats' para o state
-  //     });
+  const search = (type) => {
+    if(type ==='atividade') {
+      setActivityUser(activityUser.filter((item) => {return item.atividade === searchValue}));
+      const newData = [...searchParams];
+      newData.push({
+        title: 'Atividade é',
+        value: searchValue
+      })
+      handleClose();
+      setSearchParams(newData);
+    }else if(type === 'data') {
+      const data1 = moment(searchValue[0]).format('YYYY-MM-DD');
+      const data2 = moment(searchValue[1]).format('YYYY-MM-DD');
+      setActivityUser(activityUser.filter((item) => 
+          //  (moment(activity[0].createAt.seconds*1000) <= moment(searchValue[1]) && moment(searchValue[0]) >= moment(activity[0].createAt.seconds*1000))
+          (moment(data1).isSameOrBefore(moment(item.createAt.seconds*1000).format('YYYY-MM-DD')) && moment(data2).isSameOrAfter(moment(item.createAt.seconds*1000).format('YYYY-MM-DD')))
+        ));
+      const newData = [...searchParams];
+      newData.push({
+        title: 'Data entre',
+        value: moment(data1).format('DD-MM-YYYY') + ' - ' +  moment(data2).format('DD-MM-YYYY')
+      })
+      handleClose();
+      setSearchParams(newData);
+    }
+     else if(type === 'empresa') {
+       setActivityUser(activityUser.filter((item) => {return item.empresa.includes(searchValue)}));
+       const newData = [...searchParams];
+      newData.push({
+        title: 'Empresa é',
+        value: searchValue
+      })
+      handleClose();
+      setSearchParams(newData);
+    } else if(type === 'responsável') {
+      setActivityUser(activityUser.filter((item) => {return item.responsavel.includes(searchValue)}));
+      const newData = [...searchParams];
+      newData.push({
+        title: 'Responsável é',
+        value: searchValue
+      })
+      handleClose();
+      setSearchParams(newData);
+    } else if(type === 'cidade') {
+      setActivityUser(activityUser.filter((item) => {return item.cidade.includes(searchValue)}));
+      const newData = [...searchParams];
+      newData.push({
+        title: 'Cidade é',
+        value: searchValue
+      })
+      handleClose();
+      setSearchParams(newData);
+    } else if(type === 'consultora') {
+      setActivityUser(activityUser.filter((item) => {return item.consultora === searchValue}));
+      const newData = [...searchParams];
+      newData.push({
+        title: 'Consultora é',
+        value: searchValue
+      })
+      handleClose();
+      setSearchParams(newData);
+    }
+}
 
-  //     return unsub;
-  //   }
+  const resetSearch = () => {
+    setSearchParams([]);
+    if(userRef && userRef.cargo === 'Vendedor(a)') {
+      setActivityUser(activity.filter((act) => act.uid === user.id))
+    } else {
+      setActivityUser(activity);
+    }
+  }  
 
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [collection]);
-  
   const returnPage = () => {
     setView(false);
   };
@@ -92,13 +160,13 @@ const Prospection = ({ user, activity, userRef, members }) => {
   useEffect(() => {
     if(userRef && userRef.cargo === 'Vendedor(a)') {
       setActivityUser(activity.filter((act) => act.uid === user.id))
+      setSellers(members.filter((member) => member.cargo === 'Vendedor(a)' && member.nome !== 'Pós-Venda'))
     } else if(userRef && userRef.cargo !== 'Vendedor(a)') {
       setActivityUser(activity);
+      setSellers(members.filter((member) => member.cargo === 'Vendedor(a)' && member.nome !== 'Pós-Venda'))
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   },[activity,userRef])
-
-
 
 
   const handleToggle = (id) => {
@@ -115,6 +183,10 @@ const Prospection = ({ user, activity, userRef, members }) => {
 
   const handleClose = (type) => {
       setAnchorEl(null);
+      setSearchValue('');
+      setTimeout(() => {
+        setviewPopover(false);
+      }, 500);
   };
 
   const handleChangeRowsPerPage = (event) => {
@@ -189,8 +261,6 @@ const Prospection = ({ user, activity, userRef, members }) => {
       console.log(error)
     }
   }
-
-  console.log(activity);
   
 
   return (
@@ -222,6 +292,19 @@ const Prospection = ({ user, activity, userRef, members }) => {
               <Button aria-describedby={id} variant="outlined" color="primary" onClick={handleClick} startIcon={<AddCircleOutlineIcon />}>
               Adicionar Filtro
               </Button>
+              <div className="filter-search">
+              {searchParams && searchParams &&
+              searchParams.map((item, index) => (
+                  <div key={index} className='filter-search-item'>
+                    <span>{item.title}</span>
+                    <span>{item.value}</span>
+                  </div>
+              ))
+            }
+            {searchParams && searchParams.length > 0 &&
+            <Button onClick={resetSearch} color="error"><CloseIcon /></Button>
+            }
+            </div>
             <Popover
             id={id}
             open={openFilter}
@@ -232,39 +315,87 @@ const Prospection = ({ user, activity, userRef, members }) => {
               vertical: 'bottom',
               horizontal: 'center',
             }}
+            PaperProps={{ style: { overflow: 'visible' } }}
             >
               {!viewPopover && !viewPopover ? 
               <div className="filter-box">
                 <p className="filter-title">FILTROS</p>
-                <div className="filter-item" onClick={() => setviewPopover(true)}>Atividade<KeyboardArrowRightIcon /></div>
-                <div className="filter-item">Data<KeyboardArrowRightIcon /></div>
-                <div className="filter-item">Empresa<KeyboardArrowRightIcon /></div>
-                <div className="filter-item">Responsável<KeyboardArrowRightIcon /></div>
-                <div className="filter-item">Cidade<KeyboardArrowRightIcon /></div>
-                <div className="filter-item">Consultora<KeyboardArrowRightIcon /></div>
+                <div className="filter-item" onClick={() => {setviewPopover(true);  setSearchType('atividade')}}>Atividade<KeyboardArrowRightIcon /></div>
+                <div className="filter-item" onClick={() => {setviewPopover(true);  setSearchType('data')}}>Data<KeyboardArrowRightIcon /></div>
+                <div className="filter-item" onClick={() => {setviewPopover(true);  setSearchType('empresa')}}>Empresa<KeyboardArrowRightIcon /></div>
+                <div className="filter-item" onClick={() => {setviewPopover(true);  setSearchType('responsável')}}>Responsável<KeyboardArrowRightIcon /></div>
+                <div className="filter-item" onClick={() => {setviewPopover(true);  setSearchType('cidade')}}>Cidade<KeyboardArrowRightIcon /></div>
+                {userRef && userRef.cargo === 'Administrador' && 
+                  <div className="filter-item" onClick={() => {setviewPopover(true);  setSearchType('consultora')}}>Consultora<KeyboardArrowRightIcon /></div>
+                }
               </div> :
               <div className="filter-box2">
                   <div className="filter-header">
                     <IconButton size="small" onClick={() => setviewPopover(false)} >
                       <KeyboardArrowLeftIcon size="small" />
                     </IconButton>
-                    <p className="filter-title">ATIVIDADE</p>
-                    <IconButton size="small" onClick={handleClose}>
-                      <CloseIcon size="small" />
-                    </IconButton>
-                    </div>
-                  <div>É igual a</div>
-                  <TextField
+                  <p className="filter-title">{searchType.toUpperCase()}</p>
+                  <IconButton size="small" onClick={handleClose}>
+                  <CloseIcon size="small" />
+                  </IconButton>
+                  </div>
+                  {searchType && searchType === 'atividade' &&
+                    <><div>É igual a</div>
+                    <FormControl margin="normal" fullWidth>
+                    <InputLabel id="demo-simple-select-label">Atividade</InputLabel>
+                    <Select
+                      labelId="demo-simple-select-label"
+                      id="demo-simple-select"
+                      value={searchValue}
+                      label="Atividade"
+                      onChange={(e) => setSearchValue(e.target.value)}
+                    >
+                      <MenuItem value='Email'>Email</MenuItem>
+                      <MenuItem value='Ligacao'>Ligação</MenuItem>
+                      <MenuItem value='WhatsApp'>WhatsApp</MenuItem>
+                    </Select>
+                    </FormControl></>
+                  }
+                  {searchType && searchType === 'data' &&
+                    <><div>É entre</div>
+                    <DateRangePicker 
+                    onChange={(value) => setSearchValue(value)} 
+                    value={searchValue}
+                     />
+                    </>
+                  }
+                  {searchType && (searchType === 'empresa' || searchType === 'responsável' || searchType === 'cidade') &&
+                    <><div>É igual a</div>
+                    <TextField
                   margin="dense"
                   label="Pesquisar"
                   type="text"
                   size="small"
                   fullWidth
-                  value={search}
+                  value={searchValue}
                   variant="outlined"
-                  onChange={(e) => setSearch(e.target.value)}
-                  />
-                  <Button variant="contained">Aplicar</Button>
+                  onChange={(e) => setSearchValue(e.target.value)}
+                  /> </>
+                  }
+                  {searchType && searchType === 'consultora' &&
+                    <><div>É igual a</div>
+                    <FormControl margin="normal" fullWidth>
+                    <InputLabel id="demo-simple-select-label">Consultora</InputLabel>
+                    <Select
+                      labelId="demo-simple-select-label"
+                      id="demo-simple-select"
+                      value={searchValue}
+                      label="Consultora"
+                      onChange={(e) => setSearchValue(e.target.value)}
+                    >
+                      {sellers.map((seller) => (
+                        <MenuItem value={seller.nome}>{seller.nome}</MenuItem>
+                      ))
+                      }
+                    </Select>
+                    </FormControl></>
+                  }
+                  <Button variant="contained" onClick={() => search(searchType)}>Aplicar</Button>
                 </div>
             }
             </Popover>
@@ -285,16 +416,17 @@ const Prospection = ({ user, activity, userRef, members }) => {
                   <TableCell align="center"></TableCell>
                 </TableRow>
               </TableHead>
+              <TableBody>
               {activityUser && activityUser.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((data, index) => (
-              <TableBody key={index}>
-                <TableRow
+                <><TableRow
+                  key={index}
                   hover
                   className={`list-visit`}
                   sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
                   <TableCell aria-label={data.atividade}
-                  data-cooltipz-dir="right" align="center" sx={{ width: '50px' }}>
+                    data-cooltipz-dir="right" align="center" sx={{ width: '50px' }}>
                     {data.atividade === 'Email' && <Email className={styles.circle} style={{ backgroundColor: '#8A8A8A' }} />}
-                    {data.atividade === 'Ligaçâo' && <Phone className={styles.circle} style={{ backgroundColor: '#576AF5' }} />}
+                    {data.atividade === 'Ligação' && <Phone className={styles.circle} style={{ backgroundColor: '#576AF5' }} />}
                     {data.atividade === 'WhatsApp' && <WhatsApp className={styles.circle} style={{ backgroundColor: '#44BF2B', padding: '0.6rem' }} />}
                   </TableCell>
                   <TableCell align="center">{data.data.replace('-', 'às')}</TableCell>
@@ -305,65 +437,69 @@ const Prospection = ({ user, activity, userRef, members }) => {
                   <TableCell align="center" sx={{ width: 'auto' }}>{data.anotacao.substring(0, 30) + '...'} </TableCell>
                   <TableCell align="center" sx={{ width: '50px' }}>
                     <IconButton
-                    aria-label="Expandir"
-                    data-cooltipz-dir="left"
-                    size="small"
-                    onClick={() => handleToggle(data.id)}>
-                    {open[data.id] ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+                      aria-label="Expandir"
+                      data-cooltipz-dir="left"
+                      size="small"
+                      onClick={() => handleToggle(data.id)}>
+                      {open[data.id] ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
                     </IconButton>
                   </TableCell>
-                </TableRow>
-                <TableRow>
-                <TableCell style={{ paddingBottom: 0, paddingTop: 0, height: 0 }} colSpan={8}>
+                </TableRow><TableRow>
+                    <TableCell style={{ paddingBottom: 0, paddingTop: 0, height: 0 }} colSpan={8}>
                       <Collapse in={open[data.id]} timeout="auto" unmountOnExit colSpan={8}>
                         <Box className={styles.info_anotacao} margin={3}>
                           <h3>Anotação</h3>
-                          {viewEdit && viewEdit === data.id ? 
-                            <textarea className={styles.edit_anotacao} value={anotacao} onChange={(e) => setAnotacao(e.target.value)} cols="30" rows="5"></textarea> :              
-                            <div className={styles.anotacao}>{data.anotacao}</div>
-                           }
-                           {data && userRef && (data.uid === userRef.uid || userRef.cargo === 'Administrador') &&
-                          <div>
-                            {viewEdit && viewEdit === data.id ? 
-                              <IconButton 
-                              aria-label="Confirmar"
-                              data-cooltipz-dir="top"
-                              onClick={() => confirmEdit(data.id)}
-                              >
-                                <CheckIcon style={{ scale: '1.2' }} />
-                              </IconButton>
-                             : <IconButton 
-                              aria-label="Editar Anotação"
-                              data-cooltipz-dir="top"
-                              onClick={() => {setViewEdit(data.id); setAnotacao(data.anotacao)}}
-                              >
-                                <EditIcon />
-                              </IconButton>
-                            }
-                            {viewEdit && viewEdit === data.id ? 
-                              <IconButton 
-                              aria-label="Cancelar"
-                              data-cooltipz-dir="top"
-                              onClick={() => setViewEdit()}
-                              >
-                                <BlockIcon />
-                              </IconButton>
-                            : <IconButton 
-                            aria-label="Deletar Atividade"
-                            data-cooltipz-dir="top"
-                            onClick={() => DeleteActivity(data.id)}
-                            >
-                              <DeleteIcon color="error" />
-                            </IconButton>
-                          }
-                          </div>
-                           }
+                          {viewEdit && viewEdit === data.id ?
+                            <textarea className={styles.edit_anotacao} value={anotacao} onChange={(e) => setAnotacao(e.target.value)} cols="30" rows="5"></textarea> :
+                            <div className={styles.anotacao}>{data.anotacao}</div>}
+                          {data && userRef && (data.uid === userRef.uid || userRef.cargo === 'Administrador') &&
+                            <div>
+                              {viewEdit && viewEdit === data.id ?
+                                <IconButton
+                                  aria-label="Confirmar"
+                                  data-cooltipz-dir="top"
+                                  onClick={() => confirmEdit(data.id)}
+                                >
+                                  <CheckIcon style={{ scale: '1.2' }} />
+                                </IconButton>
+                                : <IconButton
+                                  aria-label="Editar Anotação"
+                                  data-cooltipz-dir="top"
+                                  onClick={() => { setViewEdit(data.id); setAnotacao(data.anotacao); } }
+                                >
+                                  <EditIcon />
+                                </IconButton>}
+                              {viewEdit && viewEdit === data.id ?
+                                <IconButton
+                                  aria-label="Cancelar"
+                                  data-cooltipz-dir="top"
+                                  onClick={() => setViewEdit()}
+                                >
+                                  <BlockIcon />
+                                </IconButton>
+                                : <IconButton
+                                  aria-label="Deletar Atividade"
+                                  data-cooltipz-dir="top"
+                                  onClick={() => DeleteActivity(data.id)}
+                                >
+                                  <DeleteIcon color="error" />
+                                </IconButton>}
+                            </div>}
                         </Box>
                       </Collapse>
-                </TableCell>
-                  </TableRow>
-            </TableBody>
+                    </TableCell>
+                  </TableRow></>
               ))}
+            </TableBody>
+              {activityUser && activityUser.length < 1 &&
+                <TableBody>
+                  <TableRow>
+                    <TableCell colSpan={8}>
+                      <p className="margin1" style={{ textAlign: 'center' }}>Nenhuma Atividade Encontrada</p>
+                    </TableCell>
+                  </TableRow>
+                </TableBody>
+              } 
             </Table>
             <TablePagination
             rowsPerPageOptions={[5, 10, 20]}
