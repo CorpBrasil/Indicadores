@@ -351,7 +351,7 @@ const Prospection = ({ user, activity, userRef, members }) => {
                       onChange={(e) => setSearchValue(e.target.value)}
                     >
                       <MenuItem value='Email'>Email</MenuItem>
-                      <MenuItem value='Ligacao'>Ligação</MenuItem>
+                      <MenuItem value='Ligação'>Ligação</MenuItem>
                       <MenuItem value='WhatsApp'>WhatsApp</MenuItem>
                     </Select>
                     </FormControl></>
