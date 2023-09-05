@@ -34,7 +34,7 @@ import useVisit from "../../../hooks/useVisit";
 
 import '../style.scss';
 
-const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, sellers, userRef, visitRef, 
+const CreateVisitGroup = ({ returnSchedule, tecs, sellers, userRef, visitRef, 
   scheduleRef, scheduleVisitRef, schedule, monthNumber, type, typeRef, checkNet}) => {
   const { user } = useAuth();
   // const chegadaFormatadaTec = useRef();
@@ -182,11 +182,6 @@ const CreateVisitGroup = ({ returnSchedule, filterSchedule, tecs, sellers, userR
   // console.log(driver)
 
   useEffect(() => {
-    if(dataTexto) {
-      filterSchedule(dataTexto, tecnicoTexto)
-    } else {
-      filterSchedule()
-    }
     if(consultoraTexto) {
       setSellerRef(sellers.find((sel) => sel.nome === consultoraTexto)); 
     }
