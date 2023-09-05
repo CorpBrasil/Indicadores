@@ -32,7 +32,6 @@ import "../style.scss";
 
 const EditVisit = ({
   returnSchedule,
-  filterSchedule,
   tecs,
   sellers,
   userRef,
@@ -186,11 +185,11 @@ const EditVisit = ({
   // },[dataTexto, schedule])
 
   useEffect(() => {
-    if (dataTexto) {
-      filterSchedule(dataTexto, tecnicoTexto);
-    } else {
-      filterSchedule();
-    }
+    // if (dataTexto) {
+    //   filterSchedule(dataTexto, tecnicoTexto);
+    // } else {
+    //   filterSchedule();
+    // }
     if(tecnicoTexto && tecnicoTexto !== 'Nenhum') setTecRefUID(tecs.find((tec) => tec.nome === tecnicoTexto));  
     if(consultoraTexto) {
       setSellerRef(sellers.find((sel) => sel.nome === consultoraTexto)); 

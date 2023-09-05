@@ -78,36 +78,11 @@ const Dashboard = ({ schedule, monthSelect, type, total }) => {
       setData1(schedule.filter((vis) => vis.atividade === 'Email').length);
       setData2(schedule.filter((vis) => vis.atividade === 'Ligação').length);
       setData3(schedule.filter((vis) => vis.atividade === 'WhatsApp').length);
-      setAtividadesHoje(schedule.filter((act) =>  moment(act.createAt.seconds*1000).format('YYYY-MM-DD') === moment(new Date()).format('YYYY-MM-DD')))
-      // setdataChart([
-      //   {
-      //     name: 'Ana',
-      //     Visitas: schedule.filter((con) => con.consultora === 'Ana').length,
-      //     fill: '#F28500'
-      //   },
-      //   {
-      //     name: 'Bruna',
-      //     Visitas: schedule.filter((con) => con.consultora === 'Bruna').length,
-      //     fill: '#44BF2B'
-      //   },
-      //   {
-      //     name: 'Lia',
-      //     Visitas: schedule.filter((con) => con.consultora === 'Lia').length,
-      //     fill: '#E892DD'
-      //   },
-      //   {
-      //     name: 'Fernanda',
-      //     Visitas: schedule.filter((con) => con.consultora === 'Fernanda').length,
-      //     fill: '#FFC107'
-      //   },
-      //   {
-      //     name: 'Leticia',
-      //     Visitas: schedule.filter((con) => con.consultora === 'Leticia').length,
-      //     fill: '#B901C6'
-      //   }
-      // ])
+      setAtividadesHoje(schedule.filter((act) => moment(act.createAt.seconds*1000).format('YYYY-MM-DD') === moment(new Date()).format('YYYY-MM-DD')));
     }
   }, [monthSelect, schedule, type]);
+
+  //console.log(moment(schedule[0].data.slice(0,11), 'DD-MM-YYYY'))
 
   useEffect(() => {
     if(schedule) {
