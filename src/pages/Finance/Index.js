@@ -29,6 +29,7 @@ import {
 } from "firebase/firestore";
 
 import "../Schedule/_style.scss";
+import "../../components/Dashboard/_styles.scss";
 
 const Finance = ({ userRef, alerts, sellers }) => {
   const data = new Date();

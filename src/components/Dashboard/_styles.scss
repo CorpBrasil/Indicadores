@@ -98,6 +98,10 @@
       align-items: center;
       max-width: 87px;
       padding: 1rem;
+
+      path {
+        fill: #313131;
+      }
     }
 
     &-visits {

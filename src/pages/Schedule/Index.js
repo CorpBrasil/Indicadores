@@ -44,6 +44,7 @@ import {
 
 import "cooltipz-css";
 import "./_style.scss";
+import "../../components/Dashboard/_styles.scss";
 
 import EditVisit from "../../components/Box/Edit/Index";
 import CreateVisit from "../../components/Box/Create/Index";
@@ -825,7 +826,7 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts, check }) => {
             </div>
       </div>
       <div className="content-schedule-visit">
-        <Dashboard schedule={schedule} monthSelect={monthSelect} />
+        <Dashboard schedule={schedule} monthSelect={monthSelect} type='visit' />
         <div className="box-schedule-visit" ref={boxVisitRef}>
             {
               (box.name === "create" && (
@@ -992,10 +993,10 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts, check }) => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {schedule && schedule.map((visita) => (
+                {schedule && schedule.map((visita, index) => (
                   <TableRow
                     hover
-                    key={visita.id}
+                    key={index}
                     className={`list-visit`}
                     sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                   >
@@ -1201,10 +1202,10 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts, check }) => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {schedule.map((visita) => (
+                {schedule.map((visita, index) => (
                   <TableRow
                     hover
-                    key={visita.id}
+                    key={index}
                     className={`list-visit ${visita.tipo === 'Visita Conjunta' && !visita.confirmar ? 'conjunta' : ''} ${visita.confirmar ? 'confirmar' : ''}`}
                     sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                   >

@@ -9,13 +9,14 @@ import { doc, deleteDoc, updateDoc, serverTimestamp } from "firebase/firestore";
 import "cooltipz-css";
 import styles from "./style.module.scss";
 import '../../styles/_filter.scss';
-// import { theme } from "../../data/theme"
 import '@wojtekmaj/react-daterange-picker/dist/DateRangePicker.css';
 import 'react-calendar/dist/Calendar.css';
+import "../../components/Dashboard/_styles.scss";
 
 // Components
 import CreateProspection from "../../components/Box/CreateProspection/Index";
 import Filter from "../../components/Filter/Index";
+import Dashboard from "../../components/Dashboard/Index";
 
 import { ReactComponent as ProspectionIcon } from '../../images/icons/Prospection.svg';
 import { ReactComponent as Email } from '../../images/icons/Mail.svg';
@@ -181,8 +182,13 @@ const Prospection = ({ user, activity, userRef, members, sellers }) => {
       <div className={styles.title_panel}>
         <ProspectionIcon className={styles.prospecction_icon}/>
         <h2>Prospecção</h2>
+        {userRef && userRef.cargo === 'Administrador' && 
+          <Dashboard schedule={activityUser} type={'prospeccao'} />
+        }
       </div>
       <div className={styles.content_panel}>
+        <div className={styles.box_panel}>
+            <h2>Atividades</h2>
           <div className={styles.box_panel_add}>
             {!view && !view ? 
             <button className={styles.box_panel_add_activity} onClick={() => setView(true)}>
@@ -192,8 +198,6 @@ const Prospection = ({ user, activity, userRef, members, sellers }) => {
             <CreateProspection userRef={userRef} returnPage={returnPage} changeLoading={changeLoading} />
           }
           </div>
-        <div className={styles.box_panel}>
-            <h2>Atividades</h2>
             <Filter tableData={activityUser} 
             dataFull={activity} 
             sellers={sellersOrder} 
