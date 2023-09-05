@@ -89,7 +89,7 @@ function App() {
               <Route exact path="/financeiro/:year" element={<Finance userRef={userRef} alerts={userAlerts} />} />
             }
             <Route exact path="/leads" element={<Alert user={user} userRef={userRef} alerts={userAlerts} check={check} />} />
-            <Route exact path="/prospeccao" element={<Prospecction user={user} userRef={userRef} activity={activity} members={members} check={check} />} />
+            <Route exact path="/prospeccao" element={<Prospecction user={user} userRef={userRef} activity={activity} members={members} sellers={sellers} check={check} />} />
             <Route path="/agenda/:year" element={<Schedule userRef={userRef} members={members} tecs={tecs} sellers={sellers} alerts={userAlerts} check={check} />} />
             <Route path="*" element={<Schedules userRef={userRef} alerts={userAlerts} check={check} />} />
           </Route>

@@ -7,7 +7,7 @@ import { dataBase } from "../../firebase/database";
 import Header from "../../components/Header/Index";
 import useAuth from "../../hooks/useAuth";
 import Dashboard from "../../components/Dashboard/Index";
-// import Filter from "../../components/Filter/Index";
+import Filter from "../../components/Filter/Index";
 
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
@@ -62,7 +62,7 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts, check }) => {
   });
   const boxVisitRef = useRef();
   const [schedule, setSchedule] = useState();
-  const [scheduleNew, setScheduleNew] = useState();
+  // const [scheduleNew, setScheduleNew] = useState();
   const [monthSelect, setMonthSelect] = useState(
     String(data.getMonth() + 1).padStart(2, "0")
   );
@@ -90,6 +90,10 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts, check }) => {
           setSchedule(
             schedule.docs.map((doc) => ({ ...doc.data(), id: doc.id }))
           ); // puxa a coleção 'Chats' para o state
+          setDayVisits(
+            schedule.docs.map((doc) => ({ ...doc.data(), id: doc.id }))
+          );
+          console.log('oi') // puxa a coleção 'Chats' para o state
           setScheduleRef(schedulesCollectionRef);
         });
       };
@@ -99,7 +103,7 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts, check }) => {
     [monthSelect]
   );
 
-  console.log(dayVisits)
+  console.log(dayVisits);
 
   useEffect(() => {
     if(sellers) {
@@ -125,21 +129,21 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts, check }) => {
     }
   }, [checked]);
 
-  useEffect(() => {
-    if (schedule && monthSelect) {
-      setScheduleNew(
-        schedule.sort(function (a, b) {
-          // Força a renderizaram da tabela ordenada
-          if (a.data === b.data) {
-            if (a.saidaEmpresa < b.saidaEmpresa) return -1;
-            if (a.saidaEmpresa > b.saidaEmpresa) return 1;
-          }
-          return 0;
-        }));
-        filterSchedule(schedule);
-      }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [monthSelect, schedule, scheduleNew]);
+  // useEffect(() => {
+  //   if (schedule && monthSelect) {
+  //     setScheduleNew(
+  //       schedule.sort(function (a, b) {
+  //         // Força a renderizaram da tabela ordenada
+  //         if (a.data === b.data) {
+  //           if (a.saidaEmpresa < b.saidaEmpresa) return -1;
+  //           if (a.saidaEmpresa > b.saidaEmpresa) return 1;
+  //         }
+  //         return 0;
+  //       }));
+  //       // filterSchedule(schedule);
+  //     }
+  // // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [monthSelect, schedule, scheduleNew]);
 
   // useEffect(
   //   () => {
@@ -182,8 +186,10 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts, check }) => {
 
   const returnSchedule = () => {
     setBox({name: '',type: ''});
-    setDayVisits(undefined);
+    //setDayVisits(undefined);
   };
+
+  console.log(dayVisits);
 
   const permission = (visit) => { //Permissão
     // console.log(visit)
@@ -223,15 +229,15 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts, check }) => {
   //   }
   // }
 
-  const filterSchedule = (data, tec) => {
-    if (data) {
-      setDayVisits(
-        schedule.filter((dia) => dia.consultora === 'Bruna')
-      );
-    } else {
-      setDayVisits(undefined);
-    }
-  };
+  // const filterSchedule = (data, tec) => {
+  //   if (data) {
+  //     setDayVisits(
+  //       schedule.filter((dia) => dia.consultora === 'Bruna')
+  //     );
+  //   } else {
+  //     setDayVisits(undefined);
+  //   }
+  // };
 
   const visitsFind = (type, visit) => {
     if (type === "antes")
@@ -311,7 +317,7 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts, check }) => {
                 doc(dataBase, "Agendas", year, monthSelect, visit.id)
               );
               setBox({name: '', type:''});
-              setDayVisits(undefined);
+              //setDayVisits(undefined);
               const date = new Date(visit.data);
               axios.post('https://hook.us1.make.com/tmfl4xr8g9tk9qoi9jdpo1d7istl8ksd', {
                 data: moment(visit.data).format("DD/MM/YYYY"),
@@ -611,9 +617,12 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts, check }) => {
     localStorage.setItem("foco", !focoCheck);
   };
 
-  // const changeFilter = (data) => {
-  //   setSchedule(data);
-  // }
+  const changeFilter = (data) => {
+    setSchedule(data);
+    console.log(data);
+  }
+
+  console.log(schedule)
 
   const viewVisita = (visit, type) => {
     // console.log(visit);
@@ -829,7 +838,7 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts, check }) => {
               (box.name === "create" && (
                 <CreateVisit
                   returnSchedule={returnSchedule}
-                  filterSchedule={filterSchedule}
+                  // filterSchedule={filterSchedule}
                   scheduleRef={scheduleRef}
                   membersRef={members}
                   tecs={tecs}
@@ -845,7 +854,7 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts, check }) => {
                 (box.name === "create lunch" && (
                   <CreateVisit
                     returnSchedule={returnSchedule}
-                    filterSchedule={filterSchedule}
+                    // filterSchedule={filterSchedule}
                     scheduleRef={scheduleRef}
                     membersRef={members}
                     tecs={tecs}
@@ -860,7 +869,7 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts, check }) => {
                 (box.name === "edit" && (
                   <EditVisit
                     returnSchedule={returnSchedule}
-                    filterSchedule={filterSchedule}
+                    // filterSchedule={filterSchedule}
                     tecs={tecs}
                     sellers={sellersOrder}
                     userRef={userRef}
@@ -879,7 +888,7 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts, check }) => {
                 (box.name === "group" && (
                   <CreateVisitGroup
                     returnSchedule={returnSchedule}
-                    filterSchedule={filterSchedule}
+                    // filterSchedule={filterSchedule}
                     tecs={tecs}
                     sellers={sellers}
                     userRef={userRef}
@@ -953,9 +962,8 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts, check }) => {
           ) : (
             <></>
           )}
-          {schedule && schedule.length > 0 && (
               <div className="toggle-box desktop">
-                {/* <Filter tableData={dayVisits} dataFull={schedule} sellers={sellers} changeFilter={changeFilter} type={'Visit'} /> */}
+                <Filter tableData={schedule} dataFull={dayVisits} sellers={sellers} changeFilter={changeFilter} type={'visit'} />
                 <p>Modo foco</p>
                 <input
                   type="checkbox"
@@ -966,7 +974,6 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts, check }) => {
                 />
                 <label htmlFor="toggle"></label>
               </div>
-            )}
           <div className="container-table desktop">
           <TableContainer className={focoCheck ? "table-visit table-foco" : "table-visit"} component={Paper} >
             <Table size="small" stickyHeader aria-label="sticky table">
@@ -1167,6 +1174,13 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts, check }) => {
                         </TableCell>
                   </TableRow>
                 ))}
+                {schedule && schedule.length < 1 &&
+                  <TableRow>
+                    <TableCell colSpan={15}>
+                      <p className="margin1" style={{ textAlign: 'center', margin: '1rem', fontSize: '1.2rem' }}>Nenhuma Visita Encontrada</p>
+                    </TableCell>
+                  </TableRow>
+                } 
               </TableBody>
             </Table>
           </TableContainer>

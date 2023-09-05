@@ -56,7 +56,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 // import DateRangePicker from '@wojtekmaj/react-daterange-picker';
 
 
-const Prospection = ({ user, activity, userRef, members }) => {
+const Prospection = ({ user, activity, userRef, members, sellers }) => {
   // const activityCollectionRef = collection(dataBase, "AtividadesTotal");
   const [anotacao, setAnotacao] = useState('');
   const [view, setView] = useState(false);
@@ -71,7 +71,7 @@ const Prospection = ({ user, activity, userRef, members }) => {
   // const [searchValue, setSearchValue] = useState('');
   // const [searchParams, setSearchParams] = useState([]);
   // const [searchType, setSearchType] = useState('');
-  const [sellers, setSellers] = useState(null);
+  const [sellersOrder, setSellersOrder] = useState(null);
   //const [value, onChange] = useState([new Date(), new Date()]);
   
   // const openFilter = Boolean(anchorEl);
@@ -150,6 +150,19 @@ const Prospection = ({ user, activity, userRef, members }) => {
   //   }
   // }  
 
+  useEffect(() => {
+    if(sellers) {
+      setSellersOrder(sellers.sort((a,b) => {
+        if(a.nome< b.nome) return -1;
+        if(a.nome > b.nome) return 1;
+        return 0;
+      }))
+    }
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [sellers]
+  );
+
   const changeFilter = (data) => {
     setActivityUser(data);
   }
@@ -165,10 +178,8 @@ const Prospection = ({ user, activity, userRef, members }) => {
   useEffect(() => {
     if(userRef && userRef.cargo === 'Vendedor(a)') {
       setActivityUser(activity.filter((act) => act.uid === user.id))
-      setSellers(members.filter((member) => member.cargo === 'Vendedor(a)' && member.nome !== 'Pós-Venda'))
     } else if(userRef && userRef.cargo !== 'Vendedor(a)') {
       setActivityUser(activity);
-      setSellers(members.filter((member) => member.cargo === 'Vendedor(a)' && member.nome !== 'Pós-Venda'))
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   },[activity,userRef])
@@ -408,10 +419,10 @@ const Prospection = ({ user, activity, userRef, members }) => {
             </div> */}
             <Filter tableData={activityUser} 
             dataFull={activity} 
-            sellers={sellers} 
+            sellers={sellersOrder} 
             userRef={userRef} 
             changeFilter={changeFilter}
-            type={'Activity'}
+            type={'prospeccao'}
             />
           <div className={styles.box_activity}>
           <TableContainer className={styles.table_center} component={Paper}>
