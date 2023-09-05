@@ -7,6 +7,7 @@ import { dataBase } from "../../firebase/database";
 import Header from "../../components/Header/Index";
 import useAuth from "../../hooks/useAuth";
 import Dashboard from "../../components/Dashboard/Index";
+// import Filter from "../../components/Filter/Index";
 
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
@@ -610,6 +611,10 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts, check }) => {
     localStorage.setItem("foco", !focoCheck);
   };
 
+  // const changeFilter = (data) => {
+  //   setSchedule(data);
+  // }
+
   const viewVisita = (visit, type) => {
     // console.log(visit);
     let visitType, visitInfo;
@@ -950,6 +955,7 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts, check }) => {
           )}
           {schedule && schedule.length > 0 && (
               <div className="toggle-box desktop">
+                {/* <Filter tableData={dayVisits} dataFull={schedule} sellers={sellers} changeFilter={changeFilter} type={'Visit'} /> */}
                 <p>Modo foco</p>
                 <input
                   type="checkbox"

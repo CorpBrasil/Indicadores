@@ -9,12 +9,14 @@ import { doc, deleteDoc, updateDoc, serverTimestamp } from "firebase/firestore";
 import "cooltipz-css";
 import styles from "./style.module.scss";
 import '../../styles/_filter.scss';
-import { theme } from "../../data/theme"
+// import { theme } from "../../data/theme"
 import '@wojtekmaj/react-daterange-picker/dist/DateRangePicker.css';
 import 'react-calendar/dist/Calendar.css';
 
 // Components
 import CreateProspection from "../../components/Box/CreateProspection/Index";
+import Filter from "../../components/Filter/Index";
+
 import { ReactComponent as ProspectionIcon } from '../../images/icons/Prospection.svg';
 import { ReactComponent as Email } from '../../images/icons/Mail.svg';
 import { ReactComponent as Phone } from '../../images/icons/Phone.svg';
@@ -23,10 +25,10 @@ import { ReactComponent as CheckIcon } from "../../images/icons/Check.svg";
 import { ReactComponent as BlockIcon } from "../../images/icons/Block.svg";
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
-import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
-import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
-import CloseIcon from '@mui/icons-material/Close';
+// import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+// import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
+// import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
+// import CloseIcon from '@mui/icons-material/Close';
 
 import IconButton from '@mui/material/IconButton';
 import Table from '@mui/material/Table';
@@ -42,17 +44,16 @@ import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import Collapse from '@mui/material/Collapse';
 import { Box } from "@mui/material";
 import CircularProgress from '@mui/material/CircularProgress';
-import Popover from '@mui/material/Popover';
-import Button from '@mui/material/Button';
-import TextField from '@mui/material/TextField';
-import { ThemeProvider } from '@mui/material/styles';
-import MenuItem from '@mui/material/MenuItem';
-import Select from '@mui/material/Select';
-import InputLabel from '@mui/material/InputLabel';
-import FormControl from '@mui/material/FormControl';
-import moment from "moment";
-
-import DateRangePicker from '@wojtekmaj/react-daterange-picker';
+// import Popover from '@mui/material/Popover';
+// import Button from '@mui/material/Button';
+// import TextField from '@mui/material/TextField';
+// import { ThemeProvider } from '@mui/material/styles';
+// import MenuItem from '@mui/material/MenuItem';
+// import Select from '@mui/material/Select';
+// import InputLabel from '@mui/material/InputLabel';
+// import FormControl from '@mui/material/FormControl';
+// import moment from "moment";
+// import DateRangePicker from '@wojtekmaj/react-daterange-picker';
 
 
 const Prospection = ({ user, activity, userRef, members }) => {
@@ -65,90 +66,94 @@ const Prospection = ({ user, activity, userRef, members }) => {
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [activityUser, setActivityUser] = useState(undefined);
   const [loading, setLoading] = useState(false);
-  const [anchorEl, setAnchorEl] = useState(null);
-  const [viewPopover, setviewPopover] = useState(false);
-  const [searchValue, setSearchValue] = useState('');
-  const [searchParams, setSearchParams] = useState([]);
-  const [searchType, setSearchType] = useState('');
+  // const [anchorEl, setAnchorEl] = useState(null);
+  // const [viewPopover, setviewPopover] = useState(false);
+  // const [searchValue, setSearchValue] = useState('');
+  // const [searchParams, setSearchParams] = useState([]);
+  // const [searchType, setSearchType] = useState('');
   const [sellers, setSellers] = useState(null);
   //const [value, onChange] = useState([new Date(), new Date()]);
   
-  const openFilter = Boolean(anchorEl);
-  const id = open ? 'simple-popover' : undefined;
+  // const openFilter = Boolean(anchorEl);
+  // const id = open ? 'simple-popover' : undefined;
 
-  const search = (type) => {
-    if(type ==='atividade') {
-      setActivityUser(activityUser.filter((item) => {return item.atividade === searchValue}));
-      const newData = [...searchParams];
-      newData.push({
-        title: 'Atividade é',
-        value: searchValue
-      })
-      handleClose();
-      setSearchParams(newData);
-    }else if(type === 'data') {
-      const data1 = moment(searchValue[0]).format('YYYY-MM-DD');
-      const data2 = moment(searchValue[1]).format('YYYY-MM-DD');
-      setActivityUser(activityUser.filter((item) => 
-          //  (moment(activity[0].createAt.seconds*1000) <= moment(searchValue[1]) && moment(searchValue[0]) >= moment(activity[0].createAt.seconds*1000))
-          (moment(data1).isSameOrBefore(moment(item.createAt.seconds*1000).format('YYYY-MM-DD')) && moment(data2).isSameOrAfter(moment(item.createAt.seconds*1000).format('YYYY-MM-DD')))
-        ));
-      const newData = [...searchParams];
-      newData.push({
-        title: 'Data entre',
-        value: moment(data1).format('DD-MM-YYYY') + ' - ' +  moment(data2).format('DD-MM-YYYY')
-      })
-      handleClose();
-      setSearchParams(newData);
-    }
-     else if(type === 'empresa') {
-       setActivityUser(activityUser.filter((item) => {return item.empresa.includes(searchValue)}));
-       const newData = [...searchParams];
-      newData.push({
-        title: 'Empresa é',
-        value: searchValue
-      })
-      handleClose();
-      setSearchParams(newData);
-    } else if(type === 'responsável') {
-      setActivityUser(activityUser.filter((item) => {return item.responsavel.includes(searchValue)}));
-      const newData = [...searchParams];
-      newData.push({
-        title: 'Responsável é',
-        value: searchValue
-      })
-      handleClose();
-      setSearchParams(newData);
-    } else if(type === 'cidade') {
-      setActivityUser(activityUser.filter((item) => {return item.cidade.includes(searchValue)}));
-      const newData = [...searchParams];
-      newData.push({
-        title: 'Cidade é',
-        value: searchValue
-      })
-      handleClose();
-      setSearchParams(newData);
-    } else if(type === 'consultora') {
-      setActivityUser(activityUser.filter((item) => {return item.consultora === searchValue}));
-      const newData = [...searchParams];
-      newData.push({
-        title: 'Consultora é',
-        value: searchValue
-      })
-      handleClose();
-      setSearchParams(newData);
-    }
-}
+//   const search = (type) => {
+//     if(type ==='atividade') {
+//       setActivityUser(activityUser.filter((item) => {return item.atividade === searchValue}));
+//       const newData = [...searchParams];
+//       newData.push({
+//         title: 'Atividade é',
+//         value: searchValue
+//       })
+//       handleClose();
+//       setSearchParams(newData);
+//     }else if(type === 'data') {
+//       const data1 = moment(searchValue[0]).format('YYYY-MM-DD');
+//       const data2 = moment(searchValue[1]).format('YYYY-MM-DD');
+//       setActivityUser(activityUser.filter((item) => 
+//           //  (moment(activity[0].createAt.seconds*1000) <= moment(searchValue[1]) && moment(searchValue[0]) >= moment(activity[0].createAt.seconds*1000))
+//           (moment(data1).isSameOrBefore(moment(item.createAt.seconds*1000).format('YYYY-MM-DD')) && moment(data2).isSameOrAfter(moment(item.createAt.seconds*1000).format('YYYY-MM-DD')))
+//         ));
+//       const newData = [...searchParams];
+//       newData.push({
+//         title: 'Data entre',
+//         value: moment(data1).format('DD-MM-YYYY') + ' - ' +  moment(data2).format('DD-MM-YYYY')
+//       })
+//       handleClose();
+//       setSearchParams(newData);
+//     }
+//      else if(type === 'empresa') {
+//        setActivityUser(activityUser.filter((item) => {return item.empresa.includes(searchValue)}));
+//        const newData = [...searchParams];
+//       newData.push({
+//         title: 'Empresa é',
+//         value: searchValue
+//       })
+//       handleClose();
+//       setSearchParams(newData);
+//     } else if(type === 'responsável') {
+//       setActivityUser(activityUser.filter((item) => {return item.responsavel.includes(searchValue)}));
+//       const newData = [...searchParams];
+//       newData.push({
+//         title: 'Responsável é',
+//         value: searchValue
+//       })
+//       handleClose();
+//       setSearchParams(newData);
+//     } else if(type === 'cidade') {
+//       setActivityUser(activityUser.filter((item) => {return item.cidade.includes(searchValue)}));
+//       const newData = [...searchParams];
+//       newData.push({
+//         title: 'Cidade é',
+//         value: searchValue
+//       })
+//       handleClose();
+//       setSearchParams(newData);
+//     } else if(type === 'consultora') {
+//       setActivityUser(activityUser.filter((item) => {return item.consultora === searchValue}));
+//       const newData = [...searchParams];
+//       newData.push({
+//         title: 'Consultora é',
+//         value: searchValue
+//       })
+//       handleClose();
+//       setSearchParams(newData);
+//     }
+// }
 
-  const resetSearch = () => {
-    setSearchParams([]);
-    if(userRef && userRef.cargo === 'Vendedor(a)') {
-      setActivityUser(activity.filter((act) => act.uid === user.id))
-    } else {
-      setActivityUser(activity);
-    }
-  }  
+  // const resetSearch = () => {
+  //   setSearchParams([]);
+  //   if(userRef && userRef.cargo === 'Vendedor(a)') {
+  //     setActivityUser(activity.filter((act) => act.uid === user.id))
+  //   } else {
+  //     setActivityUser(activity);
+  //   }
+  // }  
 
+  const changeFilter = (data) => {
+    setActivityUser(data);
+  }
+  
   const returnPage = () => {
     setView(false);
   };
@@ -177,17 +182,17 @@ const Prospection = ({ user, activity, userRef, members }) => {
     setPage(newPage);
   };
 
-  const handleClick = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
+  // const handleClick = (event) => {
+  //   setAnchorEl(event.currentTarget);
+  // };
 
-  const handleClose = (type) => {
-      setAnchorEl(null);
-      setSearchValue('');
-      setTimeout(() => {
-        setviewPopover(false);
-      }, 500);
-  };
+  // const handleClose = (type) => {
+  //     setAnchorEl(null);
+  //     setSearchValue('');
+  //     setTimeout(() => {
+  //       setviewPopover(false);
+  //     }, 500);
+  // };
 
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(+event.target.value);
@@ -287,7 +292,7 @@ const Prospection = ({ user, activity, userRef, members }) => {
           </div>
         <div className={styles.box_panel}>
             <h2>Atividades</h2>
-            <div className='filter-container'>
+            {/* <div className='filter-container'>
             <ThemeProvider theme={theme}>
               <Button aria-describedby={id} variant="outlined" color="primary" onClick={handleClick} startIcon={<AddCircleOutlineIcon />}>
               Adicionar Filtro
@@ -400,7 +405,14 @@ const Prospection = ({ user, activity, userRef, members }) => {
             }
             </Popover>
             </ThemeProvider>   
-            </div>
+            </div> */}
+            <Filter tableData={activityUser} 
+            dataFull={activity} 
+            sellers={sellers} 
+            userRef={userRef} 
+            changeFilter={changeFilter}
+            type={'Activity'}
+            />
           <div className={styles.box_activity}>
           <TableContainer className={styles.table_center} component={Paper}>
             <Table stickyHeader aria-label="sticky table">
