@@ -182,9 +182,7 @@ const Prospection = ({ user, activity, userRef, members, sellers }) => {
       <div className={styles.title_panel}>
         <ProspectionIcon className={styles.prospecction_icon}/>
         <h2>Prospecção</h2>
-        {userRef && userRef.cargo === 'Administrador' && 
           <Dashboard schedule={activityUser} type={'prospeccao'} />
-        }
       </div>
       <div className={styles.content_panel}>
         <div className={styles.box_panel}>
