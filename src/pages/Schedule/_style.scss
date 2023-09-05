@@ -332,10 +332,22 @@
 
       .toggle-box { // ============= Botão que altera o foco ================== //
         display: flex;
-        justify-content: flex-end;
-        align-items: center;
+        justify-content: space-between;
+        align-items: flex-end;
         gap: 0.5rem;
-        width: 97%;
+        width: 95%;
+        margin: auto;
+
+        &-item {
+          display: flex;
+          gap: 1rem;
+          align-items: flex-end;
+
+          p {
+            font-weight: bold;
+            font-size: 0.8rem;
+          }
+        }
 
         .toggle {
           position: absolute;

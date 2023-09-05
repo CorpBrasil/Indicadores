@@ -13,7 +13,6 @@ import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 import IconButton from '@mui/material/IconButton';
 
-//import EventNoteIcon from '@mui/icons-material/EventNote';
 import RequestQuoteIcon from '@mui/icons-material/RequestQuote'; // Visita Comercial
 import PeopleIcon from '@mui/icons-material/People'; // Tecnica + Comercial
 import RestaurantIcon from '@mui/icons-material/Restaurant'; // Almoço
@@ -92,8 +91,7 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts, check }) => {
           ); // puxa a coleção 'Chats' para o state
           setDayVisits(
             schedule.docs.map((doc) => ({ ...doc.data(), id: doc.id }))
-          );
-          console.log('oi') // puxa a coleção 'Chats' para o state
+          );// puxa a coleção 'Chats' para o state
           setScheduleRef(schedulesCollectionRef);
         });
       };
@@ -102,8 +100,6 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts, check }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [monthSelect]
   );
-
-  console.log(dayVisits);
 
   useEffect(() => {
     if(sellers) {
@@ -189,7 +185,6 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts, check }) => {
     //setDayVisits(undefined);
   };
 
-  console.log(dayVisits);
 
   const permission = (visit) => { //Permissão
     // console.log(visit)
@@ -619,10 +614,8 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts, check }) => {
 
   const changeFilter = (data) => {
     setSchedule(data);
-    console.log(data);
   }
 
-  console.log(schedule)
 
   const viewVisita = (visit, type) => {
     // console.log(visit);
@@ -964,15 +957,17 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts, check }) => {
           )}
               <div className="toggle-box desktop">
                 <Filter tableData={schedule} dataFull={dayVisits} sellers={sellers} changeFilter={changeFilter} type={'visit'} />
-                <p>Modo foco</p>
-                <input
-                  type="checkbox"
-                  id="toggle"
-                  className="toggle toggle--shadow"
-                  checked={focoCheck}
-                  onChange={() => changeFoco()}
-                />
-                <label htmlFor="toggle"></label>
+                <div className="toggle-box-item">
+                  <p>MODO FOCO</p>
+                  <input
+                    type="checkbox"
+                    id="toggle"
+                    className="toggle toggle--shadow"
+                    checked={focoCheck}
+                    onChange={() => changeFoco()}
+                  />
+                  <label htmlFor="toggle"></label>
+                </div>
               </div>
           <div className="container-table desktop">
           <TableContainer className={focoCheck ? "table-visit table-foco" : "table-visit"} component={Paper} >
@@ -994,7 +989,6 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts, check }) => {
                   <TableCell align="center">Motorista</TableCell>
                   <TableCell align="center">Observação</TableCell>
                   <TableCell align="center">Ação</TableCell>
-                  
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -1283,69 +1277,6 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts, check }) => {
               </TableBody>
             </Table>
           </TableContainer>
-            // <List
-            //   sx={{
-            //     width: '100%',
-            //     maxWidth: 750,            
-            //     bgcolor: 'background.paper',
-            //     position: 'relative',
-            //     overflow: 'auto',
-            //     maxHeight: 400,
-            //     '& ul': { padding: 0 },
-            //   }}>
-            //     {schedule.map((visita, index) => (
-            //       <ListItem className={`list-visit ${visita.tipo === 'Visita Conjunta' && !visita.confirmar ? 'conjunta' : ''} ${visita.confirmar ? 'confirmar' : ''}`} sx={{ borderLeft: `20px solid ${visita.cor}` }} key={index}>
-            //         <p><b>{visita.dia.substring(8,10)}</b></p>
-            //         {visita.categoria === "lunch" && <div onClick={() => viewVisita(visita, visita.categoria)} style={{ filter: 'contrast', padding: '0.2rem' }} className="type-icon lunch" aria-label="Almoço" data-cooltipz-dir="right"><RestaurantIcon /></div>}
-            //         {visita.categoria === "comercial" && <div onClick={() => viewVisita(visita, visita.categoria)} style={{ padding: '0.2rem' }} className="type-icon comercial" aria-label="Visita Comercial" data-cooltipz-dir="right"><RequestQuoteIcon /></div>}
-            //         {visita.categoria === "comercial_tecnica" && <div onClick={() => viewVisita(visita, visita.categoria)} style={{ padding: '0.2rem' }} className="type-icon comercial_tec" aria-label="Comercial + Técnica" data-cooltipz-dir="right"><PeopleIcon /></div>}
-            //         {visita.categoria === "pos_venda" && <div onClick={() => viewVisita(visita, visita.categoria)} style={{ padding: '0.2rem' }} className="type-icon pos_venda" aria-label="Pós-Venda" data-cooltipz-dir="right"><EngineeringIcon /></div>}
-            //         {!visita.confirmar && (visita.categoria === 'comercial' || visita.categoria === 'comercial_tecnica') && 
-            //         userRef && userRef.cargo === 'Vendedor(a)' && userRef.nome !== 'Pós-Venda' &&
-            //         <div className="btn-add"
-            //         aria-label="Criar Visita Conjunta"
-            //         data-cooltipz-dir="right"
-            //          onClick={() => createVisitGroupChoice({visit: visita, type: visita.categoria})}
-            //         ></div>
-            //         }
-            //         {!visita.confirmar && visita.categoria === 'pos_venda' && 
-            //         userRef && userRef.nome === 'Pós-Venda' &&
-            //         <div className="btn-add"
-            //         aria-label="Criar Visita Conjunta"
-            //         data-cooltipz-dir="right"
-            //          onClick={() => createVisitGroupChoice({visit: visita, type: visita.categoria})}
-            //         ></div>
-            //         }
-            //         {visita.confirmar === false &&
-            //         (user.email === Users[0].email || (userRef && userRef.cargo === "Administrador") || (userRef && userRef.nome === 'Pós-Venda')) ? (
-            //           <div className="btn-confirm"
-            //           aria-label="Confirmar Visita"
-            //           data-cooltipz-dir="right"
-            //           onClick={() => confirmVisit(visita, "confirm")}
-            //           ></div>
-            //         ) : 
-            //         (
-            //         <></>
-            //         )}
-            //         {visita.confirmar === true &&
-            //         (user.email === Users[0].email || (userRef && userRef.cargo === "Administrador") || (userRef && userRef.nome === 'Pós-Venda')) ? (
-            //          <div className="btn-cancel"
-            //         aria-label="Cancelar Visita"
-            //         data-cooltipz-dir="right"
-            //         onClick={() => confirmVisit(visita, "cancel")}
-            //         ></div>
-            //                 ) : (
-            //                   <></>
-            //                 )}
-            //         <p className="saida">{visita.saidaEmpresa}</p>
-            //         <p className="chegada">{visita.chegadaEmpresa}</p>
-            //         {visita.categoria !== 'lunch' &&
-            //           <p className="tecnico" style={{ backgroundColor: visita.corTec }}>{visita.tecnico}</p>
-            //         }
-            //         <p className="cidade">{visita.cidade ? visita.cidade : 'ALMOÇO'}</p>
-            //       </ListItem>
-            //     ))}
-            //    </List>
                :
                <div style={{ display: 'none!important', margin: 'auto' }} className="visit-aviso">
                 <h1>Nenhuma Visita Encontrada</h1>

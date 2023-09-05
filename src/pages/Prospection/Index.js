@@ -25,10 +25,6 @@ import { ReactComponent as CheckIcon } from "../../images/icons/Check.svg";
 import { ReactComponent as BlockIcon } from "../../images/icons/Block.svg";
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-// import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
-// import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
-// import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
-// import CloseIcon from '@mui/icons-material/Close';
 
 import IconButton from '@mui/material/IconButton';
 import Table from '@mui/material/Table';
@@ -44,20 +40,9 @@ import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import Collapse from '@mui/material/Collapse';
 import { Box } from "@mui/material";
 import CircularProgress from '@mui/material/CircularProgress';
-// import Popover from '@mui/material/Popover';
-// import Button from '@mui/material/Button';
-// import TextField from '@mui/material/TextField';
-// import { ThemeProvider } from '@mui/material/styles';
-// import MenuItem from '@mui/material/MenuItem';
-// import Select from '@mui/material/Select';
-// import InputLabel from '@mui/material/InputLabel';
-// import FormControl from '@mui/material/FormControl';
-// import moment from "moment";
-// import DateRangePicker from '@wojtekmaj/react-daterange-picker';
 
 
 const Prospection = ({ user, activity, userRef, members, sellers }) => {
-  // const activityCollectionRef = collection(dataBase, "AtividadesTotal");
   const [anotacao, setAnotacao] = useState('');
   const [view, setView] = useState(false);
   const [viewEdit, setViewEdit] = useState(false);
@@ -66,89 +51,7 @@ const Prospection = ({ user, activity, userRef, members, sellers }) => {
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [activityUser, setActivityUser] = useState(undefined);
   const [loading, setLoading] = useState(false);
-  // const [anchorEl, setAnchorEl] = useState(null);
-  // const [viewPopover, setviewPopover] = useState(false);
-  // const [searchValue, setSearchValue] = useState('');
-  // const [searchParams, setSearchParams] = useState([]);
-  // const [searchType, setSearchType] = useState('');
   const [sellersOrder, setSellersOrder] = useState(null);
-  //const [value, onChange] = useState([new Date(), new Date()]);
-  
-  // const openFilter = Boolean(anchorEl);
-  // const id = open ? 'simple-popover' : undefined;
-
-//   const search = (type) => {
-//     if(type ==='atividade') {
-//       setActivityUser(activityUser.filter((item) => {return item.atividade === searchValue}));
-//       const newData = [...searchParams];
-//       newData.push({
-//         title: 'Atividade é',
-//         value: searchValue
-//       })
-//       handleClose();
-//       setSearchParams(newData);
-//     }else if(type === 'data') {
-//       const data1 = moment(searchValue[0]).format('YYYY-MM-DD');
-//       const data2 = moment(searchValue[1]).format('YYYY-MM-DD');
-//       setActivityUser(activityUser.filter((item) => 
-//           //  (moment(activity[0].createAt.seconds*1000) <= moment(searchValue[1]) && moment(searchValue[0]) >= moment(activity[0].createAt.seconds*1000))
-//           (moment(data1).isSameOrBefore(moment(item.createAt.seconds*1000).format('YYYY-MM-DD')) && moment(data2).isSameOrAfter(moment(item.createAt.seconds*1000).format('YYYY-MM-DD')))
-//         ));
-//       const newData = [...searchParams];
-//       newData.push({
-//         title: 'Data entre',
-//         value: moment(data1).format('DD-MM-YYYY') + ' - ' +  moment(data2).format('DD-MM-YYYY')
-//       })
-//       handleClose();
-//       setSearchParams(newData);
-//     }
-//      else if(type === 'empresa') {
-//        setActivityUser(activityUser.filter((item) => {return item.empresa.includes(searchValue)}));
-//        const newData = [...searchParams];
-//       newData.push({
-//         title: 'Empresa é',
-//         value: searchValue
-//       })
-//       handleClose();
-//       setSearchParams(newData);
-//     } else if(type === 'responsável') {
-//       setActivityUser(activityUser.filter((item) => {return item.responsavel.includes(searchValue)}));
-//       const newData = [...searchParams];
-//       newData.push({
-//         title: 'Responsável é',
-//         value: searchValue
-//       })
-//       handleClose();
-//       setSearchParams(newData);
-//     } else if(type === 'cidade') {
-//       setActivityUser(activityUser.filter((item) => {return item.cidade.includes(searchValue)}));
-//       const newData = [...searchParams];
-//       newData.push({
-//         title: 'Cidade é',
-//         value: searchValue
-//       })
-//       handleClose();
-//       setSearchParams(newData);
-//     } else if(type === 'consultora') {
-//       setActivityUser(activityUser.filter((item) => {return item.consultora === searchValue}));
-//       const newData = [...searchParams];
-//       newData.push({
-//         title: 'Consultora é',
-//         value: searchValue
-//       })
-//       handleClose();
-//       setSearchParams(newData);
-//     }
-// }
-
-  // const resetSearch = () => {
-  //   setSearchParams([]);
-  //   if(userRef && userRef.cargo === 'Vendedor(a)') {
-  //     setActivityUser(activity.filter((act) => act.uid === user.id))
-  //   } else {
-  //     setActivityUser(activity);
-  //   }
-  // }  
 
   useEffect(() => {
     if(sellers) {
@@ -192,18 +95,6 @@ const Prospection = ({ user, activity, userRef, members, sellers }) => {
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
-
-  // const handleClick = (event) => {
-  //   setAnchorEl(event.currentTarget);
-  // };
-
-  // const handleClose = (type) => {
-  //     setAnchorEl(null);
-  //     setSearchValue('');
-  //     setTimeout(() => {
-  //       setviewPopover(false);
-  //     }, 500);
-  // };
 
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(+event.target.value);
@@ -303,120 +194,6 @@ const Prospection = ({ user, activity, userRef, members, sellers }) => {
           </div>
         <div className={styles.box_panel}>
             <h2>Atividades</h2>
-            {/* <div className='filter-container'>
-            <ThemeProvider theme={theme}>
-              <Button aria-describedby={id} variant="outlined" color="primary" onClick={handleClick} startIcon={<AddCircleOutlineIcon />}>
-              Adicionar Filtro
-              </Button>
-              <div className="filter-search">
-              {searchParams && searchParams &&
-              searchParams.map((item, index) => (
-                  <div key={index} className='filter-search-item'>
-                    <span>{item.title}</span>
-                    <span>{item.value}</span>
-                  </div>
-              ))
-            }
-            {searchParams && searchParams.length > 0 &&
-            <Button onClick={resetSearch} color="error"><CloseIcon /></Button>
-            }
-            </div>
-            <Popover
-            id={id}
-            open={openFilter}
-            anchorEl={anchorEl}
-            className="filter"
-            onClose={handleClose}
-            anchorOrigin={{
-              vertical: 'bottom',
-              horizontal: 'center',
-            }}
-            PaperProps={{ style: { overflow: 'visible' } }}
-            >
-              {!viewPopover && !viewPopover ? 
-              <div className="filter-box">
-                <p className="filter-title">FILTROS</p>
-                <div className="filter-item" onClick={() => {setviewPopover(true);  setSearchType('atividade')}}>Atividade<KeyboardArrowRightIcon /></div>
-                <div className="filter-item" onClick={() => {setviewPopover(true);  setSearchType('data')}}>Data<KeyboardArrowRightIcon /></div>
-                <div className="filter-item" onClick={() => {setviewPopover(true);  setSearchType('empresa')}}>Empresa<KeyboardArrowRightIcon /></div>
-                <div className="filter-item" onClick={() => {setviewPopover(true);  setSearchType('responsável')}}>Responsável<KeyboardArrowRightIcon /></div>
-                <div className="filter-item" onClick={() => {setviewPopover(true);  setSearchType('cidade')}}>Cidade<KeyboardArrowRightIcon /></div>
-                {userRef && userRef.cargo === 'Administrador' && 
-                  <div className="filter-item" onClick={() => {setviewPopover(true);  setSearchType('consultora')}}>Consultora<KeyboardArrowRightIcon /></div>
-                }
-              </div> :
-              <div className="filter-box2">
-                  <div className="filter-header">
-                    <IconButton size="small" onClick={() => setviewPopover(false)} >
-                      <KeyboardArrowLeftIcon size="small" />
-                    </IconButton>
-                  <p className="filter-title">{searchType.toUpperCase()}</p>
-                  <IconButton size="small" onClick={handleClose}>
-                  <CloseIcon size="small" />
-                  </IconButton>
-                  </div>
-                  {searchType && searchType === 'atividade' &&
-                    <><div>É igual a</div>
-                    <FormControl margin="normal" fullWidth>
-                    <InputLabel id="demo-simple-select-label">Atividade</InputLabel>
-                    <Select
-                      labelId="demo-simple-select-label"
-                      id="demo-simple-select"
-                      value={searchValue}
-                      label="Atividade"
-                      onChange={(e) => setSearchValue(e.target.value)}
-                    >
-                      <MenuItem value='Email'>Email</MenuItem>
-                      <MenuItem value='Ligação'>Ligação</MenuItem>
-                      <MenuItem value='WhatsApp'>WhatsApp</MenuItem>
-                    </Select>
-                    </FormControl></>
-                  }
-                  {searchType && searchType === 'data' &&
-                    <><div>É entre</div>
-                    <DateRangePicker 
-                    onChange={(value) => setSearchValue(value)} 
-                    value={searchValue}
-                     />
-                    </>
-                  }
-                  {searchType && (searchType === 'empresa' || searchType === 'responsável' || searchType === 'cidade') &&
-                    <><div>É igual a</div>
-                    <TextField
-                  margin="dense"
-                  label="Pesquisar"
-                  type="text"
-                  size="small"
-                  fullWidth
-                  value={searchValue}
-                  variant="outlined"
-                  onChange={(e) => setSearchValue(e.target.value)}
-                  /> </>
-                  }
-                  {searchType && searchType === 'consultora' &&
-                    <><div>É igual a</div>
-                    <FormControl margin="normal" fullWidth>
-                    <InputLabel id="demo-simple-select-label">Consultora</InputLabel>
-                    <Select
-                      labelId="demo-simple-select-label"
-                      id="demo-simple-select"
-                      value={searchValue}
-                      label="Consultora"
-                      onChange={(e) => setSearchValue(e.target.value)}
-                    >
-                      {sellers.map((seller) => (
-                        <MenuItem value={seller.nome}>{seller.nome}</MenuItem>
-                      ))
-                      }
-                    </Select>
-                    </FormControl></>
-                  }
-                  <Button variant="contained" onClick={() => search(searchType)}>Aplicar</Button>
-                </div>
-            }
-            </Popover>
-            </ThemeProvider>   
-            </div> */}
             <Filter tableData={activityUser} 
             dataFull={activity} 
             sellers={sellersOrder} 

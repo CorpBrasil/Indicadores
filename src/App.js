@@ -86,7 +86,7 @@ function App() {
             <Route exact path="/admin" element={<PanelAdmin user={user} userRef={userRef} alerts={userAlerts} check={check} />} />
             }
             {user && userRef && (user.email === Users[0].email || user.email === Users[1].email || userRef.cargo === "Técnico" || userRef.cargo === "Administrador") &&
-              <Route exact path="/financeiro/:year" element={<Finance userRef={userRef} alerts={userAlerts} />} />
+              <Route exact path="/financeiro/:year" element={<Finance userRef={userRef} alerts={userAlerts} sellers={sellers} />} />
             }
             <Route exact path="/leads" element={<Alert user={user} userRef={userRef} alerts={userAlerts} check={check} />} />
             <Route exact path="/prospeccao" element={<Prospecction user={user} userRef={userRef} activity={activity} members={members} sellers={sellers} check={check} />} />

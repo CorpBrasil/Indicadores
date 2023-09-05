@@ -4,6 +4,7 @@ import { dataBase } from "../../firebase/database";
 import Header from "../../components/Header/Index";
 import useAuth from "../../hooks/useAuth";
 import Dashboard from "../../components/Dashboard/Index";
+import Filter from "../../components/Filter/Index";
 
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -12,6 +13,11 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
+
+import RequestQuoteIcon from '@mui/icons-material/RequestQuote'; // Visita Comercial
+import PeopleIcon from '@mui/icons-material/People'; // Tecnica + Comercial
+import RestaurantIcon from '@mui/icons-material/Restaurant'; // Almoço
+import EngineeringIcon from '@mui/icons-material/Engineering'; // Pós Venda
 
 import { ReactComponent as ScheduleIcon } from "../../images/icons/Schedule1.svg";
 
@@ -24,12 +30,13 @@ import {
 
 import "../Schedule/_style.scss";
 
-const Finance = ({ userRef, alerts }) => {
+const Finance = ({ userRef, alerts, sellers }) => {
   const data = new Date();
   const { year } = useParams();
   const { user } = useAuth();
   const month = ['','Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
   const [schedule, setSchedule] = useState();
+  const [scheduleFull, setScheduleFull] = useState();
   const [scheduleNew, setScheduleNew] = useState();
   const [members, setMembers] = useState();
   const [tecs, setTecs] = useState();
@@ -39,6 +46,7 @@ const Finance = ({ userRef, alerts }) => {
     String(data.getMonth() + 1).padStart(2, "0")
   );
   const membersCollectionRef = collection(dataBase, "Membros");
+  const [sellersOrder, setSellersOrder] = useState();
 
   useEffect(
     () => {
@@ -53,6 +61,11 @@ const Finance = ({ userRef, alerts }) => {
         onSnapshot(await q, (schedule) => {
           // Atualiza os dados em tempo real
           setSchedule(
+            schedule.docs.map((doc) => (
+              { ...doc.data(), id: doc.id }
+              ))
+          ); // puxa a coleção 'Agendas' para o state
+          setScheduleFull(
             schedule.docs.map((doc) => (
               { ...doc.data(), id: doc.id }
               ))
@@ -77,6 +90,19 @@ const Finance = ({ userRef, alerts }) => {
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []
+  );
+
+  useEffect(() => {
+    if(sellers) {
+      setSellersOrder(sellers.sort((a,b) => {
+        if(a.nome< b.nome) return -1;
+        if(a.nome > b.nome) return 1;
+        return 0;
+      }))
+    }
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [sellers]
   );
 
 useEffect(() => {
@@ -123,7 +149,9 @@ useEffect(() => {
     [members]
   );
 
-   console.log(tecs);
+  const changeFilter = (data) => {
+    setSchedule(data);
+  }
 
   return (
     <div className="container-schedule">
@@ -156,9 +184,9 @@ useEffect(() => {
       </div>
       <div className="content-schedule-visit">
         <Dashboard schedule={schedule} monthSelect={monthSelect} type={'financeiro'} total={total} />
-        <div className="box-schedule-visit" style={{  }}>
-          {tecs && tecs.length > 0 &&
+        <div className="box-schedule-visit">
           <div className="container-table">
+          {tecs && tecs.length > 0 &&
             <div className="container-info">
             {tecs && tecs.map((tec, index) => {
               if(index > 0) { return (
@@ -246,13 +274,16 @@ useEffect(() => {
                     </tr>
                   </tbody>
                 </table>
-                </div>        
-            <div>
+                </div>
+            }        
+            <div className="desktop filter-finance">
+              <Filter tableData={schedule} dataFull={scheduleFull} sellers={sellersOrder} changeFilter={changeFilter} type={'visit'} />
             </div>
             <TableContainer className="table-visit table-center" component={Paper} sx={{ maxWidth: '1000px' }}>
             <Table size="small" stickyHeader aria-label="sticky table">
               <TableHead>
                 <TableRow className="table-visits_header">
+                  <TableCell align="center">Visita</TableCell>
                   <TableCell align="center">Dia</TableCell>
                   <TableCell align="center">Cidade</TableCell>
                   <TableCell align="center" padding="none">Cliente</TableCell>
@@ -263,13 +294,17 @@ useEffect(() => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {schedule.map((visita) => (
+                {schedule && schedule.map((visita) => (
                   <TableRow
                     hover
                     key={visita.id}
                     className={`list-visit`}
                     sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                   >
+                    {visita.categoria === "lunch" && <TableCell style={{ filter: 'contrast', padding: '0.2rem' }} className="type-icon lunch" aria-label="Almoço" data-cooltipz-dir="right"><RestaurantIcon /></TableCell>}
+                    {visita.categoria === "comercial" && <TableCell style={{ padding: '0.2rem' }} className="type-icon comercial" aria-label="Visita Comercial" data-cooltipz-dir="right"><RequestQuoteIcon /></TableCell>}
+                    {visita.categoria === "comercial_tecnica" && <TableCell style={{ padding: '0.2rem' }} className="type-icon comercial_tec" aria-label="Comercial + Técnica" data-cooltipz-dir="right"><PeopleIcon /></TableCell>}
+                    {visita.categoria === "pos_venda" && <TableCell style={{ padding: '0.2rem' }} className="type-icon pos_venda" aria-label="Pós-Venda" data-cooltipz-dir="right"><EngineeringIcon /></TableCell>}
                     <TableCell className="td-finance" sx={{ width: 30 }} align="center" scope="row">
                       {visita.dia.substring(8, 10)}
                     </TableCell>
@@ -289,6 +324,13 @@ useEffect(() => {
                     <TableCell className="td-finance" align="center">{visita.veiculo}</TableCell>
                   </TableRow>
                 ))}
+                {schedule && schedule.length < 1 &&
+                  <TableRow>
+                    <TableCell colSpan={15}>
+                      <p className="margin1" style={{ textAlign: 'center', margin: '1rem', fontSize: '1.2rem' }}>Nenhuma Visita Encontrada</p>
+                    </TableCell>
+                  </TableRow>
+                } 
               </TableBody>
             </Table>
           </TableContainer>
@@ -296,7 +338,6 @@ useEffect(() => {
             <button className="btn-print" onClick={() => window.print()}>Imprimir / Salvar PDF</button>
           </div>
           </div>
-          }
         </div>
       </div>
     </div>

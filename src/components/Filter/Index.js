@@ -26,8 +26,6 @@ const Filter = ({ tableData, dataFull, sellers, userRef, changeFilter, type }) =
   const openFilter = Boolean(anchorEl);
   const id = open ? 'simple-popover' : undefined;
 
-  console.log(type)
-
   const search = (act) => {
     const data1 = moment(searchValue[0]).format('YYYY-MM-DD');
     const data2 = moment(searchValue[1]).format('YYYY-MM-DD');
@@ -173,7 +171,6 @@ const Filter = ({ tableData, dataFull, sellers, userRef, changeFilter, type }) =
 const handleClose = (type) => {
     setAnchorEl(null);
     setSearchValue('');
-    //changeFilter(dataFull);
     setTimeout(() => {
       setviewPopover(false);
     }, 500);
@@ -274,8 +271,7 @@ const handleClick = (event) => {
             <><div>É entre</div>
             <DateRangePicker 
             onChange={(value) => setSearchValue(value)} 
-            value={searchValue}
-             />
+            value={searchValue}/>
             </>
           }
           {searchType && searchType === 'visita' &&
@@ -319,8 +315,8 @@ const handleClick = (event) => {
               label="Consultora"
               onChange={(e) => setSearchValue(e.target.value)}
             >
-              {sellers.map((seller) => (
-                <MenuItem value={seller.nome}>{seller.nome}</MenuItem>
+              {sellers.map((seller, index) => (
+                <MenuItem key={index} value={seller.nome}>{seller.nome}</MenuItem>
               ))
               }
             </Select>
