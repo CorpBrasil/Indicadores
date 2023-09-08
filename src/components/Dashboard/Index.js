@@ -78,11 +78,9 @@ const Dashboard = ({ schedule, monthSelect, type, total }) => {
       setData1(schedule.filter((vis) => vis.atividade === 'Email').length);
       setData2(schedule.filter((vis) => vis.atividade === 'Ligação').length);
       setData3(schedule.filter((vis) => vis.atividade === 'WhatsApp').length);
-      setAtividadesHoje(schedule.filter((act) => moment(act.createAt.seconds*1000).format('YYYY-MM-DD') === moment(new Date()).format('YYYY-MM-DD')));
+      setAtividadesHoje(schedule.filter((act) => act.dataRef === moment(new Date()).format('YYYY-MM-DD')));
     }
   }, [monthSelect, schedule, type]);
-
-  //console.log(moment(schedule[0].data.slice(0,11), 'DD-MM-YYYY'))
 
   useEffect(() => {
     if(schedule) {

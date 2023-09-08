@@ -31,11 +31,11 @@ const Filter = ({ tableData, dataFull, sellers, userRef, changeFilter, type }) =
     const data2 = moment(searchValue[1]).format('YYYY-MM-DD');
 
     if(type === 'prospeccao') {
-      if(act ==='atividade') {
-        changeFilter(tableData.filter((item) => {return item.atividade === searchValue}));
+      if(act ==='status') {
+        changeFilter(tableData.filter((item) => {return item.status === searchValue}));
         const newData = [...searchParams];
         newData.push({
-          title: 'Atividade é',
+          title: 'Status é',
           value: searchValue
         })
         handleClose();
@@ -225,7 +225,7 @@ const handleClick = (event) => {
       <div className="filter-box">
         <p className="filter-title">FILTROS</p>
         {type && type === 'prospeccao' && 
-        <><div className="filter-item" onClick={() => { setviewPopover(true); setSearchType('atividade'); } }>Atividade<KeyboardArrowRightIcon /></div><div className="filter-item" onClick={() => { setviewPopover(true); setSearchType('data'); } }>Data<KeyboardArrowRightIcon /></div><div className="filter-item" onClick={() => { setviewPopover(true); setSearchType('empresa'); } }>Empresa<KeyboardArrowRightIcon /></div><div className="filter-item" onClick={() => { setviewPopover(true); setSearchType('responsável'); } }>Responsável<KeyboardArrowRightIcon /></div><div className="filter-item" onClick={() => { setviewPopover(true); setSearchType('cidade'); } }>Cidade<KeyboardArrowRightIcon /></div></>
+        <><div className="filter-item" onClick={() => { setviewPopover(true); setSearchType('status'); } }>Status<KeyboardArrowRightIcon /></div><div className="filter-item" onClick={() => { setviewPopover(true); setSearchType('data'); } }>Data<KeyboardArrowRightIcon /></div><div className="filter-item" onClick={() => { setviewPopover(true); setSearchType('empresa'); } }>Empresa<KeyboardArrowRightIcon /></div><div className="filter-item" onClick={() => { setviewPopover(true); setSearchType('responsável'); } }>Responsável<KeyboardArrowRightIcon /></div><div className="filter-item" onClick={() => { setviewPopover(true); setSearchType('cidade'); } }>Cidade<KeyboardArrowRightIcon /></div></>
       }
         {type && type === 'visit' && 
         <>
@@ -250,20 +250,20 @@ const handleClick = (event) => {
           <CloseIcon size="small" />
           </IconButton>
           </div>
-          {searchType && searchType === 'atividade' &&
+          {searchType && searchType === 'status' &&
             <><div>É igual a</div>
             <FormControl margin="normal" fullWidth>
-            <InputLabel id="demo-simple-select-label">Atividade</InputLabel>
+            <InputLabel id="demo-simple-select-label">Status</InputLabel>
             <Select
               labelId="demo-simple-select-label"
               id="demo-simple-select"
               value={searchValue}
-              label="Atividade"
+              label="Status"
               onChange={(e) => setSearchValue(e.target.value)}
             >
-              <MenuItem value='Email'>Email</MenuItem>
-              <MenuItem value='Ligação'>Ligação</MenuItem>
-              <MenuItem value='WhatsApp'>WhatsApp</MenuItem>
+              <MenuItem value='Ativo'>Ativo</MenuItem>
+              <MenuItem value='Ganho'>Ganho</MenuItem>
+              <MenuItem value='Perdido'>Perdido</MenuItem>
             </Select>
             </FormControl></>
           }

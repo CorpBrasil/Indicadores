@@ -82,11 +82,6 @@ const CreateVisit = ({
   // console.log(schedule)
 
   useEffect(() => {
-    // if(dataTexto || driver) {
-    //   filterSchedule(dataTexto, tecnicoTexto)
-    // } else {
-    //   filterSchedule(null)
-    // }
     if(tecnicoTexto !== 'Nenhum') {
       setTecRefUID(tecs.find((tec) => tec.nome === tecnicoTexto)); 
     }

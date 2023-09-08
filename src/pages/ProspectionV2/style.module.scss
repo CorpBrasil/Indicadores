@@ -13,38 +13,6 @@
   margin: auto;
 }
 
-.activity_button {
-  display: flex;
-  gap: 1rem;
-}
-
-.lead_status {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.ativo, .ganho, .perdido {
-  font-size: 0.8rem!important;
-  text-transform: uppercase;
-  font-weight: bold!important;
-}
-
-.ativo {
-  color: #03a9f4!important;
-  background-color: #e9f8ff;
-}
-
-.ganho {
-  color: green!important;
-  background-color: #dcfadd;
-}
-
-.perdido {
-  color: red!important;
-  background-color: #ffeceb;
-}
-
 .container_panel {
   display: flex;
   flex-direction: column;
@@ -56,11 +24,6 @@
     h2 {
       font-size: 1.7rem;
     }
-  }
-
-  .title_info {
-    margin: 0.5rem;
-    text-align: center;
   }
 
   .content_panel {
@@ -152,7 +115,8 @@
               }
 
               button {
-                height: 40px;
+                width: 35px;
+                height: 35px;
               }
 
               &:nth-child(-n + 6) {
@@ -174,9 +138,6 @@
 
             .anotacao {
               background-color: #ffd;
-              display: flex;
-              align-items: center;
-              justify-content: space-between;
             }
 
             .edit_anotacao {
@@ -186,8 +147,8 @@
             }
 
             .anotacao, .edit_anotacao {
-              width: 86%;
-              padding: 1rem 1rem 1rem 2rem;
+              width: 90%;
+              padding: 1rem;
               text-align: center;
               border-radius: 10px;
               white-space: normal;

@@ -1,0 +1,109 @@
+.activity_container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.activity_box {
+  display: flex;
+  flex-direction: column;
+}
+
+.activity {
+  &_item {
+    width: 90%;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+    gap: 1rem;
+
+    &_anotacao {
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      background-color: #ffd;
+      padding: 1rem 1rem 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+  }
+
+  &_item_header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    &>div {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+  }
+}
+
+.activity_content {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  gap: 1rem;
+  justify-content: center;
+  align-items: center;
+}
+
+.activity_anotacao {
+  width: 90%;
+  max-width: 90%;
+  min-height: 5rem;
+  height: 5rem;
+  padding: 1rem;
+  border-radius: 5px;
+
+  &:focus {
+    outline: none;
+  }
+}
+
+.activity_button {
+  display: flex;
+  gap: 1rem;
+}
+
+.activity_list_item {
+  display: flex;
+  padding: 0.5rem 1rem;
+  align-items: center;
+  cursor: pointer;
+  gap: 1rem;
+
+  &:hover {
+    background-color: rgb(241, 241, 241);
+  }
+}
+
+.activity_icon {
+  padding: 0.4rem;
+  border-radius: 50%;
+  display: flex;
+
+  svg {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+.mail {
+  background-color: #8A8A8A;
+}
+.mail2 {
+  background-color: #474747;
+}
+.phone {
+  background-color: #576AF5;
+}
+.whatsapp {
+  background-color: #44BF2B;
+}
