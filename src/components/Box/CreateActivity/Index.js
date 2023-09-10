@@ -1,5 +1,5 @@
-import { addDoc, collection, query, serverTimestamp, onSnapshot, orderBy, updateDoc, doc } from "firebase/firestore";
-import { memo, useState, useEffect } from "react";
+import { addDoc, collection, serverTimestamp, updateDoc, doc } from "firebase/firestore";
+import { memo, useState } from "react";
 import axios from "axios";
 // import { PatternFormat } from "react-number-format";
 import Popover from '@mui/material/Popover';
@@ -27,11 +27,10 @@ import Button from "@mui/material/Button";
 
 const CreateActivity = ({
   data,
-  changeLoading
+  activityAll
 }) => {
   const [open] = useState(false);
-  const [activity, setActivity] = useState();
-  const [activityAll, setActivityAll] = useState();
+  const [activity, setActivity] = useState(null);
   const [view, setview] = useState(false);
   const [viewEdit, setViewEdit] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
@@ -39,17 +38,10 @@ const CreateActivity = ({
   const id = open ? 'simple-popover' : undefined;
   const [anotacao, setAnotacao] = useState('');
 
-  useEffect(() => {
-    const fethData = async () => {
-      onSnapshot(query(collection(dataBase, "Leads/" + data.id + "/Atividades"), orderBy("createAt")), (act) => {
-        // Atualiza os dados em tempo real
-        setActivityAll(act.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
-      });
-    }
-      fethData();
-  },[data])
+  console.log(data)
   
   const editActivity = async (activity) => {
+    console.log(activity)
     try {
         Swal.fire({
           title: Company,
@@ -105,7 +97,6 @@ const CreateActivity = ({
         cancelButtonText: "Não",
       }).then(async (result) => {
         if (result.isConfirmed) {
-          changeLoading(true);
           await addDoc(collection(dataBase, "Leads", data.id, "Atividades"), {
             consultora:  data.consultora,
             anotacao: anotacao,
@@ -132,7 +123,6 @@ const CreateActivity = ({
                 uid: data.uid, // UID de referência do Usuário que criou a atividade
                 idRef: data.id // ID de referência do Lead
               }).then(() => {
-                changeLoading(false);
                 Swal.fire({
                   title: Company,
                   html: `A Atividade foi registrada com sucesso.`,
@@ -162,7 +152,7 @@ const openActivity = (data) => {
 }
 
 const closeActivity = () => {
-  setActivity('');
+  setActivity(null);
   setview(false);
   setViewEdit(false);
 }
@@ -171,8 +161,8 @@ console.log(activity)
 
   return (
     <div className={styles.activity_container}>
-      {activityAll && activityAll.map((activity) => (
-      <div className={styles.activity_item}>
+      {activityAll && activityAll.map((activity, index) => (
+      <div key={index} className={styles.activity_item}>
           <div className={styles.activity_item_header}>
             <div>
             {activity.atividade === 'Email de Apresentação' && <div className={`${styles.activity_icon} ${styles.mail2}`}><Email /></div>}

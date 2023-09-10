@@ -16,7 +16,6 @@ import Button from "@mui/material/Button";
 import "../style.scss";
 
 const EditProspection = ({
-  changeLoading,
   data
 }) => {
   // const [view, setView] = useState(false);
@@ -81,12 +80,11 @@ const EditProspection = ({
       }).then(async (result) => {
         if (result.isConfirmed) {
           let telefoneFormatado = telefone.replace(/\D/g, '');
-          changeLoading(true);
           await updateDoc(doc(dataBase, 'Leads', data.id), {
             ...userData,
             telefone: '55' + telefoneFormatado,
           })
-          changeLoading(false);
+          toggleState();
           Swal.fire({
             title: Company,
             html: `O Lead foi alterado com sucesso.`,
@@ -94,8 +92,6 @@ const EditProspection = ({
             showConfirmButton: true,
             showCloseButton: true,
             confirmButtonColor: "#F39200",
-          }).then(() => {
-            //setView(false);
           })
           // axios.post('https://n8n.corpbrasil.cloud/webhook/d490a21a-4488-4907-871f-b4326209c05a', {
           //   ...userData,

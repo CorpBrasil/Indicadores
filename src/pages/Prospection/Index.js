@@ -6,7 +6,7 @@ import { Company } from "../../data/Data";
 import axios from "axios";
 // import { PatternFormat } from "react-number-format";
 // import { useForm } from "react-hook-form"; // cria formulário personalizado
-import { doc, updateDoc, serverTimestamp } from "firebase/firestore";
+import { collection, query, serverTimestamp, onSnapshot, orderBy, updateDoc, doc } from "firebase/firestore";
 
 // Css
 import "cooltipz-css";
@@ -65,7 +65,9 @@ const Prospection = ({ user, leads, activity, userRef, members, sellers }) => {
   const [leadsUser, setLeadsUser] = useState(undefined);
   const [loading, setLoading] = useState(false);
   const [sellersOrder, setSellersOrder] = useState(null);
-  const [TabsValue, setTabsValue] = useState(1);
+  const [TabsValue, setTabsValue] = useState(0);
+  const [activityAll, setActivityAll] = useState();
+
 
   useEffect(() => {
     if(sellers) {
@@ -79,6 +81,16 @@ const Prospection = ({ user, leads, activity, userRef, members, sellers }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [sellers]
   );
+
+  // useEffect(() => {
+  //   const fethData = async () => {
+  //     onSnapshot(query(collection(dataBase, "Leads/" + data.id + "/Atividades"), orderBy("createAt")), (act) => {
+  //       // Atualiza os dados em tempo real
+  //       setActivityAll(act.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
+  //     });
+  //   }
+  //     fethData();
+  // },[activity])
 
   const changeFilter = (data) => {
     setLeadsUser(data);
@@ -104,6 +116,10 @@ const Prospection = ({ user, leads, activity, userRef, members, sellers }) => {
 
   const handleToggle = (id) => {
     setOpen((prevState) => ({ ...prevState, [id]: !prevState[id] }));
+    onSnapshot(query(collection(dataBase, "Leads/" + id + "/Atividades"), orderBy("createAt")), (act) => {
+      // Atualiza os dados em tempo real
+      setActivityAll(act.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
+    });
   };
 
   const handleChangePage = (event, newPage) => {
@@ -318,6 +334,8 @@ const Prospection = ({ user, leads, activity, userRef, members, sellers }) => {
       'aria-controls': `simple-tabpanel-${index}`,
     };
   }
+
+  console.log(TabsValue);
   
 
   return (
@@ -367,9 +385,9 @@ const Prospection = ({ user, leads, activity, userRef, members, sellers }) => {
                   <TableCell align="center"></TableCell>
                 </TableRow>
               </TableHead>
-              <TableBody>
               {leadsUser && leadsUser.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((data, index) => (
-                <><TableRow
+              <TableBody>
+                <TableRow
                   key={index}
                   hover
                   className={`list-visit`}
@@ -483,12 +501,12 @@ const Prospection = ({ user, leads, activity, userRef, members, sellers }) => {
                       </Box>
                       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                       <Tabs value={TabsValue} onChange={(e, newValue) => setTabsValue(newValue)} aria-label="Informações do Lead" centered>
-                        <Tab label="Atividades" {...a11yProps(0)} />
-                        <Tab label="Dados" {...a11yProps(1)} />
+                        <Tab label="Atividades" {...a11yProps(1)} />
+                        <Tab label="Dados" {...a11yProps(2)} />
                       </Tabs>
                     </Box>
                     <CustomTabPanel value={TabsValue} index={0}>
-                      <CreateActivity data={data} changeLoading={changeLoading} />
+                      <CreateActivity activityAll={activityAll} changeLoading={changeLoading} data={data} />
                     </CustomTabPanel>
                     <CustomTabPanel value={TabsValue} index={1}>
                   <h3 className={styles.title_info}>Geral</h3>
@@ -499,9 +517,9 @@ const Prospection = ({ user, leads, activity, userRef, members, sellers }) => {
                     </CustomTabPanel>
                     </Collapse>
                 </TableCell>
-              </TableRow></>
-              ))}
+              </TableRow>
             </TableBody>
+              ))}
               {leadsUser && leadsUser.length < 1 &&
                 <TableBody>
                   <TableRow>
