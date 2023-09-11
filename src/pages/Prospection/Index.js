@@ -1,4 +1,4 @@
-import { useState, useEffect, memo, useRef } from "react";
+import { useState, useEffect, memo } from "react";
 import { dataBase } from "../../firebase/database";
 import Header from "../../components/Header/Index";
 import Swal from 'sweetalert2/dist/sweetalert2.js';
