@@ -251,7 +251,8 @@ const Prospection = ({ user, leads, activity, userRef, members, sellers }) => {
             axios.post('https://n8n.corpbrasil.cloud/webhook-test/271dd7a8-0354-4e37-8aaf-b4a955ac836b', {
               ...data,
               status: 'Ganho',
-              ID_SM: userRef.id_sm
+              ID_SM: userRef.id_sm,
+              anotacao: anotacao
             })
           });
         }
@@ -293,7 +294,8 @@ const Prospection = ({ user, leads, activity, userRef, members, sellers }) => {
             })
             axios.post('https://n8n.corpbrasil.cloud/webhook/271dd7a8-0354-4e37-8aaf-b4a955ac836b', {
               ...data,
-              status: 'Perdido'
+              status: 'Perdido',
+              anotacao: anotacao
             })
           });
         }
