@@ -85,16 +85,6 @@ const CreateActivity = ({
     const day = moment();
     console.log(moment(day).format('DD MMM YYYY - HH:mm'))
     try {
-      if(data.email.length < 1) {
-        return Swal.fire({
-          title: Company,
-          html: `Você deseja registrar a <b>Atividade?</b>`,
-          icon: "warning",
-          showCloseButton: true,
-          confirmButtonColor: "#F39200",
-          confirmButtonText: "Ok",
-        })
-      }
       Swal.fire({
         title: Company,
         html: `Você deseja registrar a <b>Atividade?</b>`,
