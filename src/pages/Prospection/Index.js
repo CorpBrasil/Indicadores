@@ -347,7 +347,7 @@ const closeAnotacaoBox = () => {
     };
   }
 
-  console.log(TabsValue);
+  // console.log(TabsValue);
   
 
   return (

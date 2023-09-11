@@ -38,10 +38,10 @@ const CreateActivity = ({
   const id = open ? 'simple-popover' : undefined;
   const [anotacao, setAnotacao] = useState('');
 
-  console.log(data)
+  // console.log(data)
   
   const editActivity = async (activity) => {
-    console.log(activity)
+    // console.log(activity)
     try {
         Swal.fire({
           title: Company,
@@ -81,12 +81,21 @@ const CreateActivity = ({
     }
   }
 
-  console.log(data)
-
   const onSubmit = async () => {
     const day = moment();
-    console.log(moment(day).format('DD MMM YYYY - HH:mm'))
+    // console.log(data);
+    // console.log(moment(day).format('DD MMM YYYY - HH:mm'))
     try {
+      if(data.email.length < 1) {
+        return Swal.fire({
+          title: 'O lead não possui email',
+          html: `Para envio automático do <b>Email de Apresentação</b>, é necessário que o lead tenha um email registrado em seu perfil.`,
+          icon: "warning",
+          showCloseButton: true,
+          confirmButtonColor: "#F39200",
+          confirmButtonText: "Ok",
+        })
+      }
       Swal.fire({
         title: Company,
         html: `Você deseja registrar a <b>Atividade?</b>`,
@@ -148,9 +157,20 @@ const CreateActivity = ({
     setAnchorEl(null);
 };
 
-const openActivity = (data) => {
+const openActivity = (act) => {
+  if(data.email.length < 1 && act === 'Email de Apresentação') {
+    Swal.fire({
+      title: 'O lead não possui email',
+      html: `Para envio automático do <b>Email de Apresentação</b>, é necessário que o lead tenha um email registrado em seu perfil.`,
+      icon: "warning",
+      showCloseButton: true,
+      confirmButtonColor: "#F39200",
+      confirmButtonText: "Ok",
+    })
+    return handleClose();
+  }
   handleClose();
-  setActivity(data);
+  setActivity(act);
   setview(true);
 }
 
@@ -160,7 +180,7 @@ const closeActivity = () => {
   setViewEdit(false);
 }
 
-console.log(activity)
+// console.log(activity)
 
   return (
     <div className={styles.activity_container}>

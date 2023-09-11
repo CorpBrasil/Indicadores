@@ -49,7 +49,7 @@ const EditProspection = ({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   },[setValue])
 
-  console.log(watched);
+  // console.log(watched);
 
   useEffect(() => {
     // eslint-disable-next-line no-self-compare
