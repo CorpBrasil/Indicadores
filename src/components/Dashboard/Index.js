@@ -84,34 +84,65 @@ const Dashboard = ({ schedule, monthSelect, type, total }) => {
 
   useEffect(() => {
     if(schedule) {
-      setdataChart([
-        {
-          name: 'Ana',
-          Visitas: schedule.filter((con) => con.consultora === 'Ana').length,
-          fill: '#F28500'
-        },
-        {
-          name: 'Bruna',
-          Visitas: schedule.filter((con) => con.consultora === 'Bruna').length,
-          fill: '#44BF2B'
-        },
-        {
-          name: 'Lia',
-          Visitas: schedule.filter((con) => con.consultora === 'Lia').length,
-          fill: '#E892DD'
-        },
-        {
-          name: 'Fernanda',
-          Visitas: schedule.filter((con) => con.consultora === 'Fernanda').length,
-          fill: '#FFC107'
-        },
-        {
-          name: 'Leticia',
-          Visitas: schedule.filter((con) => con.consultora === 'Leticia').length,
-          fill: '#B901C6'
-        }
-      ])
+      if(type === 'prospeccao') {
+        setdataChart([
+          {
+            name: 'Ana',
+            Atividades: schedule.filter((con) => con.consultora === 'Ana').length,
+            fill: '#F28500'
+          },
+          {
+            name: 'Bruna',
+            Atividades: schedule.filter((con) => con.consultora === 'Bruna').length,
+            fill: '#44BF2B'
+          },
+          {
+            name: 'Lia',
+            Atividades: schedule.filter((con) => con.consultora === 'Lia').length,
+            fill: '#E892DD'
+          },
+          {
+            name: 'Fernanda',
+            Atividades: schedule.filter((con) => con.consultora === 'Fernanda').length,
+            fill: '#FFC107'
+          },
+          {
+            name: 'Leticia',
+            Atividades: schedule.filter((con) => con.consultora === 'Leticia').length,
+            fill: '#B901C6'
+          }
+        ])
+      } else {
+        setdataChart([
+          {
+            name: 'Ana',
+            Visitas: schedule.filter((con) => con.consultora === 'Ana').length,
+            fill: '#F28500'
+          },
+          {
+            name: 'Bruna',
+            Visitas: schedule.filter((con) => con.consultora === 'Bruna').length,
+            fill: '#44BF2B'
+          },
+          {
+            name: 'Lia',
+            Visitas: schedule.filter((con) => con.consultora === 'Lia').length,
+            fill: '#E892DD'
+          },
+          {
+            name: 'Fernanda',
+            Visitas: schedule.filter((con) => con.consultora === 'Fernanda').length,
+            fill: '#FFC107'
+          },
+          {
+            name: 'Leticia',
+            Visitas: schedule.filter((con) => con.consultora === 'Leticia').length,
+            fill: '#B901C6'
+          }
+        ])
+      }
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   },[schedule])
 
   return (
@@ -234,7 +265,10 @@ const Dashboard = ({ schedule, monthSelect, type, total }) => {
               <XAxis dataKey="name" />
               <YAxis />
               <Tooltip />
+              {type === 'prospeccao' ? 
+              <Bar dataKey="Atividades" fill="#8884d8" /> :
               <Bar dataKey="Visitas" fill="#8884d8" />
+            }
             </BarChart>
             </ResponsiveContainer>
           </div> :
