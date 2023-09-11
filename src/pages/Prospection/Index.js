@@ -4,6 +4,7 @@ import Header from "../../components/Header/Index";
 import Swal from 'sweetalert2/dist/sweetalert2.js';
 import { Company } from "../../data/Data";
 import axios from "axios";
+import * as moment from "moment";
 // import { PatternFormat } from "react-number-format";
 // import { useForm } from "react-hook-form"; // cria formulário personalizado
 import { collection, query, serverTimestamp, onSnapshot, orderBy, updateDoc, doc } from "firebase/firestore";
@@ -15,6 +16,7 @@ import '../../styles/_filter.scss';
 import '@wojtekmaj/react-daterange-picker/dist/DateRangePicker.css';
 import 'react-calendar/dist/Calendar.css';
 import "../../components/Dashboard/_styles.scss";
+import { theme } from "../../data/theme"
 
 // Components
 import CreateProspection from "../../components/Box/CreateProspection/Index";
@@ -34,6 +36,13 @@ import PersonOffIcon from '@mui/icons-material/PersonOff';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import EditIcon from '@mui/icons-material/Edit';
 import Button from "@mui/material/Button";
+import Dialog from '@mui/material/Dialog';
+import TextField from '@mui/material/TextField';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
+import FormControl from '@mui/material/FormControl';
 // import DeleteIcon from '@mui/icons-material/Delete';
 
 import IconButton from '@mui/material/IconButton';
@@ -48,7 +57,7 @@ import TablePagination from '@mui/material/TablePagination';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import Collapse from '@mui/material/Collapse';
-import { Box } from "@mui/material";
+import { Box, ThemeProvider } from "@mui/material";
 import CircularProgress from '@mui/material/CircularProgress';
 import PropTypes from 'prop-types';
 import Tabs from '@mui/material/Tabs';
@@ -57,7 +66,9 @@ import Tab from '@mui/material/Tab';
 
 const Prospection = ({ user, leads, activity, userRef, members, sellers }) => {
   const [anotacao, setAnotacao] = useState('');
+  const [anotacaoBox, setAnotacaoBox] = useState(false);
   const [view, setView] = useState(false);
+  const [openDialog, setOpenDialog] = useState(false);
   const [viewEdit, setViewEdit] = useState(false);
   const [open, setOpen] = useState(false);
   const [page, setPage] = useState(0);
@@ -205,8 +216,12 @@ const Prospection = ({ user, leads, activity, userRef, members, sellers }) => {
     }
   }
 
+  
+
   const winLead = async (data) => {
     try {
+      setOpenDialog(false);
+      const day = moment();
       const docRef = doc(dataBase, 'Leads', data.id);
       Swal.fire({
         title: Company,
@@ -221,7 +236,9 @@ const Prospection = ({ user, leads, activity, userRef, members, sellers }) => {
       }).then(async (result) => {
         if(result.isConfirmed) {
           await updateDoc(docRef, {
-            status: 'Ganho'
+            status: 'Ganho',
+            anotacao: anotacao,
+            dataStatus: moment(day).format('DD MMM YYYY - HH:mm')
           }).then((result) => {
             Swal.fire({
               title: Company,
@@ -245,6 +262,8 @@ const Prospection = ({ user, leads, activity, userRef, members, sellers }) => {
 
   const loseLead = async (data) => {
     try {
+      setOpenDialog(false);
+      const day = moment();
       const docRef = doc(dataBase, 'Leads', data.id);
       Swal.fire({
         title: Company,
@@ -259,7 +278,9 @@ const Prospection = ({ user, leads, activity, userRef, members, sellers }) => {
       }).then(async (result) => {
         if(result.isConfirmed) {
           await updateDoc(docRef, {
-            status: 'Perdido'
+            status: 'Perdido',
+            anotacao: anotacao,
+            dataStatus: moment(day).format('DD MMM YYYY - HH:mm')
           }).then((result) => {
             Swal.fire({
               title: Company,
@@ -281,26 +302,17 @@ const Prospection = ({ user, leads, activity, userRef, members, sellers }) => {
     }
   }
 
-//   const onSubmit = async (userData) => {
-//     try {
-//       Swal.fire({
-//         title: Company,
-//         html: `Você deseja alterar o <b>Lead?</b>`,
-//         icon: "question",
-//         showCancelButton: true,
-//         showCloseButton: true,
-//         confirmButtonColor: "#F39200",
-//         cancelButtonColor: "#d33",
-//         confirmButtonText: "Sim",
-//         cancelButtonText: "Não",
-//       }).then(async (result) => {
-//         if(result.isConfirmed) {
+const openAnotacaoBox = (act, type) => {
+  setAnotacao(act.anotacao);
+  setOpenDialog(true);
+  setAnotacaoBox({info:act, type:type});
+}
 
-//         }})
-//     } catch {
-
-//  }  
-// }
+const closeAnotacaoBox = () => {
+  setAnotacao('');
+  setOpenDialog(false);
+  setAnotacaoBox({info: null});
+}
 
   const CustomTabPanel = (props) => {
     const { children, value, index, ...other } = props;
@@ -376,7 +388,7 @@ const Prospection = ({ user, leads, activity, userRef, members, sellers }) => {
               <TableHead>
                 <TableRow>
                   <TableCell align="center">Status</TableCell>
-                  <TableCell align="center">Data</TableCell>
+                  <TableCell align="center">Data de Criação</TableCell>
                   <TableCell align="center">Responsável</TableCell>
                   <TableCell align="center">Empresa</TableCell>
                   <TableCell align="center">Cidade</TableCell>
@@ -402,10 +414,12 @@ const Prospection = ({ user, leads, activity, userRef, members, sellers }) => {
                     <TableCell align="center" className={styles.ativo}>{data.status}</TableCell>
                   }
                   {data.status === 'Ganho' &&
-                    <TableCell align="center" className={styles.ganho}>{data.status}</TableCell>
+                    <TableCell align="center" aria-label={data.dataStatus && data.dataStatus.replace('-','às')}
+                    data-cooltipz-dir="right" className={styles.ganho}>{data.status}</TableCell>
                   }
                   {data.status === 'Perdido' &&
-                    <TableCell align="center" className={styles.perdido}>{data.status}</TableCell>
+                    <TableCell align="center" aria-label={data.dataStatus && data.dataStatus.replace('-','às')}
+                    data-cooltipz-dir="right" className={styles.perdido}>{data.status}</TableCell>
                   }
                   <TableCell align="center">{data.data.replace('-', 'às')}</TableCell>
                   <TableCell align="center">{data.nome}</TableCell>
@@ -464,7 +478,7 @@ const Prospection = ({ user, leads, activity, userRef, members, sellers }) => {
                               </div> : 
                               <div className={styles.activity_button}>
                                 {data.status !== "Ativo" ?
-                                  <><div className={styles.lead_status} style={data.status === 'Ganho' ? { color: 'green'} : { color: 'red' }}>
+                                  <><div className={styles.lead_status} aria-label={data.dataStatus && data.dataStatus.replace('-','às')} data-cooltipz-dir="top" style={data.status === 'Ganho' ? { color: 'green'} : { color: 'red' }}>
                                   <HowToRegIcon />
                                   <h3>{data.status}</h3>
                                 </div><Button
@@ -483,7 +497,7 @@ const Prospection = ({ user, leads, activity, userRef, members, sellers }) => {
                                   size="small"
                                   type="submit"
                                   startIcon={<HowToRegIcon />}
-                                  onClick={() => winLead(data)}
+                                  onClick={() => openAnotacaoBox(data, 'ganho')}
                                 >
                                   Ganho
                                 </Button><Button
@@ -492,7 +506,7 @@ const Prospection = ({ user, leads, activity, userRef, members, sellers }) => {
                                   size="small"
                                   type="submit"
                                   startIcon={<PersonOffIcon />}
-                                  onClick={() => loseLead(data)}
+                                  onClick={() => openAnotacaoBox(data, 'perdido')}
                                 >
                                     Perdido
                                   </Button></>
@@ -544,6 +558,58 @@ const Prospection = ({ user, leads, activity, userRef, members, sellers }) => {
           </div>
         </div>
       </div>
+      <ThemeProvider theme={theme} >
+      <Dialog
+              open={openDialog}
+              fullWidth={true}
+              maxWidth='sm'
+              size
+              onClose={() => setAnotacaoBox({state:false})}
+            >
+                <DialogTitle>
+                {openDialog && anotacaoBox.type === 'ganho' ? 
+                <p className="center-flex gap05"><HowToRegIcon sx={{ fill: 'green' }} /> Marcar como ganho <b>({openDialog && anotacaoBox.info.nome})</b></p> :
+                <p className="center-flex gap05"><PersonOffIcon sx={{ fill: 'red' }} /> Marcar como perdido <b>({openDialog && anotacaoBox.info.nome})</b></p>
+                }  
+                </DialogTitle>
+                <DialogContent>
+                  <DialogContentText sx={{ textAlign: 'center' }}>
+                    Complemente a anotação com um feedback sobre o Lead de acordo com a sua experiência. ✍️
+                  </DialogContentText>
+                  <div className="alert-message" style={{ margin: '1rem' }}>
+                  <FormControl sx={{ margin: '0.3rem 0' }} fullWidth>
+                </FormControl>
+                <TextField
+                  autoFocus
+                  margin="dense"
+                  id="name"
+                  label="Anotação"
+                  type="text"
+                  onChange={(e) => setAnotacao(e.target.value)}
+                  value={anotacao}
+                  fullWidth
+                  required
+                  multiline
+                  rows={2}
+                  variant="outlined"
+                />
+                  </div>
+                </DialogContent>
+                <DialogActions>
+                {openDialog && anotacaoBox.type === 'ganho' ?
+                  <Button autoFocus onClick={() => {setAnotacaoBox({state:false});winLead(anotacaoBox.info)}}>
+                    Confirmar
+                  </Button> :
+                  <Button autoFocus onClick={() => {setAnotacaoBox({state:false});loseLead(anotacaoBox.info)}}>
+                  Confirmar
+                </Button>
+                }
+                  <Button onClick={() => closeAnotacaoBox()} autoFocus>
+                    Cancelar
+                  </Button>
+                </DialogActions>
+              </Dialog>
+      </ThemeProvider>
     </div>
   );
 };

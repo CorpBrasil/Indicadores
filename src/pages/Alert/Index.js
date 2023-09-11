@@ -166,7 +166,7 @@ const Alert = ({user,  userRef, alerts, check}) => {
           {alerts && alerts.length === 0 &&
           <h1 className="alert-none">Nenhum Lead</h1>
           }
-                      <Dialog
+            <Dialog
               open={open}
               onClose={handleClose}
             >

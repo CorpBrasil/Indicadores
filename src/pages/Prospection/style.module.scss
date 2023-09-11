@@ -30,6 +30,10 @@
   font-weight: bold!important;
 }
 
+.ganho::after, .perdido::after {
+  text-transform: lowercase;
+}
+
 .ativo {
   color: #03a9f4!important;
   background-color: #e9f8ff;
