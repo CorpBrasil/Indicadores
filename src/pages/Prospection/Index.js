@@ -249,10 +249,10 @@ const Prospection = ({ user, leads, activity, userRef, members, sellers }) => {
               confirmButtonColor: "#F39200",
             })
             axios.post('https://n8n.corpbrasil.cloud/webhook-test/271dd7a8-0354-4e37-8aaf-b4a955ac836b', {
+              Anotacao: anotacao,
               ...data,
               status: 'Ganho',
-              ID_SM: userRef.id_sm,
-              anotacao: anotacao
+              ID_SM: userRef.id_sm
             })
           });
         }
@@ -264,6 +264,7 @@ const Prospection = ({ user, leads, activity, userRef, members, sellers }) => {
 
   const loseLead = async (data) => {
     try {
+      console.log(data)
       setOpenDialog(false);
       const day = moment();
       const docRef = doc(dataBase, 'Leads', data.id);
@@ -293,9 +294,9 @@ const Prospection = ({ user, leads, activity, userRef, members, sellers }) => {
               confirmButtonColor: "#F39200",
             })
             axios.post('https://n8n.corpbrasil.cloud/webhook/271dd7a8-0354-4e37-8aaf-b4a955ac836b', {
+              Anotacao: anotacao,
               ...data,
-              status: 'Perdido',
-              anotacao: anotacao
+              status: 'Perdido'
             })
           });
         }
