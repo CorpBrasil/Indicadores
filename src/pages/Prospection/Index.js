@@ -1,4 +1,4 @@
-import { useState, useEffect, memo } from "react";
+import { useState, useEffect, memo, useRef } from "react";
 import { dataBase } from "../../firebase/database";
 import Header from "../../components/Header/Index";
 import Swal from 'sweetalert2/dist/sweetalert2.js';
@@ -126,7 +126,7 @@ const Prospection = ({ user, leads, activity, userRef, members, sellers }) => {
 
 
   const handleToggle = (id) => {
-    setOpen((prevState) => ({ ...prevState, [id]: !prevState[id] }));
+    setOpen((prevState) => ({[id]: !prevState[id] }));
     onSnapshot(query(collection(dataBase, "Leads/" + id + "/Atividades"), orderBy("createAt")), (act) => {
       // Atualiza os dados em tempo real
       setActivityAll(act.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
@@ -568,8 +568,8 @@ const closeAnotacaoBox = () => {
             >
                 <DialogTitle>
                 {openDialog && anotacaoBox.type === 'ganho' ? 
-                <p className="center-flex gap05"><HowToRegIcon sx={{ fill: 'green' }} /> Marcar como ganho <b>({openDialog && anotacaoBox.info.nome})</b></p> :
-                <p className="center-flex gap05"><PersonOffIcon sx={{ fill: 'red' }} /> Marcar como perdido <b>({openDialog && anotacaoBox.info.nome})</b></p>
+                <p className="center-flex gap05"><HowToRegIcon sx={{ fill: 'green' }} /> Marcar como ganho</p> :
+                <p className="center-flex gap05"><PersonOffIcon sx={{ fill: 'red' }} /> Marcar como perdido</p>
                 }  
                 </DialogTitle>
                 <DialogContent>

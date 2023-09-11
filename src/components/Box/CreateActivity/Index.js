@@ -81,6 +81,8 @@ const CreateActivity = ({
     }
   }
 
+  console.log(data)
+
   const onSubmit = async () => {
     const day = moment();
     console.log(moment(day).format('DD MMM YYYY - HH:mm'))
