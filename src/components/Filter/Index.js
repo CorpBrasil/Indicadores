@@ -62,7 +62,7 @@ const Filter = ({ tableData, dataFull, sellers, userRef, changeFilter, type }) =
         handleClose();
         setSearchParams(newData);
       } else if(act === 'responsável') {
-        changeFilter(tableData.filter((item) => {return item.responsavel.includes(searchValue)}));
+        changeFilter(tableData.filter((item) => {return item.nome.includes(searchValue)}));
         const newData = [...searchParams];
         newData.push({
           title: 'Responsável é',
