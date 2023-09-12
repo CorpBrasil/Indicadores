@@ -317,6 +317,7 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts, check }) => {
               const date = new Date(visit.data);
               axios.post('https://hook.us1.make.com/tmfl4xr8g9tk9qoi9jdpo1d7istl8ksd', {
                 data: moment(visit.data).format("DD/MM/YYYY"),
+                dataDelete: moment(new Date()).format("DD/MM/YYYY HH:mm"),
                 nome: visit.tecnico,
                 cliente: visit.cliente,
                 marcado: visit.chegadaCliente,
@@ -325,7 +326,10 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts, check }) => {
                 semana: getMonthlyWeekNumber(date),
                 mes: moment(visit.data).format("M"),
                 ende: visit.endereco,
-                del: true
+                del: true,
+                categoria: visit.categoria,
+                tipo: visit.tipo,
+                confirmar: visit.confirmar
               })
               Swal.fire({
                 title: Company,
