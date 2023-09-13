@@ -49,8 +49,27 @@ function useVisit(checkNet, scheduleRef, returnSchedule) {
           }
            else {
             let endereco;
-            await addDoc(scheduleRef, data);
             const date = new Date(data.data);
+            await addDoc(scheduleRef, data).then((result) => {
+              axios.post('https://n8n.corpbrasil.cloud/webhook/dfbbb99b-1721-4a7d-8ac0-f95335b15aa7', {
+                data: moment(data.data).format("DD/MM/YYYY"),
+                ID: result.id,
+                nome: data.tecnico,
+                cliente: data.cliente,
+                saida: data.saidaEmpresa,
+                marcado: data.chegadaCliente,
+                consultora: data.consultora,
+                city: data.cidade,
+                duracao: data.visita,
+                saidaCliente: data.saidaDoCliente,
+                semana: getMonthlyWeekNumber(date),
+                mes: moment(data.data).format("M"),
+                ende: data.endereco,
+                confirmada: 'Não',
+                categoria: data.categoria
+              })
+            }
+            );
             Swal.fire({
              title: Company,
              html: `A visita em <b>${data.cidade}</b> foi criada com sucesso!`,
@@ -83,22 +102,6 @@ function useVisit(checkNet, scheduleRef, returnSchedule) {
                categoria: data.categoria
              })
            }
-           axios.post('https://hook.us1.make.com/tmfl4xr8g9tk9qoi9jdpo1d7istl8ksd', {
-               data: moment(data.data).format("DD/MM/YYYY"),
-               nome: data.tecnico,
-               cliente: data.cliente,
-               saida: data.saidaEmpresa,
-               marcado: data.chegadaCliente,
-               consultora: data.consultora,
-               city: data.cidade,
-               duracao: data.visita,
-               saidaCliente: data.saidaDoCliente,
-               semana: getMonthlyWeekNumber(date),
-               mes: moment(data.data).format("M"),
-               ende: data.endereco,
-               confirmada: 'Não',
-               categoria: data.categoria
-             })
 
              return returnSchedule();
           }

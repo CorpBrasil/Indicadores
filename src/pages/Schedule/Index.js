@@ -315,7 +315,8 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts, check }) => {
               setBox({name: '', type:''});
               //setDayVisits(undefined);
               const date = new Date(visit.data);
-              axios.post('https://hook.us1.make.com/tmfl4xr8g9tk9qoi9jdpo1d7istl8ksd', {
+              axios.post('https://n8n.corpbrasil.cloud/webhook/321c02a7-03b7-4f81-b4a0-2958660ff449', {
+                ID: visit.id,
                 data: moment(visit.data).format("DD/MM/YYYY"),
                 dataDelete: moment(new Date()).format("DD/MM/YYYY HH:mm"),
                 nome: visit.tecnico,
@@ -326,7 +327,6 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts, check }) => {
                 semana: getMonthlyWeekNumber(date),
                 mes: moment(visit.data).format("M"),
                 ende: visit.endereco,
-                del: true,
                 categoria: visit.categoria,
                 tipo: visit.tipo,
                 confirmar: visit.confirmar

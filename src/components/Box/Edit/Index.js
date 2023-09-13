@@ -579,7 +579,8 @@ const EditVisit = ({
               }
               if(visitRef.categoria !== "lunch") {
                 const date = new Date(visitRef.data);
-                axios.post('https://hook.us1.make.com/tmfl4xr8g9tk9qoi9jdpo1d7istl8ksd', {
+                axios.post('https://n8n.corpbrasil.cloud/webhook/dfbbb99b-1721-4a7d-8ac0-f95335b15aa7', {
+                  ID: visitRef.id,
                   data: moment(visitRef.data).format("DD/MM/YYYY"),
                   nome: tecRefUID.nome,
                   cliente: userData.cliente,
@@ -589,7 +590,8 @@ const EditVisit = ({
                   semana: getMonthlyWeekNumber(date),
                   mes: moment(visitRef.data).format("M"),
                   ende: visitRef.endereco,
-                  confirmada: 'Não'
+                  confirmada: 'Não',
+                  categoria: visitRef.categoria
                 })
               } 
               Swal.fire({
