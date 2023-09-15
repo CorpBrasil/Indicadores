@@ -165,6 +165,22 @@ const Filter = ({ tableData, dataFull, sellers, userRef, changeFilter, type }) =
         handleClose();
         setSearchParams(newData);
       }
+      else if(act === 'confirmado') {
+        changeFilter(tableData.filter((item) => {return item.confirmar === searchValue}));
+        const newData = [...searchParams];
+        let newValue;
+        if(searchValue === true) {
+          newValue = 'Sim'
+        } else {
+          newValue = 'Não'
+        }
+        newData.push({
+          title: 'Confirmado é',
+          value: newValue
+        })
+        handleClose();
+        setSearchParams(newData);
+      }
     }
 }
 
@@ -234,7 +250,8 @@ const handleClick = (event) => {
         <div className="filter-item" onClick={() => { setviewPopover(true); setSearchType('cidade'); } }>Cidade<KeyboardArrowRightIcon /></div>
         <div className="filter-item" onClick={() => { setviewPopover(true); setSearchType('cliente'); } }>Cliente<KeyboardArrowRightIcon /></div>
         <div className="filter-item" onClick={() => {setviewPopover(true);  setSearchType('consultora')}}>Consultora<KeyboardArrowRightIcon /></div>
-        <div className="filter-item" onClick={() => {setviewPopover(true);  setSearchType('motorista')}}>Motorista<KeyboardArrowRightIcon /></div></>
+        <div className="filter-item" onClick={() => {setviewPopover(true);  setSearchType('motorista')}}>Motorista<KeyboardArrowRightIcon /></div>
+        <div className="filter-item" onClick={() => {setviewPopover(true);  setSearchType('confirmado')}}>Confirmado<KeyboardArrowRightIcon /></div></>
         }
         {userRef && userRef.cargo === 'Administrador' && 
           <div className="filter-item" onClick={() => {setviewPopover(true);  setSearchType('consultora')}}>Consultora<KeyboardArrowRightIcon /></div>
@@ -336,6 +353,22 @@ const handleClick = (event) => {
                 <MenuItem value='Bruna'>Bruna</MenuItem>
                 <MenuItem value='Lia'>Lia</MenuItem>
                 <MenuItem value='Lucas'>Lucas</MenuItem>
+            </Select>
+            </FormControl></>
+          }
+          {searchType && searchType === 'confirmado' &&
+            <><div>É igual a</div>
+            <FormControl margin="normal" fullWidth>
+            <InputLabel id="demo-simple-select-label">Confirmado</InputLabel>
+            <Select
+              labelId="demo-simple-select-label"
+              id="demo-simple-select"
+              value={searchValue}
+              label="Confirmado"
+              onChange={(e) => setSearchValue(e.target.value)}
+            >
+                <MenuItem value={true}>Sim</MenuItem>
+                <MenuItem value={false}>Não</MenuItem>
             </Select>
             </FormControl></>
           }

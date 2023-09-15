@@ -436,7 +436,8 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts, check }) => {
                 createConfirm: new Date()
               });
             }
-            axios.post('https://hook.us1.make.com/tmfl4xr8g9tk9qoi9jdpo1d7istl8ksd', {
+            axios.post('https://n8n.corpbrasil.cloud/webhook/321c02a7-03b7-4f81-b4a0-2958660ff449', {
+              ID: ref.id,
               data: moment(ref.data).format("DD/MM/YYYY"),
               nome: ref.tecnico,
               cliente: ref.cliente,
@@ -446,8 +447,8 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts, check }) => {
               semana: getMonthlyWeekNumber(date),
               mes: moment(ref.data).format("M"),
               ende: ref.endereco,
-              confirmada: 'Sim',
-              categoria: ref.categoria
+              categoria: ref.categoria,
+              confirmar: 'Sim',
             })
             Swal.fire({
               title: Company,
@@ -472,7 +473,8 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts, check }) => {
           cancelButtonText: "Não",
         }).then(async (result) => {
           if (result.isConfirmed) {
-            axios.post('https://hook.us1.make.com/tmfl4xr8g9tk9qoi9jdpo1d7istl8ksd', {
+            axios.post('https://n8n.corpbrasil.cloud/webhook/321c02a7-03b7-4f81-b4a0-2958660ff449', {
+              ID: ref.id,
               data: moment(ref.data).format("DD/MM/YYYY"),
               nome: ref.tecnico,
               cliente: ref.cliente,
@@ -482,7 +484,7 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts, check }) => {
               semana: getMonthlyWeekNumber(date),
               mes: moment(ref.data).format("M"),
               ende: ref.endereco,
-              confirmada: 'Não',
+              confirmar: 'Não',
               categoria: ref.categoria
             })
             Swal.fire({
