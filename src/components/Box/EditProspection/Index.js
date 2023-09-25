@@ -38,6 +38,7 @@ const EditProspection = ({
 
   useEffect(() => {
     const fethData = async () => {
+      setValue('cnpj', data.cnpj);
       setValue('nome', data.nome);
       setValue('empresa', data.empresa);
       setValue('cidade', data.cidade);
@@ -108,6 +109,16 @@ const EditProspection = ({
     <div className="box-visit__container">
                   <form onSubmit={handleSubmit(onSubmit)}>
                   <div className="box-visit__form"> 
+                  <label className="label">
+                    <p>CNPJ *</p>
+                    <input
+                      className="label__input"
+                      type="text"
+                      autoComplete="off"
+                      required={inputState === 'required'}
+                      disabled={inputState === 'disabled'}
+                      {...register("cnpj")} />
+                  </label>
                   <label className="label">
                     <p>Nome *</p>
                     <input

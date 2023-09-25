@@ -11,6 +11,13 @@
   }
 }
 
+.title-panel {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 3rem;
+}
+
 .container-panel {
   height: 100%;
   display: flex;

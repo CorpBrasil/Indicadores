@@ -5,9 +5,7 @@ import Swal from 'sweetalert2/dist/sweetalert2.js';
 import { Company } from "../../data/Data";
 import axios from "axios";
 import * as moment from "moment";
-// import { PatternFormat } from "react-number-format";
-// import { useForm } from "react-hook-form"; // cria formulário personalizado
-import { collection, query, serverTimestamp, onSnapshot, orderBy, updateDoc, doc } from "firebase/firestore";
+import { collection, query, serverTimestamp, onSnapshot, orderBy, updateDoc, doc, deleteDoc } from "firebase/firestore";
 
 // Css
 import "cooltipz-css";
@@ -24,11 +22,9 @@ import EditProspection from "../../components/Box/EditProspection/Index";
 import CreateActivity from "../../components/Box/CreateActivity/Index";
 import Filter from "../../components/Filter/Index";
 import Dashboard from "../../components/Dashboard/Index";
+import ImportLeads from "../../components/Prospection/ImportLeads";
 
 import { ReactComponent as ProspectionIcon } from '../../images/icons/Prospection.svg';
-// import { ReactComponent as Email } from '../../images/icons/Mail.svg';
-// import { ReactComponent as Phone } from '../../images/icons/Phone.svg';
-// import { ReactComponent as WhatsApp } from '../../images/icons/WhatsApp.svg';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import BlockIcon from '@mui/icons-material/Block';
 import HowToRegIcon from '@mui/icons-material/HowToReg';
@@ -43,6 +39,7 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import FormControl from '@mui/material/FormControl';
+import DeleteIcon from '@mui/icons-material/Delete';
 // import DeleteIcon from '@mui/icons-material/Delete';
 
 import IconButton from '@mui/material/IconButton';
@@ -64,7 +61,7 @@ import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 
 
-const Prospection = ({ user, leads, activity, userRef, members, sellers }) => {
+const Prospection = ({ user, leads, activity, userRef, listLeads, members, sellers }) => {
   const [anotacao, setAnotacao] = useState('');
   const [anotacaoBox, setAnotacaoBox] = useState(false);
   const [view, setView] = useState(false);
@@ -78,6 +75,7 @@ const Prospection = ({ user, leads, activity, userRef, members, sellers }) => {
   const [sellersOrder, setSellersOrder] = useState(null);
   const [TabsValue, setTabsValue] = useState(0);
   const [activityAll, setActivityAll] = useState();
+  const [viewImport, setViewImport] = useState(false);
 
 
   useEffect(() => {
@@ -92,16 +90,6 @@ const Prospection = ({ user, leads, activity, userRef, members, sellers }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [sellers]
   );
-
-  // useEffect(() => {
-  //   const fethData = async () => {
-  //     onSnapshot(query(collection(dataBase, "Leads/" + data.id + "/Atividades"), orderBy("createAt")), (act) => {
-  //       // Atualiza os dados em tempo real
-  //       setActivityAll(act.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
-  //     });
-  //   }
-  //     fethData();
-  // },[activity])
 
   const changeFilter = (data) => {
     setLeadsUser(data);
@@ -351,7 +339,58 @@ const closeAnotacaoBox = () => {
     };
   }
 
-  // console.log(TabsValue);
+  const closeImport = () => {
+    setViewImport(false);
+  }
+
+  const openImport = () => {
+    setViewImport(true);
+  }
+
+  const deleteList = (list) => {
+    try {
+      Swal.fire({
+        title: 'Atenção',
+        html: `Você deseja excluir a lista <b>(${list.nome})</b>? <br /><br />` +
+        `Importante: Ao excluir <b>(${list.nome})</b>, todos os leads vinculados a essa lista também serão removidos.<br /> <b>Esta ação é irreversível!</b>`,
+        icon: "question",
+        showCancelButton: true,
+        showCloseButton: true,
+        confirmButtonColor: "#F39200",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Sim",
+        cancelButtonText: "Não",
+      }).then(async (result) => {
+        if(result.isConfirmed) {
+        changeLoading(true);
+        const listRef = leads.filter((ref) => ref.listaID === list.id);
+        Promise.all(listRef.map(async (data) => {
+          await deleteDoc(doc(dataBase, "Leads", data.id))
+        })).then(async (result) => {
+          if(result) {
+            const day = moment();
+            await updateDoc(doc(dataBase, "Lista_Leads", list.id), {
+              status: "Excluido",
+              dataStatus: moment(day).format('DD MMM YYYY - HH:mm')
+            }).then(() => {
+              changeLoading(false);
+              Swal.fire({
+                title: Company,
+                html: `A lista foi excluida com sucesso.`,
+                icon: "success",
+                showConfirmButton: true,
+                showCloseButton: true,
+                confirmButtonColor: "#F39200",
+              })
+            })
+        }
+      })
+    }
+    })
+  } catch {
+
+    }
+  }
   
 
   return (
@@ -368,14 +407,89 @@ const closeAnotacaoBox = () => {
           <Dashboard schedule={activity} type={'prospeccao'} />
       </div>
       <div className={styles.content_panel}>
+        {userRef && userRef.cargo === "Administrador" && 
+          <div className={styles.content_list}>
+            <h2>Histórico de Importação de Leads</h2>
+            <TableContainer className={styles.table_center} component={Paper}>
+              <Table stickyHeader aria-label="sticky table">
+                <TableHead>
+                  <TableRow>
+                    <TableCell align="center">Status</TableCell>
+                    <TableCell align="center">Data de Criação</TableCell>
+                    <TableCell align="center">Nome</TableCell>
+                    <TableCell align="center">Responsável</TableCell>
+                    <TableCell align="center">Consultora</TableCell>
+                    <TableCell align="center">Ação</TableCell>
+                  </TableRow>
+                </TableHead>
+                {listLeads && listLeads.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((data, index) => (
+                <TableBody>
+                  <TableRow
+                    key={index}
+                    hover
+                    className={`list-visit`}
+                    sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+                    {data.status === 'Ativo' &&
+                      <TableCell align="center" className={styles.ativo}>{data.status}</TableCell>
+                    }
+                    {data.status === 'Excluido' &&
+                      <TableCell align="center" aria-label={data.dataStatus && data.dataStatus.replace('-','às')}
+                      data-cooltipz-dir="right" className={styles.perdido}>{data.status}</TableCell>
+                    }
+                    <TableCell align="center">{data.data.replace('-', 'às')}</TableCell>
+                    <TableCell align="center"><b>{data.nome}</b></TableCell>
+                    <TableCell align="center">{data.responsavel}</TableCell>
+                    <TableCell align="center">{data.consultora}</TableCell>
+                    <TableCell align="center" sx={{ width: '50px' }}>
+                      {data.status === 'Excluido' ? 
+                      <IconButton
+                        aria-label="Excluir Lista"
+                        data-cooltipz-dir="left"
+                        size="small"
+                        disabled>
+                        <DeleteIcon />
+                      </IconButton> :
+                      <IconButton
+                      aria-label="Excluir Lista"
+                      data-cooltipz-dir="left"
+                      size="small"
+                      onClick={() => deleteList(data)}>
+                      <DeleteIcon sx={{ fill: 'red' }} />
+                    </IconButton>}
+                    </TableCell>
+                  </TableRow>
+              </TableBody>
+                ))}
+              </Table>
+              <TablePagination
+              rowsPerPageOptions={[5, 10, 20]}
+              labelRowsPerPage="Lista por página"
+              component="div"
+              count={listLeads ? listLeads.length : 0}
+              rowsPerPage={rowsPerPage}
+              page={page}
+              onPageChange={handleChangePage}
+              onRowsPerPageChange={handleChangeRowsPerPage}
+              />
+            </TableContainer>
+          </div>
+        }
         <div className={styles.box_panel}>
-            <h2>Atividades</h2>
+            <h2>Leads</h2>
           <div className={styles.box_panel_add}>
             {!view && !view ? 
-            <button className={styles.box_panel_add_activity} onClick={() => setView(true)}>
-            <ProspectionIcon className={styles.prospecction_icon} />
-              <p>Cadastrar Lead</p>
-            </button> :
+            <><button className={styles.box_panel_add_activity} onClick={() => setView(true)}>
+                <ProspectionIcon className={styles.prospecction_icon} />
+                <p>Cadastrar Lead</p>
+              </button>
+              {userRef && userRef.cargo === "Administrador" && 
+              <><button className={styles.box_panel_add_activity} onClick={() => setViewImport(true)}>
+                    <ProspectionIcon className={styles.prospecction_icon} />
+                    <p>Importar Leads</p>
+                  </button><ImportLeads members={members} company={Company} dataBase={dataBase} view={viewImport}
+                    open={openImport} close={closeImport} userRef={userRef} changeLoading={changeLoading} /></>
+                }
+                </> :
             <CreateProspection userRef={userRef} returnPage={returnPage} changeLoading={changeLoading} />
           }
           </div>
@@ -408,12 +522,6 @@ const closeAnotacaoBox = () => {
                   hover
                   className={`list-visit`}
                   sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-                  {/* <TableCell aria-label={data.atividade}
-                    data-cooltipz-dir="right" align="center" sx={{ width: '50px' }}>
-                    {data.atividade === 'Email' && <Email className={styles.circle} style={{ backgroundColor: '#8A8A8A' }} />}
-                    {data.atividade === 'Ligação' && <Phone className={styles.circle} style={{ backgroundColor: '#576AF5' }} />}
-                    {data.atividade === 'WhatsApp' && <WhatsApp className={styles.circle} style={{ backgroundColor: '#44BF2B', padding: '0.6rem' }} />}
-                  </TableCell> */}
                   {data.status === 'Ativo' &&
                     <TableCell align="center" className={styles.ativo}>{data.status}</TableCell>
                   }
@@ -430,7 +538,7 @@ const closeAnotacaoBox = () => {
                   <TableCell align="center">{data.empresa}</TableCell>
                   <TableCell align="center">{data.cidade}</TableCell>
                   <TableCell align="center" sx={{ backgroundColor: members.find((data1) => data1.uid === data.uid).cor, color: '#fff' }}>{data.consultora}</TableCell>
-                  <TableCell align="center" sx={{ width: 'auto' }}>{data.anotacao.substring(0, 30) + '...'} </TableCell>
+                  <TableCell align="center" sx={{ width: 'auto' }}>{data.anotacao ? data.anotacao.substring(0, 30) + '...' : ""} </TableCell>
                   <TableCell align="center" sx={{ width: '50px' }}>
                     <IconButton
                       aria-label="Expandir"
@@ -454,7 +562,7 @@ const closeAnotacaoBox = () => {
                             data-cooltipz-dir="top"
                             size="small"
                             onClick={() => { setViewEdit(data.id); setAnotacao(data.anotacao); } }
-                          >
+                          > 
                             <EditIcon />
                           </IconButton></div>}
                               {viewEdit && viewEdit === data.id ?
@@ -530,9 +638,6 @@ const closeAnotacaoBox = () => {
                   <h3 className={styles.title_info}>Geral</h3>
                     <EditProspection changeLoading={changeLoading} data={data} />
                     </CustomTabPanel>
-                    <CustomTabPanel value={TabsValue} index={2}>
-                      Item Three
-                    </CustomTabPanel>
                     </Collapse>
                 </TableCell>
               </TableRow>
@@ -594,7 +699,7 @@ const closeAnotacaoBox = () => {
                   fullWidth
                   required
                   multiline
-                  rows={2}
+                  rows={5}
                   variant="outlined"
                 />
                   </div>

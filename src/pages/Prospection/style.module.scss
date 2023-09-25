@@ -56,6 +56,9 @@
 
   .title_panel {
     padding: 4rem 0 1rem 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 
     h2 {
       font-size: 1.7rem;
@@ -75,6 +78,17 @@
     margin: auto;
     height: 100%;
 
+    h2 {
+      margin: 1rem 0;
+      text-align: center;
+    }
+
+    .content_list {
+      max-width: 1200px;
+      width: 100%;
+      margin: auto;
+    }
+
     .box_panel {
       display: flex;
       flex-direction: column;
@@ -82,10 +96,12 @@
       justify-content: space-around;
       padding: 3rem 0;
       gap: 0.5rem;
+      text-align: center;
 
       &_add {
         display: flex;
         justify-content: center;
+        gap: 1rem;
 
         &_activity {
           margin: 0;

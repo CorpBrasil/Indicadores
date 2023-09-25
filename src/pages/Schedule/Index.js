@@ -416,7 +416,7 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts, check }) => {
           if (result.isConfirmed) {
             await updateDoc(visitRef, {
               //Atualizar dados sem sobrescrever os existentes
-              confirmar: true,
+              confirmar: true
             });
             if(ref.tipo !== "Almoço") {
               await setDoc(financeRef, {

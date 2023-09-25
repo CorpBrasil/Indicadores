@@ -28,6 +28,7 @@
     "framer-motion": "^10.0.1",
     "moment": "^2.29.4",
     "react": "^18.2.0",
+    "react-csv-reader": "^4.0.0",
     "react-currency-input-field": "^3.6.11",
     "react-dom": "^18.2.0",
     "react-geocode": "^0.2.3",

@@ -23,10 +23,12 @@ function App() {
   const [activity, setActivity] = useState();
   const [tecs, setTecs] = useState();
   const [sellers, setSellers] = useState();
+  const [listLeads, setListLeads] = useState();
   const [check, setCheck] = useState(false);
   const membersCollectionRef = collection(dataBase, "Membros");
   const leadsCollectionRef = collection(dataBase, "Leads");
   const activityCollectionRef = collection(dataBase, "Atividades_Total");
+  const listCollectionRef = collection(dataBase, "Lista_Leads");
   let { status } = useNavigatorOnline();
 
   useEffect(() => {
@@ -48,13 +50,17 @@ function App() {
           // Atualiza os dados em tempo real
           setUserAlerts(member.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
         });
-          onSnapshot(query(leadsCollectionRef, orderBy("createAt", 'desc')), (activity) => {
+          onSnapshot(query(leadsCollectionRef, orderBy("createAt", 'desc')), (lead) => {
             // Atualiza os dados em tempo real
-          setLeads(activity.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
+          setLeads(lead.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
           });
           onSnapshot(query(activityCollectionRef, orderBy("createAt", 'desc')), (activity) => {
             // Atualiza os dados em tempo real
           setActivity(activity.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
+          });
+          onSnapshot(query(listCollectionRef, orderBy("createAt", 'desc')), (list) => {
+            // Atualiza os dados em tempo real
+          setListLeads(list.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
           });
           // onSnapshot(query(collection(dataBase, "Atividades/" + user.id + "/Registro"), orderBy("data")), (activity) => {
           //   // Atualiza os dados em tempo real
@@ -95,7 +101,7 @@ function App() {
               <Route exact path="/financeiro/:year" element={<Finance userRef={userRef} alerts={userAlerts} sellers={sellers} />} />
             }
             <Route exact path="/leads" element={<Alert user={user} userRef={userRef} alerts={userAlerts} check={check} />} />
-            <Route exact path="/prospeccao" element={<Prospecction user={user} userRef={userRef} leads={leads} activity={activity} members={members} sellers={sellers} check={check} />} />
+            <Route exact path="/prospeccao" element={<Prospecction user={user} userRef={userRef} leads={leads} activity={activity} listLeads={listLeads} members={members} sellers={sellers} check={check} />} />
             <Route path="/agenda/:year" element={<Schedule userRef={userRef} members={members} tecs={tecs} sellers={sellers} alerts={userAlerts} check={check} />} />
             <Route path="*" element={<Schedules userRef={userRef} alerts={userAlerts} check={check} />} />
           </Route>

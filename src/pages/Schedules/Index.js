@@ -425,28 +425,6 @@ const Schedules = ({ userRef, alerts, check }) => {
           required
           fullWidth
           />
-          {/* <TextField
-            margin="dense"
-            id="name"
-            label="Quantidade Total de Litro"
-            type="number"
-            onChange={(e) => setTotal(e.target.value)}
-            value={total  || ''}
-            fullWidth
-            required
-            variant="outlined"
-          /> */}
-          {/* <TextField
-            margin="dense"
-            id="name"
-            label="Quantidade Total de Litro"
-            type="number"
-            onChange={(e) => setTotal(e.target.value)}
-            value={total  || ''}
-            fullWidth
-            required
-            variant="outlined"
-          /> */}
           <FormControl sx={{ margin: '0.3rem 0' }} fullWidth>
             <InputLabel id="demo-simple-select-label">Combustível</InputLabel>
             <Select
