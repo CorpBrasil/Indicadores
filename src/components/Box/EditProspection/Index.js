@@ -20,7 +20,7 @@ const EditProspection = ({
 }) => {
   // const [view, setView] = useState(false);
   const { register, handleSubmit, setValue, watch } = useForm();
-  const [telefone, setTelefone] = useState(data.telefone.slice(2,14));
+  const [telefone, setTelefone] = useState(data.telefone.slice(0,14));
   const [inputState, setInputState] = useState('disabled');
   const [viewEdit, setViewEdit] = useState('');
   const watched =  watch();
@@ -38,7 +38,7 @@ const EditProspection = ({
 
   useEffect(() => {
     const fethData = async () => {
-      setValue('cnpj', data.cnpj);
+      setValue('cnpj', data.cnpj.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, "$1 $2 $3/$4-$5"));
       setValue('nome', data.nome);
       setValue('empresa', data.empresa);
       setValue('cidade', data.cidade);
@@ -55,12 +55,13 @@ const EditProspection = ({
   useEffect(() => {
     // eslint-disable-next-line no-self-compare
     if (JSON.stringify(watched) === JSON.stringify(watched) && !viewEdit) { // Verificar Depois
+      setValue('cnpj', data.cnpj.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, "$1 $2 $3/$4-$5"));
       setValue('nome', data.nome);
       setValue('empresa', data.empresa);
       setValue('cidade', data.cidade);
       setValue('email', data.email);
       setValue('consumo', data.consumo);
-      setTelefone(data.telefone.slice(2,14))
+      setTelefone(data.telefone.slice(0,14))
     }
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
