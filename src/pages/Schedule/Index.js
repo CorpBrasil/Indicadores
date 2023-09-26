@@ -436,7 +436,7 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts, check }) => {
                 createConfirm: new Date()
               });
             }
-            axios.post('https://n8n.corpbrasil.cloud/webhook/dfbbb99b-1721-4a7d-8ac0-f95335b15aa7', {
+            axios.post('https://n8n.corpbrasil.cloud/webhook/63b48297-3e22-4eba-8b21-45e87f52f3fb', {
               ID: ref.id,
               data: moment(ref.data).format("DD/MM/YYYY"),
               nome: ref.tecnico,
@@ -448,7 +448,7 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts, check }) => {
               mes: moment(ref.data).format("M"),
               ende: ref.endereco,
               categoria: ref.categoria,
-              confirmar: 'Sim',
+              confirmada: 'Sim',
             })
             Swal.fire({
               title: Company,
@@ -484,7 +484,7 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts, check }) => {
               semana: getMonthlyWeekNumber(date),
               mes: moment(ref.data).format("M"),
               ende: ref.endereco,
-              confirmar: 'Não',
+              confirmada: 'Não',
               categoria: ref.categoria
             })
             Swal.fire({
