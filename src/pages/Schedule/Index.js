@@ -436,7 +436,7 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts, check }) => {
                 createConfirm: new Date()
               });
             }
-            axios.post('https://n8n.corpbrasil.cloud/webhook/321c02a7-03b7-4f81-b4a0-2958660ff449', {
+            axios.post('https://n8n.corpbrasil.cloud/webhook/dfbbb99b-1721-4a7d-8ac0-f95335b15aa7', {
               ID: ref.id,
               data: moment(ref.data).format("DD/MM/YYYY"),
               nome: ref.tecnico,
@@ -473,7 +473,7 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts, check }) => {
           cancelButtonText: "Não",
         }).then(async (result) => {
           if (result.isConfirmed) {
-            axios.post('https://n8n.corpbrasil.cloud/webhook/321c02a7-03b7-4f81-b4a0-2958660ff449', {
+            axios.post('https://n8n.corpbrasil.cloud/webhook/dfbbb99b-1721-4a7d-8ac0-f95335b15aa7', {
               ID: ref.id,
               data: moment(ref.data).format("DD/MM/YYYY"),
               nome: ref.tecnico,
