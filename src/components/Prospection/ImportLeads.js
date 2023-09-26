@@ -125,9 +125,6 @@ const ImportLeads = ({ members, company, dataBase, view, open, close, userRef, c
     }
   }
 
-  const tel = '(19) 99548-2332'
-  console.log(tel.replace(/[^0-9]+/g,''))
-
   return (
     <div>
       <Dialog

@@ -70,7 +70,7 @@ const Prospection = ({ user, leads, activity, userRef, listLeads, members, selle
   const [viewEdit, setViewEdit] = useState(false);
   const [open, setOpen] = useState(false);
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [rowsPerPage, setRowsPerPage] = useState(20);
   const [leadsUser, setLeadsUser] = useState(undefined);
   const [loading, setLoading] = useState(false);
   const [sellersOrder, setSellersOrder] = useState(null);
@@ -514,6 +514,7 @@ const closeAnotacaoBox = () => {
                   <TableCell align="center">Empresa</TableCell>
                   <TableCell align="center">Cidade</TableCell>
                   <TableCell align="center">Consultora</TableCell>
+                  <TableCell align="center">Atividades</TableCell>
                   <TableCell align="center">Anotação</TableCell>
                   <TableCell align="center"></TableCell>
                 </TableRow>
@@ -524,7 +525,8 @@ const closeAnotacaoBox = () => {
                   key={index}
                   hover
                   className={`list-visit`}
-                  sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+                  // sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                  >
                   {data.status === 'Ativo' &&
                     <TableCell align="center" className={styles.ativo}>{data.status}</TableCell>
                   }
@@ -537,10 +539,14 @@ const closeAnotacaoBox = () => {
                     data-cooltipz-dir="right" className={styles.perdido}>{data.status}</TableCell>
                   }
                   <TableCell align="center">{data.data.replace('-', 'às')}</TableCell>
-                  <TableCell align="center">{data.nome}</TableCell>
+                  <TableCell align="center">{data.nome ? data.nome.substring(0, 30) + '...' : ""}</TableCell>
                   <TableCell align="center">{data.empresa}</TableCell>
                   <TableCell align="center">{data.cidade}</TableCell>
+                  {members.find((data1) => data1.uid === data.uid) ? 
                   <TableCell align="center" sx={{ backgroundColor: members.find((data1) => data1.uid === data.uid).cor, color: '#fff' }}>{data.consultora}</TableCell>
+                  : <TableCell align="center">{data.consultora}</TableCell>
+                  }
+                  <TableCell align="center">{activity.filter((act) => act.idRef === data.id).length}</TableCell>
                   <TableCell align="center" sx={{ width: 'auto' }}>{data.anotacao ? data.anotacao.substring(0, 30) + '...' : ""} </TableCell>
                   <TableCell align="center" sx={{ width: '50px' }}>
                     <IconButton
@@ -553,8 +559,8 @@ const closeAnotacaoBox = () => {
                   </TableCell>
                 </TableRow>
                 <TableRow key={data.id}>
-                  <TableCell style={{ paddingBottom: 0, paddingTop: 0, height: 0 }} colSpan={8}>
-                      <Collapse in={open[data.id]} timeout="auto" unmountOnExit colSpan={8}>
+                  <TableCell style={{ paddingBottom: 0, paddingTop: 0, height: 0 }} colSpan={9}>
+                      <Collapse in={open[data.id]} timeout="auto" unmountOnExit colSpan={9}>
                       <Box className={styles.info_anotacao} margin={3}>
                           <h3>Anotação</h3>
                           {viewEdit && viewEdit === data.id ?
@@ -657,12 +663,12 @@ const closeAnotacaoBox = () => {
               } 
             </Table>
             <TablePagination
-            rowsPerPageOptions={[5, 10, 20]}
-            labelRowsPerPage="Atividades por página"
+            rowsPerPageOptions={[10, 20, 50]}
+            labelRowsPerPage="Leads por página"
             component="div"
             count={leadsUser ? leadsUser.length : 0}
+            page={!leadsUser || leadsUser.length <= 0 ? 0 : page}
             rowsPerPage={rowsPerPage}
-            page={page}
             onPageChange={handleChangePage}
             onRowsPerPageChange={handleChangeRowsPerPage}
             />
