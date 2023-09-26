@@ -70,6 +70,7 @@ const Prospection = ({ user, leads, activity, userRef, listLeads, members, selle
   const [viewEdit, setViewEdit] = useState(false);
   const [open, setOpen] = useState(false);
   const [page, setPage] = useState(0);
+  const [page2, setPage2] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(20);
   const [leadsUser, setLeadsUser] = useState(undefined);
   const [loading, setLoading] = useState(false);
@@ -444,20 +445,28 @@ const closeAnotacaoBox = () => {
                     <TableCell align="center">{data.responsavel}</TableCell>
                     <TableCell align="center">{data.consultora}</TableCell>
                     <TableCell align="center" sx={{ width: '50px' }}>
-                      {data.status === 'Excluido' ? 
+                      {data.status === 'Excluido' && 
                       <IconButton
                         aria-label="Excluir Lista"
                         data-cooltipz-dir="left"
                         size="small"
                         disabled>
                         <DeleteIcon />
-                      </IconButton> :
+                      </IconButton>}
+                      {userRef && userRef.email === 'admin@corpbrasil.com' ?
                       <IconButton
                       aria-label="Excluir Lista"
                       data-cooltipz-dir="left"
                       size="small"
                       onClick={() => deleteList(data)}>
                       <DeleteIcon sx={{ fill: 'red' }} />
+                    </IconButton>: 
+                    <IconButton
+                    aria-label="Excluir Lista"
+                    data-cooltipz-dir="left"
+                    size="small"
+                    disabled>
+                    <DeleteIcon />
                     </IconButton>}
                     </TableCell>
                   </TableRow>
@@ -470,7 +479,7 @@ const closeAnotacaoBox = () => {
               component="div"
               count={listLeads ? listLeads.length : 0}
               rowsPerPage={rowsPerPage}
-              page={page}
+              page={page2}
               onPageChange={handleChangePage}
               onRowsPerPageChange={handleChangeRowsPerPage}
               />
