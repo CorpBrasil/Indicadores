@@ -125,11 +125,13 @@ const Prospection = ({ user, leads, activity, userRef, listLeads, members, selle
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
+    setPage2(0)
   };
 
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(+event.target.value);
     setPage(0);
+    setPage2(0);
   };
 
   const confirmEdit = async(data) => {
