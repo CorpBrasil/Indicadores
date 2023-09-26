@@ -40,6 +40,7 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import FormControl from '@mui/material/FormControl';
 import DeleteIcon from '@mui/icons-material/Delete';
+import PersonAddAltIcon from '@mui/icons-material/PersonAddAlt';
 // import DeleteIcon from '@mui/icons-material/Delete';
 
 import IconButton from '@mui/material/IconButton';
@@ -417,6 +418,7 @@ const closeAnotacaoBox = () => {
                     <TableCell align="center">Status</TableCell>
                     <TableCell align="center">Data de Criação</TableCell>
                     <TableCell align="center">Nome</TableCell>
+                    <TableCell align="center">Leads</TableCell>
                     <TableCell align="center">Responsável</TableCell>
                     <TableCell align="center">Consultora</TableCell>
                     <TableCell align="center">Ação</TableCell>
@@ -438,6 +440,7 @@ const closeAnotacaoBox = () => {
                     }
                     <TableCell align="center">{data.data.replace('-', 'às')}</TableCell>
                     <TableCell align="center"><b>{data.nome}</b></TableCell>
+                    <TableCell align="center">{data.leads}</TableCell>
                     <TableCell align="center">{data.responsavel}</TableCell>
                     <TableCell align="center">{data.consultora}</TableCell>
                     <TableCell align="center" sx={{ width: '50px' }}>
@@ -484,7 +487,7 @@ const closeAnotacaoBox = () => {
               </button>
               {userRef && userRef.cargo === "Administrador" && 
               <><button className={styles.box_panel_add_activity} onClick={() => setViewImport(true)}>
-                    <ProspectionIcon className={styles.prospecction_icon} />
+                    <PersonAddAltIcon className={styles.prospecction_icon} />
                     <p>Importar Leads</p>
                   </button><ImportLeads members={members} company={Company} dataBase={dataBase} view={viewImport}
                     open={openImport} close={closeImport} userRef={userRef} changeLoading={changeLoading} /></>

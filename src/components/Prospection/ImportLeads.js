@@ -81,6 +81,7 @@ const ImportLeads = ({ members, company, dataBase, view, open, close, userRef, c
               responsavel: userRef.nome,
               data: moment(day).format('DD MMM YYYY - HH:mm'),
               consultora: consultora.nome,
+              leads: leads.length,
               status: 'Ativo',
             }).then((result) => {
               Promise.all(leads.map(async(lead) => {
@@ -163,7 +164,7 @@ const ImportLeads = ({ members, company, dataBase, view, open, close, userRef, c
                     <Select
                       labelId="demo-simple-select-label"
                       id="demo-simple-select"
-                      value={consultoraRef || undefined}
+                      value={consultoraRef ?? null}
                       label="Consultora"
                       onChange={(e) => setConsultoraRef(e.target.value)}
                       required
