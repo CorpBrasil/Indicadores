@@ -240,7 +240,7 @@ const Prospection = ({ user, leads, activity, userRef, listLeads, members, selle
               showCloseButton: true,
               confirmButtonColor: "#F39200",
             })
-            axios.post('https://n8n.corpbrasil.cloud/webhook-test/271dd7a8-0354-4e37-8aaf-b4a955ac836b', {
+            axios.post('https://n8n.corpbrasil.cloud/webhook/271dd7a8-0354-4e37-8aaf-b4a955ac836b', {
               Anotacao: anotacao,
               ...data,
               status: 'Ganho',

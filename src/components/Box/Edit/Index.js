@@ -579,7 +579,7 @@ const EditVisit = ({
               }
               if(visitRef.categoria !== "lunch") {
                 const date = new Date(visitRef.data);
-                axios.post('https://n8n.corpbrasil.cloud/webhook/dfbbb99b-1721-4a7d-8ac0-f95335b15aa7', {
+                axios.post('https://n8n.corpbrasil.cloud/webhook/63b48297-3e22-4eba-8b21-45e87f52f3fb', {
                   ID: visitRef.id,
                   data: moment(visitRef.data).format("DD/MM/YYYY"),
                   nome: tecRefUID.nome,
@@ -591,7 +591,8 @@ const EditVisit = ({
                   mes: moment(visitRef.data).format("M"),
                   ende: visitRef.endereco,
                   confirmada: 'Não',
-                  categoria: visitRef.categoria
+                  categoria: visitRef.categoria,
+                  extra: visitRef.preData,
                 })
               } 
               Swal.fire({

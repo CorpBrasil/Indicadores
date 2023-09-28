@@ -15,6 +15,22 @@
     }
   }
 
+.buttons-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+
+  @media (min-width: 650px) {
+    gap: 1.5rem;
+  }
+
+  &:first-child {
+    margin-top: 2rem;
+  }
+
+}
+
   .content-schedule {
     width: 100%;
     max-width: 1200px;
@@ -26,21 +42,16 @@
 
     .box-schedule {
       display: flex;
-      width: 90%;
       flex-wrap: wrap;
       justify-content: space-around;
       padding: 0.5rem 0;
-      gap: 4rem;
-
-      &:first-child {
-        padding-top: 2rem;
-      }
 
       .visits{background-color: #006633;}
       .finance{background-color: #3163eb;}
       .prospection{background-color: #404040;}
       .alert {background-color: #f39200;}
       .fuel {background-color: #ad1717;}
+      .cache {background-color: #2c2c2c;}
 
       .card {
         display: flex;
@@ -95,8 +106,7 @@
       .schedule {
         display: flex;
         align-items: center;
-        width: 90%;
-        max-width: 300px;
+        width: 300px;
         border-radius: 10px;
         list-style: none;
         height: 6rem;

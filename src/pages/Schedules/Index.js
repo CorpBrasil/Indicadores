@@ -32,6 +32,7 @@ import PeopleIcon from '@mui/icons-material/People';
 import LocalGasStationIcon from '@mui/icons-material/LocalGasStation';
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
 import { ReactComponent as Prospection } from '../../images/icons/Prospection.svg';
+import CachedIcon from '@mui/icons-material/Cached';
 
 
 
@@ -150,6 +151,24 @@ const Schedules = ({ userRef, alerts, check }) => {
 
   //   }
   // }
+
+  const clearCacheData = () => {
+    caches.keys().then((names) => {
+      names.forEach((name) => {
+        caches.delete(name);
+      });
+    });
+    Swal.fire({
+      title: 'Cache Limpo',
+      icon: "success",
+      html: `O Cache foi limpado com sucesso.`,
+      confirmButtonText: "Fechar",
+      showCloseButton: true,
+      confirmButtonColor: "#0eb05f"  
+    }).then(() => {
+      window.location.reload();
+    })
+  };
 
   const handleClickOpen = () => {
     if(check) {
@@ -284,6 +303,7 @@ const Schedules = ({ userRef, alerts, check }) => {
         <h1>Inicio</h1>
       </div>
        <div className='content-schedule'>
+        <div className='buttons-content'>
        {(user.email !== Users[1].email) &&
         <div className='box-schedule'>
           {schedules && schedules.map((schedule, index) => (
@@ -304,10 +324,9 @@ const Schedules = ({ userRef, alerts, check }) => {
               </div>
             </li>
           ))}
-       </div>
-        }
+       </div>}
        {userRef && (user.email === Users[0].email || user.email === Users[1].email || userRef.cargo === "Técnico" || userRef.cargo === "Administrador") &&
-        <><div className='box-schedule'>
+        <div className='box-schedule'>
             {financeSchedules && financeSchedules.map((schedule, index) => (
               <li key={index} className='schedule'>
                 {/* {userRef && (user.email === Users[0].email || userRef.cargo === "Administrador") &&
@@ -323,10 +342,12 @@ const Schedules = ({ userRef, alerts, check }) => {
                 </div>
               </li>
             ))}
-          </div></>
-      }
+          </div>
+          }
+        </div>
+        <div className='buttons-content'>
          {userRef && (user.email === Users[0].email || userRef.cargo === "Vendedor(a)" || userRef.cargo === "Administrador") && userRef.nome !== 'Pós-Venda' &&
-         <><div className='box-schedule'>
+         <div className='box-schedule'>
            <li className='schedule'>
              <Link className='schedule__content' to="/prospeccao">
                <div className='schedule__icon prospection'><Prospection /></div>
@@ -335,10 +356,10 @@ const Schedules = ({ userRef, alerts, check }) => {
                </div>
                </Link>
            </li>
-             </div></>
+             </div>
         }
        {userRef && (user.email === Users[0].email || userRef.cargo === "Vendedor(a)" || userRef.cargo === "Administrador") && userRef.nome !== 'Pós-Venda' &&
-       <><div className='box-schedule'>
+       <div className='box-schedule'>
          <li className='schedule'>
            <Link className='schedule__content' to="/leads">
              <div className='schedule__icon alert'><PeopleIcon /></div>
@@ -347,21 +368,33 @@ const Schedules = ({ userRef, alerts, check }) => {
              </div>
              </Link>
          </li>
-           </div></>
+           </div>
       }
+        </div>
+        <div className='buttons-content'>
        {userRef && (user.email === Users[0].email || userRef.cargo === "Administrador" || userRef.cargo === "Técnico" || findTec) &&
         <><div className='box-schedule'>
-        <li className='schedule'>
-          <Link className='schedule__content' onClick={() => handleClickOpen()}>
-            <div className='schedule__icon fuel'><LocalGasStationIcon /></div>
-            <div className='schedule__text'>
-              <p>Confirmar</p>
-              <p>Combustivel</p>
-            </div>
-            </Link>
-        </li>
-          </div></>
+              <li className='schedule'>
+                <Link className='schedule__content' onClick={() => handleClickOpen()}>
+                  <div className='schedule__icon fuel'><LocalGasStationIcon /></div>
+                  <div className='schedule__text'>
+                    <p>Confirmar</p>
+                    <p>Combustivel</p>
+                  </div>
+                </Link>
+              </li>
+            </div><div className='box-schedule'>
+                <li className='schedule'>
+                  <Link className='schedule__content' onClick={() => clearCacheData()}>
+                    <div className='schedule__icon cache'><CachedIcon /></div>
+                    <div className='schedule__text'>
+                      <p>Limpar Cache</p>
+                    </div>
+                  </Link>
+                </li>
+              </div></>
       }
+        </div>
       {user.email === Users[0].email &&   
       <div className='add-schedule'>
               <button onClick={() => setCreateSchedule(true)} className='add-schedule__btn'></button>

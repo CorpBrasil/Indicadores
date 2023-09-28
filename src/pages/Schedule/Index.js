@@ -8,6 +8,7 @@ import Header from "../../components/Header/Index";
 import useAuth from "../../hooks/useAuth";
 import Dashboard from "../../components/Dashboard/Index";
 import Filter from "../../components/Filter/Index";
+import Requirement from "../../components/Box/Requirement/Index";
 
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
@@ -52,7 +53,7 @@ import CreateVisitGroup from "../../components/Box/Group/Index";
 import { Company, Users } from "../../data/Data";
 
 const Schedule = ({ userRef, members, tecs, sellers, alerts, check }) => {
-  const data = new Date();
+  const date = new Date();
   const checked = JSON.parse(localStorage.getItem("foco"));
   const [focoCheck, setFocoCheck] = useState(false);
   const { year } = useParams();
@@ -64,7 +65,7 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts, check }) => {
   const [schedule, setSchedule] = useState();
   // const [scheduleNew, setScheduleNew] = useState();
   const [monthSelect, setMonthSelect] = useState(
-    String(data.getMonth() + 1).padStart(2, "0")
+    String(date.getMonth() + 1).padStart(2, "0")
   );
   const [editVisit, setEditVisit] = useState({ check: false });
   const [box, setBox] = useState({name: '', type:''});
@@ -73,6 +74,9 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts, check }) => {
   const [scheduleRef, setScheduleRef] = useState();
   const [monthNumber, setMonthNumber] = useState();
   const [sellersOrder, setSellersOrder] = useState();
+  const [view, setView] = useState(false);
+  const [type, setType] = useState({});
+  const [data, setData] = useState({});
 
   const schedulesCollectionRef = collection(
     dataBase,
@@ -105,7 +109,7 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts, check }) => {
   useEffect(() => {
     if(sellers) {
       setSellersOrder(sellers.sort((a,b) => {
-        if(a.nome< b.nome) return -1;
+        if(a.nome < b.nome) return -1;
         if(a.nome > b.nome) return 1;
         return 0;
       }))
@@ -126,21 +130,20 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts, check }) => {
     }
   }, [checked]);
 
-  // useEffect(() => {
-  //   if (schedule && monthSelect) {
-  //     setScheduleNew(
-  //       schedule.sort(function (a, b) {
-  //         // Força a renderizaram da tabela ordenada
-  //         if (a.data === b.data) {
-  //           if (a.saidaEmpresa < b.saidaEmpresa) return -1;
-  //           if (a.saidaEmpresa > b.saidaEmpresa) return 1;
-  //         }
-  //         return 0;
-  //       }));
-  //       // filterSchedule(schedule);
-  //     }
-  // // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [monthSelect, schedule, scheduleNew]);
+  useEffect(() => {
+    if (schedule && monthSelect) {
+      setSchedule(
+        schedule.sort((a, b) => {
+          // Força a renderizaram da tabela ordenada
+            if (moment(a.chegadaCliente) < moment(b.chegadaCliente)) return -1;
+            if (moment(a.chegadaCliente) > moment(b.chegadaCliente)) return 1;
+        
+          return 0;
+        }));
+        // filterSchedule(schedule);
+      }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [monthSelect, schedule]);
 
   // useEffect(
   //   () => {
@@ -329,7 +332,8 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts, check }) => {
                 ende: visit.endereco,
                 categoria: visit.categoria,
                 tipo: visit.tipo,
-                confirmar: visit.confirmar
+                confirmar: visit.confirmar,
+                extra: visit.preData
               })
               Swal.fire({
                 title: Company,
@@ -506,12 +510,26 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts, check }) => {
     }
   };
 
+  const closeBox = () => {
+    setView(false);
+  }
+
+  const openBox = (type) => {
+    setType(type);
+    setView(true);
+  }
+
   const changeBox = (type) => {
-    setBox(type);
+    if(type.ref === "conjunta") {
+      return createVisitGroupChoice(type)
+    } else {
+      setBox(type);
+    }
+    // setView(false);
+    // setType(type);
   };
 
   const createVisitGroupChoice = (ref) => {
-    // console.log(ref)
     Swal.fire({
       title: Company,
       html: `Você deseja criar a visita conjunta <b>antes</b> ou <b>depois</b> da visita escolhida? </br></br>
@@ -556,11 +574,13 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts, check }) => {
                 info: ref.visit,
                 typeRef: 'pos_venda',
                 ref: doc(dataBase, "Agendas", year, monthSelect, ref.visit.id),
+                preData: ref.data
               });
               setBox({name: "group"});
               return handleBoxVisitRef();
             }, 400);
           } else {
+            console.log(data)
             setTimeout(() => {
               setCreateVisitGroup({
                 check: true,
@@ -568,6 +588,7 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts, check }) => {
                 info: ref.visit,
                 typeRef: ref.type,
                 ref: doc(dataBase, "Agendas", year, monthSelect, ref.visit.id),
+                preData: ref.data
               });
               setBox({name: "group"});
               return handleBoxVisitRef();
@@ -605,6 +626,7 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts, check }) => {
               info: ref.visit,
               typeRef: ref.type,
               ref: doc(dataBase, "Agendas", year, monthSelect, ref.visit.id),
+              preData: data
             });
             setBox({name: "group"});
             return handleBoxVisitRef();
@@ -803,8 +825,13 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts, check }) => {
     }
   }
 
+  const collectData = (data) => {
+    setData(data);
+  }
+
   return (
     <div className="container-schedule">
+      <Requirement type={type} view={view} collectData={collectData} openBox={openBox} changeBox={changeBox} closeBox={closeBox} />
       <Header user={user} userRef={userRef} alerts={alerts}></Header>
       <div className="title-schedule">
         <ScheduleIcon />
@@ -838,7 +865,7 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts, check }) => {
               (box.name === "create" && (
                 <CreateVisit
                   returnSchedule={returnSchedule}
-                  // filterSchedule={filterSchedule}
+                  preData={data}
                   scheduleRef={scheduleRef}
                   membersRef={members}
                   tecs={tecs}
@@ -888,7 +915,7 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts, check }) => {
                 (box.name === "group" && (
                   <CreateVisitGroup
                     returnSchedule={returnSchedule}
-                    // filterSchedule={filterSchedule}
+                    preData={data ? data : createVisitGroup.preData}
                     tecs={tecs}
                     sellers={sellers}
                     userRef={userRef}
@@ -914,7 +941,7 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts, check }) => {
                 <><div className="box-schedule-visit__add">
                       <button
                         onClick={() => {
-                          changeBox({ name: "create", type: "comercial" });
+                          openBox({ name: "create", type: "comercial" });
                           return handleBoxVisitRef();
                         } }
                       >
@@ -924,10 +951,9 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts, check }) => {
                     </div><div className="box-schedule-visit__add">
                         <button
                           onClick={() => {
-                            changeBox({ name: "create", type: "comercial_tecnica" });
+                            openBox({ name: "create", type: "comercial_tecnica" });
                             return handleBoxVisitRef();
-                          } }
-                        >
+                          } }>
                           <span className="visit-icon comercial_tec-fill"><PeopleIcon /></span>
                           <div className="visit-text"><p>Comercial + Tecnica</p></div>
                         </button>
@@ -1039,7 +1065,7 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts, check }) => {
                         <TableCell className="btn-add"
                         aria-label="Criar Visita Conjunta"
                         data-cooltipz-dir="right"
-                        onClick={() => createVisitGroupChoice({visit: visita, type: visita.categoria})}>
+                        onClick={() => openBox({visit: visita, type: visita.categoria, ref: 'conjunta'})}>
                         </TableCell>
                         }
                         {/* Para quem não é vendedor */}
@@ -1231,7 +1257,7 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts, check }) => {
                     <TableCell className="btn-add"
                     aria-label="Criar Visita Conjunta"
                     data-cooltipz-dir="right"
-                     onClick={() => createVisitGroupChoice({visit: visita, type: visita.categoria})}
+                     onClick={() => openBox({visit: visita, type: visita.categoria, ref: 'conjunta'})}
                     ></TableCell>
                     }
                     {!visita.confirmar && visita.categoria === 'pos_venda' && 

@@ -35,7 +35,7 @@ import useVisit from "../../../hooks/useVisit";
 import '../style.scss';
 
 const CreateVisitGroup = ({ returnSchedule, tecs, sellers, userRef, visitRef, 
-  scheduleRef, scheduleVisitRef, schedule, monthNumber, type, typeRef, checkNet}) => {
+  scheduleRef, scheduleVisitRef, schedule, monthNumber, type, typeRef, checkNet, preData}) => {
   const { user } = useAuth();
   // const chegadaFormatadaTec = useRef();
   // const saidaFormatadaTec = useRef();
@@ -77,8 +77,20 @@ const CreateVisitGroup = ({ returnSchedule, tecs, sellers, userRef, visitRef,
   const {
     register,
     handleSubmit,
-    reset
+    reset,
+    setValue
   } = useForm();
+
+  console.log(preData);
+
+  useEffect(() => {
+    const fethData = async () => {
+      setValue('cliente', preData.nome);
+    }
+    fethData();
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  },[setValue])
 
   const { isLoaded } = useLoadScript({
     id: "google-map-script",
@@ -370,6 +382,7 @@ const CreateVisitGroup = ({ returnSchedule, tecs, sellers, userRef, visitRef,
                  SaidaClienteRef2 = saidaCliente;
               }
               createVisit({
+                ...{preData},
                 dia: moment(dataTexto).format("YYYY MM DD"),
                 saidaEmpresa: saidaTexto,
                 chegadaCliente: horarioTexto,
@@ -415,6 +428,7 @@ const CreateVisitGroup = ({ returnSchedule, tecs, sellers, userRef, visitRef,
               } 
                 //====================================== DEPOIS
                 const visita = {
+                  ...{preData},
                   dia: moment(dataTexto).format("YYYY MM DD"),
                   saidaEmpresa: visitRef.tipo === "Almoço" ? visitRef.saidaDoCliente : saidaTexto,
                   chegadaCliente: horarioTexto,

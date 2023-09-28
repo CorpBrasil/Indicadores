@@ -11,9 +11,9 @@ import {
   useLoadScript,
 } from "@react-google-maps/api";
 import "moment/locale/pt-br";
+
 import { Company, KeyMaps } from "../../../data/Data";
 import useVisit from "../../../hooks/useVisit";
-import CurrencyInput from "react-currency-input-field";
 
 import RequestQuoteIcon from '@mui/icons-material/RequestQuote'; // Visita Comercial
 import PeopleIcon from '@mui/icons-material/People'; // Tecnica + Comercial
@@ -32,29 +32,12 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogTitle from '@mui/material/DialogTitle';
-import TextField from '@mui/material/TextField';
-import FormControl from '@mui/material/FormControl';
-import Button from "@mui/material/Button";
-import Select from '@mui/material/Select';
-import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
-import { theme } from '../../../data/theme';
-import { ThemeProvider } from "@mui/material";
-import Alert from '@mui/material/Alert';
-import AlertTitle from '@mui/material/AlertTitle';
-import Radio from '@mui/material/Radio';
-import RadioGroup from '@mui/material/RadioGroup';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import FormLabel from '@mui/material/FormLabel';
 
 import "../style.scss";
 
 const CreateVisit = ({
   returnSchedule,
+  preData,
   scheduleRef,
   tecs,
   sellers,
@@ -94,17 +77,10 @@ const CreateVisit = ({
   const [typeVisit] = useState(type); // Escolhe o tipo de visita
   const [driver, setDriver] = useState(); // Para escolher o motorista/tecnico de acordo com o tipo de visita
   const [libraries] = useState(["places"]);
-  const { register, handleSubmit } = useForm(); 
+  const { register, handleSubmit, setValue } = useForm(); 
   const [visitsFindCount, setVisitsFindCount] = useState();
   const [visitsFind, setVisitsFind] = useState();
   const { createVisit } = useVisit(checkNet, scheduleRef, returnSchedule); // Custom Hook para Criar Visitas
-  // eslint-disable-next-line no-unused-vars
-  const [view, setView] = useState(false);
-  const [consumo, setConsumo] = useState('');
-  const [prazo, setPrazo] = useState('');
-
-  
-  // console.log(schedule)
 
   useEffect(() => {
     if(tecnicoTexto !== 'Nenhum') {
@@ -157,16 +133,14 @@ const CreateVisit = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // useEffect(() => {
-  //   if(dataTexto) {
-  //     const visitsData = schedule.filter((visit) => visit.data === dataTexto);
-  //     if (visitsData && dataTexto.substring(8,10) !== "00") {
-  //       setVisits(visitsData);
-  //     }
-  //   } else {
-  //     setVisits(schedule);
-  //   }
-  // },[dataTexto, schedule])
+  useEffect(() => {
+    const fethData = async () => {
+      setValue('cliente', preData.nome);
+    }
+    fethData();
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  },[setValue])
 
   useEffect(() => {
     // let visitsType = schedule.filter((visit) => visit.tecnico === "Lucas" && visit.tecnico === "Luis");
@@ -378,6 +352,7 @@ const CreateVisit = ({
               })
             } else {
               const visita = {
+                ...{preData},
                 dia: moment(dataTexto).format("YYYY MM DD"),
                 saidaEmpresa: saidaTexto,
                 chegadaCliente: horarioTexto,
@@ -406,7 +381,6 @@ const CreateVisit = ({
                 corTec: tecRefUID.cor,
                 createVisit: new Date() 
               };
-                  //createVisitDay(visita);
                   createVisit(visita)
             }
           } else return null
@@ -510,11 +484,6 @@ const CreateVisit = ({
   //     console.error('SEM CONEXÃO', e)
   //   }
   // }
-
-  const handleOnValueChange = (value) => {
-    setRawValue(value === undefined ? "undefined" : value || " ");
-    setConsumo(value);
-  };
 
   const verifyLunch = () => {
     const lunchDay = schedule.find((lunch) => lunch.data === dataTexto && lunch.categoria === "lunch" && lunch.tecnico === tecnicoTexto)
@@ -691,13 +660,13 @@ const CreateVisit = ({
                     <TableCell sx={{ width: 30 }} className="btn-add"
                         aria-label="Criar Visita Conjunta"
                         data-cooltipz-dir="right"
-                        onClick={() => createVisitGroupChoice({ visit: visita, type: type })}
+                        onClick={() => createVisitGroupChoice({ visit: visita, type: type, data:preData })}
                       ></TableCell>}
                     {visita.categoria === 'pos_venda' && userRef && userRef.nome === 'Pós-Venda' && type !== 'lunch' &&
                     <TableCell sx={{ width: 30 }} className="btn-add"
                         aria-label="Criar Visita Conjunta"
                         data-cooltipz-dir="right"
-                        onClick={() => createVisitGroupChoice({ visit: visita, type: type })}
+                        onClick={() => createVisitGroupChoice({ visit: visita, type: type, data:preData })}
                       ></TableCell>}
                     {(visita.categoria === 'lunch' || visita.categoria === 'pos_venda') &&
                      userRef && visita.confirmar && (userRef.cargo === 'Vendedor(a)' || userRef.cargo === 'Administrador') &&
@@ -857,99 +826,6 @@ const CreateVisit = ({
           <input className="box-visit__btn" type="submit" value="CRIAR" />
         </form>
       </div>
-      
-      <Dialog
-              open={view}
-              fullWidth={true}
-              maxWidth='sm'
-              size
-              // onClose={() => close()}
-            >
-                <DialogTitle align='center'>
-                  Confirmação de Agendamento
-                </DialogTitle>
-                <DialogContent>
-                  {/* <DialogContentText sx={{ textAlign: 'center' }}>
-                    Preencha os campos abaixo para agendar a <b>Visita</b>
-                  </DialogContentText> */}
-                    <Alert severity="info" sx={{ marginTop: '1rem' }}>
-                    <AlertTitle>Atenção</AlertTitle>
-                    Preencha todos os campos abaixo para agendar a <b>Visita</b>
-                    </Alert>
-                  <div style={{ margin: '1rem' }}>
-                  <ThemeProvider theme={theme} >
-                  <FormControl sx={{ margin: '0.3rem 0' }} fullWidth>
-                  <FormLabel id="radio-buttons-group-label">O Lead é potencial?</FormLabel>
-                  <RadioGroup
-                      row
-                      aria-labelledby="radio-buttons-group-label"
-                      defaultValue="Sim"
-                      name="radio-buttons-group"
-                    >
-                      <FormControlLabel value="Sim" control={<Radio />} label="Sim" />
-                      <FormControlLabel value="Não" control={<Radio />} label="Não" />
-                    </RadioGroup>
-                  </FormControl>
-                    <CurrencyInput
-                      customInput={TextField}
-                      style={{ margin: '0.7rem 0rem 0.3rem 0' }}
-                      className="label__text"
-                      label="Consumo do Lead"
-                      placeholder="R$ 00"
-                      intlConfig={{ locale: "pt-BR", currency: "BRL" }}
-                      onValueChange={handleOnValueChange}
-                      decimalsLimit={2}
-                      value={consumo || ''}
-                      required
-                      fullWidth
-                      />
-                    <FormControl sx={{ margin: '0.3rem 0' }} fullWidth>
-                    <InputLabel id="simple-select-label">Prazo de Instalação</InputLabel>
-                    <Select
-                      labelId="simple-select-label"
-                      id="simple-select"
-                      value={prazo ?? null}
-                      label="Prazo de Instalação"
-                      onChange={(e) => setPrazo(e.target.value)}
-                      required
-                    >
-                      <MenuItem value="Urgente">Urgente</MenuItem>
-                      <MenuItem value="1 Mês">Até 1 Mês</MenuItem>
-                      <MenuItem value="3 Meses">Até 3 meses</MenuItem>
-                      <MenuItem value="6 Meses">Até 6 meses</MenuItem>
-                      <MenuItem value="12 Meses">Até 12 meses</MenuItem>
-                    </Select>
-                  </FormControl>
-                  <FormControl sx={{ margin: '0.3rem 0' }} fullWidth>
-                    <InputLabel id="simple-select-label2">Padrão de Entrada</InputLabel>
-                    <Select
-                      labelId="simple-select-label2"
-                      id="simple-select"
-                      value={prazo ?? null}
-                      label="Padrão de Entrada"
-                      onChange={(e) => setPrazo(e.target.value)}
-                      required
-                    >
-                      <MenuItem value="Ana">Monofásico</MenuItem>
-                      <MenuItem value="Bruna">Bifásico</MenuItem>
-                      <MenuItem value="Lia">Trifásico</MenuItem>
-                    </Select>
-                  </FormControl>
-                  </ThemeProvider>
-                  </div>
-                </DialogContent>
-                <ThemeProvider theme={theme} >
-                <DialogActions>
-                  <Button>
-                  Confirmar
-                </Button>
-                  <Button>
-                    Cancelar
-                  </Button>
-                </DialogActions>
-                </ThemeProvider>
-              </Dialog>
-
       {isLoaded && check === true ? (
         <GoogleMap zoom={10} center={{lat: -23.109731, lng: -47.715045}}>
           <DistanceMatrixService

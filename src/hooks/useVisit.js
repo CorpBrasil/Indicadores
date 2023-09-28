@@ -66,7 +66,8 @@ function useVisit(checkNet, scheduleRef, returnSchedule) {
                 mes: moment(data.data).format("M"),
                 ende: data.endereco,
                 confirmada: 'Não',
-                categoria: data.categoria
+                categoria: data.categoria,
+                extra: data.preData
               })
             }
             );
