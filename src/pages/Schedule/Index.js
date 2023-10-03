@@ -203,41 +203,6 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts, check }) => {
     }
   }
 
-  // const showAddress = (visit) => {
-  //   if(visit) {
-  //     Swal.fire({
-  //       title: Company,
-  //       html: `Endereço: </br>` + 
-  //       `<b>${visit}</b>`,
-  //       showCloseButton: true,
-  //       confirmButtonColor: "#F39200",
-  //       confirmButtonText: "Copiar Endereço",
-  //     }).then((result) => {
-  //       if(result.isConfirmed) {
-  //         Swal.fire({
-  //           title: Company,
-  //           html: `<b>Endereço</b> copiado com sucesso.`,
-  //           icon: "success",
-  //           showConfirmButton: true,
-  //           showCloseButton: true,
-  //           confirmButtonColor: "#F39200",
-  //         });
-  //         navigator.clipboard.writeText(visit) // Copia o texto 'visit'
-  //       }
-  //     })
-  //   }
-  // }
-
-  // const filterSchedule = (data, tec) => {
-  //   if (data) {
-  //     setDayVisits(
-  //       schedule.filter((dia) => dia.consultora === 'Bruna')
-  //     );
-  //   } else {
-  //     setDayVisits(undefined);
-  //   }
-  // };
-
   const visitsFind = (type, visit) => {
     if (type === "antes")
       return schedule.filter(

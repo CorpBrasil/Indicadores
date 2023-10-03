@@ -39,7 +39,7 @@ const Requirement = ({ type, view, collectData, openBox, changeBox, closeBox }) 
   const onSubmit = (e) => {
     e.preventDefault();
     closeBox()
-    if(confirm === "Não" || confirm2 === 'Não' || confirm4 === 'Não') {
+    if(confirm === "Não" || confirm2 === 'Não') {
       return Swal.fire({
         title: 'Visita Não Qualificada',
         html: `A visita não pode ser criada pois a visita não é <b>Qualificada</b>`,
