@@ -86,16 +86,6 @@ const CreateActivity = ({
     // console.log(data);
     // console.log(moment(day).format('DD MMM YYYY - HH:mm'))
     try {
-      if(data.email.length < 1) {
-        return Swal.fire({
-          title: 'O lead não possui email',
-          html: `Para envio automático do <b>Email de Apresentação</b>, é necessário que o lead tenha um email registrado em seu perfil.`,
-          icon: "warning",
-          showCloseButton: true,
-          confirmButtonColor: "#F39200",
-          confirmButtonText: "Ok",
-        })
-      }
       Swal.fire({
         title: Company,
         html: `Você deseja registrar a <b>Atividade?</b>`,
