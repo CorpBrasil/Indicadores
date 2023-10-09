@@ -6,7 +6,7 @@ import { useParams } from "react-router-dom";
 import { dataBase } from "../../firebase/database";
 import Header from "../../components/Header/Index";
 import useAuth from "../../hooks/useAuth";
-import Dashboard from "../../components/Dashboard/Index";
+import Dashboard from "../../components/Dashboard/Visit_and_Prospection/Index";
 import Filter from "../../components/Filter/Index";
 import Requirement from "../../components/Box/Requirement/Index";
 
@@ -45,7 +45,7 @@ import {
 
 import "cooltipz-css";
 import "./_style.scss";
-import "../../components/Dashboard/_styles.scss";
+import "../../components/Dashboard/Visit_and_Prospection/_styles.scss";
 
 import EditVisit from "../../components/Box/Edit/Index";
 import CreateVisit from "../../components/Box/Create/Index";

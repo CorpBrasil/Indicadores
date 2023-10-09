@@ -3,16 +3,16 @@ import { useState, useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import moment from 'moment';
 
-import { ReactComponent as ScheduleIcon2 } from "../../images/icons/Schedule2.svg";
-import { ReactComponent as CheckIcon } from "../../images/icons/Check.svg";
-import { ReactComponent as BlockIcon } from "../../images/icons/Block.svg";
-import { ReactComponent as ProspectionIcon } from '../../images/icons/Prospection.svg';
+import { ReactComponent as ScheduleIcon2 } from "../../../images/icons/Schedule2.svg";
+import { ReactComponent as CheckIcon } from "../../../images/icons/Check.svg";
+import { ReactComponent as BlockIcon } from "../../../images/icons/Block.svg";
+import { ReactComponent as ProspectionIcon } from '../../../images/icons/Prospection.svg';
 import RequestQuoteIcon from '@mui/icons-material/RequestQuote'; // Visita Comercial
 import PeopleIcon from '@mui/icons-material/People'; // Tecnica + Comercial
 import EngineeringIcon from '@mui/icons-material/Engineering'; // Pós Venda
-import { ReactComponent as Email } from '../../images/icons/Mail.svg';
-import { ReactComponent as Phone } from '../../images/icons/Phone.svg';
-import { ReactComponent as WhatsApp } from '../../images/icons/WhatsApp.svg';
+import { ReactComponent as Email } from '../../../images/icons/Mail.svg';
+import { ReactComponent as Phone } from '../../../images/icons/Phone.svg';
+import { ReactComponent as WhatsApp } from '../../../images/icons/WhatsApp.svg';
 
 const Dashboard = ({ schedule, monthSelect, type, total }) => {
   const [dataChart, setdataChart] = useState();

@@ -32,6 +32,7 @@ import PeopleIcon from '@mui/icons-material/People';
 import LocalGasStationIcon from '@mui/icons-material/LocalGasStation';
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
 import { ReactComponent as Prospection } from '../../images/icons/Prospection.svg';
+// import { ReactComponent as Management } from '../../images/icons/Management.svg';
 import CachedIcon from '@mui/icons-material/Cached';
 
 
@@ -326,23 +327,36 @@ const Schedules = ({ userRef, alerts, check }) => {
           ))}
        </div>}
        {userRef && (user.email === Users[0].email || user.email === Users[1].email || userRef.cargo === "Técnico" || userRef.cargo === "Administrador") &&
-        <div className='box-schedule'>
-            {financeSchedules && financeSchedules.map((schedule, index) => (
-              <li key={index} className='schedule'>
-                {/* {userRef && (user.email === Users[0].email || userRef.cargo === "Administrador") &&
-                  <div className='schedule__button'>
-                    <button onClick={() => deleteSchedule(schedule.id)}></button>
-                  </div>} */}
-                <div className='schedule__content' onClick={() => goToSchedule('/financeiro/', schedule.id)}>
-                  <div className='schedule__icon finance'><CalendarMonthIcon /></div>
-                  <div className='schedule__text'>
-                    <p>Agenda Financeiro</p>
-                    <p>{schedule.id}</p>
+        <><div className='box-schedule'>
+              {financeSchedules && financeSchedules.map((schedule, index) => (
+                <li key={index} className='schedule'>
+                  {/* {userRef && (user.email === Users[0].email || userRef.cargo === "Administrador") &&
+              <div className='schedule__button'>
+                <button onClick={() => deleteSchedule(schedule.id)}></button>
+              </div>} */}
+                  <div className='schedule__content' onClick={() => goToSchedule('/financeiro/', schedule.id)}>
+                    <div className='schedule__icon finance'><CalendarMonthIcon /></div>
+                    <div className='schedule__text'>
+                      <p>Agenda Financeiro</p>
+                      <p>{schedule.id}</p>
+                    </div>
                   </div>
-                </div>
-              </li>
-            ))}
-          </div>
+                </li>
+              ))}
+            </div>
+            {/* {userRef && (user.email === Users[0].email || userRef.cargo === "Vendedor(a)" || userRef.cargo === "Administrador") && userRef.nome !== 'Pós-Venda' &&
+         <div className='box-schedule'>
+           <li className='schedule'>
+             <Link className='schedule__content' to="/gestao-comercial">
+               <div className='schedule__icon management'><Management /></div>
+               <div className='schedule__text'>
+                 <p>Gestão Comercial</p>
+               </div>
+               </Link>
+           </li>
+             </div>
+        } */}
+        </>
           }
         </div>
         <div className='buttons-content'>

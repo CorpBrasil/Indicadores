@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import { dataBase } from "../../firebase/database";
 import Header from "../../components/Header/Index";
 import useAuth from "../../hooks/useAuth";
-import Dashboard from "../../components/Dashboard/Index";
+import Dashboard from "../../components/Dashboard/Visit_and_Prospection/Index";
 import Filter from "../../components/Filter/Index";
 
 import Table from '@mui/material/Table';
@@ -29,7 +29,7 @@ import {
 } from "firebase/firestore";
 
 import "../Schedule/_style.scss";
-import "../../components/Dashboard/_styles.scss";
+import "../../components/Dashboard/Visit_and_Prospection/_styles.scss";
 
 const Finance = ({ userRef, alerts, sellers }) => {
   const data = new Date();

@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { useState, useEffect, memo } from "react";
 import { dataBase } from "../../firebase/database";
 import Header from "../../components/Header/Index";
@@ -13,18 +14,16 @@ import styles from "./style.module.scss";
 import '../../styles/_filter.scss';
 import '@wojtekmaj/react-daterange-picker/dist/DateRangePicker.css';
 import 'react-calendar/dist/Calendar.css';
-import "../../components/Dashboard/Visit_and_Prospection/_styles.scss";
 import { theme } from "../../data/theme"
+import DateRangePicker from '@wojtekmaj/react-daterange-picker';
 
 // Components
-import CreateProspection from "../../components/Box/CreateProspection/Index";
 import EditProspection from "../../components/Box/EditProspection/Index";
 import CreateActivity from "../../components/Box/CreateActivity/Index";
-import Filter from "../../components/Filter/Index";
-import Dashboard from "../../components/Dashboard/Visit_and_Prospection/Index";
-import ImportLeads from "../../components/Prospection/ImportLeads";
+import Dashboard from "../../components/Dashboard/Management/Index";
 
-import { ReactComponent as ProspectionIcon } from '../../images/icons/Prospection.svg';
+import { ReactComponent as ManagementIcon} from '../../images/icons/Management.svg';
+import { ReactComponent as Report} from '../../images/icons/Report.svg';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import BlockIcon from '@mui/icons-material/Block';
 import HowToRegIcon from '@mui/icons-material/HowToReg';
@@ -39,9 +38,6 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import FormControl from '@mui/material/FormControl';
-import DeleteIcon from '@mui/icons-material/Delete';
-import PersonAddAltIcon from '@mui/icons-material/PersonAddAlt';
-// import DeleteIcon from '@mui/icons-material/Delete';
 
 import IconButton from '@mui/material/IconButton';
 import Table from '@mui/material/Table';
@@ -62,10 +58,11 @@ import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 
 
-const Prospection = ({ user, leads, activity, userRef, listLeads, members, sellers }) => {
+const Commercial = ({ user, leads, activity, userRef, members, sellers}) => {
   const [anotacao, setAnotacao] = useState('');
   const [anotacaoBox, setAnotacaoBox] = useState(false);
   const [view, setView] = useState(false);
+  const [dateValue, setDateValue] = useState('');
   const [openDialog, setOpenDialog] = useState(false);
   const [viewEdit, setViewEdit] = useState(false);
   const [open, setOpen] = useState(false);
@@ -78,6 +75,10 @@ const Prospection = ({ user, leads, activity, userRef, listLeads, members, selle
   const [TabsValue, setTabsValue] = useState(0);
   const [activityAll, setActivityAll] = useState();
   const [viewImport, setViewImport] = useState(false);
+  const [consultora, setConsultora] = useState('Geral');
+  const [visits, setVisits] = useState(null);
+  const [visitsAll, setVisitsAll] = useState(undefined);
+  // const meses = ['01','02','03','04','05','06','07','08','09','10','11'];
 
 
   useEffect(() => {
@@ -93,13 +94,46 @@ const Prospection = ({ user, leads, activity, userRef, listLeads, members, selle
     [sellers]
   );
 
-  const changeFilter = (data) => {
-    setLeadsUser(data);
-  }
+  // useEffect(
+  //   () => {
+  //     const fetchData = async () => {
+  //       let items = [];
+  //       meses.map(async (mes) => {
+  //         onSnapshot(await query(collection(dataBase,"Agendas","2023", mes)), (visit) => {
+  //           // Atualiza os dados em tempo real
+  //           items.push(visit.docs.map((doc) => ({ ...doc.data(), id: doc.id }))) 
+  //         });
+  //         console.log(items)
+  //         setVisits(items);
+  //       })
+
+
+  //     };
+  //     fetchData();
+  //   },
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  //   []
+  // );
+
+  // useEffect(() => {
+  //   if(visits) {
+  //     setVisitsAll(visits.reduce((accumulator, currentArray) => {
+  //       return [...accumulator, ...currentArray];
+  //   },[]))
+  //   }
+  // },
+  //   [visits] );
+
+  console.log(visits);
+
+  // const changeFilter = (data) => {
+  //   setLeadsUser(data);
+  // }
   
-  const returnPage = () => {
-    setView(false);
-  };
+  // const returnPage = () => {
+  //   setView(false);
+  // };
+
 
   const changeLoading = (data) => {
     setLoading(data);
@@ -395,7 +429,6 @@ const closeAnotacaoBox = () => {
 
     }
   }
-  
 
   return (
     <div className={styles.container_panel}>
@@ -406,114 +439,45 @@ const closeAnotacaoBox = () => {
         }
       <Header user={user} userRef={userRef}></Header>
       <div className={styles.title_panel}>
-        <ProspectionIcon className={styles.prospecction_icon}/>
-        <h2>Prospecção</h2>
-          <Dashboard schedule={activity} type={'prospeccao'} />
+        <ManagementIcon className={styles.prospecction_icon}/>
+        <h2>Gestão Comercial</h2>
+        <div className={styles.box_panel_add}>
+        <div className={styles.sellers}>
+              <select
+                // value={monthSelect}
+                className={styles.sellers_select}
+                name="month"
+                onChange={(e) => setConsultora(e.target.value)}
+              >
+                <option value="Geral">Geral</option>
+                <option value="Ana">Ana</option>
+                <option value="Bruna">Bruna</option>
+                <option value="Lia">Lia</option>
+                <option value="Leticia">Leticia</option>
+              </select>
+            </div>
+            <DateRangePicker 
+            className={styles.date_range}
+            onChange={(value) => setDateValue(value)} 
+            value={dateValue ? dateValue : [new Date(), new Date()]}/>
+        </div>
+        <div className={styles.box_panel_add}>
+            <button className={styles.box_panel_activity} onClick={() => setView(true)}>
+                <Report className={styles.report_icon} />
+                <p>Criar Relátorio</p>
+              </button>
+          </div>
+          <Dashboard dataBase={dataBase} activity={activity} dateValue={dateValue} leads={leads} />
       </div>
       <div className={styles.content_panel}>
-        {userRef && userRef.cargo === "Administrador" && 
-          <div className={styles.content_list}>
-            <h2>Histórico de Importação de Leads</h2>
-            <TableContainer className={styles.table_center} component={Paper}>
-              <Table stickyHeader aria-label="sticky table">
-                <TableHead>
-                  <TableRow>
-                    <TableCell align="center">Status</TableCell>
-                    <TableCell align="center">Data de Criação</TableCell>
-                    <TableCell align="center">Nome</TableCell>
-                    <TableCell align="center">Leads</TableCell>
-                    <TableCell align="center">Responsável</TableCell>
-                    <TableCell align="center">Consultora</TableCell>
-                    <TableCell align="center">Ação</TableCell>
-                  </TableRow>
-                </TableHead>
-                {listLeads && listLeads.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((data, index) => (
-                <TableBody>
-                  <TableRow
-                    key={index}
-                    hover
-                    className={`list-visit`}
-                    sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-                    {data.status === 'Ativo' &&
-                      <TableCell align="center" className={styles.ativo}>{data.status}</TableCell>
-                    }
-                    {data.status === 'Excluido' &&
-                      <TableCell align="center" aria-label={data.dataStatus && data.dataStatus.replace('-','às')}
-                      data-cooltipz-dir="right" className={styles.perdido}>{data.status}</TableCell>
-                    }
-                    <TableCell align="center">{data.data.replace('-', 'às')}</TableCell>
-                    <TableCell align="center"><b>{data.nome}</b></TableCell>
-                    <TableCell align="center">{data.leads}</TableCell>
-                    <TableCell align="center">{data.responsavel}</TableCell>
-                    <TableCell align="center">{data.consultora}</TableCell>
-                    <TableCell align="center" sx={{ width: '50px' }}>
-                      {data.status === 'Excluido' && 
-                      <IconButton
-                        aria-label="Excluir Lista"
-                        data-cooltipz-dir="left"
-                        size="small"
-                        disabled>
-                        <DeleteIcon />
-                      </IconButton>}
-                      {userRef && userRef.email === 'admin@corpbrasil.com' ?
-                      <IconButton
-                      aria-label="Excluir Lista"
-                      data-cooltipz-dir="left"
-                      size="small"
-                      onClick={() => deleteList(data)}>
-                      <DeleteIcon sx={{ fill: 'red' }} />
-                    </IconButton>: 
-                    <IconButton
-                    aria-label="Excluir Lista"
-                    data-cooltipz-dir="left"
-                    size="small"
-                    disabled>
-                    <DeleteIcon />
-                    </IconButton>}
-                    </TableCell>
-                  </TableRow>
-              </TableBody>
-                ))}
-              </Table>
-              <TablePagination
-              rowsPerPageOptions={[5, 10, 20]}
-              labelRowsPerPage="Lista por página"
-              component="div"
-              count={listLeads ? listLeads.length : 0}
-              rowsPerPage={rowsPerPage}
-              page={page2}
-              onPageChange={handleChangePage}
-              onRowsPerPageChange={handleChangeRowsPerPage}
-              />
-            </TableContainer>
-          </div>
-        }
         <div className={styles.box_panel}>
-            <h2>Leads</h2>
-          <div className={styles.box_panel_add}>
-            {!view && !view ? 
-            <><button className={styles.box_panel_add_activity} onClick={() => setView(true)}>
-                <ProspectionIcon className={styles.prospecction_icon} />
-                <p>Cadastrar Lead</p>
-              </button>
-              {userRef && userRef.cargo === "Administrador" && 
-              <><button className={styles.box_panel_add_activity} onClick={() => setViewImport(true)}>
-                    <PersonAddAltIcon className={styles.prospecction_icon} />
-                    <p>Importar Leads</p>
-                  </button><ImportLeads members={members} company={Company} dataBase={dataBase} view={viewImport}
-                    open={openImport} close={closeImport} userRef={userRef} changeLoading={changeLoading} /></>
-                }
-                </> :
-            <CreateProspection userRef={userRef} returnPage={returnPage} changeLoading={changeLoading} />
-          }
-          </div>
-            <Filter tableData={leadsUser} 
+            {/* <Filter tableData={leadsUser} 
             dataFull={leads} 
             sellers={sellersOrder} 
             userRef={userRef} 
             changeFilter={changeFilter}
             type={'prospeccao'}
-            />
+            /> */}
           <div className={styles.box_activity}>
           <TableContainer className={styles.table_center} component={Paper}>
             <Table stickyHeader aria-label="sticky table">
@@ -743,4 +707,4 @@ const closeAnotacaoBox = () => {
   );
 };
 
-export default memo(Prospection);
+export default memo(Commercial);
