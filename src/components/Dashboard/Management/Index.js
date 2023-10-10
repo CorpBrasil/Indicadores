@@ -1,6 +1,6 @@
 import React from 'react'
-import { useState, useEffect, memo } from 'react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { useState, useEffect, memo} from 'react';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LabelList } from 'recharts';
 import { collection, query, onSnapshot } from "firebase/firestore";
 import moment from 'moment';
 import axios from 'axios';
@@ -16,8 +16,9 @@ import { ReactComponent as Trophy } from '../../../images/icons/Trophy.svg';
 import PersonAddDisabledOutlinedIcon from '@mui/icons-material/PersonAddDisabledOutlined';
 import HowToRegOutlinedIcon from '@mui/icons-material/HowToRegOutlined';
 
-const Dashboard = ({dataBase, dateValue, activity, leads}) => {
-  // const [dataChart, setdataChart] = useState();
+const Dashboard = ({dataBase, dateValue, activity, leads, consultora}) => {
+  const [dataChart, setdataChart] = useState();
+  const [dataChart2, setdataChart2] = useState();
   const [data1, setData1] = useState();
   const [data2, setData2] = useState();
   const [data3, setData3] = useState();
@@ -31,55 +32,11 @@ const Dashboard = ({dataBase, dateValue, activity, leads}) => {
   const [allLeads, setAllLeads] = useState();
   const [leadsSheets, setLeadsSheets] = useState();
   const [leadsSheetsRef, setLeadsSheetsRef] = useState();
+  const [vendasSheets, setVendasSheets] = useState();
+  const [vendasSheetsRef, setVendasSheetsRef] = useState();
   // const [loading, setLoading] = useState(true);
   const meses = ['01','02','03','04','05','06','07','08','09','10','11'];
-
-  console.log(leads)
-
-  const data = [
-    {
-      name: 'Page A',
-      uv: 4000,
-      pv: 2400,
-      amt: 2400,
-    },
-    {
-      name: 'Page B',
-      uv: 3000,
-      pv: 1398,
-      amt: 2210,
-    },
-    {
-      name: 'Page C',
-      uv: 2000,
-      pv: 9800,
-      amt: 2290,
-    },
-    {
-      name: 'Page D',
-      uv: 2780,
-      pv: 3908,
-      amt: 2000,
-    },
-    {
-      name: 'Page E',
-      uv: 1890,
-      pv: 4800,
-      amt: 2181,
-    },
-    {
-      name: 'Page F',
-      uv: 2390,
-      pv: 3800,
-      amt: 2500,
-    },
-    {
-      name: 'Page G',
-      uv: 3490,
-      pv: 4300,
-      amt: 2100,
-    },
-  ];
+  
 
   useEffect(() => {
     const fetchData = async () => {
@@ -104,7 +61,30 @@ const Dashboard = ({dataBase, dateValue, activity, leads}) => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   []);
 
-  console.log(leadsSheets)
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        await axios.get('https://script.google.com/macros/s/AKfycbyWrl_taZ0cqe8PG5NxLVPljlCNZZH62U6dAe09DRc5wQtwwOW16k7jtGZ-jb28CJjc/exec')
+        .then((result) => {
+          let sheets = [];
+          result.data.GoogleSheetData.forEach((data) => {
+            if(data[0] !== 'Data') {
+              // const newData = Object.assign({}, data);
+              sheets.push(data)
+            }
+          })
+          setVendasSheets(sheets.length);
+          setVendasSheetsRef(sheets);
+        })
+      } catch {
+      }
+    }
+    fetchData();
+},
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  []);
+
+  // console.log(vendasSheetsRef)
 
   useEffect(() => {
       const fetchData = async () => {
@@ -130,15 +110,7 @@ const Dashboard = ({dataBase, dateValue, activity, leads}) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []);
 
-//   useEffect(() => {
-//     if(visitasAll) {
-//       setVisitas(visitasAll);
-// }
-//   },[visitas])
-
-
-
-  console.log(visitas);
+  // console.log(visitas);
 
   useEffect(() => {
     if (visitas) {
@@ -148,26 +120,53 @@ const Dashboard = ({dataBase, dateValue, activity, leads}) => {
   }, [visitas]);
 
   useEffect(() => {
-    if (dateValue) {
-          const data1 = moment(dateValue[0]).format('YYYY-MM-DD');
-          const data2 = moment(dateValue[1]).format('YYYY-MM-DD');
-          setVisitas(visitasAll && visitasAll.filter((item) => (moment(data1).isSameOrBefore(moment(item.data).format('YYYY-MM-DD')) && moment(data2).isSameOrAfter(moment(item.data).format('YYYY-MM-DD')))))
-          setAtividades(activity && activity.filter((item) => (moment(data1).isSameOrBefore(moment(item.createAt.seconds*1000).format('YYYY-MM-DD')) && moment(data2).isSameOrAfter(moment(item.createAt.seconds*1000).format('YYYY-MM-DD')))))
-          setAllLeads(leads && leads.filter((item) => (moment(data1).isSameOrBefore(moment.unix(item.createAt.seconds).format('YYYY-MM-DD')) && moment(data2).isSameOrAfter(moment.unix(item.createAt.seconds).format('YYYY-MM-DD')))))
-          setLeadsSheets(leadsSheetsRef && leadsSheetsRef.filter((item) => (moment(data1).isSameOrBefore(moment(item[0]).format('YYYY-MM-DD')) && moment(data2).isSameOrAfter(moment(item[0]).format('YYYY-MM-DD')))).length)
-        } else {
-        setVisitas(visitasAll);
-        setAtividades(activity);
-        setData1(activity ? activity.filter((vis) => vis.atividade === 'Email').length : 0);
-        setData2(activity ? activity.filter((vis) => vis.atividade === 'Ligação').length : 0);
-        setData3(activity ? activity.filter((vis) => vis.atividade === 'WhatsApp').length : 0);
-        setGanho(leads ? leads.filter((vis) => vis.status === 'Ganho').length : 0);
-        setPerdido(leads ? leads.filter((vis) => vis.status === 'Perdido').length : 0);
-        setAllLeads(leads);
-        setLeadsSheets(leadsSheetsRef && leadsSheetsRef.length);
-      }
+    if(consultora === 'Geral') {
+      if (dateValue) {
+            const data1 = moment(dateValue[0]).format('YYYY-MM-DD');
+            const data2 = moment(dateValue[1]).format('YYYY-MM-DD');
+            setVisitas(visitasAll && visitasAll.filter((item) => (moment(data1).isSameOrBefore(moment(item.data).format('YYYY-MM-DD')) && moment(data2).isSameOrAfter(moment(item.data).format('YYYY-MM-DD')))))
+            setAtividades(activity && activity.filter((item) => (moment(data1).isSameOrBefore(moment(item.createAt.seconds*1000).format('YYYY-MM-DD')) && moment(data2).isSameOrAfter(moment(item.createAt.seconds*1000).format('YYYY-MM-DD')))))
+            setAllLeads(leads && leads.filter((item) => (moment(data1).isSameOrBefore(moment.unix(item.createAt.seconds).format('YYYY-MM-DD')) && moment(data2).isSameOrAfter(moment.unix(item.createAt.seconds).format('YYYY-MM-DD')))))
+            setLeadsSheets(leadsSheetsRef && leadsSheetsRef.filter((item) => (moment(data1).isSameOrBefore(moment(item[0]).format('YYYY-MM-DD')) && moment(data2).isSameOrAfter(moment(item[0]).format('YYYY-MM-DD')))).length)
+            setVendasSheets(vendasSheetsRef && vendasSheetsRef.filter((item) => (moment(data1).isSameOrBefore(moment(item[0]).format('YYYY-MM-DD')) && moment(data2).isSameOrAfter(moment(item[0]).format('YYYY-MM-DD')))).length)
+          } else {
+          setVisitas(visitasAll);
+          setAtividades(activity);
+          setData1(activity ? activity.filter((vis) => vis.atividade === 'Email').length : 0);
+          setData2(activity ? activity.filter((vis) => vis.atividade === 'Ligação').length : 0);
+          setData3(activity ? activity.filter((vis) => vis.atividade === 'WhatsApp').length : 0);
+          setGanho(leads ? leads.filter((vis) => vis.status === 'Ganho').length : 0);
+          setPerdido(leads ? leads.filter((vis) => vis.status === 'Perdido').length : 0);
+          setAllLeads(leads);
+          setLeadsSheets(leadsSheetsRef && leadsSheetsRef.length);
+          setVendasSheets(vendasSheetsRef && vendasSheetsRef.length);
+        }
+    } else {
+      if (dateValue) {
+        const data1 = moment(dateValue[0]).format('YYYY-MM-DD');
+        const data2 = moment(dateValue[1]).format('YYYY-MM-DD');
+        setVisitas(visitasAll && visitasAll.filter((item) => (moment(data1).isSameOrBefore(moment(item.data).format('YYYY-MM-DD')) && moment(data2).isSameOrAfter(moment(item.data).format('YYYY-MM-DD')) && item.consultora === consultora )))
+        setAtividades(activity && activity.filter((item) => (moment(data1).isSameOrBefore(moment(item.createAt.seconds*1000).format('YYYY-MM-DD')) && moment(data2).isSameOrAfter(moment(item.createAt.seconds*1000).format('YYYY-MM-DD')) && item.consultora === consultora )))
+        setAllLeads(leads && leads.filter((item) => (moment(data1).isSameOrBefore(moment.unix(item.createAt.seconds).format('YYYY-MM-DD')) && moment(data2).isSameOrAfter(moment.unix(item.createAt.seconds).format('YYYY-MM-DD')) && item.consultora === consultora )))
+        setLeadsSheets(leadsSheetsRef && leadsSheetsRef.filter((item) => (moment(data1).isSameOrBefore(moment(item[0]).format('YYYY-MM-DD')) && moment(data2).isSameOrAfter(moment(item[0]).format('YYYY-MM-DD')) && item[9] === consultora)).length)
+        setVendasSheets(vendasSheetsRef && vendasSheetsRef.filter((item) => (moment(data1).isSameOrBefore(moment(item[0]).format('YYYY-MM-DD')) && moment(data2).isSameOrAfter(moment(item[0]).format('YYYY-MM-DD')) && item[7] === consultora)).length)
+      } else {
+      setVisitas(visitasAll);
+      setAtividades(activity);
+      setData1(activity ? activity.filter((vis) => vis.atividade === 'Email' && vis.consultora === consultora).length : 0);
+      setData2(activity ? activity.filter((vis) => vis.atividade === 'Ligação' && vis.consultora === consultora).length : 0);
+      setData3(activity ? activity.filter((vis) => vis.atividade === 'WhatsApp' && vis.consultora === consultora).length : 0);
+      setGanho(leads ? leads.filter((vis) => vis.status === 'Ganho' && vis.consultora === consultora).length : 0);
+      setPerdido(leads ? leads.filter((vis) => vis.status === 'Perdido' && vis.consultora === consultora).length : 0);
+      setAllLeads(leads);
+      setLeadsSheets(leadsSheetsRef && leadsSheetsRef.length);
+      setVendasSheets(vendasSheetsRef && vendasSheetsRef.length);
+    }
+    }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dateValue]);
+  }, [dateValue, consultora]);
+
+  // console.log(dataChart)
 
   useEffect(() => {
     if(atividades !== activity) {
@@ -180,70 +179,52 @@ const Dashboard = ({dataBase, dateValue, activity, leads}) => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   },[atividades, allLeads])
 
-  // console.log(leads && moment.unix(leads[0].createAt.seconds).format('YYYY-MM-DD'));
+  useEffect(() => {
+    if(visitas) {
+      let dataChartRef = [];
+      let dataChartRef2 = [];
+      let dia = [];
+        visitas && visitas.forEach((vis) => {
+          if(!dia.includes(vis.data)) {   
+            dia.push(vis.data)
+            dataChartRef.push({ name: moment(vis.data).format("DD/MM/YYYY"), Confirmada: visitas && visitas.filter((v) => v.data === vis.data && v.confirmar === true && v.categoria !== 'pos_venda').length,
+            Nao_Confirmada: visitas && visitas.filter((v) => v.data === vis.data && v.confirmar === false && v.categoria !== 'pos_venda').length})
+          }
+        })
+        dataChartRef2 = dataChartRef.sort((a,b) => {
+          if(a.name > b.name) {
+            return 1;
+          } else if(a.name < b.name) {
+            return -1;
+          } return 0;
+        })
+        setdataChart(dataChartRef2)
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  },[visitas])
 
-  // useEffect(() => {
-  //   if(schedule) {
-  //     if(type === 'prospeccao') {
-  //       setdataChart([
-  //         {
-  //           name: 'Ana',
-  //           Atividades: schedule.filter((con) => con.consultora === 'Ana').length,
-  //           fill: '#F28500'
-  //         },
-  //         {
-  //           name: 'Bruna',
-  //           Atividades: schedule.filter((con) => con.consultora === 'Bruna').length,
-  //           fill: '#44BF2B'
-  //         },
-  //         {
-  //           name: 'Lia',
-  //           Atividades: schedule.filter((con) => con.consultora === 'Lia').length,
-  //           fill: '#E892DD'
-  //         },
-  //         {
-  //           name: 'Fernanda',
-  //           Atividades: schedule.filter((con) => con.consultora === 'Fernanda').length,
-  //           fill: '#FFC107'
-  //         },
-  //         {
-  //           name: 'Leticia',
-  //           Atividades: schedule.filter((con) => con.consultora === 'Leticia').length,
-  //           fill: '#B901C6'
-  //         }
-  //       ])
-  //     } else {
-  //       setdataChart([
-  //         {
-  //           name: 'Ana',
-  //           Visitas: schedule.filter((con) => con.consultora === 'Ana').length,
-  //           fill: '#F28500'
-  //         },
-  //         {
-  //           name: 'Bruna',
-  //           Visitas: schedule.filter((con) => con.consultora === 'Bruna').length,
-  //           fill: '#44BF2B'
-  //         },
-  //         {
-  //           name: 'Lia',
-  //           Visitas: schedule.filter((con) => con.consultora === 'Lia').length,
-  //           fill: '#E892DD'
-  //         },
-  //         {
-  //           name: 'Fernanda',
-  //           Visitas: schedule.filter((con) => con.consultora === 'Fernanda').length,
-  //           fill: '#FFC107'
-  //         },
-  //         {
-  //           name: 'Leticia',
-  //           Visitas: schedule.filter((con) => con.consultora === 'Leticia').length,
-  //           fill: '#B901C6'
-  //         }
-  //       ])
-  //     }
-  //   }
-  // // eslint-disable-next-line react-hooks/exhaustive-deps
-  // },[schedule])
+  useEffect(() => {
+    if(atividades) {
+      let dataChartRef = [];
+      let dataChartRef2 = [];
+      let dia = [];
+        atividades && atividades.forEach((vis) => {
+          if(!dia.includes(moment(vis.createAt.seconds*1000).format('YYYY-MM-DD'))) {   
+            dia.push(moment(vis.createAt.seconds*1000).format('YYYY-MM-DD'))
+            dataChartRef.push({ name: moment(vis.createAt.seconds*1000).format('DD/MM/YYYY'), Atividades: atividades && atividades.filter((v) => moment(v.createAt.seconds*1000).format('YYYY-MM-DD') === moment(vis.createAt.seconds*1000).format('YYYY-MM-DD')).length})
+          }
+        })
+        dataChartRef2 = dataChartRef.sort((a,b) => {
+          if(a.name > b.name) {
+            return 1;
+          } else if(a.name < b.name) {
+            return -1;
+          } return 0;
+        })
+        setdataChart2(dataChartRef2)
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  },[visitas])
 
   return (
     <div className={styles.dashboard}>
@@ -275,12 +256,12 @@ const Dashboard = ({dataBase, dateValue, activity, leads}) => {
             </div> 
           </div>
           <div className="dashboard__box3">
-          <h2>Visitas x Leads</h2>
-          <ResponsiveContainer width="90%" height="80%">
+          <h2>Visitas</h2>
+          <ResponsiveContainer width="95%" height="80%">
           <LineChart
           width={500}
           height={300}
-          data={data}
+          data={dataChart}
           margin={{
             top: 5,
             right: 30,
@@ -290,11 +271,15 @@ const Dashboard = ({dataBase, dateValue, activity, leads}) => {
         >
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="name" />
-          <YAxis />
+          <YAxis type="number" domain={[-1, 'dataMax + 5']} allowDataOverflow={true}  />
           <Tooltip />
           <Legend />
-          <Line type="monotone" dataKey="pv" stroke="#8884d8" activeDot={{ r: 8 }} />
-          <Line type="monotone" dataKey="uv" stroke="#82ca9d" />
+          <Line type="basics" legendType='plainline' name='Confirmada' strokeWidth={2} dataKey="Confirmada" stroke="green" activeDot={{ r: 8 }}>
+            <LabelList dataKey="Confirmada" offset={8} position="top" />
+          </Line>
+          <Line type="basics" legendType='plainline' name='Não Confirmada' strokeWidth={2} dataKey="Nao_Confirmada" label="Não Confirmada" stroke="red" activeDot={{ r: 8 }} >
+            <LabelList dataKey="Nao_Confirmada" offset={8} position="top" />
+          </Line>
         </LineChart>
           </ResponsiveContainer>
         </div>
@@ -305,12 +290,12 @@ const Dashboard = ({dataBase, dateValue, activity, leads}) => {
                 <h2>Leads</h2>
               </div>
               <div>
-                <p><b>30</b> Trafégo/Meetime | <b>{ganho && ganho}</b> Prospecção</p>
+                <p><b>{leadsSheets && leadsSheets}</b> Trafégo/Meetime | <b>{ganho && ganho}</b> Prospecção</p>
               </div>
             </div>
             <div className={styles.dashboard__box4_item2}>
               <div>
-                <h1>10</h1>
+                <h1>{vendasSheets}</h1>
                 <h2>Vendas</h2>
                 <h3><b style={{ color: 'green' }}>100%</b> &nbsp;Alcançada</h3>
               </div>
@@ -333,12 +318,12 @@ const Dashboard = ({dataBase, dateValue, activity, leads}) => {
               <div className={styles.dashboard__box2_info_list}>
                 <div>
                     <HowToRegOutlinedIcon style={{ fill: 'green' }} />
-                    <h1>10 {ganho && ganho}</h1>
+                    <h1>{ganho ? ganho : 0}</h1>
                     <p>Leads Ganhos</p>
                   </div>
                   <div>
                     <PersonAddDisabledOutlinedIcon style={{ fill: 'red' }} />
-                    <h1>10 {perdido && perdido}</h1>
+                    <h1>{perdido ? perdido : 0}</h1>
                     <p>Leads Perdidos</p>
                   </div>
               </div>
@@ -355,7 +340,7 @@ const Dashboard = ({dataBase, dateValue, activity, leads}) => {
           <div className={styles.dashboard__box2}>
             <div className={styles.dashboard__box2_info}>
               <div className={styles.dashboard__box2_info_list}>
-                <h1>{atividades && atividades.length}</h1>
+                <h1>{atividades && atividades ? atividades.length : 0}</h1>
                 <h2>Atividades Realizadas</h2>
               </div>
               <ul className={styles.dashboard__box2_info_list}>
@@ -364,21 +349,21 @@ const Dashboard = ({dataBase, dateValue, activity, leads}) => {
                   <span style={{ backgroundColor: '#8a8a8a' }}><Email /></span>
                   <p>Email</p>
                 </div>
-              <h3>{data1}</h3>
+              <h3>{data1 ? data1 : 0}</h3>
               </li>
               <li className={styles.dashboard__box2_info_list_item}>
                 <div>
                   <span style={{ backgroundColor: '#576af5' }}><Phone /></span>
                   <p>Ligação</p>
                 </div>
-              <h3>{data2}</h3>
+              <h3>{data2 ? data2 : 0}</h3>
               </li>
               <li className={styles.dashboard__box2_info_list_item}>
                 <div>
                   <span style={{ backgroundColor: '#44bf2b' }}><WhatsApp /></span>
                   <p>WhatsApp</p>
                 </div>
-              <h3>{data3}</h3>
+              <h3>{data3 ? data3: 0}</h3>
               </li>
             </ul>
               <div className={styles.dashboard__box2_info_list}>
@@ -393,11 +378,11 @@ const Dashboard = ({dataBase, dateValue, activity, leads}) => {
           </div>
           <div className="dashboard__box3">
           <h2>Atividades</h2>
-          <ResponsiveContainer width="90%" height="80%">
+          <ResponsiveContainer width="95%" height="80%">
           <LineChart
           width={500}
           height={300}
-          data={data}
+          data={dataChart2}
           margin={{
             top: 5,
             right: 30,
@@ -407,11 +392,13 @@ const Dashboard = ({dataBase, dateValue, activity, leads}) => {
         >
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="name" />
-          <YAxis />
+          <YAxis type="number" domain={[-1, 'dataMax + 5']} allowDataOverflow={true} />
           <Tooltip />
           <Legend />
-          <Line type="monotone" dataKey="pv" stroke="#8884d8" activeDot={{ r: 8 }} />
-          <Line type="monotone" dataKey="uv" stroke="#82ca9d" />
+          <Line type="basics" legendType='plainline' dataKey="Atividades" dot={true} stroke="#8884d8" activeDot={{ r: 8 }}>
+          <LabelList dataKey="Atividades" position="top" offset={8} />
+          </Line>
+          {/* <ReferenceLine label="Meta" stroke="green" strokeDasharray="4 4" segment={[{ x: '02/10/2023', y: 0 }, { x: '10/10/2023', y: 400 }]} /> */}
         </LineChart>
           </ResponsiveContainer>
         </div>

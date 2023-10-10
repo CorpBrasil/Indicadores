@@ -114,6 +114,7 @@
     display: flex;
     justify-content: center;
     margin: 1rem;
+    gap: 1rem;
     align-items: center;
   }
 
@@ -135,6 +136,10 @@
       width: 2.5rem;
       height: 2.5rem;
     }
+
+    @media print {
+      display: none;
+    }
   }
 
   .content_panel {
@@ -144,6 +149,10 @@
     flex-direction: column;
     margin: auto;
     height: 100%;
+
+    @media print {
+      display: none;
+    }
 
     h2 {
       margin: 1rem 0;

@@ -25,6 +25,7 @@ import Dashboard from "../../components/Dashboard/Management/Index";
 import { ReactComponent as ManagementIcon} from '../../images/icons/Management.svg';
 import { ReactComponent as Report} from '../../images/icons/Report.svg';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import PrintIcon from '@mui/icons-material/Print';
 import BlockIcon from '@mui/icons-material/Block';
 import HowToRegIcon from '@mui/icons-material/HowToReg';
 import PersonOffIcon from '@mui/icons-material/PersonOff';
@@ -107,38 +108,27 @@ const Commercial = ({ user, leads, activity, userRef, members, sellers}) => {
     []
   );
 
-  // useEffect(() => {
-  //   if(visits) {
-  //     setVisitsAll(visits.reduce((accumulator, currentArray) => {
-  //       return [...accumulator, ...currentArray];
-  //   },[]))
-  //   }
-  // },
-  //   [visits] );
-
-  console.log(dateValue);
-
-  // const changeFilter = (data) => {
-  //   setLeadsUser(data);
-  // }
-  
-  // const returnPage = () => {
-  //   setView(false);
-  // };
-
-
   const changeLoading = (data) => {
     setLoading(data);
   };
 
+  // useEffect(() => {
+  //   if(userRef && userRef.cargo === 'Vendedor(a)') {
+  //     setLeadsUser(leads.filter((act) => act.uid === user.id))
+  //   } else if(userRef && userRef.cargo !== 'Vendedor(a)') {
+  //     setLeadsUser(leads);
+  //   }
+  // // eslint-disable-next-line react-hooks/exhaustive-deps
+  // },[leads,userRef])
+
   useEffect(() => {
-    if(userRef && userRef.cargo === 'Vendedor(a)') {
-      setLeadsUser(leads.filter((act) => act.uid === user.id))
-    } else if(userRef && userRef.cargo !== 'Vendedor(a)') {
+    if(consultora !== 'Geral') {
+      setLeadsUser(leads.filter((act) => act.consultora === consultora))
+    } else {
       setLeadsUser(leads);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  },[leads,userRef])
+  },[consultora])
 
 
   const handleToggle = (id) => {
@@ -458,18 +448,15 @@ const closeAnotacaoBox = () => {
                 <Report className={styles.report_icon} />
                 <p>Criar Relátorio</p>
               </button>
+            <button className={styles.box_panel_activity} onClick={() => window.print()}>
+                <PrintIcon/>
+                <p>Imprimir</p>
+              </button>
           </div>
-          <Dashboard dataBase={dataBase} activity={activity} dateValue={dateValue} leads={leads} />
+          <Dashboard dataBase={dataBase} activity={activity} dateValue={dateValue} leads={leads} consultora={consultora} />
       </div>
       <div className={styles.content_panel}>
         <div className={styles.box_panel}>
-            {/* <Filter tableData={leadsUser} 
-            dataFull={leads} 
-            sellers={sellersOrder} 
-            userRef={userRef} 
-            changeFilter={changeFilter}
-            type={'prospeccao'}
-            /> */}
           <div className={styles.box_activity}>
           <TableContainer className={styles.table_center} component={Paper}>
             <Table stickyHeader aria-label="sticky table">
