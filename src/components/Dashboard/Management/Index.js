@@ -1,5 +1,5 @@
 import React from 'react'
-import { useState, useEffect } from 'react';
+import { useState, useEffect, memo } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { collection, query, onSnapshot } from "firebase/firestore";
 import moment from 'moment';
@@ -84,9 +84,8 @@ const Dashboard = ({dataBase, dateValue, activity, leads}) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        axios.get('https://script.google.com/macros/s/AKfycbxad1yCWiFmL9Q2qXIMglIFbH-m9KafsaNoD9UVYrhKgdmdjHpAlbJ-IxeTj-OroUjjsw/exec')
+        await axios.get('https://script.google.com/macros/s/AKfycbxad1yCWiFmL9Q2qXIMglIFbH-m9KafsaNoD9UVYrhKgdmdjHpAlbJ-IxeTj-OroUjjsw/exec')
         .then((result) => {
-          console.log(result);
           let sheets = [];
           result.data.GoogleSheetData.forEach((data) => {
             if(data[0].length > 1) {
@@ -94,7 +93,7 @@ const Dashboard = ({dataBase, dateValue, activity, leads}) => {
               sheets.push(data)
             }
           })
-          setLeadsSheets(sheets);
+          setLeadsSheets(sheets.length);
           setLeadsSheetsRef(sheets);
         })
       } catch {
@@ -152,10 +151,10 @@ const Dashboard = ({dataBase, dateValue, activity, leads}) => {
     if (dateValue) {
           const data1 = moment(dateValue[0]).format('YYYY-MM-DD');
           const data2 = moment(dateValue[1]).format('YYYY-MM-DD');
-          setVisitas(visitasAll.filter((item) => (moment(data1).isSameOrBefore(moment(item.data).format('YYYY-MM-DD')) && moment(data2).isSameOrAfter(moment(item.data).format('YYYY-MM-DD')))))
-          setAtividades(activity.filter((item) => (moment(data1).isSameOrBefore(moment(item.createAt.seconds*1000).format('YYYY-MM-DD')) && moment(data2).isSameOrAfter(moment(item.createAt.seconds*1000).format('YYYY-MM-DD')))))
-          setAllLeads(leads.filter((item) => (moment(data1).isSameOrBefore(moment(item.data).format('YYYY-MM-DD')) && moment(data2).isSameOrAfter(moment(item.data).format('YYYY-MM-DD')))))
-          setLeadsSheets(leadsSheetsRef.filter((item) => (moment(data1).isSameOrBefore(moment(item[0]).format('YYYY-MM-DD')) && moment(data2).isSameOrAfter(moment(item[0]).format('YYYY-MM-DD')))))
+          setVisitas(visitasAll && visitasAll.filter((item) => (moment(data1).isSameOrBefore(moment(item.data).format('YYYY-MM-DD')) && moment(data2).isSameOrAfter(moment(item.data).format('YYYY-MM-DD')))))
+          setAtividades(activity && activity.filter((item) => (moment(data1).isSameOrBefore(moment(item.createAt.seconds*1000).format('YYYY-MM-DD')) && moment(data2).isSameOrAfter(moment(item.createAt.seconds*1000).format('YYYY-MM-DD')))))
+          setAllLeads(leads && leads.filter((item) => (moment(data1).isSameOrBefore(moment.unix(item.createAt.seconds).format('YYYY-MM-DD')) && moment(data2).isSameOrAfter(moment.unix(item.createAt.seconds).format('YYYY-MM-DD')))))
+          setLeadsSheets(leadsSheetsRef && leadsSheetsRef.filter((item) => (moment(data1).isSameOrBefore(moment(item[0]).format('YYYY-MM-DD')) && moment(data2).isSameOrAfter(moment(item[0]).format('YYYY-MM-DD')))).length)
         } else {
         setVisitas(visitasAll);
         setAtividades(activity);
@@ -165,7 +164,7 @@ const Dashboard = ({dataBase, dateValue, activity, leads}) => {
         setGanho(leads ? leads.filter((vis) => vis.status === 'Ganho').length : 0);
         setPerdido(leads ? leads.filter((vis) => vis.status === 'Perdido').length : 0);
         setAllLeads(leads);
-        setLeadsSheets(leadsSheetsRef);
+        setLeadsSheets(leadsSheetsRef && leadsSheetsRef.length);
       }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dateValue]);
@@ -181,8 +180,7 @@ const Dashboard = ({dataBase, dateValue, activity, leads}) => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   },[atividades, allLeads])
 
-  console.log(ganho)
-  console.log(data1)
+  // console.log(leads && moment.unix(leads[0].createAt.seconds).format('YYYY-MM-DD'));
 
   // useEffect(() => {
   //   if(schedule) {
@@ -303,7 +301,7 @@ const Dashboard = ({dataBase, dateValue, activity, leads}) => {
           <div className={styles.dashboard__box4}>
             <div className={styles.dashboard__box4_item}>
               <div>
-                <h1>{leadsSheets && leadsSheets.length}</h1>
+                <h1>{leadsSheets && leadsSheets}</h1>
                 <h2>Leads</h2>
               </div>
               <div>
@@ -422,4 +420,4 @@ const Dashboard = ({dataBase, dateValue, activity, leads}) => {
   )
 }
 
-export default Dashboard;
+export default memo(Dashboard);

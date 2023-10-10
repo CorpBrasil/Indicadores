@@ -62,7 +62,7 @@ const Commercial = ({ user, leads, activity, userRef, members, sellers}) => {
   const [anotacao, setAnotacao] = useState('');
   const [anotacaoBox, setAnotacaoBox] = useState(false);
   const [view, setView] = useState(false);
-  const [dateValue, setDateValue] = useState('');
+  const [dateValue, setDateValue] = useState(null);
   const [openDialog, setOpenDialog] = useState(false);
   const [viewEdit, setViewEdit] = useState(false);
   const [open, setOpen] = useState(false);
@@ -94,26 +94,18 @@ const Commercial = ({ user, leads, activity, userRef, members, sellers}) => {
     [sellers]
   );
 
-  // useEffect(
-  //   () => {
-  //     const fetchData = async () => {
-  //       let items = [];
-  //       meses.map(async (mes) => {
-  //         onSnapshot(await query(collection(dataBase,"Agendas","2023", mes)), (visit) => {
-  //           // Atualiza os dados em tempo real
-  //           items.push(visit.docs.map((doc) => ({ ...doc.data(), id: doc.id }))) 
-  //         });
-  //         console.log(items)
-  //         setVisits(items);
-  //       })
-
-
-  //     };
-  //     fetchData();
-  //   },
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  //   []
-  // );
+  useEffect(
+    () => {
+      const fetchData = async () => {
+        setTimeout(() => {
+          setDateValue([new Date(), new Date()])
+        }, 1000);
+      };
+      fetchData();
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  );
 
   // useEffect(() => {
   //   if(visits) {
@@ -124,7 +116,7 @@ const Commercial = ({ user, leads, activity, userRef, members, sellers}) => {
   // },
   //   [visits] );
 
-  console.log(visits);
+  console.log(dateValue);
 
   // const changeFilter = (data) => {
   //   setLeadsUser(data);
