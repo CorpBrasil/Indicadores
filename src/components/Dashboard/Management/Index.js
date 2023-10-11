@@ -16,7 +16,7 @@ import { ReactComponent as Trophy } from '../../../images/icons/Trophy.svg';
 import PersonAddDisabledOutlinedIcon from '@mui/icons-material/PersonAddDisabledOutlined';
 import HowToRegOutlinedIcon from '@mui/icons-material/HowToRegOutlined';
 
-const Dashboard = ({dataBase, dateValue, activity, leads, consultora}) => {
+const Dashboard = ({dataBase, dateValue, activity, leads, consultora, sendData}) => {
   const [dataChart, setdataChart] = useState();
   const [dataChart2, setdataChart2] = useState();
   const [data1, setData1] = useState();
@@ -34,9 +34,18 @@ const Dashboard = ({dataBase, dateValue, activity, leads, consultora}) => {
   const [leadsSheetsRef, setLeadsSheetsRef] = useState();
   const [vendasSheets, setVendasSheets] = useState();
   const [vendasSheetsRef, setVendasSheetsRef] = useState();
+  const [leadsRobo, setLeadsRobo] = useState();
+  const [leadsMeetime, setLeadsMeetime] = useState();
   // const [loading, setLoading] = useState(true);
   const meses = ['01','02','03','04','05','06','07','08','09','10','11'];
+  const meta = {
+    vendas: 5,
+    visitas: 5,
+    ganho: 5,
+    atividades: 100
+  }
   
+  console.log(meta)
 
   useEffect(() => {
     const fetchData = async () => {
@@ -50,7 +59,7 @@ const Dashboard = ({dataBase, dateValue, activity, leads, consultora}) => {
               sheets.push(data)
             }
           })
-          setLeadsSheets(sheets.length);
+          setLeadsSheets(sheets);
           setLeadsSheetsRef(sheets);
         })
       } catch {
@@ -119,6 +128,8 @@ const Dashboard = ({dataBase, dateValue, activity, leads, consultora}) => {
       }
   }, [visitas]);
 
+  // console.log(leadsSheetsRef)
+
   useEffect(() => {
     if(consultora === 'Geral') {
       if (dateValue) {
@@ -127,8 +138,8 @@ const Dashboard = ({dataBase, dateValue, activity, leads, consultora}) => {
             setVisitas(visitasAll && visitasAll.filter((item) => (moment(data1).isSameOrBefore(moment(item.data).format('YYYY-MM-DD')) && moment(data2).isSameOrAfter(moment(item.data).format('YYYY-MM-DD')))))
             setAtividades(activity && activity.filter((item) => (moment(data1).isSameOrBefore(moment(item.createAt.seconds*1000).format('YYYY-MM-DD')) && moment(data2).isSameOrAfter(moment(item.createAt.seconds*1000).format('YYYY-MM-DD')))))
             setAllLeads(leads && leads.filter((item) => (moment(data1).isSameOrBefore(moment.unix(item.createAt.seconds).format('YYYY-MM-DD')) && moment(data2).isSameOrAfter(moment.unix(item.createAt.seconds).format('YYYY-MM-DD')))))
-            setLeadsSheets(leadsSheetsRef && leadsSheetsRef.filter((item) => (moment(data1).isSameOrBefore(moment(item[0]).format('YYYY-MM-DD')) && moment(data2).isSameOrAfter(moment(item[0]).format('YYYY-MM-DD')))).length)
-            setVendasSheets(vendasSheetsRef && vendasSheetsRef.filter((item) => (moment(data1).isSameOrBefore(moment(item[0]).format('YYYY-MM-DD')) && moment(data2).isSameOrAfter(moment(item[0]).format('YYYY-MM-DD')))).length)
+            setLeadsSheets(leadsSheetsRef && leadsSheetsRef.filter((item) => (moment(data1).isSameOrBefore(moment(item[0]).format('YYYY-MM-DD')) && moment(data2).isSameOrAfter(moment(item[0]).format('YYYY-MM-DD')))))
+            setVendasSheets(vendasSheetsRef && vendasSheetsRef.filter((item) => (moment(data1).isSameOrBefore(moment(item[0]).format('YYYY-MM-DD')) && moment(data2).isSameOrAfter(moment(item[0]).format('YYYY-MM-DD')))))
           } else {
           setVisitas(visitasAll);
           setAtividades(activity);
@@ -148,8 +159,8 @@ const Dashboard = ({dataBase, dateValue, activity, leads, consultora}) => {
         setVisitas(visitasAll && visitasAll.filter((item) => (moment(data1).isSameOrBefore(moment(item.data).format('YYYY-MM-DD')) && moment(data2).isSameOrAfter(moment(item.data).format('YYYY-MM-DD')) && item.consultora === consultora )))
         setAtividades(activity && activity.filter((item) => (moment(data1).isSameOrBefore(moment(item.createAt.seconds*1000).format('YYYY-MM-DD')) && moment(data2).isSameOrAfter(moment(item.createAt.seconds*1000).format('YYYY-MM-DD')) && item.consultora === consultora )))
         setAllLeads(leads && leads.filter((item) => (moment(data1).isSameOrBefore(moment.unix(item.createAt.seconds).format('YYYY-MM-DD')) && moment(data2).isSameOrAfter(moment.unix(item.createAt.seconds).format('YYYY-MM-DD')) && item.consultora === consultora )))
-        setLeadsSheets(leadsSheetsRef && leadsSheetsRef.filter((item) => (moment(data1).isSameOrBefore(moment(item[0]).format('YYYY-MM-DD')) && moment(data2).isSameOrAfter(moment(item[0]).format('YYYY-MM-DD')) && item[9] === consultora)).length)
-        setVendasSheets(vendasSheetsRef && vendasSheetsRef.filter((item) => (moment(data1).isSameOrBefore(moment(item[0]).format('YYYY-MM-DD')) && moment(data2).isSameOrAfter(moment(item[0]).format('YYYY-MM-DD')) && item[7] === consultora)).length)
+        setLeadsSheets(leadsSheetsRef && leadsSheetsRef.filter((item) => (moment(data1).isSameOrBefore(moment(item[0]).format('YYYY-MM-DD')) && moment(data2).isSameOrAfter(moment(item[0]).format('YYYY-MM-DD')) && item[9] === consultora)))
+        setVendasSheets(vendasSheetsRef && vendasSheetsRef.filter((item) => (moment(data1).isSameOrBefore(moment(item[0]).format('YYYY-MM-DD')) && moment(data2).isSameOrAfter(moment(item[0]).format('YYYY-MM-DD')) && item[7] === consultora)))
       } else {
       setVisitas(visitasAll);
       setAtividades(activity);
@@ -169,6 +180,59 @@ const Dashboard = ({dataBase, dateValue, activity, leads, consultora}) => {
   // console.log(dataChart)
 
   useEffect(() => {
+    if(dateValue || consultora) {
+      sendData({
+        consultora: consultora,
+        visitas: visitas && visitas.length,
+        visitas_confirmada: confirmar,
+        visitas_naoConfirmada: nconfirmar,
+        visitas_meta: 5,
+        visitas_metaR: visitas && visitas.length/5*100,
+        vendas: vendasSheets && vendasSheets.length,
+        vendas_meta: 2,
+        vendas_metaR: vendasSheets && vendasSheets.length/5*100,
+        leads: leadsSheets && leadsSheets.length + ganho,
+        leadsSheet_robo: leadsRobo,
+        leadsSheet_meetime: leadsMeetime,
+        leadsSheet_ganho: ganho,
+        prospeccao: allLeads && allLeads.length,
+        prospeccao_ganho: ganho,
+        prospeccao_perdido: perdido,
+        atividades: atividades && atividades.length,
+        atividades_email: data1,
+        atividades_ligacao: data2,
+        atividades_whats: data1,
+        atividades_meta: 100,
+        atividades_metaR: atividades && atividades.length/100*100
+      })
+      console.log({
+        visitas: visitas && visitas.length,
+        visitas_confirmada: confirmar,
+        visitas_naoConfirmada: nconfirmar,
+        visitas_meta: 5,
+        visitas_metaR: visitas && visitas.length/5*100,
+        vendas: vendasSheets && vendasSheets.length,
+        vendas_meta: 2,
+        vendas_metaR: vendasSheets && vendasSheets.length/5*100,
+        leads: leadsSheets && leadsSheets.length + ganho,
+        leadsSheet_robo: leadsRobo,
+        leadsSheet_meetime: leadsMeetime,
+        leadsSheet_ganho: ganho,
+        prospeccao: allLeads && allLeads.length,
+        prospeccao_ganho: ganho,
+        prospeccao_perdido: perdido,
+        atividades: atividades && atividades.length,
+        atividades_email: data1,
+        atividades_ligacao: data2,
+        atividades_whats: data1,
+        atividades_meta: 100,
+        atividades_metaR: atividades && atividades.length/100*100})
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  },[dateValue, consultora])
+
+
+  useEffect(() => {
     if(atividades !== activity) {
       setData1(atividades.filter((vis) => vis.atividade === 'Email').length);
       setData2(atividades.filter((vis) => vis.atividade === 'Ligação').length);
@@ -178,6 +242,16 @@ const Dashboard = ({dataBase, dateValue, activity, leads, consultora}) => {
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   },[atividades, allLeads])
+
+  useEffect(() => {
+    if(leadsSheets) {
+      setLeadsRobo(leadsSheets && leadsSheets.filter((lead) => lead[10] === '').length);
+      setLeadsMeetime(leadsSheets && leadsSheets.filter((lead) => lead[10] !== '').length);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  },[leadsSheets])
+
+  console.log(leadsSheets)
 
   useEffect(() => {
     if(visitas) {
@@ -250,8 +324,8 @@ const Dashboard = ({dataBase, dateValue, activity, leads, consultora}) => {
               </div>
               <div className={styles.dashboard__meta}>
               <span className={styles.visit_icon}><Trophy /></span>
-              <p>Meta do Mês</p>
-              <h2>20</h2>
+              <p>Meta da Semana</p>
+              <h2>{meta.visitas}</h2>
               </div>
             </div> 
           </div>
@@ -286,23 +360,23 @@ const Dashboard = ({dataBase, dateValue, activity, leads, consultora}) => {
           <div className={styles.dashboard__box4}>
             <div className={styles.dashboard__box4_item}>
               <div>
-                <h1>{leadsSheets && leadsSheets}</h1>
+                <h1>{leadsSheets && leadsSheets.length}</h1>
                 <h2>Leads</h2>
               </div>
               <div>
-                <p><b>{leadsSheets && leadsSheets}</b> Trafégo/Meetime | <b>{ganho && ganho}</b> Prospecção</p>
+                <p style={{textAlign: 'center' }}><b>{leadsRobo && leadsRobo}</b> Trafégo Pago | <b>{leadsMeetime && leadsMeetime}</b> Meetime <br /> <b>{ganho && ganho}</b> Prospecção</p>
               </div>
             </div>
             <div className={styles.dashboard__box4_item2}>
               <div>
-                <h1>{vendasSheets}</h1>
+                <h1>{vendasSheets ? vendasSheets.length : 0}</h1>
                 <h2>Vendas</h2>
-                <h3><b style={{ color: 'green' }}>100%</b> &nbsp;Alcançada</h3>
+                <h3><b style={{ color: 'green' }}>{(vendasSheets / 10)*100}%</b>&nbsp;da Meta Alcançada</h3>
               </div>
               <div className={styles.dashboard__meta}>
               <span className={styles.visit_icon}><Trophy /></span>
-              <p>Meta do Mês</p>
-              <h2>20</h2>
+              <p>Meta da Semana</p>
+              <h2>{meta.vendas}</h2>
               </div>
             </div>
         </div>
@@ -328,12 +402,12 @@ const Dashboard = ({dataBase, dateValue, activity, leads, consultora}) => {
                   </div>
               </div>
               <div className={styles.dashboard__box2_info_list}>
-                <h3><b style={{ color: 'green' }}>100%</b> &nbsp;Alcançada</h3>
+                <h3><b style={{ color: 'green' }}>{(ganho / 5)*100}%</b>&nbsp;da Meta Alcançada</h3>
               </div>
               <div className={styles.dashboard__meta}>
               <span className={styles.visit_icon}><Trophy /></span>
-              <p>Meta do Mês</p>
-              <h2>20</h2>
+              <p>Meta da Semana</p>
+              <h2>{meta.ganho}</h2>
               </div>
             </div> 
           </div>
@@ -367,12 +441,12 @@ const Dashboard = ({dataBase, dateValue, activity, leads, consultora}) => {
               </li>
             </ul>
               <div className={styles.dashboard__box2_info_list}>
-                <h3><b style={{ color: 'green' }}>100%</b> &nbsp;Alcançada</h3>
+                <h3><b style={{ color: 'green' }}>{atividades && (atividades.length / 100)*100}%</b>&nbsp;da Meta Alcançada</h3>
               </div>
               <div className={styles.dashboard__meta}>
               <span className={styles.visit_icon}><Trophy /></span>
-              <p>Meta do Mês</p>
-              <h2>100</h2>
+              <p>Meta da Semana</p>
+              <h2>{meta.atividades}</h2>
               </div>
             </div> 
           </div>

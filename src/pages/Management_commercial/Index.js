@@ -21,9 +21,10 @@ import DateRangePicker from '@wojtekmaj/react-daterange-picker';
 import EditProspection from "../../components/Box/EditProspection/Index";
 import CreateActivity from "../../components/Box/CreateActivity/Index";
 import Dashboard from "../../components/Dashboard/Management/Index";
+import Report from "../../components/Box/Report/Index";
 
 import { ReactComponent as ManagementIcon} from '../../images/icons/Management.svg';
-import { ReactComponent as Report} from '../../images/icons/Report.svg';
+import { ReactComponent as ReportIcon} from '../../images/icons/Report.svg';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import PrintIcon from '@mui/icons-material/Print';
 import BlockIcon from '@mui/icons-material/Block';
@@ -72,28 +73,29 @@ const Commercial = ({ user, leads, activity, userRef, members, sellers}) => {
   const [rowsPerPage, setRowsPerPage] = useState(20);
   const [leadsUser, setLeadsUser] = useState(undefined);
   const [loading, setLoading] = useState(false);
-  const [sellersOrder, setSellersOrder] = useState(null);
+  // const [sellersOrder, setSellersOrder] = useState(null);
   const [TabsValue, setTabsValue] = useState(0);
   const [activityAll, setActivityAll] = useState();
   const [viewImport, setViewImport] = useState(false);
   const [consultora, setConsultora] = useState('Geral');
-  const [visits, setVisits] = useState(null);
-  const [visitsAll, setVisitsAll] = useState(undefined);
+  const [collectData, setCollectData] = useState();
+  // const [visits, setVisits] = useState(null);
+  // const [visitsAll, setVisitsAll] = useState(undefined);
   // const meses = ['01','02','03','04','05','06','07','08','09','10','11'];
 
 
-  useEffect(() => {
-    if(sellers) {
-      setSellersOrder(sellers.sort((a,b) => {
-        if(a.nome< b.nome) return -1;
-        if(a.nome > b.nome) return 1;
-        return 0;
-      }))
-    }
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [sellers]
-  );
+  // useEffect(() => {
+  //   if(sellers) {
+  //     setSellersOrder(sellers.sort((a,b) => {
+  //       if(a.nome< b.nome) return -1;
+  //       if(a.nome > b.nome) return 1;
+  //       return 0;
+  //     }))
+  //   }
+  //   },
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  //   [sellers]
+  // );
 
   useEffect(
     () => {
@@ -367,6 +369,10 @@ const closeAnotacaoBox = () => {
     setViewImport(true);
   }
 
+  const sendData = (data) => {
+    setCollectData(data)
+  }
+
   const deleteList = (list) => {
     try {
       Swal.fire({
@@ -412,13 +418,35 @@ const closeAnotacaoBox = () => {
     }
   }
 
+  console.log(consultora)
+
+  const openBox = () => {
+    if(consultora === 'Geral') {
+      Swal.fire({
+        title: 'Consultora Não Escolhida',
+        html: `Selecione uma consultora para criar o relatório`,
+        icon: "warning",
+        showCloseButton: true,
+        confirmButtonColor: "#F39200",
+        confirmButtonText: "Ok",
+      })
+    } else {
+      setView(true);
+    }
+  }
+
+  const closeBox = () => {
+    setView(false);
+  }
+
   return (
     <div className={styles.container_panel}>
-        {loading && loading &&
+        {/* {loading && loading &&
           <Box className="loading">
               <CircularProgress />
           </Box>
-        }
+        } */}
+      <Report view={view} openBox={openBox} closeBox={closeBox} collectData={collectData} />
       <Header user={user} userRef={userRef}></Header>
       <div className={styles.title_panel}>
         <ManagementIcon className={styles.prospecction_icon}/>
@@ -444,8 +472,8 @@ const closeAnotacaoBox = () => {
             value={dateValue ? dateValue : [new Date(), new Date()]}/>
         </div>
         <div className={styles.box_panel_add}>
-            <button className={styles.box_panel_activity} onClick={() => setView(true)}>
-                <Report className={styles.report_icon} />
+            <button className={styles.box_panel_activity} onClick={() => openBox()}>
+                <ReportIcon className={styles.report_icon} />
                 <p>Criar Relátorio</p>
               </button>
             <button className={styles.box_panel_activity} onClick={() => window.print()}>
@@ -453,7 +481,7 @@ const closeAnotacaoBox = () => {
                 <p>Imprimir</p>
               </button>
           </div>
-          <Dashboard dataBase={dataBase} activity={activity} dateValue={dateValue} leads={leads} consultora={consultora} />
+          <Dashboard dataBase={dataBase} activity={activity} dateValue={dateValue} leads={leads} consultora={consultora} sendData={sendData} />
       </div>
       <div className={styles.content_panel}>
         <div className={styles.box_panel}>

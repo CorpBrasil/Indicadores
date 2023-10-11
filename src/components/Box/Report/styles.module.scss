@@ -1,0 +1,86 @@
+.check_form {
+  margin-top: 1rem;
+  width: 100%;
+  justify-content: center;
+
+  div > span {
+    font-size: 0.9rem!important;
+  }
+}
+
+.label_content {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  gap: 1.5rem;
+
+  @media screen and (max-width: 600px) {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  div {
+    margin-top: 0.2rem;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+
+    span {
+      margin-left: 0.8rem;
+      font-size: 0.8rem;
+    }
+
+    input {
+      padding: 16.5px 14px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+
+      &:hover {
+        border: 1px solid #111;
+      }
+
+      &:focus {
+        border: 2px solid #111;
+      }
+    }
+  }
+}
+
+.label_content2 {
+  margin-top: 0.5rem;
+  width: 100%;
+  display: flex;
+  gap: 1.5rem;
+  justify-content: space-between;
+}
+
+.result {
+  margin: 1rem;
+  background-color: #ffd;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  h4, b {color: #000;}
+
+  &_title {
+    margin-bottom: 1rem;
+  }
+
+  &_item {
+    width: 80%;
+    margin-bottom: 1rem;
+    ul {
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+  
+      li {
+        text-align: start;
+      }
+    }
+  }
+
+}
