@@ -39,13 +39,13 @@ const Dashboard = ({dataBase, dateValue, activity, leads, consultora, sendData})
   // const [loading, setLoading] = useState(true);
   const meses = ['01','02','03','04','05','06','07','08','09','10','11'];
   const meta = {
-    vendas: 5,
-    visitas: 5,
-    ganho: 5,
-    atividades: 100
+    vendas: consultora && consultora !== 'Geral' ? 5 : 5*4,
+    visitas: consultora && consultora !== 'Geral' ? 5 : 5*4,
+    ganho: consultora && consultora !== 'Geral' ? 5 : 5*4,
+    atividades: consultora && consultora !== 'Geral' ? 100 : 100*4
   }
   
-  console.log(meta)
+  console.log(vendasSheets)
 
   useEffect(() => {
     const fetchData = async () => {
@@ -82,7 +82,7 @@ const Dashboard = ({dataBase, dateValue, activity, leads, consultora, sendData})
               sheets.push(data)
             }
           })
-          setVendasSheets(sheets.length);
+          setVendasSheets(sheets);
           setVendasSheetsRef(sheets);
         })
       } catch {
@@ -149,8 +149,8 @@ const Dashboard = ({dataBase, dateValue, activity, leads, consultora, sendData})
           setGanho(leads ? leads.filter((vis) => vis.status === 'Ganho').length : 0);
           setPerdido(leads ? leads.filter((vis) => vis.status === 'Perdido').length : 0);
           setAllLeads(leads);
-          setLeadsSheets(leadsSheetsRef && leadsSheetsRef.length);
-          setVendasSheets(vendasSheetsRef && vendasSheetsRef.length);
+          setLeadsSheets(leadsSheetsRef && leadsSheetsRef);
+          setVendasSheets(vendasSheetsRef && vendasSheetsRef);
         }
     } else {
       if (dateValue) {
@@ -170,8 +170,8 @@ const Dashboard = ({dataBase, dateValue, activity, leads, consultora, sendData})
       setGanho(leads ? leads.filter((vis) => vis.status === 'Ganho' && vis.consultora === consultora).length : 0);
       setPerdido(leads ? leads.filter((vis) => vis.status === 'Perdido' && vis.consultora === consultora).length : 0);
       setAllLeads(leads);
-      setLeadsSheets(leadsSheetsRef && leadsSheetsRef.length);
-      setVendasSheets(vendasSheetsRef && vendasSheetsRef.length);
+      setLeadsSheets(leadsSheetsRef && leadsSheetsRef);
+      setVendasSheets(vendasSheetsRef && vendasSheetsRef);
     }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -182,14 +182,16 @@ const Dashboard = ({dataBase, dateValue, activity, leads, consultora, sendData})
   useEffect(() => {
     if(dateValue || consultora) {
       sendData({
-        consultora: consultora,
+        data_inicio: dateValue && moment(dateValue[0]).format('DD/MM/YYYY'),
+        data_final: dateValue && moment(dateValue[1]).format('DD/MM/YYYY'),
+        consultora: consultora && consultora,
         visitas: visitas && visitas.length,
         visitas_confirmada: confirmar,
         visitas_naoConfirmada: nconfirmar,
-        visitas_meta: 5,
+        visitas_meta: meta.visitas,
         visitas_metaR: visitas && visitas.length/5*100,
         vendas: vendasSheets && vendasSheets.length,
-        vendas_meta: 2,
+        vendas_meta: meta.vendas,
         vendas_metaR: vendasSheets && vendasSheets.length/5*100,
         leads: leadsSheets && leadsSheets.length + ganho,
         leadsSheet_robo: leadsRobo,
@@ -202,7 +204,7 @@ const Dashboard = ({dataBase, dateValue, activity, leads, consultora, sendData})
         atividades_email: data1,
         atividades_ligacao: data2,
         atividades_whats: data1,
-        atividades_meta: 100,
+        atividades_meta: meta.atividades,
         atividades_metaR: atividades && atividades.length/100*100
       })
       console.log({
@@ -224,12 +226,13 @@ const Dashboard = ({dataBase, dateValue, activity, leads, consultora, sendData})
         atividades: atividades && atividades.length,
         atividades_email: data1,
         atividades_ligacao: data2,
-        atividades_whats: data1,
+        atividades_whats: data3,
         atividades_meta: 100,
         atividades_metaR: atividades && atividades.length/100*100})
     }
+  
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  },[dateValue, consultora])
+  },[dateValue, consultora, visitas, confirmar, nconfirmar, vendasSheets, leadsSheets, ganho, leadsRobo, leadsMeetime, allLeads, perdido, atividades, data1, data2, data3])
 
 
   useEffect(() => {
@@ -244,27 +247,24 @@ const Dashboard = ({dataBase, dateValue, activity, leads, consultora, sendData})
   },[atividades, allLeads])
 
   useEffect(() => {
-    if(leadsSheets) {
+    if(leadsSheets && dateValue) {
       setLeadsRobo(leadsSheets && leadsSheets.filter((lead) => lead[10] === '').length);
       setLeadsMeetime(leadsSheets && leadsSheets.filter((lead) => lead[10] !== '').length);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  },[leadsSheets])
+  },[leadsSheets, dateValue])
 
   console.log(leadsSheets)
 
   useEffect(() => {
-    if(visitas) {
+    if(visitas && dateValue) {
       let dataChartRef = [];
       let dataChartRef2 = [];
-      let dia = [];
-        visitas && visitas.forEach((vis) => {
-          if(!dia.includes(vis.data)) {   
-            dia.push(vis.data)
-            dataChartRef.push({ name: moment(vis.data).format("DD/MM/YYYY"), Confirmada: visitas && visitas.filter((v) => v.data === vis.data && v.confirmar === true && v.categoria !== 'pos_venda').length,
-            Nao_Confirmada: visitas && visitas.filter((v) => v.data === vis.data && v.confirmar === false && v.categoria !== 'pos_venda').length})
-          }
-        })
+      let final = dateValue[1];
+      for(let inicio = dateValue[0]; inicio <= final; inicio.setDate(inicio.getDate() + 1)) {
+          dataChartRef.push({ name: moment(inicio).format("DD/MM/YYYY"), Confirmada: visitas && visitas.filter((v) => v.data === moment(inicio).format("DD/MM/YYYY") && v.confirmar === true && v.categoria !== 'pos_venda').length,
+          Nao_Confirmada: visitas && visitas.filter((v) => v.data === moment(inicio).format("DD/MM/YYYY") && v.confirmar === false && v.categoria !== 'pos_venda').length})
+        }
         dataChartRef2 = dataChartRef.sort((a,b) => {
           if(a.name > b.name) {
             return 1;
@@ -276,6 +276,31 @@ const Dashboard = ({dataBase, dateValue, activity, leads, consultora, sendData})
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   },[visitas])
+
+
+  // useEffect(() => {
+  //   if(visitas) {
+  //     let dataChartRef = [];
+  //     let dataChartRef2 = [];
+  //     let dia = [];
+  //       visitas && visitas.forEach((vis) => {
+  //         if(!dia.includes(vis.data)) {   
+  //           dia.push(vis.data)
+  //           dataChartRef.push({ name: moment(vis.data).format("DD/MM/YYYY"), Confirmada: visitas && visitas.filter((v) => v.data === vis.data && v.confirmar === true && v.categoria !== 'pos_venda').length,
+  //           Nao_Confirmada: visitas && visitas.filter((v) => v.data === vis.data && v.confirmar === false && v.categoria !== 'pos_venda').length})
+  //         }
+  //       })
+  //       dataChartRef2 = dataChartRef.sort((a,b) => {
+  //         if(a.name > b.name) {
+  //           return 1;
+  //         } else if(a.name < b.name) {
+  //           return -1;
+  //         } return 0;
+  //       })
+  //       setdataChart(dataChartRef2)
+  //   }
+  // // eslint-disable-next-line react-hooks/exhaustive-deps
+  // },[visitas])
 
   useEffect(() => {
     if(atividades) {
@@ -360,7 +385,7 @@ const Dashboard = ({dataBase, dateValue, activity, leads, consultora, sendData})
           <div className={styles.dashboard__box4}>
             <div className={styles.dashboard__box4_item}>
               <div>
-                <h1>{leadsSheets && leadsSheets.length}</h1>
+                <h1>{leadsSheets && leadsSheets.length + ganho}</h1>
                 <h2>Leads</h2>
               </div>
               <div>
@@ -371,7 +396,7 @@ const Dashboard = ({dataBase, dateValue, activity, leads, consultora, sendData})
               <div>
                 <h1>{vendasSheets ? vendasSheets.length : 0}</h1>
                 <h2>Vendas</h2>
-                <h3><b style={{ color: 'green' }}>{(vendasSheets / 10)*100}%</b>&nbsp;da Meta Alcançada</h3>
+                <h3><b style={{ color: 'green' }}>{(vendasSheets && vendasSheets.length / meta.vendas)*100}%</b>&nbsp;da Meta Alcançada</h3>
               </div>
               <div className={styles.dashboard__meta}>
               <span className={styles.visit_icon}><Trophy /></span>
@@ -402,7 +427,7 @@ const Dashboard = ({dataBase, dateValue, activity, leads, consultora, sendData})
                   </div>
               </div>
               <div className={styles.dashboard__box2_info_list}>
-                <h3><b style={{ color: 'green' }}>{(ganho / 5)*100}%</b>&nbsp;da Meta Alcançada</h3>
+                <h3><b style={{ color: 'green' }}>{(ganho && ganho / meta.ganho)*100}%</b>&nbsp;da Meta Alcançada</h3>
               </div>
               <div className={styles.dashboard__meta}>
               <span className={styles.visit_icon}><Trophy /></span>
@@ -441,7 +466,7 @@ const Dashboard = ({dataBase, dateValue, activity, leads, consultora, sendData})
               </li>
             </ul>
               <div className={styles.dashboard__box2_info_list}>
-                <h3><b style={{ color: 'green' }}>{atividades && (atividades.length / 100)*100}%</b>&nbsp;da Meta Alcançada</h3>
+                <h3><b style={{ color: 'green' }}>{atividades && (atividades.length / meta.atividades)*100}%</b>&nbsp;da Meta Alcançada</h3>
               </div>
               <div className={styles.dashboard__meta}>
               <span className={styles.visit_icon}><Trophy /></span>

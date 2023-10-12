@@ -12,7 +12,7 @@ import DialogContentText from "@mui/material/DialogContentText";
 import Swal from 'sweetalert2/dist/sweetalert2.js';
 import styles from "./styles.module.scss";
 
-const Report = ({view, openBox, closeBox, collectData }) => {
+const Report = ({view, openBox, closeBox, collectData, members, userRef }) => {
   const [feedback, setFeedback] = useState("");
 
   console.log(collectData)
@@ -44,8 +44,16 @@ const Report = ({view, openBox, closeBox, collectData }) => {
           //   inversor10kW: confirm3,
           //   link: confirm4
           // })
+          Swal.fire({
+            title: "CORPBRASIL",
+            html: `O Relatório foi gerado com sucesso.`,
+            icon: "success",
+            showConfirmButton: true,
+            showCloseButton: true,
+            confirmButtonColor: "#F39200",
+          })
           setFeedback('');
-          // closeBox()
+          closeBox()
         } else {
           openBox();
         }
@@ -60,44 +68,43 @@ const Report = ({view, openBox, closeBox, collectData }) => {
   return (
     <Dialog
       open={view}
-      fullWidth={true}
+      fullWidth
       maxWidth="sm"
-      size
       onClose={() => closeBox()}
     >
-      <DialogTitle align="center">Relatório Comercial - Lia</DialogTitle>
+      <DialogTitle align="center">Relatório Comercial - <b>{collectData && collectData.consultora}</b></DialogTitle>
       <DialogContent>
-        <DialogContentText sx={{ textAlign: "center" }}>
+        <DialogContentText component={"div"} sx={{ textAlign: "center" }}>
           Deixe um feedback sobre o desempenho da consultora.
           <div className={styles.result}>
-            <h4 className={styles.result_title}>Relátorio Comercial - 01/10/2023 até 07/10/2023</h4>
+            <h4 className={styles.result_title}>Relátorio Comercial - {collectData && collectData.data_inicio} até {collectData && collectData.data_final}</h4>
             <div className={styles.result_item}>
             <h4>Visitas</h4>
               <ul>
                 <li>
-                Foram agendadas <b>{collectData.visitas} visitas</b> ao longo da semana.
+                Foram agendadas <b>{collectData && collectData.visitas} visitas</b> ao longo da semana.
               </li>
                 <li>
-                Destas, <b>{collectData.visitas_confirmada} visitas</b> foram confirmadas e <b>{collectData.visitas_naoConfirmada} visitas</b> não foram confirmadas.
+                Destas, <b>{collectData && collectData.visitas_confirmada} visitas</b> foram confirmadas e <b>{collectData && collectData.visitas_naoConfirmada} visitas</b> não foram confirmadas.
               </li>
                 <li>
-                A meta de visitas para a semana era de <b>{collectData.visitas_meta}</b>, e você antigiu <b>{collectData.visitas_metaR}%</b>.
+                A meta de visitas para a semana era de <b>{collectData && collectData.visitas_meta}</b>, e você antigiu <b>{collectData && collectData.visitas_metaR}%</b>.
               </li>
               </ul>
             </div>
             <div className={styles.result_item}>
             <h4>Vendas</h4>
               <ul>
-              {collectData.visitas ? 
+              {collectData && collectData.visitas ? 
                 <li>
                 Não foram registradas vendas, resultando em <b>0%</b> da meta de vendas alcançada.
                 </li> :
                 <li>
-                Foi registrado <b>{collectData.vendas} venda(s)</b>, resultando em <b>{collectData.vendas_metaR}%</b> da meta de vendas alcançada.
+                Foi registrado <b>{collectData && collectData.vendas} venda(s)</b>, resultando em <b>{collectData && collectData.vendas_metaR}%</b> da meta de vendas alcançada.
                 </li> 
             }
                 <li>
-                A meta de vendas para a semana era de <b>{collectData.vendas_meta}</b>.
+                A meta de vendas para a semana era de <b>{collectData && collectData.vendas_meta}</b>.
               </li>
               </ul>
             </div>
@@ -105,10 +112,10 @@ const Report = ({view, openBox, closeBox, collectData }) => {
             <h4>Leads</h4>
               <ul>
                 <li>
-                Foram gerados <b>{collectData.leads} leads</b> durante a semana.
+                Foram gerados <b>{collectData && collectData.leads} leads</b> durante a semana.
               </li>
                 <li>
-                <b>{collectData.leadsSheet_robo}</b> vieram do Robô, <b>{collectData.leadsSheet_meetime}</b> da Meetime e <b>{collectData.leadsSheet_ganho}</b> de Prospecção.
+                <b>{collectData && collectData.leadsSheet_robo}</b> vieram do Robô, <b>{collectData && collectData.leadsSheet_meetime}</b> da Meetime e <b>{collectData && collectData.leadsSheet_ganho}</b> de Prospecção.
               </li>
               </ul>
             </div>
@@ -116,10 +123,10 @@ const Report = ({view, openBox, closeBox, collectData }) => {
             <h4>Prospecção</h4>
               <ul>
                 <li>
-                Você possui <b>{collectData.prospecção ? collectData.prospecção : 0} leads ativos</b>.
+                Você possui <b>{collectData && collectData.prospeccao ? collectData.prospeccao : 0} leads ativos</b>.
               </li>
                 <li>
-                Durante o periodo, <b>{collectData.prospeccao_ganho} novo(s) lead(s)</b> foi adquirido, enquanto <b>{collectData.prospeccao_perdido} leads</b> foram perdidos.
+                Durante o periodo, <b>{collectData && collectData.prospeccao_ganho} novo(s) lead(s)</b> foi adquirido, enquanto <b>{collectData && collectData.prospeccao_perdido} leads</b> foram perdidos.
               </li>
               </ul>
             </div>
@@ -127,17 +134,17 @@ const Report = ({view, openBox, closeBox, collectData }) => {
             <h4>Atividades Realizadas</h4>
               <ul>
                 <li>
-                Um total de <b>{collectData.atividades}</b> atividades foram realizadas.
+                Um total de <b>{collectData && collectData.atividades}</b> atividades foram realizadas.
               </li>
                 <li>
                 A distribuição das atividades foi a seguinte:
                 <ul>
-                  <li>Email: {collectData.atividades_email} atividades</li>
-                  <li>Ligação: {collectData.atividades_ligacao} atividades</li>
-                  <li>WhatsApp: {collectData.atividades_whatsapp} atividade</li>
+                  <li>Email: {collectData && collectData.atividades_email} atividades</li>
+                  <li>Ligação: {collectData && collectData.atividades_ligacao} atividades</li>
+                  <li>WhatsApp: {collectData && collectData.atividades_whats} atividade</li>
                 </ul>
               </li>
-              <li>Você alcançou <b>{collectData.atividades_metaR}%</b> da meta de atividades, com uma meta estabelecida de <b>{collectData.atividades_meta} atividades.</b></li>
+              <li>Você alcançou <b>{collectData && collectData.atividades_metaR}%</b> da meta de atividades, com uma meta estabelecida de <b>{collectData && collectData.atividades_meta} atividades.</b></li>
               </ul>
             </div>
           </div>

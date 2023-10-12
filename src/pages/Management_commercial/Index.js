@@ -60,7 +60,7 @@ import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 
 
-const Commercial = ({ user, leads, activity, userRef, members, sellers}) => {
+const Commercial = ({ user, leads, activity, userRef, members}) => {
   const [anotacao, setAnotacao] = useState('');
   const [anotacaoBox, setAnotacaoBox] = useState(false);
   const [view, setView] = useState(false);
@@ -76,7 +76,6 @@ const Commercial = ({ user, leads, activity, userRef, members, sellers}) => {
   // const [sellersOrder, setSellersOrder] = useState(null);
   const [TabsValue, setTabsValue] = useState(0);
   const [activityAll, setActivityAll] = useState();
-  const [viewImport, setViewImport] = useState(false);
   const [consultora, setConsultora] = useState('Geral');
   const [collectData, setCollectData] = useState();
   // const [visits, setVisits] = useState(null);
@@ -361,14 +360,6 @@ const closeAnotacaoBox = () => {
     };
   }
 
-  const closeImport = () => {
-    setViewImport(false);
-  }
-
-  const openImport = () => {
-    setViewImport(true);
-  }
-
   const sendData = (data) => {
     setCollectData(data)
   }
@@ -446,7 +437,7 @@ const closeAnotacaoBox = () => {
               <CircularProgress />
           </Box>
         } */}
-      <Report view={view} openBox={openBox} closeBox={closeBox} collectData={collectData} />
+      <Report view={view} openBox={openBox} closeBox={closeBox} collectData={collectData} members={members} userRef={userRef} />
       <Header user={user} userRef={userRef}></Header>
       <div className={styles.title_panel}>
         <ManagementIcon className={styles.prospecction_icon}/>
