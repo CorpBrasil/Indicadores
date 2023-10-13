@@ -82,7 +82,8 @@ const Header = ({ user,  userRef, alerts }) => {
           <li><Link to="/" data-cooltipz-dir="left"><HomeOutlinedIcon sx={{ scale: '1.5' }} />Inicio</Link></li>
           <li><Link to="/leads" data-cooltipz-dir="left"><Leads /> Leads</Link></li>
           <li><Link to="/relatorio" data-cooltipz-dir="left"><Report className="icon-black" />Relatório</Link></li>
-          <li><Link to="/admin" data-cooltipz-dir="left"><Admin /> Painel Administrativo</Link></li>
+          {user && userRef && (user.email === Users[0].email || userRef.cargo === 'Administrador') ?
+          <li><Link to="/admin" data-cooltipz-dir="left"><Admin /> Painel Administrativo</Link></li> : <></>}
           <li><Link to="" onClick={logoff} data-cooltipz-dir="left"><Exit /> Sair</Link></li>
         </ul>
           </nav>
