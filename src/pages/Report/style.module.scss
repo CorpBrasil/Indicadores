@@ -1,0 +1,131 @@
+@import '../../styles/mixins.scss';
+
+.prospecction_icon {
+  width: 50px;
+  height: 50px;
+
+  path {
+    fill: #000;
+  }
+}
+
+.table-center {
+  margin: auto;
+}
+
+.container_panel {
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+
+  .title_panel {
+    padding: 4rem 0 1rem 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    h2 {
+      font-size: 1.7rem;
+    }
+  }
+
+  .content_panel {
+    width: 97%;
+    max-width: 1000px;
+    display: flex;
+    flex-direction: column;
+    margin: auto;
+    height: 100%;
+
+      .box_activity {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+        width: 100%;
+        overflow-x: auto;
+        z-index: 0;
+        padding: 0.1rem;
+        
+        table {
+          background: #FFF;
+          border-collapse: collapse;
+
+          thead {
+            border: 1px solid #313131!important;
+            height: 3rem;
+            border-right: none;
+            height: 70px;
+
+            th {
+              padding: 0 0.5rem;
+              color: #fff;
+              background-color: #313131!important;
+            }
+          }
+
+          tbody {
+            td {
+              height: 39px;
+              font-weight: 100;
+              padding: 0;
+              white-space: nowrap;
+
+              .circle {
+                border-radius: 50%;
+                padding: 0.7rem;
+                margin: 0.2rem 0;
+              }
+
+              button {
+                height: 40px;
+              }
+
+              &:nth-child(-n + 6) {
+                border: 1px solid #ccc;
+                padding: 0 0.5rem;
+              }
+            }
+          }
+
+            .anotacao {
+              background-color: #ffd;
+              display: flex;
+              padding: 1rem;
+              flex-direction: column;
+              text-align: initial;
+              align-items: center;
+              text-align: center;
+
+              h4, b {color: #000;}
+
+              &_title {
+                margin-bottom: 1rem;
+              }
+
+              &_item {
+                width: 80%;
+                margin-bottom: 1rem;
+
+                &:last-child {
+                  border: 1px solid #0eb05f;
+                  background-color: #e3fff1;
+                  padding: 0.5rem;
+                }
+
+                ul {
+                  display: flex;
+                  flex-direction: column;
+                  justify-content: flex-start;
+                  align-items: center;
+              
+                  li {
+                    text-align: start;
+                  }
+
+                }
+               }
+            }
+          }
+        }
+      }
+  }

@@ -205,6 +205,7 @@ const handleClick = (event) => {
     }
   }  
 
+  console.log(searchValue)
 
   return (
     <div className='filter-container'>

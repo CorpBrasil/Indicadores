@@ -11,8 +11,10 @@ import { ThemeProvider } from "@mui/material";
 import DialogContentText from "@mui/material/DialogContentText";
 import Swal from 'sweetalert2/dist/sweetalert2.js';
 import styles from "./styles.module.scss";
+import moment from "moment";
+import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 
-const Report = ({view, openBox, closeBox, collectData, members, userRef }) => {
+const Report = ({dataBase, view, openBox, closeBox, collectData, members, userRef }) => {
   const [feedback, setFeedback] = useState("");
 
   console.log(collectData)
@@ -30,20 +32,43 @@ const Report = ({view, openBox, closeBox, collectData, members, userRef }) => {
         cancelButtonColor: "#d33",
         confirmButtonText: "Sim",
         cancelButtonText: "Não",
-      }).then((result) => {
+      }).then(async (result) => {
         if(result.isConfirmed) {
-          // let telefoneFormatado = telefone.replace(/\D/g, '');
-          // collectData({
-          //   nome: nome,
-          //   telefone: '55' + telefoneFormatado,
-          //   dataNouF: data,
-          //   simulacao: simulacao,
-          //   cpfOuCnpj: cpfCnpj,
-          //   pagamento: confirm,
-          //   proposta: confirm2,
-          //   inversor10kW: confirm3,
-          //   link: confirm4
-          // })
+          const day = new Date();
+          await addDoc(collection(dataBase, 'Relatorio'), {
+            consultora_uid: members && members.find((cons) => cons.nome === collectData.consultora).uid,
+            responsavel: userRef && userRef.nome,
+            createAt: serverTimestamp(),
+            data: moment(day).format('DD / MMMM / YYYY - HH:mm'),
+            dataRef: moment(day).format('YYYY-MM-DD'),
+            data_inicio: collectData.data_inicio,
+            data_final: collectData.data_final,
+            consultora: collectData.consultora,
+            visitas: collectData.visitas,
+            visitas_confirmada: collectData.visitas_confirmada,
+            visitas_naoConfirmada: collectData.visitas_naoConfirmada,
+            visitas_meta: collectData.visitas_meta,
+            visitas_metaR: collectData.visitas_metaR,
+            vendas: collectData.vendas,
+            vendas_meta: collectData.vendas_meta,
+            vendas_metaR: collectData.vendas_metaR,
+            leads: collectData.leads,
+            leadsSheet_robo: collectData.leadsSheet_robo,
+            leadsSheet_meetime: collectData.leadsSheet_meetime,
+            leadsSheet_ganho: collectData.leadsSheet_ganho,
+            prospeccao: collectData.prospeccao,
+            prospeccao_ganho: collectData.prospeccao_ganho,
+            prospeccao_perdido: collectData.prospeccao_perdido,
+            atividades: collectData.atividades,
+            atividades_email: collectData.atividades_email,
+            atividades_ligacao: collectData.atividades_ligacao,
+            atividades_whats: collectData.atividades_whats,
+            atividades_meta: collectData.atividades_meta,
+            atividades_metaR: collectData.atividades_metaR,
+            aberto: false,
+            setor: 'Comercial',
+            feedback: feedback
+          })
           Swal.fire({
             title: "CORPBRASIL",
             html: `O Relatório foi gerado com sucesso.`,
@@ -139,9 +164,9 @@ const Report = ({view, openBox, closeBox, collectData, members, userRef }) => {
                 <li>
                 A distribuição das atividades foi a seguinte:
                 <ul>
-                  <li>Email: {collectData && collectData.atividades_email} atividades</li>
-                  <li>Ligação: {collectData && collectData.atividades_ligacao} atividades</li>
-                  <li>WhatsApp: {collectData && collectData.atividades_whats} atividade</li>
+                  <li>Email: <b>{collectData && collectData.atividades_email}</b> atividades</li>
+                  <li>Ligação: <b>{collectData && collectData.atividades_ligacao}</b> atividades</li>
+                  <li>WhatsApp: <b>{collectData && collectData.atividades_whats}</b> atividade</li>
                 </ul>
               </li>
               <li>Você alcançou <b>{collectData && collectData.atividades_metaR}%</b> da meta de atividades, com uma meta estabelecida de <b>{collectData && collectData.atividades_meta} atividades.</b></li>

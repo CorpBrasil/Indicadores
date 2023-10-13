@@ -14,6 +14,7 @@ import { Users } from "./data/Data";
 import { useNavigatorOnline } from '@oieduardorabelo/use-navigator-online';
 import Prospecction from "./pages/Prospection/Index";
 import Commercial from "./pages/Management_commercial/Index";
+import Report from "./pages/Report/Index";
 
 function App() {
   const { user } = useAuth();
@@ -102,6 +103,7 @@ function App() {
               <Route exact path="/financeiro/:year" element={<Finance userRef={userRef} alerts={userAlerts} sellers={sellers} />} />
             }
             <Route exact path="/leads" element={<Alert user={user} userRef={userRef} alerts={userAlerts} check={check} />} />
+            <Route exact path="/relatorio" element={<Report user={user} userRef={userRef} alerts={userAlerts} check={check} />} />
             <Route exact path="/prospeccao" element={<Prospecction user={user} userRef={userRef} leads={leads} activity={activity} listLeads={listLeads} members={members} sellers={sellers} check={check} />} />
             <Route exact path="/gestao-comercial" element={<Commercial user={user} userRef={userRef} leads={leads} activity={activity} listLeads={listLeads} members={members} sellers={sellers} check={check} />} />
             <Route path="/agenda/:year" element={<Schedule userRef={userRef} members={members} tecs={tecs} sellers={sellers} alerts={userAlerts} check={check} />} />

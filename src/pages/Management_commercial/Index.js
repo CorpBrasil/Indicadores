@@ -64,7 +64,7 @@ const Commercial = ({ user, leads, activity, userRef, members}) => {
   const [anotacao, setAnotacao] = useState('');
   const [anotacaoBox, setAnotacaoBox] = useState(false);
   const [view, setView] = useState(false);
-  const [dateValue, setDateValue] = useState(null);
+  const [value, onChange] = useState(null)
   const [openDialog, setOpenDialog] = useState(false);
   const [viewEdit, setViewEdit] = useState(false);
   const [open, setOpen] = useState(false);
@@ -100,7 +100,7 @@ const Commercial = ({ user, leads, activity, userRef, members}) => {
     () => {
       const fetchData = async () => {
         setTimeout(() => {
-          setDateValue([new Date(), new Date()])
+          onChange(null)
         }, 1000);
       };
       fetchData();
@@ -437,7 +437,7 @@ const closeAnotacaoBox = () => {
               <CircularProgress />
           </Box>
         } */}
-      <Report view={view} openBox={openBox} closeBox={closeBox} collectData={collectData} members={members} userRef={userRef} />
+      <Report dataBase={dataBase} view={view} openBox={openBox} closeBox={closeBox} collectData={collectData} members={members} userRef={userRef} />
       <Header user={user} userRef={userRef}></Header>
       <div className={styles.title_panel}>
         <ManagementIcon className={styles.prospecction_icon}/>
@@ -459,8 +459,8 @@ const closeAnotacaoBox = () => {
             </div>
             <DateRangePicker 
             className={styles.date_range}
-            onChange={(value) => setDateValue(value)} 
-            value={dateValue ? dateValue : [new Date(), new Date()]}/>
+            onChange={onChange} 
+            value={value}/>
         </div>
         <div className={styles.box_panel_add}>
             <button className={styles.box_panel_activity} onClick={() => openBox()}>
@@ -472,7 +472,7 @@ const closeAnotacaoBox = () => {
                 <p>Imprimir</p>
               </button>
           </div>
-          <Dashboard dataBase={dataBase} activity={activity} dateValue={dateValue} leads={leads} consultora={consultora} sendData={sendData} />
+          <Dashboard dataBase={dataBase} activity={activity} dateValue={value} leads={leads} consultora={consultora} sendData={sendData} />
       </div>
       <div className={styles.content_panel}>
         <div className={styles.box_panel}>

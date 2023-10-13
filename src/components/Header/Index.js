@@ -3,6 +3,7 @@ import { signOut } from "firebase/auth";
 import { auth } from "../../firebase/database";
 import Badge from '@mui/material/Badge';
 import { Users } from "../../data/Data";
+import { useState } from "react";
 
 //CSS
 import 'cooltipz-css';
@@ -11,11 +12,15 @@ import "./_style.scss";
 import { ReactComponent as Leads } from '../../images/icons/Leads.svg';
 import { ReactComponent as Admin } from '../../images/icons/Admin.svg';
 import { ReactComponent as Exit } from '../../images/icons/Logoff.svg';
+import { ReactComponent as Report } from '../../images/icons/Report.svg';
+import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
+import MenuIcon from '@mui/icons-material/Menu';
 
 // Imagem
 import Logo from '../../images/LogoCORPBRASIL.png'
 
 const Header = ({ user,  userRef, alerts }) => {
+  const [isOpen, setIsOpen] = useState(false);
 
   const logoff = () => {
     signOut(auth)
@@ -29,6 +34,17 @@ const Header = ({ user,  userRef, alerts }) => {
   const returnPanel = () => {
     document.location.replace("/");
   };
+
+//   const handleClick = (event) => {
+//     setAnchorEl(event.currentTarget);
+//   };
+
+//   const handleClose = () => {
+//     setAnchorEl(null);
+//     setTimeout(() => {
+//       setviewPopover(false);
+//     }, 500);
+// };
 
   return (
     <div className="container-header">
@@ -44,6 +60,9 @@ const Header = ({ user,  userRef, alerts }) => {
               <Leads />
             </Link>
           </Badge>}
+            <Link to="/relatorio" aria-label="Relatório" data-cooltipz-dir="left">
+              <Report className="icon-black" />
+              </Link>
           {user && userRef && (user.email === Users[0].email || userRef.cargo === 'Administrador') ? 
             (<Link to="/admin" aria-label="Painel Administrativo" data-cooltipz-dir="left">
               <Admin />
@@ -54,7 +73,19 @@ const Header = ({ user,  userRef, alerts }) => {
           <Link to="" onClick={logoff} aria-label="Sair" data-cooltipz-dir="left">
             <Exit />
           </Link>
-      </div>
+        </div>
+          <nav className='nav'>
+          <button onClick={() => setIsOpen(!isOpen)} className={'menu-icon'}>
+             <MenuIcon/>
+          </button>
+          <ul className={isOpen ? 'nav-links open' : 'nav-links'}>
+          <li><Link to="/" data-cooltipz-dir="left"><HomeOutlinedIcon sx={{ scale: '1.5' }} />Inicio</Link></li>
+          <li><Link to="/leads" data-cooltipz-dir="left"><Leads /> Leads</Link></li>
+          <li><Link to="/relatorio" data-cooltipz-dir="left"><Report className="icon-black" />Relatório</Link></li>
+          <li><Link to="/admin" data-cooltipz-dir="left"><Admin /> Painel Administrativo</Link></li>
+          <li><Link to="" onClick={logoff} data-cooltipz-dir="left"><Exit /> Sair</Link></li>
+        </ul>
+          </nav>
     </div>
   );
 };
