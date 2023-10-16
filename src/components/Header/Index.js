@@ -19,7 +19,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 // Imagem
 import Logo from '../../images/LogoCORPBRASIL.png'
 
-const Header = ({ user,  userRef, alerts }) => {
+const Header = ({ user,  userRef, alerts, reports }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const logoff = () => {
@@ -46,6 +46,9 @@ const Header = ({ user,  userRef, alerts }) => {
 //     }, 500);
 // };
 
+console.log(reports && reports.length - userRef.relatorio)
+console.log()
+
   return (
     <div className="container-header">
       <div className="container-header__logo">
@@ -55,14 +58,15 @@ const Header = ({ user,  userRef, alerts }) => {
       </div>
       <div className="container-header__nav">
           {user && userRef && (user.email === Users[0].email || userRef.cargo === 'Administrador' || userRef.cargo === 'Vendedor(a)') &&
-          <Badge badgeContent={alerts && alerts.length} color="error">
-          <Link to="/leads" aria-label="Confirmar Leads" data-cooltipz-dir="left">
+          <><Badge badgeContent={alerts && alerts.length} color="error">
+            <Link to="/leads" aria-label="Confirmar Leads" data-cooltipz-dir="left">
               <Leads />
             </Link>
-          </Badge>}
-            <Link to="/relatorio" aria-label="Relatório" data-cooltipz-dir="left">
-              <Report className="icon-black" />
+          </Badge><Badge badgeContent={reports && reports.length - userRef.relatorio} color="error">
+              <Link to="/relatorio" aria-label="Relatório" data-cooltipz-dir="left">
+                <Report className="icon-black" />
               </Link>
+            </Badge></>}
           {user && userRef && (user.email === Users[0].email || userRef.cargo === 'Administrador') ? 
             (<Link to="/admin" aria-label="Painel Administrativo" data-cooltipz-dir="left">
               <Admin />
@@ -80,8 +84,8 @@ const Header = ({ user,  userRef, alerts }) => {
           </button>
           <ul className={isOpen ? 'nav-links open' : 'nav-links'}>
           <li><Link to="/" data-cooltipz-dir="left"><HomeOutlinedIcon sx={{ scale: '1.5' }} />Inicio</Link></li>
-          <li><Link to="/leads" data-cooltipz-dir="left"><Leads /> Leads</Link></li>
-          <li><Link to="/relatorio" data-cooltipz-dir="left"><Report className="icon-black" />Relatório</Link></li>
+          {user && userRef && (user.email === Users[0].email || userRef.cargo === 'Administrador' || userRef.cargo === 'Vendedor(a)') &&
+          <><li><Link to="/leads" data-cooltipz-dir="left"><Leads /> Leads</Link></li><li><Link to="/relatorio" data-cooltipz-dir="left"><Report className="icon-black" />Relatório</Link></li></>}
           {user && userRef && (user.email === Users[0].email || userRef.cargo === 'Administrador') ?
           <li><Link to="/admin" data-cooltipz-dir="left"><Admin /> Painel Administrativo</Link></li> : <></>}
           <li><Link to="" onClick={logoff} data-cooltipz-dir="left"><Exit /> Sair</Link></li>

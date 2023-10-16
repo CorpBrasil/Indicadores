@@ -170,7 +170,7 @@ const Alert = ({user,  userRef, alerts, check}) => {
               open={open}
               onClose={handleClose}
             >
-                <DialogTitle>
+                <DialogTitle sx={{ textAlign: 'center' }}>
                   Qualifique o Lead
                 </DialogTitle>
                 <DialogContent>

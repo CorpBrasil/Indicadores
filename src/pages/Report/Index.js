@@ -1,7 +1,7 @@
-import { useState, useEffect, memo } from "react";
+import { useState, memo } from "react";
 import { dataBase } from "../../firebase/database";
 import Header from "../../components/Header/Index";
-import { collection, query, onSnapshot, orderBy} from "firebase/firestore";
+import {updateDoc, doc} from "firebase/firestore";
 
 // Css
 // import "cooltipz-css";
@@ -25,45 +25,30 @@ import Collapse from '@mui/material/Collapse';
 import { Box } from "@mui/material";
 
 
-const Report = ({ user, leads, activity, userRef, listLeads, members, sellers }) => {
-  const [report, setReport] = useState('');
-  const [reportUser, setReportUser] = useState('');
+const Report = ({ user, userRef, alerts, reports}) => {
   const [open, setOpen] = useState(false);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(20);
 
+  console.log(reports)
 
-  useEffect(() => {
-      const fetchData = async () => {
-          onSnapshot(query(collection(dataBase, "Relatorio"), orderBy("createAt", 'desc')), (list) => {
-            // Atualiza os dados em tempo real
-          setReport(list.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
-          });
-        }
-        fetchData();
-  },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []);
+  // useEffect(() => {
+  //   if(userRef && userRef.cargo === 'Vendedor(a)' && reports) {
+  //     setReportUser(reports.filter((act) => act.consultora_uid === user.id))
+  //   } else if(userRef && userRef.cargo !== 'Vendedor(a)') {
+  //     setReportUser(reports);
+  //   }
+  //   localStorage.setItem('reports', reports && reports.length);
+  // // eslint-disable-next-line react-hooks/exhaustive-deps
+  // },[reports,userRef])
 
-  // const changeFilter = (data) => {
-  //   setReport(data);
-  // }
-
-  useEffect(() => {
-    if(userRef && userRef.cargo === 'Vendedor(a)' && report) {
-      setReportUser(report.filter((act) => act.consultora_uid === user.id))
-    } else if(userRef && userRef.cargo !== 'Vendedor(a)') {
-      setReportUser(report);
+  const handleToggle = async (id) => {
+    if(reports.length - userRef.relatorio !== 0) {
+      await updateDoc(doc(dataBase,"Membros", userRef.id), {
+        relatorio: (reports.length - userRef.relatorio) + userRef.relatorio 
+      })
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  },[report,userRef])
-
-  const handleToggle = (id) => {
     setOpen((prevState) => ({[id]: !prevState[id] }));
-    // onSnapshot(query(collection(dataBase, "Leads/" + id + "/Atividades"), orderBy("createAt")), (act) => {
-    //   // Atualiza os dados em tempo real
-    //   setActivityAll(act.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
-    // });
   };
 
   const handleChangePage = (event, newPage) => {
@@ -108,8 +93,6 @@ const Report = ({ user, leads, activity, userRef, listLeads, members, sellers })
   //     'aria-controls': `simple-tabpanel-${index}`,
   //   };
   // }
-
-  console.log(report)
   
 
   return (
@@ -119,7 +102,7 @@ const Report = ({ user, leads, activity, userRef, listLeads, members, sellers })
               <CircularProgress />
           </Box>
         } */}
-      <Header user={user} userRef={userRef}></Header>
+      <Header user={user} userRef={userRef} alerts={alerts}></Header>
       <div className={styles.title_panel}>
         <ReportIcon className={styles.prospecction_icon}/>
         <h2>Relatório</h2>
@@ -147,7 +130,7 @@ const Report = ({ user, leads, activity, userRef, listLeads, members, sellers })
                   <TableCell align="center"></TableCell>
                 </TableRow>
               </TableHead>
-              {reportUser && reportUser.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((data, index) => (
+              {reports && reports.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((data, index) => (
               <TableBody>
                 <TableRow
                   key={index}
@@ -261,8 +244,8 @@ const Report = ({ user, leads, activity, userRef, listLeads, members, sellers })
             rowsPerPageOptions={[10, 20, 50]}
             labelRowsPerPage="Relatório por página"
             component="div"
-            count={report ? report.length : 0}
-            page={!report || report.length <= 0 ? 0 : page}
+            count={reports ? reports.length : 0}
+            page={!reports || reports.length <= 0 ? 0 : page}
             rowsPerPage={rowsPerPage}
             onPageChange={handleChangePage}
             onRowsPerPageChange={handleChangeRowsPerPage}

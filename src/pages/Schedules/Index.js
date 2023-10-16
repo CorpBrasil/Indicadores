@@ -27,19 +27,21 @@ import Select from '@mui/material/Select';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
+import Badge from '@mui/material/Badge';
 
 import PeopleIcon from '@mui/icons-material/People';
 import LocalGasStationIcon from '@mui/icons-material/LocalGasStation';
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
 import { ReactComponent as Prospection } from '../../images/icons/Prospection.svg';
 import { ReactComponent as Management } from '../../images/icons/Management.svg';
+import { ReactComponent as ReportIcon } from '../../images/icons/Report.svg';
 import CachedIcon from '@mui/icons-material/Cached';
 
 
 
 import './_style.scss';
 
-const Schedules = ({ userRef, alerts, check }) => {
+const Schedules = ({ userRef, alerts, check, reports }) => {
   Geocode.setLanguage("pt-BR");
   Geocode.setRegion("br");
   Geocode.setApiKey(KeyMaps);
@@ -298,7 +300,7 @@ const Schedules = ({ userRef, alerts, check }) => {
 
   return (
     <div className='container-schedules'>
-      <Header user={user} userRef={userRef} alerts={alerts}></Header>
+      <Header user={user} userRef={userRef} alerts={alerts} reports={reports}></Header>
       <div className='title-schedule'>
         <HomeOutlinedIcon sx={{ width: '50px', height: '50px' }} />
         <h1>Inicio</h1>
@@ -358,8 +360,6 @@ const Schedules = ({ userRef, alerts, check }) => {
         }
         </>
           }
-        </div>
-        <div className='buttons-content'>
          {userRef && (user.email === Users[0].email || userRef.cargo === "Vendedor(a)" || userRef.cargo === "Administrador") && userRef.nome !== 'Pós-Venda' &&
          <div className='box-schedule'>
            <li className='schedule'>
@@ -384,8 +384,20 @@ const Schedules = ({ userRef, alerts, check }) => {
          </li>
            </div>
       }
-        </div>
-        <div className='buttons-content'>
+       {userRef && (user.email === Users[0].email || userRef.cargo === "Vendedor(a)" || userRef.cargo === "Administrador") && userRef.nome !== 'Pós-Venda' &&
+       <div className='box-schedule'>
+         <li className='schedule'>
+           <Link className='schedule__content' to="/relatorio">
+           <Badge sx={{ width: '5.6rem', height: '100%' }} badgeContent={reports && reports.length - userRef.relatorio} color="error">
+             <div className='schedule__icon report'><ReportIcon /></div>
+           </Badge>
+             <div className='schedule__text'>
+               <p>Relatório</p>
+             </div>
+             </Link>
+         </li>
+           </div>
+      }
        {userRef && (user.email === Users[0].email || userRef.cargo === "Administrador" || userRef.cargo === "Técnico" || findTec) &&
         <><div className='box-schedule'>
               <li className='schedule'>

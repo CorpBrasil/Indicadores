@@ -13,6 +13,7 @@ import Swal from 'sweetalert2/dist/sweetalert2.js';
 import styles from "./styles.module.scss";
 import moment from "moment";
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
+import axios from "axios";
 
 const Report = ({dataBase, view, openBox, closeBox, collectData, members, userRef }) => {
   const [feedback, setFeedback] = useState("");
@@ -68,6 +69,12 @@ const Report = ({dataBase, view, openBox, closeBox, collectData, members, userRe
             aberto: false,
             setor: 'Comercial',
             feedback: feedback
+          })
+          axios.post('https://backend.botconversa.com.br/api/v1/webhooks-automation/catch/45898/KXM5gjzwvkK4/', {
+            nome: collectData.consultora,
+            relatorio: 'Relatório Comercial - ' + collectData.data_inicio + ' até ' + collectData.data_final,
+            responsavel: userRef && userRef.nome,
+            telefone: members && members.find((cons) => cons.nome === collectData.consultora).telefone
           })
           Swal.fire({
             title: "CORPBRASIL",
