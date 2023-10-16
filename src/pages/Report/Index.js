@@ -51,7 +51,7 @@ const Report = ({ user, leads, activity, userRef, listLeads, members, sellers })
 
   useEffect(() => {
     if(userRef && userRef.cargo === 'Vendedor(a)' && report) {
-      setReportUser(report.filter((act) => act.uid === user.id))
+      setReportUser(report.filter((act) => act.consultora_uid === user.id))
     } else if(userRef && userRef.cargo !== 'Vendedor(a)') {
       setReportUser(report);
     }
