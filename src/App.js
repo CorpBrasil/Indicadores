@@ -112,7 +112,7 @@ function App() {
         <Routes>
           <Route exact element={<PrivateRoute />}>
             <Route exact path="/" element={<Schedules userRef={userRef} alerts={userAlerts} check={check} reports={reports} />} />
-              {user && userRef && (user.email === Users[0].email || userRef.cargo === "Administrador") &&
+              {user && userRef && (user.email === Users[0].email) &&
             <Route exact path="/admin" element={<PanelAdmin user={user} userRef={userRef} alerts={userAlerts} check={check} reports={reports} />} />
             }
             {user && userRef && (user.email === Users[0].email || user.email === Users[1].email || userRef.cargo === "Técnico" || userRef.cargo === "Administrador") &&

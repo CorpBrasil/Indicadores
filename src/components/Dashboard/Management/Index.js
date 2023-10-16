@@ -197,10 +197,10 @@ const Dashboard = ({dataBase, dateValue, activity, leads, consultora, sendData})
         visitas_confirmada: confirmar,
         visitas_naoConfirmada: nconfirmar,
         visitas_meta: meta.visitas,
-        visitas_metaR: visitas && visitas.length/5*100,
+        visitas_metaR: visitas && (visitas.length/5*100).toFixed(0),
         vendas: vendasSheets && vendasSheets.length,
         vendas_meta: meta.vendas,
-        vendas_metaR: vendasSheets && vendasSheets.length/5*100,
+        vendas_metaR: vendasSheets && (vendasSheets.length/5*100).toFixed(0),
         leads: leadsSheets && leadsSheets.length + ganho,
         leadsSheet_robo: leadsRobo,
         leadsSheet_meetime: leadsMeetime,
@@ -213,7 +213,7 @@ const Dashboard = ({dataBase, dateValue, activity, leads, consultora, sendData})
         atividades_ligacao: data2,
         atividades_whats: data3,
         atividades_meta: meta.atividades,
-        atividades_metaR: atividades && atividades.length/100*100
+        atividades_metaR: atividades && (atividades.length/100*100).toFixed(0)
       })
       console.log({
         visitas: visitas && visitas.length,

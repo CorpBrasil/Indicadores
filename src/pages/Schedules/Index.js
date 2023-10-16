@@ -421,11 +421,11 @@ const Schedules = ({ userRef, alerts, check, reports }) => {
               </div></>
       }
         </div>
-      {user.email === Users[0].email &&   
+      {/* {user.email === Users[0].email &&   
       <div className='add-schedule'>
               <button onClick={() => setCreateSchedule(true)} className='add-schedule__btn'></button>
       </div>
-      }
+      } */}
       </div>
       {createSchedule && <CreateSchedule returnSchedule={returnSchedule} schedules={schedules}></CreateSchedule>} 
       <Dialog open={open} onClose={handleClose}>

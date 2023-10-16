@@ -26,8 +26,7 @@ import IconButton from '@mui/material/IconButton';
 const PanelAdmin = ({ user, alerts, userRef }) => {
   const [members, setMembers] = useState();
   const [memberRef, setMemberRef] = useState();
-  const [createAdmin, setCreateAdmin] = useState(undefined);
-  const [editAdmin, setEditAdmin] = useState(undefined);
+  const [open, setOpen] = useState({create: false, edit:false});
   const membersCollectionRef = collection(dataBase, "Membros");
 
   useEffect(() => {
@@ -47,10 +46,22 @@ const PanelAdmin = ({ user, alerts, userRef }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [collection]);
 
-  const returnAdmin = () => {
-    setCreateAdmin(false);
-    setEditAdmin(false);
-  };
+  // const returnAdmin = () => {
+  //   setCreateAdmin(false);
+  //   setEditAdmin(false);
+  // };
+
+  const openBox = (data) => {
+    if(data === 'edit') {
+      setOpen({create: false, edit: true});
+    } else {
+      setOpen({create: true, edit: false});
+    }
+  }
+
+  const close = () => {
+    setOpen({create: false, edit: false});
+  }
 
   return (
     <div className={styles.container_panel}>
@@ -63,7 +74,7 @@ const PanelAdmin = ({ user, alerts, userRef }) => {
         <div className={styles.box_panel}>
             <h1>Colaboradores</h1>
           <div className={styles.box_panel__add}>
-            <button onClick={() => setCreateAdmin(true)}>
+            <button onClick={() => openBox('create')}>
               <AccountCircleIcon className={styles.icon_user} /> 
               <p>Cadastrar novo Colaborador</p>
             </button>
@@ -98,32 +109,19 @@ const PanelAdmin = ({ user, alerts, userRef }) => {
                       <TableCell align="center">{member.senha}</TableCell>
                       <TableCell align="center">{member.cargo}</TableCell>
                       <TableCell align="center">{member.veiculo}</TableCell>
-                      <TableCell align="center">{member.veiculo ? 
-                          (<IconButton
+                      <TableCell align="center">
+                          <IconButton
                             id="basic-button"
                             onClick={() => {
                               setMemberRef(member);
-                              return setEditAdmin(true);
+                              return openBox('edit');
                             }}
-                            aria-label="Editar Veiculo"
+                            aria-label="Editar Perfil"
                             data-cooltipz-dir="left"
                           >
                             <EditIcon sx={{ fill: '#000' }} />
-                          </IconButton>) : null
-                        }
-                        {member.cargo !== "Técnico" ? 
-                          (<IconButton
-                            id="basic-button"
-                            onClick={() => {
-                              setMemberRef(member);
-                              return setEditAdmin(true);
-                            }}
-                            aria-label="Editar Cor"
-                            data-cooltipz-dir="left"
-                          >
-                            <EditIcon />
-                          </IconButton>) : null
-                        }</TableCell>
+                          </IconButton> 
+                        </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -132,12 +130,8 @@ const PanelAdmin = ({ user, alerts, userRef }) => {
           </div>
         </div>
       </div>
-      {createAdmin && (
-        <CreateAdmin returnAdmin={returnAdmin} members={members}></CreateAdmin>
-      )}
-      {editAdmin && (
-        <EditAdmin returnAdmin={returnAdmin} memberRef={memberRef}></EditAdmin>
-      )}
+        <CreateAdmin members={members} open={open.create} close={close} openBox={openBox}></CreateAdmin>
+        <EditAdmin memberRef={memberRef} open={open.edit} close={close} openBox={openBox}></EditAdmin>
     </div>
   );
 };
