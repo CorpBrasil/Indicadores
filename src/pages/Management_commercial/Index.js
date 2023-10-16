@@ -71,7 +71,7 @@ const Commercial = ({ user, leads, activity, userRef, members}) => {
   const [page, setPage] = useState(0);
   const [page2, setPage2] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(20);
-  const [leadsUser, setLeadsUser] = useState(undefined);
+  const [leadsUser, setLeadsUser] = useState(leads);
   const [loading, setLoading] = useState(false);
   // const [sellersOrder, setSellersOrder] = useState(null);
   const [TabsValue, setTabsValue] = useState(0);
@@ -113,15 +113,6 @@ const Commercial = ({ user, leads, activity, userRef, members}) => {
     setLoading(data);
   };
 
-  // useEffect(() => {
-  //   if(userRef && userRef.cargo === 'Vendedor(a)') {
-  //     setLeadsUser(leads.filter((act) => act.uid === user.id))
-  //   } else if(userRef && userRef.cargo !== 'Vendedor(a)') {
-  //     setLeadsUser(leads);
-  //   }
-  // // eslint-disable-next-line react-hooks/exhaustive-deps
-  // },[leads,userRef])
-
   useEffect(() => {
     if(consultora !== 'Geral') {
       setLeadsUser(leads.filter((act) => act.consultora === consultora))
@@ -129,7 +120,7 @@ const Commercial = ({ user, leads, activity, userRef, members}) => {
       setLeadsUser(leads);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  },[consultora])
+  },[consultora, leads])
 
 
   const handleToggle = (id) => {
@@ -314,6 +305,8 @@ const Commercial = ({ user, leads, activity, userRef, members}) => {
       console.log(error)
     }
   }
+
+  
 
 const openAnotacaoBox = (act, type) => {
   setAnotacao(act.anotacao);

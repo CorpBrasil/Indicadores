@@ -27,6 +27,7 @@ import { Box } from "@mui/material";
 
 const Report = ({ user, leads, activity, userRef, listLeads, members, sellers }) => {
   const [report, setReport] = useState('');
+  const [reportUser, setReportUser] = useState('');
   const [open, setOpen] = useState(false);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(20);
@@ -47,6 +48,15 @@ const Report = ({ user, leads, activity, userRef, listLeads, members, sellers })
   // const changeFilter = (data) => {
   //   setReport(data);
   // }
+
+  useEffect(() => {
+    if(userRef && userRef.cargo === 'Vendedor(a)' && report) {
+      setReportUser(report.filter((act) => act.uid === user.id))
+    } else if(userRef && userRef.cargo !== 'Vendedor(a)') {
+      setReportUser(report);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  },[report,userRef])
 
   const handleToggle = (id) => {
     setOpen((prevState) => ({[id]: !prevState[id] }));
@@ -137,7 +147,7 @@ const Report = ({ user, leads, activity, userRef, listLeads, members, sellers })
                   <TableCell align="center"></TableCell>
                 </TableRow>
               </TableHead>
-              {report && report.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((data, index) => (
+              {reportUser && reportUser.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((data, index) => (
               <TableBody>
                 <TableRow
                   key={index}

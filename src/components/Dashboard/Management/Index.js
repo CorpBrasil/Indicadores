@@ -127,7 +127,7 @@ const Dashboard = ({dataBase, dateValue, activity, leads, consultora, sendData})
       }
   }, [visitas, dateValue]);
 
-  // console.log(leadsSheetsRef)
+  console.log(leads && leads.filter((el) => el.updateAt && el.updateAt.seconds*1000))
 
   useEffect(() => {
     if(consultora === 'Geral') {
@@ -136,9 +136,15 @@ const Dashboard = ({dataBase, dateValue, activity, leads, consultora, sendData})
             const data2 = moment(dateValue[1]).format('YYYY-MM-DD');
             setVisitas(visitasAll && visitasAll.filter((item) => (moment(data1).isSameOrBefore(moment(item.data).format('YYYY-MM-DD')) && moment(data2).isSameOrAfter(moment(item.data).format('YYYY-MM-DD')))))
             setAtividades(activity && activity.filter((item) => (moment(data1).isSameOrBefore(moment(item.createAt.seconds*1000).format('YYYY-MM-DD')) && moment(data2).isSameOrAfter(moment(item.createAt.seconds*1000).format('YYYY-MM-DD')))))
-            // setAllLeads(leads && leads.filter((item) => (moment(data1).isSameOrBefore(moment.unix(item.createAt.seconds).format('YYYY-MM-DD')) && moment(data2).isSameOrAfter(moment.unix(item.createAt.seconds).format('YYYY-MM-DD')))))
             setLeadsSheets(leadsSheetsRef && leadsSheetsRef.filter((item) => (moment(data1).isSameOrBefore(moment(item[0]).format('YYYY-MM-DD')) && moment(data2).isSameOrAfter(moment(item[0]).format('YYYY-MM-DD')))))
             setVendasSheets(vendasSheetsRef && vendasSheetsRef.filter((item) => (moment(data1).isSameOrBefore(moment(item[0]).format('YYYY-MM-DD')) && moment(data2).isSameOrAfter(moment(item[0]).format('YYYY-MM-DD')))))
+            setAllLeads(leads);
+            setGanho(leads ? leads.filter((vis) => vis.status === 'Ganho' && vis.updateAt &&
+            moment(data1).isSameOrBefore(moment(vis.updateAt.seconds*1000)) &&
+            moment(data2).isSameOrAfter(moment(vis.updateAt.seconds*1000))).length : 0);
+            setPerdido(leads ? leads.filter((vis) => vis.status === 'Perdido' && vis.updateAt &&
+            moment(data1).isSameOrBefore(moment(vis.updateAt.seconds*1000)) &&
+            moment(data2).isSameOrAfter(moment(vis.updateAt.seconds*1000))).length : 0);
           } else {
           setVisitas(visitasAll);
           setAtividades(activity);
@@ -157,19 +163,20 @@ const Dashboard = ({dataBase, dateValue, activity, leads, consultora, sendData})
         const data2 = moment(dateValue[1]).format('YYYY-MM-DD');
         setVisitas(visitasAll && visitasAll.filter((item) => (moment(data1).isSameOrBefore(moment(item.data).format('YYYY-MM-DD')) && moment(data2).isSameOrAfter(moment(item.data).format('YYYY-MM-DD')) && item.consultora === consultora )))
         setAtividades(activity && activity.filter((item) => (moment(data1).isSameOrBefore(moment(item.createAt.seconds*1000).format('YYYY-MM-DD')) && moment(data2).isSameOrAfter(moment(item.createAt.seconds*1000).format('YYYY-MM-DD')) && item.consultora === consultora )))
-        // setAllLeads(leads && leads.filter((item) => (moment(data1).isSameOrBefore(moment.unix(item.createAt.seconds).format('YYYY-MM-DD')) && moment(data2).isSameOrAfter(moment.unix(item.createAt.seconds).format('YYYY-MM-DD')) && item.consultora === consultora )))
         setAllLeads(leads && leads.filter(item => item.consultora === consultora));
         setLeadsSheets(leadsSheetsRef && leadsSheetsRef.filter((item) => (moment(data1).isSameOrBefore(moment(item[0]).format('YYYY-MM-DD')) && moment(data2).isSameOrAfter(moment(item[0]).format('YYYY-MM-DD')) && item[9] === consultora)))
         setVendasSheets(vendasSheetsRef && vendasSheetsRef.filter((item) => (moment(data1).isSameOrBefore(moment(item[0]).format('YYYY-MM-DD')) && moment(data2).isSameOrAfter(moment(item[0]).format('YYYY-MM-DD')) && item[7] === consultora)))
+        setGanho(leads ? leads.filter((vis) => vis.status === 'Ganho' && vis.updateAt && vis.consultora === consultora &&
+        moment(data1).isSameOrBefore(moment(vis.updateAt.seconds*1000)) &&
+        moment(data2).isSameOrAfter(moment(vis.updateAt.seconds*1000))).length : 0);
+        setPerdido(leads ? leads.filter((vis) => vis.status === 'Perdido' && vis.updateAt && vis.consultora === consultora &&
+        moment(data1).isSameOrBefore(moment(vis.updateAt.seconds*1000)) &&
+        moment(data2).isSameOrAfter(moment(vis.updateAt.seconds*1000))).length : 0);
       } else {
       setVisitas(visitasAll);
       setAtividades(activity);
-      // setData1(activity ? activity.filter((vis) => vis.atividade === 'Email' && vis.consultora === consultora).length : 0);
-      // setData2(activity ? activity.filter((vis) => vis.atividade === 'Ligação' && vis.consultora === consultora).length : 0);
-      // setData3(activity ? activity.filter((vis) => vis.atividade === 'WhatsApp' && vis.consultora === consultora).length : 0);
-      // setGanho(leads ? leads.filter((vis) => vis.status === 'Ganho' && vis.consultora === consultora).length : 0);
-      // setPerdido(leads ? leads.filter((vis) => vis.status === 'Perdido' && vis.consultora === consultora).length : 0);
-      // setAllLeads(leads);
+      setGanho(leads ? leads.filter((vis) => vis.status === 'Ganho' && vis.consultora === consultora).length : 0);
+      setPerdido(leads ? leads.filter((vis) => vis.status === 'Perdido' && vis.consultora === consultora).length : 0);
       setAllLeads(leads && leads.filter(item => item.consultora === consultora));
       setLeadsSheets(leadsSheetsRef && leadsSheetsRef);
       setVendasSheets(vendasSheetsRef && vendasSheetsRef);
@@ -237,30 +244,14 @@ const Dashboard = ({dataBase, dateValue, activity, leads, consultora, sendData})
 
 
   useEffect(() => {
-    const dataValue1 = dateValue && moment(dateValue[0]).format('YYYY-MM-DD');
-    const dataValue2 = dateValue && moment(dateValue[1]).format('YYYY-MM-DD');
-    console.log(dataValue1, dataValue2)
-    if(atividades !== activity && consultora === 'Geral') {
+    if(atividades && consultora === 'Geral') {
       setData1(atividades ? atividades.filter((vis) => vis.atividade === 'Email').length : activity && activity.filter((vis) => vis.atividade === 'Email').length);
       setData2(atividades ? atividades.filter((vis) => vis.atividade === 'Ligação').length : activity && activity.filter((vis) => vis.atividade === 'Ligação').length);
       setData3(atividades ? atividades.filter((vis) => vis.atividade === 'WhatsApp').length : activity && activity.filter((vis) => vis.atividade === 'WhatsApp').length);
-      setGanho(allLeads ? allLeads.filter((vis) => vis.status === 'Ganho' &&
-      moment(dataValue1).isSameOrBefore(moment(vis.dataRef)) &&
-      moment(dataValue2).isSameOrAfter(moment(vis.dataRef))).length : leads && leads.filter((vis) => vis.status === 'Ganho').length);
-      setPerdido(allLeads ? 
-      allLeads.filter((vis) => vis.status === 'Perdido' && moment(dataValue1).isSameOrBefore(moment(vis.dataRef)) &&
-      moment(dataValue2).isSameOrAfter(moment(vis.dataRef))).length : leads && leads.filter((vis) => vis.status === 'Perdido').length);
     } else {
       setData1(atividades ? atividades.filter((vis) => vis.atividade === 'Email').length : 0);
       setData2(atividades ? atividades.filter((vis) => vis.atividade === 'Ligação').length : 0);
       setData3(atividades ? atividades.filter((vis) => vis.atividade === 'WhatsApp').length : 0);
-      console.log(allLeads && allLeads.filter((el) => el.email === "costelaenome@hotmail.com"));
-      setGanho(allLeads ? allLeads.filter((vis) => vis.status === 'Ganho' && vis.consultora === consultora &&
-      moment(dataValue1).isSameOrBefore(moment(vis.dataRef)) &&
-      moment(dataValue2).isSameOrAfter(moment(vis.dataRef))).length : 0);
-      setPerdido(allLeads ? allLeads.filter((vis) => vis.status === 'Perdido' && vis.consultora === consultora &&
-      moment(dataValue1).isSameOrBefore(moment(vis.dataRef)) &&
-      moment(dataValue2).isSameOrAfter(moment(vis.dataRef))).length : 0); // Parei aqui
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   },[atividades, allLeads, dateValue, activity, consultora])
@@ -275,41 +266,16 @@ const Dashboard = ({dataBase, dateValue, activity, leads, consultora, sendData})
 
   console.log(leadsSheets)
 
-  // useEffect(() => {
-  //   if(visitas && dateValue) {
-  //     let dataChartRef = [];
-  //     let dataChartRef2 = [];
-  //     let final = dateValue[1];
-  //     let inicio2 = dateValue[0];
-  //     for(let inicio = inicio2; inicio <= final; inicio.setDate(inicio.getDate() + 1)) {
-  //         dataChartRef.push({ name: moment(inicio).format("DD/MM/YYYY"), Confirmada: visitas && visitas.filter((v) => v.data === moment(inicio).format("YYYY-MM-DD") && v.confirmar === true && v.categoria !== 'pos_venda').length,
-  //         Nao_Confirmada: visitas && visitas.filter((v) => v.data === moment(inicio).format("YYYY-MM-DD") && v.confirmar === false && v.categoria !== 'pos_venda').length})
-  //       }
-  //       dataChartRef2 = dataChartRef.sort((a,b) => {
-  //         if(a.name > b.name) {
-  //           return 1;
-  //         } else if(a.name < b.name) {
-  //           return -1;
-  //         } return 0;
-  //       })
-  //       setdataChart(dataChartRef2)
-  //   }
-  // // eslint-disable-next-line react-hooks/exhaustive-deps
-  // },[visitas, dateValue])
-
-
   useEffect(() => {
-    if(visitas) {
+    if(visitas && dateValue) {
       let dataChartRef = [];
       let dataChartRef2 = [];
-      let dia = [];
-        visitas && visitas.forEach((vis) => {
-          if(!dia.includes(vis.data)) {   
-            dia.push(vis.data)
-            dataChartRef.push({ name: moment(vis.data).format("DD/MM/YYYY"), Confirmada: visitas && visitas.filter((v) => v.data === vis.data && v.confirmar === true && v.categoria !== 'pos_venda').length,
-            Nao_Confirmada: visitas && visitas.filter((v) => v.data === vis.data && v.confirmar === false && v.categoria !== 'pos_venda').length})
-          }
-        })
+      let inicio2 = moment(dateValue[0]);
+      let final = moment(dateValue[1]);
+      for(let inicio = inicio2; inicio <= final; inicio.add(1, 'days')) {
+          dataChartRef.push({ name: moment(inicio).format("DD/MM/YYYY"), Confirmada: visitas && visitas.filter((v) => v.data === moment(inicio).format("YYYY-MM-DD") && v.confirmar === true && v.categoria !== 'pos_venda').length,
+          Nao_Confirmada: visitas && visitas.filter((v) => v.data === moment(inicio).format("YYYY-MM-DD") && v.confirmar === false && v.categoria !== 'pos_venda').length})
+        }
         dataChartRef2 = dataChartRef.sort((a,b) => {
           if(a.name > b.name) {
             return 1;
@@ -320,18 +286,21 @@ const Dashboard = ({dataBase, dateValue, activity, leads, consultora, sendData})
         setdataChart(dataChartRef2)
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  },[visitas])
+  },[visitas, dateValue])
+
 
   // useEffect(() => {
-  //   if(atividades && dateValue) {
+  //   if(visitas) {
   //     let dataChartRef = [];
   //     let dataChartRef2 = [];
-  //     let final = dateValue[1];
-  //     for(let inicio2 = dateValue[0]; inicio2 <= final; inicio2.setDate(inicio2.getDate() + 1)) {
-
-  //         dataChartRef.push({ name: moment(inicio2).format("DD/MM/YYYY"), Atividades: atividades && atividades.filter((v) => v.dataRef === moment(inicio2).format("YYYY-MM-DD")).length})
-  //         console.log('11111111111111111111111')
-  //       }
+  //     let dia = [];
+  //       visitas && visitas.forEach((vis) => {
+  //         if(!dia.includes(vis.data)) {   
+  //           dia.push(vis.data)
+  //           dataChartRef.push({ name: moment(vis.data).format("DD/MM/YYYY"), Confirmada: visitas && visitas.filter((v) => v.data === vis.data && v.confirmar === true && v.categoria !== 'pos_venda').length,
+  //           Nao_Confirmada: visitas && visitas.filter((v) => v.data === vis.data && v.confirmar === false && v.categoria !== 'pos_venda').length})
+  //         }
+  //       })
   //       dataChartRef2 = dataChartRef.sort((a,b) => {
   //         if(a.name > b.name) {
   //           return 1;
@@ -339,24 +308,21 @@ const Dashboard = ({dataBase, dateValue, activity, leads, consultora, sendData})
   //           return -1;
   //         } return 0;
   //       })
-  //       setdataChart2(dataChartRef2)
+  //       setdataChart(dataChartRef2)
   //   }
   // // eslint-disable-next-line react-hooks/exhaustive-deps
-  // },[visitas, dateValue])
-
-  // console.log(dateValue)
+  // },[visitas])
 
   useEffect(() => {
-    if(atividades) {
+    if(atividades && dateValue) {
       let dataChartRef = [];
       let dataChartRef2 = [];
-      let dia = [];
-        atividades && atividades.forEach((vis) => {
-          if(!dia.includes(moment(vis.createAt.seconds*1000).format('YYYY-MM-DD'))) {   
-            dia.push(moment(vis.createAt.seconds*1000).format('YYYY-MM-DD'))
-            dataChartRef.push({ name: moment(vis.createAt.seconds*1000).format('DD/MM/YYYY'), Atividades: atividades && atividades.filter((v) => moment(v.createAt.seconds*1000).format('YYYY-MM-DD') === moment(vis.createAt.seconds*1000).format('YYYY-MM-DD')).length})
-          }
-        })
+      let final = moment(dateValue[1]);
+      let inicio2 = moment(dateValue[0]);
+      for(let inicio = inicio2; inicio <= final; inicio.add(1, 'days')) {
+
+          dataChartRef.push({ name: moment(inicio2).format("DD/MM/YYYY"), Atividades: atividades && atividades.filter((v) => v.dataRef === moment(inicio2).format("YYYY-MM-DD")).length})
+        }
         dataChartRef2 = dataChartRef.sort((a,b) => {
           if(a.name > b.name) {
             return 1;
@@ -367,7 +333,30 @@ const Dashboard = ({dataBase, dateValue, activity, leads, consultora, sendData})
         setdataChart2(dataChartRef2)
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  },[visitas])
+  },[visitas, dateValue])
+
+  // useEffect(() => {
+  //   if(atividades) {
+  //     let dataChartRef = [];
+  //     let dataChartRef2 = [];
+  //     let dia = [];
+  //       atividades && atividades.forEach((vis) => {
+  //         if(!dia.includes(moment(vis.createAt.seconds*1000).format('YYYY-MM-DD'))) {   
+  //           dia.push(moment(vis.createAt.seconds*1000).format('YYYY-MM-DD'))
+  //           dataChartRef.push({ name: moment(vis.createAt.seconds*1000).format('DD/MM/YYYY'), Atividades: atividades && atividades.filter((v) => moment(v.createAt.seconds*1000).format('YYYY-MM-DD') === moment(vis.createAt.seconds*1000).format('YYYY-MM-DD')).length})
+  //         }
+  //       })
+  //       dataChartRef2 = dataChartRef.sort((a,b) => {
+  //         if(a.name > b.name) {
+  //           return 1;
+  //         } else if(a.name < b.name) {
+  //           return -1;
+  //         } return 0;
+  //       })
+  //       setdataChart2(dataChartRef2)
+  //   }
+  // // eslint-disable-next-line react-hooks/exhaustive-deps
+  // },[visitas])
 
   return (
     <div className={styles.dashboard}>
