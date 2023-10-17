@@ -510,7 +510,8 @@ const EditVisit = ({
                   confirmar: false,
                   categoria: 'lunch',
                   corTec: tecRefUID.cor,
-                  updateVisit: new Date()
+                  updateVisit: new Date(),
+                  dataRef: new Date(`${dataTexto}T${saidaTexto}`)
                 });
               }
               if (
@@ -543,7 +544,8 @@ const EditVisit = ({
                     tipo: "Visita",
                     categoria: visitRef.categoria,
                     corTec: tecRefUID.cor,
-                    updateVisit: new Date() 
+                    updateVisit: new Date(),
+                    dataRef: new Date(`${dataTexto}T${horarioTexto}`) 
                   }
                 );
               } else if (
@@ -573,7 +575,8 @@ const EditVisit = ({
                     cor: sellerRef.cor,
                     categoria: visitRef.categoria, //Alterar
                     corTec: tecRefUID.cor,
-                    updateVisit: new Date() 
+                    updateVisit: new Date(),
+                    dataRef: new Date(`${dataTexto}T${horarioTexto}`) 
                   }
                 );
               }

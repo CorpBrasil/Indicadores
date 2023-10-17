@@ -415,7 +415,8 @@ const CreateVisitGroup = ({ returnSchedule, tecs, sellers, userRef, visitRef,
                 tipo: "Visita Conjunta",
                 categoria: typeRef,
                 corTec: tecRefUID.cor,
-                createVisit: new Date()
+                createVisit: new Date(),
+                dataRef: new Date(`${dataTexto}T${horarioTexto}`)
               })
             } else {
               if(visitRef.categoria !== "lunch") {
@@ -461,7 +462,8 @@ const CreateVisitGroup = ({ returnSchedule, tecs, sellers, userRef, visitRef,
                   tipo: 'Visita Conjunta',
                   categoria: typeRef,
                   corTec: tecRefUID.cor,
-                  createVisit: new Date()
+                  createVisit: new Date(),
+                  dataRef: new Date(`${dataTexto}T${horarioTexto}`)
                 };
   
                 // const visitaConjunta = {

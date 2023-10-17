@@ -40,7 +40,7 @@ import {
   orderBy,
   deleteDoc,
   updateDoc,
-  setDoc,
+  setDoc
 } from "firebase/firestore";
 
 import "cooltipz-css";
@@ -88,7 +88,7 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts, check }) => {
   useEffect(
     () => {
       const fetchData = async () => {
-        const q = query(schedulesCollectionRef, orderBy("dia"));
+        const q = query(schedulesCollectionRef, orderBy("dataRef"));
         onSnapshot(await q, (schedule) => {
           // Atualiza os dados em tempo real
           setSchedule(
@@ -130,20 +130,27 @@ const Schedule = ({ userRef, members, tecs, sellers, alerts, check }) => {
     }
   }, [checked]);
 
-  useEffect(() => {
-    if (schedule && monthSelect) {
-      setSchedule(
-        schedule.sort((a, b) => {
-          // Força a renderizaram da tabela ordenada
-            if (moment(a.chegadaCliente) < moment(b.chegadaCliente)) return -1;
-            if (moment(a.chegadaCliente) > moment(b.chegadaCliente)) return 1;
+  // useEffect(() => {
+  //   if (schedule) {
+  //     schedule.map(async (visita) => {
+  //       await updateDoc(doc(dataBase, "Agendas", year, monthSelect, visita.id), {
+  //         dataRef: new Date(`${visita.data}T${visita.chegadaCliente}`)
+          
+  //       })
+  //     })
+  //     // setSchedule(
+  //     //   dayVisits && dayVisits.sort((a, b) => {
+  //     //     // Força a renderizaram da tabela ordenada
+  //     //       if (moment(a.saidaEmpresa) < moment(b.saidaEmpresa)) return -1;
+  //     //       if (moment(a.saidaEmpresa) > moment(b.saidaEmpresa)) return 1;      
+  //     //     return 0;
+  //     //   }));
         
-          return 0;
-        }));
-        // filterSchedule(schedule);
-      }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [monthSelect, schedule]);
+  //     }
+  // // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [monthSelect, schedule, dayVisits]);
+
+
 
   // useEffect(
   //   () => {

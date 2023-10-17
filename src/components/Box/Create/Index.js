@@ -338,7 +338,8 @@ const CreateVisit = ({
                 tipo: "Almoço",
                 categoria: type,
                 corTec: tecRefUID.cor,
-                createVisit: new Date() 
+                createVisit: new Date(),
+                dataRef: new Date(`${dataTexto}T${horarioTexto}`) 
               });
               Swal.fire({
                 title: Company,
@@ -379,7 +380,8 @@ const CreateVisit = ({
                 tipo: 'Visita',
                 categoria: type,
                 corTec: tecRefUID.cor,
-                createVisit: new Date() 
+                createVisit: new Date(),
+                dataRef: new Date(`${dataTexto}T${horarioTexto}`) 
               };
                   createVisit(visita)
             }
