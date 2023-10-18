@@ -30,8 +30,20 @@ const CreateProspection = ({
   Geocode.setApiKey(KeyMaps);
   Geocode.setLocationType("ROOFTOP");
 
+  useEffect(() => {
+    const dataLoad = () => {
+      navigator.geolocation.getCurrentPosition(function (position) {
+        setLat(position.coords.latitude);
+        setLng(position.coords.longitude);
+      }) 
+    }
+    dataLoad();
+  },[])
+
+  console.log(lat)
+
   useEffect( () => {
-    if(!cidade && lng) {
+    if(!cidade) {
       Geocode.fromLatLng(lat,lng).then(
         async (response) => {
           // console.log(response)
@@ -48,12 +60,8 @@ const CreateProspection = ({
   const onSubmit = async (userData) => {
     const day = moment();
     console.log(moment(day).format('DD MMM YYYY - HH:mm'))
-    try {
+    try {      
       if(cidade) {
-        navigator.geolocation.getCurrentPosition(function (position) {
-          setLat(position.coords.latitude);
-          setLng(position.coords.longitude);
-        })       
         Swal.fire({
           title: Company,
           html: `Você deseja cadastrar o <b>Lead?</b>`,
