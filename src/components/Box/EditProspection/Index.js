@@ -36,26 +36,26 @@ const EditProspection = ({
   };
 
 
-  useEffect(() => {
-    const fethData = async () => {
-      setValue('cnpj', data.cnpj.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, "$1 $2 $3/$4-$5"));
-      setValue('nome', data.nome);
-      setValue('empresa', data.empresa);
-      setValue('cidade', data.cidade);
-      setValue('email', data.email);
-      setValue('consumo', data.consumo);
-    }
-    fethData();
+  // useEffect(() => {
+  //   const fethData = async () => {
+  //     // setValue('cnpj', data.cnpj.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, "$1 $2 $3/$4-$5"));
+  //     setValue('nome', data.nome);
+  //     setValue('empresa', data.empresa);
+  //     setValue('cidade', data.cidade);
+  //     setValue('email', data.email);
+  //     setValue('consumo', data.consumo);
+  //   }
+  //   fethData();
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  },[setValue])
+  // // eslint-disable-next-line react-hooks/exhaustive-deps
+  // },[setValue])
 
   // console.log(watched);
 
   useEffect(() => {
     // eslint-disable-next-line no-self-compare
-    if (JSON.stringify(watched) === JSON.stringify(watched) && !viewEdit) { // Verificar Depois
-      setValue('cnpj', data.cnpj.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, "$1 $2 $3/$4-$5"));
+    if (JSON.stringify(watched) === JSON.stringify(watched) && !viewEdit) {
+      // setValue('cnpj', data.cnpj.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, "$1 $2 $3/$4-$5"));
       setValue('nome', data.nome);
       setValue('empresa', data.empresa);
       setValue('cidade', data.cidade);
@@ -110,16 +110,6 @@ const EditProspection = ({
     <div className="box-visit__container">
                   <form onSubmit={handleSubmit(onSubmit)}>
                   <div className="box-visit__form"> 
-                  <label className="label">
-                    <p>CNPJ *</p>
-                    <input
-                      className="label__input"
-                      type="text"
-                      autoComplete="off"
-                      required={inputState === 'required'}
-                      disabled={inputState === 'disabled'}
-                      {...register("cnpj")} />
-                  </label>
                   <label className="label">
                     <p>Nome *</p>
                     <input

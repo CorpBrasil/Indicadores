@@ -57,12 +57,13 @@ console.log()
         </Link>
       </div>
       <div className="container-header__nav">
-          {user && userRef && (user.email === Users[0].email || userRef.cargo === 'Administrador' || userRef.cargo === 'Vendedor(a)') &&
-          <><Badge badgeContent={alerts && alerts.length} color="error">
-            <Link to="/leads" aria-label="Confirmar Leads" data-cooltipz-dir="left">
-              <Leads />
-            </Link>
-          </Badge><Badge badgeContent={reports && reports.length - userRef.relatorio} color="error">
+          {user && userRef && (user.email === Users[0].email || userRef.cargo === 'Administrador' || userRef.cargo === 'Indicador') &&
+           // <Badge badgeContent={alerts && alerts.length} color="error">
+          //   <Link to="/leads" aria-label="Confirmar Leads" data-cooltipz-dir="left">
+          //     <Leads />
+          //   </Link>
+          // </Badge>
+          <><Badge badgeContent={reports && reports.length - userRef.relatorio} color="error">
               <Link to="/relatorio" aria-label="Relatório" data-cooltipz-dir="left">
                 <Report className="icon-black" />
               </Link>

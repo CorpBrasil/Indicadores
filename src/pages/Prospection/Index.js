@@ -22,7 +22,8 @@ import EditProspection from "../../components/Box/EditProspection/Index";
 import CreateActivity from "../../components/Box/CreateActivity/Index";
 import Filter from "../../components/Filter/Index";
 import Dashboard from "../../components/Dashboard/Visit_and_Prospection/Index";
-import ImportLeads from "../../components/Prospection/ImportLeads";
+// import ImportLeads from "../../components/Prospection/ImportLeads";
+import PostAddIcon from '@mui/icons-material/PostAdd';
 
 import { ReactComponent as ProspectionIcon } from '../../images/icons/Prospection.svg';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
@@ -77,7 +78,7 @@ const Prospection = ({ user, leads, activity, userRef, listLeads, members, selle
   const [sellersOrder, setSellersOrder] = useState(null);
   const [TabsValue, setTabsValue] = useState(0);
   const [activityAll, setActivityAll] = useState();
-  const [viewImport, setViewImport] = useState(false);
+  // const [viewImport, setViewImport] = useState(false);
 
 
   useEffect(() => {
@@ -343,58 +344,58 @@ const closeAnotacaoBox = () => {
     };
   }
 
-  const closeImport = () => {
-    setViewImport(false);
-  }
+  // const closeImport = () => {
+  //   setViewImport(false);
+  // }
 
-  const openImport = () => {
-    setViewImport(true);
-  }
+  // const openImport = () => {
+  //   setViewImport(true);
+  // }
 
-  const deleteList = (list) => {
-    try {
-      Swal.fire({
-        title: 'Atenção',
-        html: `Você deseja excluir a lista <b>(${list.nome})</b>? <br /><br />` +
-        `Importante: Ao excluir <b>(${list.nome})</b>, todos os leads vinculados a essa lista também serão removidos.<br /> <b>Esta ação é irreversível!</b>`,
-        icon: "question",
-        showCancelButton: true,
-        showCloseButton: true,
-        confirmButtonColor: "#F39200",
-        cancelButtonColor: "#d33",
-        confirmButtonText: "Sim",
-        cancelButtonText: "Não",
-      }).then(async (result) => {
-        if(result.isConfirmed) {
-        changeLoading(true);
-        const listRef = leads.filter((ref) => ref.listaID === list.id);
-        Promise.all(listRef.map(async (data) => {
-          await deleteDoc(doc(dataBase, "Leads", data.id))
-        })).then(async (result) => {
-          if(result) {
-            const day = moment();
-            await updateDoc(doc(dataBase, "Lista_Leads", list.id), {
-              status: "Excluido",
-              dataStatus: moment(day).format('DD MMM YYYY - HH:mm')
-            }).then(() => {
-              changeLoading(false);
-              Swal.fire({
-                title: Company,
-                html: `A lista foi excluida com sucesso.`,
-                icon: "success",
-                showConfirmButton: true,
-                showCloseButton: true,
-                confirmButtonColor: "#F39200",
-              })
-            })
-        }
-      })
-    }
-    })
-  } catch {
+  // const deleteList = (list) => {
+  //   try {
+  //     Swal.fire({
+  //       title: 'Atenção',
+  //       html: `Você deseja excluir a lista <b>(${list.nome})</b>? <br /><br />` +
+  //       `Importante: Ao excluir <b>(${list.nome})</b>, todos os leads vinculados a essa lista também serão removidos.<br /> <b>Esta ação é irreversível!</b>`,
+  //       icon: "question",
+  //       showCancelButton: true,
+  //       showCloseButton: true,
+  //       confirmButtonColor: "#F39200",
+  //       cancelButtonColor: "#d33",
+  //       confirmButtonText: "Sim",
+  //       cancelButtonText: "Não",
+  //     }).then(async (result) => {
+  //       if(result.isConfirmed) {
+  //       changeLoading(true);
+  //       const listRef = leads.filter((ref) => ref.listaID === list.id);
+  //       Promise.all(listRef.map(async (data) => {
+  //         await deleteDoc(doc(dataBase, "Leads", data.id))
+  //       })).then(async (result) => {
+  //         if(result) {
+  //           const day = moment();
+  //           await updateDoc(doc(dataBase, "Lista_Leads", list.id), {
+  //             status: "Excluido",
+  //             dataStatus: moment(day).format('DD MMM YYYY - HH:mm')
+  //           }).then(() => {
+  //             changeLoading(false);
+  //             Swal.fire({
+  //               title: Company,
+  //               html: `A lista foi excluida com sucesso.`,
+  //               icon: "success",
+  //               showConfirmButton: true,
+  //               showCloseButton: true,
+  //               confirmButtonColor: "#F39200",
+  //             })
+  //           })
+  //       }
+  //     })
+  //   }
+  //   })
+  // } catch {
 
-    }
-  }
+  //   }
+  // }
   
 
   return (
@@ -411,7 +412,7 @@ const closeAnotacaoBox = () => {
           <Dashboard schedule={activity} type={'prospeccao'} />
       </div>
       <div className={styles.content_panel}>
-        {userRef && userRef.cargo === "Administrador" && 
+        {/* {userRef && userRef.cargo === "Administrador" && 
           <div className={styles.content_list}>
             <h2>Histórico de Importação de Leads</h2>
             <TableContainer className={styles.table_center} component={Paper}>
@@ -423,7 +424,7 @@ const closeAnotacaoBox = () => {
                     <TableCell align="center">Nome</TableCell>
                     <TableCell align="center">Leads</TableCell>
                     <TableCell align="center">Responsável</TableCell>
-                    <TableCell align="center">Consultora</TableCell>
+                    <TableCell align="center">Indicador</TableCell>
                     <TableCell align="center">Ação</TableCell>
                   </TableRow>
                 </TableHead>
@@ -487,25 +488,25 @@ const closeAnotacaoBox = () => {
               />
             </TableContainer>
           </div>
-        }
+        } */}
         <div className={styles.box_panel}>
             <h2>Leads</h2>
           <div className={styles.box_panel_add}>
             {!view && !view ? 
-            <><button className={styles.box_panel_add_activity} onClick={() => setView(true)}>
+            <button className={styles.box_panel_add_activity} onClick={() => setView(true)}>
                 <ProspectionIcon className={styles.prospecction_icon} />
                 <p>Cadastrar Lead</p>
-              </button>
-              {userRef && userRef.cargo === "Administrador" && 
+              </button> 
+              :
+              <CreateProspection userRef={userRef} returnPage={returnPage} changeLoading={changeLoading} />
+            }
+              {/* {userRef && userRef.cargo === "Administrador" && 
               <><button className={styles.box_panel_add_activity} onClick={() => setViewImport(true)}>
                     <PersonAddAltIcon className={styles.prospecction_icon} />
                     <p>Importar Leads</p>
                   </button><ImportLeads members={members} company={Company} dataBase={dataBase} view={viewImport}
                     open={openImport} close={closeImport} userRef={userRef} changeLoading={changeLoading} /></>
-                }
-                </> :
-            <CreateProspection userRef={userRef} returnPage={returnPage} changeLoading={changeLoading} />
-          }
+                  } */}    
           </div>
             <Filter tableData={leadsUser} 
             dataFull={leads} 
@@ -524,8 +525,8 @@ const closeAnotacaoBox = () => {
                   <TableCell align="center">Responsável</TableCell>
                   <TableCell align="center">Empresa</TableCell>
                   <TableCell align="center">Cidade</TableCell>
-                  <TableCell align="center">Consultora</TableCell>
-                  <TableCell align="center">Atividades</TableCell>
+                  <TableCell align="center">Indicador(a)</TableCell>
+                  <TableCell align="center">Código</TableCell>
                   <TableCell align="center">Anotação</TableCell>
                   <TableCell align="center"></TableCell>
                 </TableRow>
@@ -553,11 +554,9 @@ const closeAnotacaoBox = () => {
                   <TableCell align="center">{data.nome ? data.nome.substring(0, 30) + '...' : ""}</TableCell>
                   <TableCell align="center">{data.empresa}</TableCell>
                   <TableCell align="center">{data.cidade}</TableCell>
-                  {members.find((data1) => data1.uid === data.uid) ? 
-                  <TableCell align="center" sx={{ backgroundColor: members.find((data1) => data1.uid === data.uid).cor, color: '#fff' }}>{data.consultora}</TableCell>
-                  : <TableCell align="center">{data.consultora}</TableCell>
-                  }
-                  <TableCell align="center">{activity.filter((act) => act.idRef === data.id).length}</TableCell>
+                  <TableCell align="center"><b>{data.consultora}</b></TableCell>
+                  <TableCell align="center">88-100</TableCell>
+                  {/* <TableCell align="center">{activity.filter((act) => act.idRef === data.id).length}</TableCell> */}
                   <TableCell align="center" sx={{ width: 'auto' }}>{data.anotacao ? data.anotacao.substring(0, 30) + '...' : ""} </TableCell>
                   <TableCell align="center" sx={{ width: '50px' }}>
                     <IconButton
@@ -625,13 +624,13 @@ const closeAnotacaoBox = () => {
                                   </Button></> : 
                                   <><Button
                                   variant="contained"
-                                  color="success"
+                                  color="primary"
                                   size="small"
                                   type="submit"
-                                  startIcon={<HowToRegIcon />}
+                                  startIcon={<PostAddIcon />}
                                   onClick={() => openAnotacaoBox(data, 'ganho')}
                                 >
-                                  Ganho
+                                  Solicitar Orçamento
                                 </Button><Button
                                   variant="contained"
                                   color="error"

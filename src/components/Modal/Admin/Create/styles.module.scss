@@ -24,69 +24,75 @@
     flex-direction: column;
     gap: 0.5rem;
   }
-
+}
   div {
-    margin-top: 0.2rem;
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.2rem;
+    // margin-top: 0.2rem;
+    // width: 100%;
+    // display: flex;
+    // flex-direction: column;
+    // gap: 0.2rem;
 
     span {
+      margin-left: 0.7rem;
       font-size: 0.8rem;
+      // color: rgba(0, 0, 0, 0.6);
     }
 
-    input {
-      padding: 16.5px 0px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      text-align: center;
+    .input_telefone {
+      display: flex;
+      flex-direction: column;
       width: 100%;
-
-      &:hover {
-        border: 1px solid #111;
-      }
-
-      &:focus {
-        border: 2px solid #111;
-      }
-    }
-
-    .color {
-      padding: 0;
-      height: 50.6px;
-      border-radius: 5px;
-      -webkit-appearance: none;
-      -moz-appearance: none;
-      appearance: none;
-      border: none;
-      cursor: pointer;
-
-      &:focus{
-        border: none;
-      }
-
-      &::-webkit-color-swatch {
+      gap: 0.2rem;
+      
+      input {
+        padding: 16.5px 0.7rem;
+        border: 1px solid #ccc;
         border-radius: 5px;
-        border: none;
+
+        &:hover {
+          border: 1px solid #111;
+        }
+  
+        &:focus {
+          border: 2px solid #111;
+        }
       }
 
-      &::-moz-color-swatch {
-        border-radius: 5px;
-        border: none;
-      }
     }
 
-    .name_color {
-      position: relative;
-      color: #fff;
-      top: -2.5rem;
-      text-align: center;
-      width: fit-content;
-    }
+    // .color {
+    //   padding: 0;
+    //   height: 50.6px;
+    //   border-radius: 5px;
+    //   -webkit-appearance: none;
+    //   -moz-appearance: none;
+    //   appearance: none;
+    //   border: none;
+    //   cursor: pointer;
+
+    //   &:focus{
+    //     border: none;
+    //   }
+
+    //   &::-webkit-color-swatch {
+    //     border-radius: 5px;
+    //     border: none;
+    //   }
+
+    //   &::-moz-color-swatch {
+    //     border-radius: 5px;
+    //     border: none;
+    //   }
+    // }
+
+    // .name_color {
+    //   position: relative;
+    //   color: #fff;
+    //   top: -2.5rem;
+    //   text-align: center;
+    //   width: fit-content;
+    // }
   }
-}
 
 .label_content2 {
   margin-top: 0.5rem;
