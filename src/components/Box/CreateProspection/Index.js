@@ -1,12 +1,14 @@
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
-import { memo, useState } from "react";
+import { memo, useState, useEffect } from "react";
 import axios from "axios";
+import Geocode from "react-geocode";
 import { PatternFormat } from "react-number-format";
 import { useForm } from "react-hook-form"; // cria formulário personalizado
 import Swal from 'sweetalert2/dist/sweetalert2.js';
 import * as moment from "moment";
 import "moment/locale/pt-br";
 
+import { KeyMaps } from "../../../data/Data";
 import { Company } from "../../../data/Data";
 import { dataBase } from "../../../firebase/database";
 
@@ -19,55 +21,95 @@ const CreateProspection = ({
 }) => {
   const { register, handleSubmit } = useForm();
   const [celular, setCelular] = useState('');
+  const [lng, setLng] = useState();
+  const [lat, setLat] = useState();
+  const [cidade, setCidade] = useState(undefined);
+
+  Geocode.setLanguage("pt-BR");
+  Geocode.setRegion("br");
+  Geocode.setApiKey(KeyMaps);
+  Geocode.setLocationType("ROOFTOP");
+
+  useEffect( () => {
+    if(!cidade && lng) {
+      Geocode.fromLatLng(lat,lng).then(
+        async (response) => {
+          // console.log(response)
+         let cityRef = response.results[0].address_components;
+          setCidade(cityRef.find((ref) => ref.types[0] === 'administrative_area_level_2'));
+        //  console.log(cidade)
+       },
+       (error) => {
+        //  console.log(error);
+       })
+    }
+  },[cidade,lat,lng])
 
   const onSubmit = async (userData) => {
     const day = moment();
     console.log(moment(day).format('DD MMM YYYY - HH:mm'))
     try {
-      Swal.fire({
-        title: Company,
-        html: `Você deseja cadastrar o <b>Lead?</b>`,
-        icon: "question",
-        showCancelButton: true,
-        showCloseButton: true,
-        confirmButtonColor: "#F39200",
-        cancelButtonColor: "#d33",
-        confirmButtonText: "Sim",
-        cancelButtonText: "Não",
-      }).then(async (result) => {
-        if (result.isConfirmed) {
-          let telefoneFormatado = celular.replace(/\D/g, '');
-          changeLoading(true);
-          await addDoc(collection(dataBase, 'Leads'), {
-            ...userData,
-            telefone: '55' + telefoneFormatado,
-            consultora: userRef.nome,
-            data: moment(day).format('DD MMM YYYY - HH:mm'),
-            createAt: serverTimestamp(),
-            uid: userRef.uid,
-            status: 'Ativo'
-          }).then((result) => {
-            console.log(result);
-            changeLoading(false);
-            Swal.fire({
-              title: Company,
-              html: `O Lead foi cadastrado com sucesso.`,
-              icon: "success",
-              showConfirmButton: true,
-              showCloseButton: true,
-              confirmButtonColor: "#F39200",
-            }).then(() => {
-              return returnPage();
-            })
-            axios.post('https://n8n.corpbrasil.cloud/webhook/7cfc8217-7c93-4959-afaf-8292eb7884ac', {
+      if(cidade) {
+        navigator.geolocation.getCurrentPosition(function (position) {
+          setLat(position.coords.latitude);
+          setLng(position.coords.longitude);
+        })       
+        Swal.fire({
+          title: Company,
+          html: `Você deseja cadastrar o <b>Lead?</b>`,
+          icon: "question",
+          showCancelButton: true,
+          showCloseButton: true,
+          confirmButtonColor: "#F39200",
+          cancelButtonColor: "#d33",
+          confirmButtonText: "Sim",
+          cancelButtonText: "Não",
+        }).then(async (result) => {
+          if (result.isConfirmed) {
+            let telefoneFormatado = celular.replace(/\D/g, '');
+            changeLoading(true);
+            await addDoc(collection(dataBase, 'Leads'), {
               ...userData,
               telefone: '55' + telefoneFormatado,
               consultora: userRef.nome,
+              data: moment(day).format('DD MMM YYYY - HH:mm'),
+              createAt: serverTimestamp(),
+              uid: userRef.uid,
               status: 'Ativo',
-              ID: result.id
+              endereco: `https://maps.google.com/?q=${lat},${lng}`
+            }).then((result) => {
+              console.log(result);
+              changeLoading(false);
+              Swal.fire({
+                title: Company,
+                html: `O Lead foi cadastrado com sucesso.`,
+                icon: "success",
+                showConfirmButton: true,
+                showCloseButton: true,
+                confirmButtonColor: "#F39200",
+              }).then(() => {
+                return returnPage();
+              })
+              axios.post('https://n8n.corpbrasil.cloud/webhook-test/60c9d4e8-670f-4c28-abfc-3c87aab8872f', {
+                ...userData,
+                telefone: '55' + telefoneFormatado,
+                consultora: userRef.nome,
+                status: 'Ativo',
+                ID: result.id,
+                endereco: `https://maps.google.com/?q=${lat},${lng}`
+              })
             })
-          })
-        }})
+          }})
+      } else {
+        Swal.fire({
+                title: 'GPS Desativado',
+                html: `Ative o <b>GPS</b> para confirmar o abastecimento.`,
+                icon: "error",
+                showCloseButton: true,
+                confirmButtonColor: "#F39200",
+                confirmButtonText: "Ok",
+              })
+      }
     } catch {
 
     }

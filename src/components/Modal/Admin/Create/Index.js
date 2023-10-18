@@ -30,7 +30,7 @@ import styles from "./styles.module.scss";
 const CreateAdmin = ({ members, open, close, openBox  }) => {
   // const { register, handleSubmit } = useForm();
   const navigate = useNavigate();
-  const [cargo, setCargo] = useState("Vendedor(a)");
+  const [cargo, setCargo] = useState("Indicador");
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
@@ -197,9 +197,10 @@ const CreateAdmin = ({ members, open, close, openBox  }) => {
               onChange={(e) => setCargo(e.target.value)}
               required
             >
-              <MenuItem value="Vendedor(a)">Vendedor(a)</MenuItem>
-              <MenuItem value="Técnico">Técnico</MenuItem>
-              <MenuItem value="Administrador">Administrador</MenuItem>
+              <MenuItem value="Indicador">Indicador</MenuItem>
+              <MenuItem value="Assistente de Vendas">Assistente de Vendas</MenuItem>
+              <MenuItem value="Closer">Especialista em Apresentação e Fechamento</MenuItem>
+              <MenuItem value="Gestor">Gestor</MenuItem>
             </Select>
           </FormControl>
             <TextField

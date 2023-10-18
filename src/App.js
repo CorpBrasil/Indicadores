@@ -6,8 +6,8 @@ import PanelAdmin from './pages/PanelAdmin/Index';
 import Alert from './pages/Alert/Index';
 import useAuth from './hooks/useAuth';
 import PrivateRoute from './components/PrivateRoute';
-import Schedule from './pages/Schedule/Index';
-import Finance from './pages/Finance/Index';
+// import Schedule from './pages/Schedule/Index';
+// import Finance from './pages/Finance/Index';
 import { collection, onSnapshot, query, orderBy } from "firebase/firestore";
 import { dataBase } from "./firebase/database";
 import { Users } from "./data/Data";
@@ -23,7 +23,7 @@ function App() {
   const [userAlerts, setUserAlerts] = useState();
   const [leads, setLeads] = useState();
   const [activity, setActivity] = useState();
-  const [tecs, setTecs] = useState();
+  // const [tecs, setTecs] = useState();
   const [sellers, setSellers] = useState();
   const [listLeads, setListLeads] = useState();
   const [reports, setReports] = useState();
@@ -83,8 +83,8 @@ function App() {
       const fetchData = async () => {
         if (members) {
           setUserRef(members.find((doc) => doc.uid === user.id));
-          setTecs(members.filter((member) => member.cargo === "Técnico"));
-          setSellers(members.filter((member) => member.cargo === "Vendedor(a)"));
+          // setTecs(members.filter((member) => member.cargo === "Técnico"));
+          setSellers(members.filter((member) => member.cargo === "Indicador"));
         }
       };
       fetchData();
@@ -95,9 +95,9 @@ function App() {
 
   useEffect(() => {
         if (reportsRef) {
-          if(userRef && userRef.cargo === 'Vendedor(a)') {
+          if(userRef && userRef.cargo === 'Indicador') {
             setReports(reportsRef.filter((act) => act.consultora_uid === user.id))
-          } else if(userRef && userRef.cargo !== 'Vendedor(a)') {
+          } else if(userRef && userRef.cargo !== 'Indicador') {
             setReports(reportsRef);
           }
         }
@@ -115,14 +115,14 @@ function App() {
               {user && userRef && (user.email === Users[0].email) &&
             <Route exact path="/admin" element={<PanelAdmin user={user} userRef={userRef} alerts={userAlerts} check={check} reports={reports} />} />
             }
-            {user && userRef && (user.email === Users[0].email || user.email === Users[1].email || userRef.cargo === "Técnico" || userRef.cargo === "Administrador") &&
+            {/* {user && userRef && (user.email === Users[0].email || user.email === Users[1].email || userRef.cargo === "Técnico" || userRef.cargo === "Administrador") &&
               <Route exact path="/financeiro/:year" element={<Finance userRef={userRef} alerts={userAlerts} sellers={sellers} reports={reports} />} />
-            }
+            } */}
             <Route exact path="/leads" element={<Alert user={user} userRef={userRef} alerts={userAlerts} check={check} reports={reports} />} />
             <Route exact path="/relatorio" element={<Report user={user} userRef={userRef} alerts={userAlerts} check={check} reports={reports} />} />
             <Route exact path="/prospeccao" element={<Prospecction user={user} userRef={userRef} leads={leads} activity={activity} listLeads={listLeads} members={members} sellers={sellers} check={check} reports={reports} alerts={userAlerts} />} />
             <Route exact path="/gestao-comercial" element={<Commercial user={user} userRef={userRef} leads={leads} activity={activity} listLeads={listLeads} members={members} sellers={sellers} check={check} reports={reports}/>} />
-            <Route path="/agenda/:year" element={<Schedule userRef={userRef} members={members} tecs={tecs} sellers={sellers} alerts={userAlerts} check={check} reports={reports} />} />
+            {/* <Route path="/agenda/:year" element={<Schedule userRef={userRef} members={members} tecs={tecs} sellers={sellers} alerts={userAlerts} check={check} reports={reports} />} /> */}
             <Route path="*" element={<Schedules userRef={userRef} alerts={userAlerts} check={check} reports={reports} />} />
           </Route>
           <Route exact path="/login" element={<Login />} />
