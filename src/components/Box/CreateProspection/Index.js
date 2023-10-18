@@ -88,16 +88,6 @@ const CreateProspection = ({
             }).then((result) => {
               console.log(result);
               changeLoading(false);
-              Swal.fire({
-                title: Company,
-                html: `O Lead foi cadastrado com sucesso.`,
-                icon: "success",
-                showConfirmButton: true,
-                showCloseButton: true,
-                confirmButtonColor: "#F39200",
-              }).then(() => {
-                return returnPage();
-              })
               axios.post('https://n8n.corpbrasil.cloud/webhook-test/60c9d4e8-670f-4c28-abfc-3c87aab8872f', {
                 ...userData,
                 telefone: '55' + telefoneFormatado,
@@ -105,6 +95,17 @@ const CreateProspection = ({
                 status: 'Ativo',
                 ID: result.id,
                 endereco: `https://maps.google.com/?q=${lat},${lng}`
+              }).then(() => {
+                Swal.fire({
+                  title: Company,
+                  html: `O Lead foi cadastrado com sucesso.`,
+                  icon: "success",
+                  showConfirmButton: true,
+                  showCloseButton: true,
+                  confirmButtonColor: "#F39200",
+                }).then(() => {
+                  return returnPage();
+                })
               })
             })
           }})
