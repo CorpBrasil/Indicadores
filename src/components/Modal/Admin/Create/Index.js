@@ -44,6 +44,9 @@ const CreateAdmin = ({ members, open, close, openBox}) => {
   const [checkID, setCheckID] = useState(false);
   const [checkEmail, setCheckEmail] = useState(false);
   const [checkCidade, setCheckCidade] = useState(false);
+  const [indicadores, setIndicadores] = useState([]);
+
+  console.log(idCidade);
 
   const listCidades = [
     { code: '01', cidade: 'Tietê' },
@@ -148,14 +151,26 @@ useEffect(() => {
 },[idCidade])
 
 useEffect(() => {
+  const fethData = () => {
+    setIndicadores(members && members.filter((data) => data.cargo === 'Indicador'))
+  }
+  fethData();
+},[members])
+
+
+
+useEffect(() => {
     if(cidade === null) {
         setCheckCidade(true);
-    } else {
+      } else {
         setCheckCidade(false);
+        setTimeout(() => {
+          setidCidade(indicadores && indicadores.find((data) => data.cidade.code === cidade.code) ? String(indicadores.filter((data) => data.cidade.code === cidade.code).length + 100) : '101')
+        }, 100);
       }
   
 // eslint-disable-next-line react-hooks/exhaustive-deps
-},[cidade])
+},[cidade,indicadores])
 
 useEffect(() => {
   if(email) {
@@ -272,11 +287,7 @@ useEffect(() => {
               showConfirmButton: true,
               showCloseButton: true,
               confirmButtonColor: "#F39200",
-            }).then((result) => {
-              if (result.isConfirmed) {
-                window.location.reload(true); // Recarrega a pagina
-              }
-            });
+            })
           } else {
             openBox('create')
           }
@@ -417,9 +428,10 @@ useEffect(() => {
                   error={checkID}
                   fullWidth
                   required
+                  value={idCidade ? idCidade : ''}
                   margin="dense"
                   id="outlined-start-adornment"
-                  onChange={(e) => setidCidade(e.target.value)}
+                  // onChange={(e) => setidCidade(e.target.value)}
                   InputProps={{
                     startAdornment: <InputAdornment position="start">{cidade && cidade.code} - </InputAdornment>,
                   }}

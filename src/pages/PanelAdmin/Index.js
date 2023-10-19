@@ -85,9 +85,10 @@ const PanelAdmin = ({ user, alerts, userRef }) => {
               <TableHead>
                 <TableRow>
                   <TableCell align="center">Nome</TableCell>
-                  <TableCell align="center">Cor</TableCell>
                   <TableCell align="center" padding="none">Email</TableCell>
                   <TableCell align="center">Senha</TableCell>
+                  <TableCell align="center">Código</TableCell>
+                  <TableCell align="center">Cidade</TableCell>
                   <TableCell align="center">Cargo</TableCell>
                   <TableCell align="center">Veiculo</TableCell>
                   <TableCell align="center">Ação</TableCell>
@@ -102,11 +103,10 @@ const PanelAdmin = ({ user, alerts, userRef }) => {
                     sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                   >
                      <TableCell align="center">{member.nome}</TableCell>
-                      <TableCell style={member.cor && {
-                            backgroundColor: member.cor
-                          }}></TableCell>
                       <TableCell align="center">{member.email}</TableCell>
                       <TableCell align="center">{member.senha}</TableCell>
+                      <TableCell align="center">{member.id_user ? member.id_user : '000'}</TableCell>
+                      <TableCell align="center">{member.cidade ? member.cidade.cidade : 'Tietê'}</TableCell>
                       <TableCell align="center">{member.cargo}</TableCell>
                       <TableCell align="center">{member.veiculo}</TableCell>
                       <TableCell align="center">

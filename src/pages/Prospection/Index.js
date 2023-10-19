@@ -5,7 +5,7 @@ import Swal from 'sweetalert2/dist/sweetalert2.js';
 import { Company } from "../../data/Data";
 import axios from "axios";
 import * as moment from "moment";
-import { collection, query, serverTimestamp, onSnapshot, orderBy, updateDoc, doc, deleteDoc } from "firebase/firestore";
+import { collection, query, serverTimestamp, onSnapshot, orderBy, updateDoc, doc } from "firebase/firestore";
 
 // Css
 import "cooltipz-css";
@@ -40,8 +40,8 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import FormControl from '@mui/material/FormControl';
-import DeleteIcon from '@mui/icons-material/Delete';
-import PersonAddAltIcon from '@mui/icons-material/PersonAddAlt';
+// import DeleteIcon from '@mui/icons-material/Delete';
+// import PersonAddAltIcon from '@mui/icons-material/PersonAddAlt';
 // import DeleteIcon from '@mui/icons-material/Delete';
 
 import IconButton from '@mui/material/IconButton';
@@ -71,7 +71,6 @@ const Prospection = ({ user, leads, activity, userRef, listLeads, members, selle
   const [viewEdit, setViewEdit] = useState(false);
   const [open, setOpen] = useState(false);
   const [page, setPage] = useState(0);
-  const [page2, setPage2] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(20);
   const [leadsUser, setLeadsUser] = useState(undefined);
   const [loading, setLoading] = useState(false);
@@ -126,13 +125,11 @@ const Prospection = ({ user, leads, activity, userRef, listLeads, members, selle
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
-    setPage2(0)
   };
 
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(+event.target.value);
     setPage(0);
-    setPage2(0);
   };
 
   const confirmEdit = async(data) => {
