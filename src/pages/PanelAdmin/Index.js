@@ -131,7 +131,7 @@ const PanelAdmin = ({ user, alerts, userRef }) => {
         </div>
       </div>
         <CreateAdmin members={members} open={open.create} close={close} openBox={openBox}></CreateAdmin>
-        <EditAdmin memberRef={memberRef} open={open.edit} close={close} openBox={openBox}></EditAdmin>
+        <EditAdmin members={members} memberRef={memberRef} open={open.edit} close={close} openBox={openBox}></EditAdmin>
     </div>
   );
 };

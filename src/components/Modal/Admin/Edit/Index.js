@@ -21,15 +21,27 @@ import { theme } from '../../../../data/theme';
 import { ThemeProvider } from "@mui/material";
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
+import InputAdornment from '@mui/material/InputAdornment';
+import Autocomplete from "@mui/material/Autocomplete";
+import { listCidades } from "../../../../data/Data";
 
 
-const EditAdmin = ({ memberRef, open, close, openBox }) => {
+const EditAdmin = ({members, memberRef, open, close, openBox }) => {
 
   const [cor, setCor] = useState();
   const [telefone, setTelefone] = useState();
   const [idCRM, setIdCRM] = useState();
   const [veiculo, setVeiculo] = useState();
   const [cargo, setCargo] = useState();
+  const [cidade, setCidade] = useState();
+  const [checkID, setCheckID] = useState(false);
+  const [idCidade, setidCidade] = useState();
+  const [checkCidade, setCheckCidade] = useState(false);
+  const [indicadores, setIndicadores] = useState([]);
+  const [orcamentistaRef, setOrcamentistaRef] = useState([]);
+  const [orcamentista, setOrcamentista] = useState([]);
+
+  console.log(idCidade)
 
   // useLayoutEffect(() => {
   //   // faz a solicitação do servidor assíncrono e preenche o formulário
@@ -42,13 +54,62 @@ const EditAdmin = ({ memberRef, open, close, openBox }) => {
   // // eslint-disable-next-line react-hooks/exhaustive-deps
   // }, [memberRef]);
 
+  // useEffect(() => {
+  //   if(idCidade !== cidade.code && memberRef.cargo === 'Indicador') {
+  //     if(members && members.find((data) => data.id_user === cidade.code + ' - ' + idCidade)) {
+  //       setCheckID(true);
+  //     } else {
+  //       setCheckID(false);
+  //     }
+  //   }
+  // // eslint-disable-next-line react-hooks/exhaustive-deps
+  // },[idCidade])
+
+  useEffect(() => {
+    const fethData = () => {
+      setIndicadores(members && members.filter((data) => data.cargo === 'Indicador'))
+      setOrcamentistaRef(members && members.filter((data) => data.cargo === 'Orçamentista'))
+    }
+    fethData();
+  },[members])
+  
+  
+  
+  useEffect(() => {
+    if(open && memberRef.cargo === "Indicador") {
+      if(cidade === null) {
+          setCheckCidade(true);
+        } else {
+          setCheckCidade(false);
+          if(cidade && cidade.code !== memberRef.cidade.code) {
+            setTimeout(() => {
+              setidCidade(indicadores && indicadores.find((data) => data.cidade.code === cidade.code) ? String(indicadores.filter((data) => data.cidade.code === cidade.code).length + 100) : '100')
+            }, 100);
+          } else if(memberRef && memberRef.cargo === 'Indicador') {
+            setidCidade(memberRef && memberRef.id_user.slice(5,9))
+          }
+        }
+    }
+    
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  },[cidade,indicadores, idCidade, open])
+
  useEffect(() => {
   if(open) {
     setCor(memberRef && memberRef.cor);
     setTelefone(memberRef && memberRef.telefone);
-    setIdCRM(memberRef && memberRef.id_sm);
-    setVeiculo(memberRef && memberRef.veiculo);
     setCargo(memberRef && memberRef.cargo);
+    if(memberRef && memberRef.cargo === 'Orçamentista') {
+      setIdCRM(memberRef && memberRef.id_crm);
+    }
+    if(memberRef && memberRef.cargo === 'Closer') {
+      setVeiculo(memberRef && memberRef.veiculo);
+    }
+    if(memberRef && memberRef.cargo === 'Indicador') {
+      setCidade(memberRef && memberRef.cidade);
+      setidCidade(memberRef && memberRef.id_user.slice(5,9));
+      setOrcamentista(orcamentistaRef.filter((data) => data.uid === memberRef.orcamentista.uid)[0]);
+    }
   }
  // eslint-disable-next-line react-hooks/exhaustive-deps
  },[open])
@@ -71,13 +132,41 @@ const EditAdmin = ({ memberRef, open, close, openBox }) => {
             cancelButtonText: "Não",
           }).then(async (result) => {
             if (result.isConfirmed) {
-              await updateDoc(doc(dataBase,"Membros", memberRef.id), {
-                cargo: cargo,
-                id_sm: idCRM,
-                veiculo: veiculo,
-                telefone: telefone,
-                cor: cor
-              }).then((result) => {
+              let data;
+              switch(cargo) {
+                case 'Indicador':
+                  data = {
+                    cargo: cargo,
+                    cidade: cidade,
+                    id_user: cidade.code + ' - ' + idCidade,
+                    telefone: telefone,
+                    orcamentista: {
+                      nome: orcamentista.nome,
+                      uid: orcamentista.uid
+                    }
+                  }
+                break
+                case 'Orçamentista':
+                  data = {
+                    cargo: cargo,
+                    id_crm: idCRM,
+                    telefone: telefone
+                  }
+                break
+                case 'Closer':
+                  data = {
+                    veiculo: veiculo,
+                    cargo: cargo,
+                    telefone: telefone
+                  }
+                break
+                default: 
+                  data = {
+                    cargo: cargo,
+                    telefone: telefone
+                  }
+              }
+              await updateDoc(doc(dataBase,"Membros", memberRef.id), data).then((result) => {
                 Swal.fire({
                title: Company,
                html: 'Os dados do Colaborador(a) foi alterado com sucesso.',
@@ -98,13 +187,15 @@ const EditAdmin = ({ memberRef, open, close, openBox }) => {
         }
     }
 
+    console.log(orcamentistaRef)
+    console.log(orcamentista)
+
   return (
     <Dialog
       className={styles.dialog}
       open={open}
-      fullWidth={true}
+      fullWidth
       maxWidth="sm"
-      size
       onClose={() => close()}
     >
       <IconButton
@@ -142,14 +233,74 @@ const EditAdmin = ({ memberRef, open, close, openBox }) => {
               id="simple-select"
               value={cargo ? cargo : ''}
               label="Cargo"
-              onChange={(e) => setCargo(e.target.value)}
-              required
+              // onChange={(e) => setCargo(e.target.value)}
+              disabled
             >
-              <MenuItem value="Vendedor(a)">Vendedor(a)</MenuItem>
-              <MenuItem value="Técnico">Técnico</MenuItem>
-              <MenuItem value="Administrador">Administrador</MenuItem>
+              <MenuItem value="Indicador">Indicador</MenuItem>
+              <MenuItem value="Orçamentista">Orçamentista</MenuItem>
+              <MenuItem value="Closer">Especialista em Apresentação e Fechamento</MenuItem>
+              <MenuItem value="Gestor">Gestor</MenuItem>
+              </Select>
+            </FormControl>
+            {cargo && cargo === 'Indicador' && 
+          <FormControl sx={{ margin: "0.3rem 0" }} fullWidth>
+            <InputLabel id="simple-select-label">Orçamentista</InputLabel>
+            <Select
+              labelId="simple-select-label"
+              id="simple-select"
+              displayEmpty
+              sx={{ margin: '0.3rem 0' }}
+              value={orcamentista ? orcamentista : ''}
+              label="Orçament"
+              onChange={(e) => setOrcamentista(e.target.value)}
+              required
+              >
+                {orcamentistaRef && orcamentistaRef.map((data) => (
+                <MenuItem value={data}>{data.nome}</MenuItem>
+                ))}
             </Select>
-          </FormControl>
+          </FormControl> 
+          }
+            {cargo && cargo === 'Indicador' && 
+            <><FormControl sx={{ margin: "0.3rem 0" }} fullWidth>
+                <Autocomplete
+                  disablePortal
+                  fullWidth
+                  sx={{ margin: '0.3rem 0' }}
+                  value={cidade ? cidade : { code: '00', cidade: 'Nenhuma' }}
+                  onChange={(event, newValue) => {
+                    setCidade(newValue);
+                  } }
+                  color="primary"
+                  clearText='Escolha uma cidade'
+                  clearOnEscape={true}
+                  isOptionEqualToValue={(option, value) => option.id === value.id}
+                  getOptionLabel={(option) => option.cidade + ' - ' + option.code}
+                  options={listCidades ? listCidades : ['']}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="Cidade"
+                      required
+                      helperText={checkCidade ? 'Selecione uma cidade' : ''}
+                      error={checkCidade}
+                      style={{ zindex: 111111 }}
+                      color="primary" />
+                  )} />
+              </FormControl><TextField
+                  label="ID"
+                  disabled
+                  fullWidth
+                  required
+                  value={idCidade ? idCidade : ''}
+                  margin="dense"
+                  id="outlined-start-adornment"
+                  onChange={(e) => setidCidade(e.target.value)}
+                  InputProps={{
+                    startAdornment: <InputAdornment position="start">{cidade && cidade.code} - </InputAdornment>,
+                  }} /></>
+          }
+          {cargo && cargo === 'Orçamentista' && 
             <TextField
             autoFocus
             margin="dense"
@@ -161,6 +312,8 @@ const EditAdmin = ({ memberRef, open, close, openBox }) => {
             fullWidth
             variant="outlined"
           />
+          }
+          {cargo && cargo === 'Closer' &&
             <TextField
             autoFocus
             margin="dense"
@@ -172,8 +325,9 @@ const EditAdmin = ({ memberRef, open, close, openBox }) => {
             fullWidth
             variant="outlined"
           />
+          }
         <div className={styles.label_content}>
-          <div>
+          <div className={styles.input_telefone}>
             <span>Telefone</span>
             <PatternFormat
               className="label__input"
@@ -189,7 +343,7 @@ const EditAdmin = ({ memberRef, open, close, openBox }) => {
               required
             />
           </div>
-          <div>
+          {/* <div>
           <span>Cor</span>
           <input type="color"
             className={styles.color}
@@ -199,7 +353,7 @@ const EditAdmin = ({ memberRef, open, close, openBox }) => {
             required
           />
              <p className={styles.name_color}>{memberRef && memberRef.nome}</p>
-          </div>
+          </div> */}
         </div>
           </ThemeProvider>
           <ThemeProvider theme={theme}>

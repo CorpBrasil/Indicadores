@@ -6,6 +6,7 @@ import { dataBase } from "../../../../firebase/database";
 import { Company } from "../../../../data/Data";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
+import { listCidades } from "../../../../data/Data";
 
 import "../../_modal.scss";
 
@@ -45,99 +46,10 @@ const CreateAdmin = ({ members, open, close, openBox}) => {
   const [checkEmail, setCheckEmail] = useState(false);
   const [checkCidade, setCheckCidade] = useState(false);
   const [indicadores, setIndicadores] = useState([]);
+  const [orcamentistaRef, setOrcamentistaRef] = useState([]);
+  const [orcamentista, setOrcamentista] = useState([]);
 
   console.log(idCidade);
-
-  const listCidades = [
-    { code: '01', cidade: 'Tietê' },
-    { code: '02', cidade: 'Jumirim' },
-    { code: '03', cidade: 'Cerquilho' },
-    { code: '04', cidade: 'Laranjal Paulista' },
-    { code: '05', cidade: 'Porto Feliz' },
-    { code: '06', cidade: 'Boituva' },
-    { code: '07', cidade: 'Tatuí' },
-    { code: '08', cidade: 'Cesário Lange' },
-    { code: '09', cidade: 'Pereiras' },
-    { code: '10', cidade: 'Conchas' },
-    { code: '11', cidade: 'Porangaba' },
-    { code: '12', cidade: 'Quadra' },
-    { code: '13', cidade: 'Bofete' },
-    { code: '14', cidade: 'Pardinho' },
-    { code: '15', cidade: 'Anhembi' },
-    { code: '16', cidade: 'Itatinga' },
-    { code: '11', cidade: 'Botucatu' },
-    { code: '18', cidade: 'Avaré' },
-    { code: '19', cidade: 'Torre de Pedra' },
-    { code: '20', cidade: 'Guareí' },
-    { code: '21', cidade: 'Itapetininga' },
-    { code: '22', cidade: 'Alambari' },
-    { code: '23', cidade: 'São Miguel Arcanjo' },
-    { code: '24', cidade: 'Pilar do Sul' },
-    { code: '25', cidade: 'Sarapuí' },
-    { code: '26', cidade: 'Piedade' },
-    { code: '27', cidade: 'Salto de Pirapora' },
-    { code: '28', cidade: 'Araçoiaba da Serra' },
-    { code: '29', cidade: 'Capela do Alto' },
-    { code: '30', cidade: 'Iperó' },
-    { code: '31', cidade: 'Sorocaba' },
-    { code: '32', cidade: 'Votorantim' },
-    { code: '33', cidade: 'Mairinque' },
-    { code: '34', cidade: 'Itu' },
-    { code: '35', cidade: 'Aluminio' },
-    { code: '36', cidade: 'São Roque' },
-    { code: '37', cidade: 'Araçariguama' },
-    { code: '38', cidade: 'Cabreuva' },
-    { code: '39', cidade: 'Salto' },
-    { code: '40', cidade: 'Indaiatuba' },
-    { code: '41', cidade: 'Itupeva' },
-    { code: '42', cidade: 'Elias Fausto' },
-    { code: '43', cidade: 'Jundiaí' },
-    { code: '44', cidade: 'Louveira' },
-    { code: '45', cidade: 'Vinhedo' },
-    { code: '46', cidade: 'Valinhos' },
-    { code: '47', cidade: 'Itatiba' },
-    { code: '48', cidade: 'Campinas' },
-    { code: '49', cidade: 'Monte Mor' },
-    { code: '50', cidade: 'Hortolândia' },
-    { code: '51', cidade: 'Rafard' },
-    { code: '52', cidade: 'Capivari' },
-    { code: '53', cidade: 'Mombuca' },
-    { code: '54', cidade: 'Sumaré' },
-    { code: '55', cidade: 'Nova Odessa' },
-    { code: '56', cidade: 'Paulínia' },
-    { code: '57', cidade: 'Americana' },
-    { code: '58', cidade: 'Rio das Pedras' },
-    { code: '59', cidade: 'Saltinho' },
-    { code: '60', cidade: 'Piracicaba' },
-    { code: '61', cidade: "Santa Bárbara d'Oeste" },
-    { code: '62', cidade: 'Iracemápolis' },
-    { code: '63', cidade: 'Limeira' },
-    { code: '64', cidade: 'Cosmópolis' },
-    { code: '65', cidade: 'Holambra' },
-    { code: '66', cidade: 'Jaguariúna' },
-    { code: '67', cidade: 'Santo Antônio de Posse' },
-    { code: '68', cidade: 'Artur Nogueira' },
-    { code: '69', cidade: 'Engenheiro Coelho' },
-    { code: '70', cidade: 'Mogi-mirim' },
-    { code: '71', cidade: 'Conchal' },
-    { code: '72', cidade: 'Araras' },
-    { code: '73', cidade: 'Cordeirópolis' },
-    { code: '74', cidade: 'Santa Gertrudes' },
-    { code: '75', cidade: 'Rio Claro' },
-    { code: '76', cidade: 'Leme' },
-    { code: '77', cidade: 'Santa Cruz da Conceição' },
-    { code: '78', cidade: 'Corumbataí' },
-    { code: '79', cidade: 'Analândia' },
-    { code: '80', cidade: 'São Carlos' },
-    { code: '81', cidade: 'Brotas' },
-    { code: '82', cidade: 'Itirapina' },
-    { code: '83', cidade: 'Torrinha' },
-    { code: '84', cidade: 'Ipeúna' },
-    { code: '85', cidade: 'Charqueada' },
-    { code: '86', cidade: 'São Pedro' },
-    { code: '87', cidade: 'Águas de São Pedro' },
-    { code: '88', cidade: 'Santa Maria da Serra' }
-]
 
 useEffect(() => {
   if(idCidade) {
@@ -153,6 +65,8 @@ useEffect(() => {
 useEffect(() => {
   const fethData = () => {
     setIndicadores(members && members.filter((data) => data.cargo === 'Indicador'))
+    setOrcamentistaRef(members && members.filter((data) => data.cargo === 'Orçamentista'))
+    setOrcamentista(members && members.filter((data) => data.cargo === 'Orçamentista'))
   }
   fethData();
 },[members])
@@ -165,7 +79,7 @@ useEffect(() => {
       } else {
         setCheckCidade(false);
         setTimeout(() => {
-          setidCidade(indicadores && indicadores.find((data) => data.cidade.code === cidade.code) ? String(indicadores.filter((data) => data.cidade.code === cidade.code).length + 100) : '101')
+          setidCidade(indicadores && indicadores.find((data) => data.cidade.code === cidade.code) ? String(indicadores.filter((data) => data.cidade.code === cidade.code).length + 100) : '100')
         }, 100);
       }
   
@@ -183,6 +97,7 @@ useEffect(() => {
 // eslint-disable-next-line react-hooks/exhaustive-deps
 },[email])
 
+console.log(orcamentista)
 
   const onSubmit = async (e) => {
     e.preventDefault();
@@ -230,10 +145,14 @@ useEffect(() => {
                       relatorio: 0,
                       cidade: cidade,
                       id_user: cidade.code + ' - ' + idCidade,
-                      telefone: telefone
+                      telefone: telefone,
+                      orcamentista: {
+                        nome: orcamentista.nome,
+                        uid: orcamentista.uid
+                      }
                     }
                   break
-                  case 'Assistente de Vendas':
+                  case 'Orçamentista':
                     data = {
                       email: email,
                       nome: nome,
@@ -241,8 +160,7 @@ useEffect(() => {
                       cargo: cargo,
                       uid: user.uid,
                       relatorio: 0,
-                      cidade: cidade,
-                      id_crm: idCidade,
+                      id_crm: idCRM,
                       telefone: telefone
                     }
                   break
@@ -385,19 +303,36 @@ useEffect(() => {
               id="simple-select"
               sx={{ margin: '0.3rem 0' }}
               value={cargo ? cargo : ''}
-              label="Cargo"
+              label="Ca"
               onChange={(e) => setCargo(e.target.value)}
               required
             >
               <MenuItem value="Indicador">Indicador</MenuItem>
-              <MenuItem value="Assistente de Vendas">Assistente de Vendas</MenuItem>
+              <MenuItem value="Orçamentista">Orçamentista</MenuItem>
               <MenuItem value="Closer">Especialista em Apresentação e Fechamento</MenuItem>
               <MenuItem value="Gestor">Gestor</MenuItem>
             </Select>
           </FormControl>
-          <div className={styles.label_content}>
-
           {cargo && cargo === 'Indicador' && 
+          <FormControl sx={{ margin: "0.3rem 0" }} fullWidth>
+            <InputLabel id="simple-select-label">Orçamentista</InputLabel>
+            <Select
+              labelId="simple-select-label"
+              id="simple-select"
+              sx={{ margin: '0.3rem 0' }}
+              value={orcamentista ? orcamentista[0] : ''}
+              label="Orçament"
+              onChange={(e) => setOrcamentista(e.target.value)}
+              required
+              >
+                {orcamentistaRef && orcamentistaRef.map((data) => (
+                <MenuItem value={data}>{data.nome}</MenuItem>
+                ))}
+            </Select>
+          </FormControl> 
+          }
+          <div className={styles.label_content}>
+              {cargo && cargo === 'Indicador' && 
             <><Autocomplete
                 disablePortal
                 fullWidth
@@ -421,7 +356,7 @@ useEffect(() => {
                     error={checkCidade}
                     style={{ zindex: 111111 }}
                     color="primary" />
-                )} />
+                    )} />
                 <TextField
                   label="ID"
                   helperText={checkID ? 'Já existe um indicador com esse ID' : ''}
@@ -435,10 +370,10 @@ useEffect(() => {
                   InputProps={{
                     startAdornment: <InputAdornment position="start">{cidade && cidade.code} - </InputAdornment>,
                   }}
-                />
+                  />
                   </>
           }
-          {cargo && cargo === 'Assistente de Vendas' && 
+          {cargo && cargo === 'Orçamentista' && 
             <TextField
             margin="dense"
             id="name"

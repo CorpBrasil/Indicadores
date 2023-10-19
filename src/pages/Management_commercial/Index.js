@@ -18,7 +18,7 @@ import { theme } from "../../data/theme"
 import DateRangePicker from '@wojtekmaj/react-daterange-picker';
 
 // Components
-import EditProspection from "../../components/Box/EditProspection/Index";
+import EditProspection from "../../components/Prospection/Edit/Index";
 import CreateActivity from "../../components/Box/CreateActivity/Index";
 import Dashboard from "../../components/Dashboard/Management/Index";
 import Report from "../../components/Box/Report/Index";

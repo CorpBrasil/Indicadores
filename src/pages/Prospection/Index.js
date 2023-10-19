@@ -17,9 +17,10 @@ import "../../components/Dashboard/Visit_and_Prospection/_styles.scss";
 import { theme } from "../../data/theme"
 
 // Components
-import CreateProspection from "../../components/Box/CreateProspection/Index";
-import EditProspection from "../../components/Box/EditProspection/Index";
-import CreateActivity from "../../components/Box/CreateActivity/Index";
+import CreateProspection from "../../components/Prospection/Create/Index";
+import EditProspection from "../../components/Prospection/Edit/Index";
+import Estimate from "../../components/Prospection/Estimate/Index";
+// import CreateActivity from "../../components/Box/CreateActivity/Index";
 import Filter from "../../components/Filter/Index";
 import Dashboard from "../../components/Dashboard/Visit_and_Prospection/Index";
 // import ImportLeads from "../../components/Prospection/ImportLeads";
@@ -57,10 +58,10 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import Collapse from '@mui/material/Collapse';
 import { Box, ThemeProvider } from "@mui/material";
-import CircularProgress from '@mui/material/CircularProgress';
-import PropTypes from 'prop-types';
-import Tabs from '@mui/material/Tabs';
-import Tab from '@mui/material/Tab';
+// import CircularProgress from '@mui/material/CircularProgress';
+// import PropTypes from 'prop-types';
+// import Tabs from '@mui/material/Tabs';
+// import Tab from '@mui/material/Tab';
 
 
 const Prospection = ({ user, leads, activity, userRef, listLeads, members, sellers }) => {
@@ -68,14 +69,15 @@ const Prospection = ({ user, leads, activity, userRef, listLeads, members, selle
   const [anotacaoBox, setAnotacaoBox] = useState(false);
   const [view, setView] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
+  const [openEstimate, setOpenEstimate] = useState();
   const [viewEdit, setViewEdit] = useState(false);
   const [open, setOpen] = useState(false);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(20);
   const [leadsUser, setLeadsUser] = useState(undefined);
-  const [loading, setLoading] = useState(false);
+  // const [loading, setLoading] = useState(false);
   const [sellersOrder, setSellersOrder] = useState(null);
-  const [TabsValue, setTabsValue] = useState(0);
+  // eslint-disable-next-line no-unused-vars
   const [activityAll, setActivityAll] = useState();
   // const [viewImport, setViewImport] = useState(false);
 
@@ -102,7 +104,7 @@ const Prospection = ({ user, leads, activity, userRef, listLeads, members, selle
   };
 
   const changeLoading = (data) => {
-    setLoading(data);
+    // setLoading(data);
   };
 
   useEffect(() => {
@@ -308,38 +310,38 @@ const closeAnotacaoBox = () => {
   setAnotacaoBox({info: null});
 }
 
-  const CustomTabPanel = (props) => {
-    const { children, value, index, ...other } = props;
+  // const CustomTabPanel = (props) => {
+  //   const { children, value, index, ...other } = props;
   
-    return (
-      <div
-        role="tabpanel"
-        hidden={value !== index}
-        id={`simple-tabpanel-${index}`}
-        aria-labelledby={`simple-tab-${index}`}
-        {...other}
-      >
-        {value === index && (
-          <Box sx={{ p: 3 }}>
-            {children}
-          </Box>
-        )}
-      </div>
-    );
-  }
+  //   return (
+  //     <div
+  //       role="tabpanel"
+  //       hidden={value !== index}
+  //       id={`simple-tabpanel-${index}`}
+  //       aria-labelledby={`simple-tab-${index}`}
+  //       {...other}
+  //     >
+  //       {value === index && (
+  //         <Box sx={{ p: 3 }}>
+  //           {children}
+  //         </Box>
+  //       )}
+  //     </div>
+  //   );
+  // }
 
-  CustomTabPanel.propTypes = {
-    children: PropTypes.node,
-    index: PropTypes.number.isRequired,
-    value: PropTypes.number.isRequired,
-  };
+  // CustomTabPanel.propTypes = {
+  //   children: PropTypes.node,
+  //   index: PropTypes.number.isRequired,
+  //   value: PropTypes.number.isRequired,
+  // };
   
-  const a11yProps = (index) => {
-    return {
-      id: `simple-tab-${index}`,
-      'aria-controls': `simple-tabpanel-${index}`,
-    };
-  }
+  // const a11yProps = (index) => {
+  //   return {
+  //     id: `simple-tab-${index}`,
+  //     'aria-controls': `simple-tabpanel-${index}`,
+  //   };
+  // }
 
   // const closeImport = () => {
   //   setViewImport(false);
@@ -393,15 +395,20 @@ const closeAnotacaoBox = () => {
 
   //   }
   // }
-  
+
+  const close = () => {
+    setOpenEstimate(false);
+  }
+
+  console.log(openEstimate)
 
   return (
     <div className={styles.container_panel}>
-        {loading && loading &&
+        {/* {loading && loading &&
           <Box className="loading">
               <CircularProgress />
           </Box>
-        }
+        } */}
       <Header user={user} userRef={userRef}></Header>
       <div className={styles.title_panel}>
         <ProspectionIcon className={styles.prospecction_icon}/>
@@ -409,83 +416,6 @@ const closeAnotacaoBox = () => {
           <Dashboard schedule={activity} type={'prospeccao'} />
       </div>
       <div className={styles.content_panel}>
-        {/* {userRef && userRef.cargo === "Administrador" && 
-          <div className={styles.content_list}>
-            <h2>Histórico de Importação de Leads</h2>
-            <TableContainer className={styles.table_center} component={Paper}>
-              <Table stickyHeader aria-label="sticky table">
-                <TableHead>
-                  <TableRow>
-                    <TableCell align="center">Status</TableCell>
-                    <TableCell align="center">Data de Criação</TableCell>
-                    <TableCell align="center">Nome</TableCell>
-                    <TableCell align="center">Leads</TableCell>
-                    <TableCell align="center">Responsável</TableCell>
-                    <TableCell align="center">Indicador</TableCell>
-                    <TableCell align="center">Ação</TableCell>
-                  </TableRow>
-                </TableHead>
-                {listLeads && listLeads.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((data, index) => (
-                <TableBody>
-                  <TableRow
-                    key={index}
-                    hover
-                    className={`list-visit`}
-                    sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-                    {data.status === 'Ativo' &&
-                      <TableCell align="center" className={styles.ativo}>{data.status}</TableCell>
-                    }
-                    {data.status === 'Excluido' &&
-                      <TableCell align="center" aria-label={data.dataStatus && data.dataStatus.replace('-','às')}
-                      data-cooltipz-dir="right" className={styles.perdido}>{data.status}</TableCell>
-                    }
-                    <TableCell align="center">{data.data.replace('-', 'às')}</TableCell>
-                    <TableCell align="center"><b>{data.nome}</b></TableCell>
-                    <TableCell align="center">{data.leads}</TableCell>
-                    <TableCell align="center">{data.responsavel}</TableCell>
-                    <TableCell align="center">{data.consultora}</TableCell>
-                    <TableCell align="center" sx={{ width: '50px' }}>
-                      {data.status === 'Excluido' && 
-                      <IconButton
-                        aria-label="Excluir Lista"
-                        data-cooltipz-dir="left"
-                        size="small"
-                        disabled>
-                        <DeleteIcon />
-                      </IconButton>}
-                      {userRef && userRef.email === 'admin@corpbrasil.com' ?
-                      <IconButton
-                      aria-label="Excluir Lista"
-                      data-cooltipz-dir="left"
-                      size="small"
-                      onClick={() => deleteList(data)}>
-                      <DeleteIcon sx={{ fill: 'red' }} />
-                    </IconButton>: 
-                    <IconButton
-                    aria-label="Excluir Lista"
-                    data-cooltipz-dir="left"
-                    size="small"
-                    disabled>
-                    <DeleteIcon />
-                    </IconButton>}
-                    </TableCell>
-                  </TableRow>
-              </TableBody>
-                ))}
-              </Table>
-              <TablePagination
-              rowsPerPageOptions={[5, 10, 20]}
-              labelRowsPerPage="Lista por página"
-              component="div"
-              count={listLeads ? listLeads.length : 0}
-              rowsPerPage={rowsPerPage}
-              page={page2}
-              onPageChange={handleChangePage}
-              onRowsPerPageChange={handleChangeRowsPerPage}
-              />
-            </TableContainer>
-          </div>
-        } */}
         <div className={styles.box_panel}>
             <h2>Leads</h2>
           <div className={styles.box_panel_add}>
@@ -569,6 +499,7 @@ const closeAnotacaoBox = () => {
                   <TableCell style={{ paddingBottom: 0, paddingTop: 0, height: 0 }} colSpan={9}>
                       <Collapse in={open[data.id]} timeout="auto" unmountOnExit colSpan={9}>
                       <Box className={styles.info_anotacao} margin={3}>
+                        <Estimate data={data} openEstimate={openEstimate} close={close} />
                           <h3>Anotação</h3>
                           {viewEdit && viewEdit === data.id ?
                             <textarea className={styles.edit_anotacao} value={anotacao} onChange={(e) => setAnotacao(e.target.value)} cols="30" rows="5"></textarea> :
@@ -625,7 +556,7 @@ const closeAnotacaoBox = () => {
                                   size="small"
                                   type="submit"
                                   startIcon={<PostAddIcon />}
-                                  onClick={() => openAnotacaoBox(data, 'ganho')}
+                                  onClick={() => setOpenEstimate(true)}
                                 >
                                   Solicitar Orçamento
                                 </Button><Button
@@ -642,18 +573,22 @@ const closeAnotacaoBox = () => {
                             </div>}
                       </Box>
                       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-                      <Tabs value={TabsValue} onChange={(e, newValue) => setTabsValue(newValue)} aria-label="Informações do Lead" centered>
+                      </Box>
+                      <Box className={styles.info_anotacao} margin={3}>
+                        <h3 className={styles.title_info}>Geral</h3>
+                        <EditProspection changeLoading={changeLoading} data={data} />
+                      </Box>
+                      {/* <Tabs value={TabsValue} onChange={(e, newValue) => setTabsValue(newValue)} aria-label="Informações do Lead" centered>
                         <Tab label="Atividades" {...a11yProps(1)} />
                         <Tab label="Dados" {...a11yProps(2)} />
-                      </Tabs>
-                    </Box>
-                    <CustomTabPanel value={TabsValue} index={0}>
+                      </Tabs> */}
+                    {/* <CustomTabPanel value={TabsValue} index={0}>
                       <CreateActivity activityAll={activityAll} changeLoading={changeLoading} data={data} />
-                    </CustomTabPanel>
-                    <CustomTabPanel value={TabsValue} index={1}>
+                    </CustomTabPanel> */}
+                    {/* <CustomTabPanel value={TabsValue} index={1}>
                   <h3 className={styles.title_info}>Geral</h3>
                     <EditProspection changeLoading={changeLoading} data={data} />
-                    </CustomTabPanel>
+                    </CustomTabPanel> */}
                     </Collapse>
                 </TableCell>
               </TableRow>
@@ -733,7 +668,7 @@ const closeAnotacaoBox = () => {
                     Cancelar
                   </Button>
                 </DialogActions>
-              </Dialog>
+      </Dialog>
       </ThemeProvider>
     </div>
   );

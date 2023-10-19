@@ -12,7 +12,7 @@ import { KeyMaps } from "../../../data/Data";
 import { Company } from "../../../data/Data";
 import { dataBase } from "../../../firebase/database";
 
-import "../style.scss";
+import "../../Box/style.scss";
 
 const CreateProspection = ({
   returnPage,

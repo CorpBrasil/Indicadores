@@ -13,7 +13,7 @@ import BlockIcon from '@mui/icons-material/Block';
 import EditIcon from '@mui/icons-material/Edit';
 import Button from "@mui/material/Button";
 
-import "../style.scss";
+import "../../Box/style.scss";
 
 const EditProspection = ({
   data
@@ -196,15 +196,16 @@ const EditProspection = ({
                       </form>
                       {!viewEdit && !viewEdit &&
                       <Button
-                                  variant="outlined"
-                                  color="primary"
-                                  size="small"
-                                  type="button"
-                                  onClick={() => toggleState(data.id)}
-                                  startIcon={<EditIcon />}>
-                                    Alterar dados
-                                </Button>}
-                      </div>
+                       variant="outlined"
+                       color="primary"
+                       sx={{ maxWidth: '10rem' }}
+                       size="small"
+                       type="button"
+                       onClick={() => toggleState(data.id)}
+                       startIcon={<EditIcon />}>
+                          Alterar dados
+                      </Button>}
+    </div>
   );
 };
 
