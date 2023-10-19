@@ -28,13 +28,13 @@ import { listCidades } from "../../../../data/Data";
 
 const EditAdmin = ({members, memberRef, open, close, openBox }) => {
 
-  const [cor, setCor] = useState();
+  // const [cor, setCor] = useState();
   const [telefone, setTelefone] = useState();
   const [idCRM, setIdCRM] = useState();
   const [veiculo, setVeiculo] = useState();
   const [cargo, setCargo] = useState();
   const [cidade, setCidade] = useState();
-  const [checkID, setCheckID] = useState(false);
+  // const [checkID, setCheckID] = useState(false);
   const [idCidade, setidCidade] = useState();
   const [checkCidade, setCheckCidade] = useState(false);
   const [indicadores, setIndicadores] = useState([]);
@@ -96,7 +96,7 @@ const EditAdmin = ({members, memberRef, open, close, openBox }) => {
 
  useEffect(() => {
   if(open) {
-    setCor(memberRef && memberRef.cor);
+    // setCor(memberRef && memberRef.cor);
     setTelefone(memberRef && memberRef.telefone);
     setCargo(memberRef && memberRef.cargo);
     if(memberRef && memberRef.cargo === 'Orçamentista') {
