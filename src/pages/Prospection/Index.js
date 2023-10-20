@@ -41,6 +41,9 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import FormControl from '@mui/material/FormControl';
+import Stepper from '@mui/material/Stepper';
+import Step from '@mui/material/Step';
+import StepLabel from '@mui/material/StepLabel';
 // import DeleteIcon from '@mui/icons-material/Delete';
 // import PersonAddAltIcon from '@mui/icons-material/PersonAddAlt';
 // import DeleteIcon from '@mui/icons-material/Delete';
@@ -58,13 +61,17 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import Collapse from '@mui/material/Collapse';
 import { Box, ThemeProvider } from "@mui/material";
-// import CircularProgress from '@mui/material/CircularProgress';
-// import PropTypes from 'prop-types';
-// import Tabs from '@mui/material/Tabs';
-// import Tab from '@mui/material/Tab';
+
+const steps = [
+  'Ativo',
+  'Pedido de Orçamento',
+  'Orçamento Gerado',
+  'Apresentação',
+  'Finalizado'
+];
 
 
-const Prospection = ({ user, leads, activity, userRef, listLeads, members, sellers }) => {
+const Prospection = ({ user, leads, visits, userRef, listLeads, members, sellers }) => {
   const [anotacao, setAnotacao] = useState('');
   const [anotacaoBox, setAnotacaoBox] = useState(false);
   const [view, setView] = useState(false);
@@ -400,6 +407,10 @@ const closeAnotacaoBox = () => {
     setOpenEstimate(false);
   }
 
+  const openBox = () => {
+    setOpenEstimate(true);
+  }
+
   console.log(openEstimate)
 
   return (
@@ -413,7 +424,7 @@ const closeAnotacaoBox = () => {
       <div className={styles.title_panel}>
         <ProspectionIcon className={styles.prospecction_icon}/>
         <h2>Prospecção</h2>
-          <Dashboard schedule={activity} type={'prospeccao'} />
+          <Dashboard type={'prospeccao'} />
       </div>
       <div className={styles.content_panel}>
         <div className={styles.box_panel}>
@@ -469,6 +480,12 @@ const closeAnotacaoBox = () => {
                   {data.status === 'Ativo' &&
                     <TableCell align="center" className={styles.ativo}>{data.status}</TableCell>
                   }
+                  {data.status === 'Orçamento' &&
+                    <TableCell align="center" className={styles.orcamento}>{data.status}</TableCell>
+                  }
+                  {data.status === 'Apresentação' &&
+                    <TableCell align="center" className={styles.apresentacao}>{data.status}</TableCell>
+                  }
                   {data.status === 'Ganho' &&
                     <TableCell align="center" aria-label={data.dataStatus && data.dataStatus.replace('-','às')}
                     data-cooltipz-dir="right" className={styles.ganho}>{data.status}</TableCell>
@@ -499,7 +516,16 @@ const closeAnotacaoBox = () => {
                   <TableCell style={{ paddingBottom: 0, paddingTop: 0, height: 0 }} colSpan={9}>
                       <Collapse in={open[data.id]} timeout="auto" unmountOnExit colSpan={9}>
                       <Box className={styles.info_anotacao} margin={3}>
-                        <Estimate data={data} openEstimate={openEstimate} close={close} />
+                        <Estimate data={data} visits={visits} openEstimate={openEstimate} close={close} open={openBox} userRef={userRef} />
+                        <Box sx={{ width: '100%', marginBottom: '1rem' }}>
+                          <Stepper activeStep={data && data.step} alternativeLabel>
+                            {steps.map((label) => (
+                              <Step key={label}>
+                                <StepLabel>{label}</StepLabel>
+                              </Step>
+                            ))}
+                          </Stepper>
+                        </Box>
                           <h3>Anotação</h3>
                           {viewEdit && viewEdit === data.id ?
                             <textarea className={styles.edit_anotacao} value={anotacao} onChange={(e) => setAnotacao(e.target.value)} cols="30" rows="5"></textarea> :
@@ -536,8 +562,8 @@ const closeAnotacaoBox = () => {
                                 </Button>
                               </div> : 
                               <div className={styles.activity_button}>
-                                {data.status !== "Ativo" ?
-                                  <><div className={styles.lead_status} aria-label={data.dataStatus && data.dataStatus.replace('-','às')} data-cooltipz-dir="top" style={data.status === 'Ganho' ? { color: 'green'} : { color: 'red' }}>
+                                 {(data.status === "Ganho" || data.status === "Perdido") &&
+                                  <><div className={styles.lead_status} aria-label={data.dataStatus && data.dataStatus.replace('-', 'às')} data-cooltipz-dir="top" style={data.status === 'Ganho' ? { color: 'green' } : { color: 'red' }}>
                                   <HowToRegIcon />
                                   <h3>{data.status}</h3>
                                 </div><Button
@@ -549,8 +575,9 @@ const closeAnotacaoBox = () => {
                                   onClick={() => openLead(data)}
                                 >
                                     Reabrir
-                                  </Button></> : 
-                                  <><Button
+                                  </Button></>}
+                                  {(data.status === "Ativo") &&
+                                  <Button
                                   variant="contained"
                                   color="primary"
                                   size="small"
@@ -559,7 +586,18 @@ const closeAnotacaoBox = () => {
                                   onClick={() => setOpenEstimate(true)}
                                 >
                                   Solicitar Orçamento
-                                </Button><Button
+                                </Button>}
+                                <Button
+                                  variant="contained"
+                                  color="success"
+                                  size="small"
+                                  type="submit"
+                                  startIcon={<PersonOffIcon />}
+                                  onClick={() => openAnotacaoBox(data, 'ganho')}
+                                >
+                                    Ganho
+                                  </Button>
+                                <Button
                                   variant="contained"
                                   color="error"
                                   size="small"
@@ -568,9 +606,10 @@ const closeAnotacaoBox = () => {
                                   onClick={() => openAnotacaoBox(data, 'perdido')}
                                 >
                                     Perdido
-                                  </Button></>
-                                }
-                            </div>}
+                                  </Button>
+                                
+                            </div>
+                            }
                       </Box>
                       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                       </Box>

@@ -23,6 +23,7 @@ function App() {
   const [userAlerts, setUserAlerts] = useState();
   const [leads, setLeads] = useState();
   const [activity, setActivity] = useState();
+  const [visits, setVisits] = useState();
   // const [tecs, setTecs] = useState();
   const [sellers, setSellers] = useState();
   const [listLeads, setListLeads] = useState();
@@ -34,6 +35,7 @@ function App() {
   const activityCollectionRef = collection(dataBase, "Atividades_Total");
   const listCollectionRef = collection(dataBase, "Lista_Leads");
   const relatorioCollectionRef = collection(dataBase, "Relatorio");
+  const VisitasCollectionRef = collection(dataBase,"Visitas_2023", 'Apresentação', 'Bruna');
   let { status } = useNavigatorOnline();
 
   useEffect(() => {
@@ -70,6 +72,10 @@ function App() {
           onSnapshot(query(relatorioCollectionRef, orderBy("createAt", 'desc')), (list) => {
             // Atualiza os dados em tempo real
           setReportsRef(list.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
+          });
+          onSnapshot(query(VisitasCollectionRef, orderBy("dataRef", 'desc')), (list) => {
+            // Atualiza os dados em tempo real
+          setVisits(list.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
           });
       };
       fetchData();
@@ -120,7 +126,7 @@ function App() {
             } */}
             <Route exact path="/leads" element={<Alert user={user} userRef={userRef} alerts={userAlerts} check={check} reports={reports} />} />
             <Route exact path="/relatorio" element={<Report user={user} userRef={userRef} alerts={userAlerts} check={check} reports={reports} />} />
-            <Route exact path="/prospeccao" element={<Prospecction user={user} userRef={userRef} leads={leads} activity={activity} listLeads={listLeads} members={members} sellers={sellers} check={check} reports={reports} alerts={userAlerts} />} />
+            <Route exact path="/prospeccao" element={<Prospecction user={user} userRef={userRef} leads={leads} visits={visits} listLeads={listLeads} members={members} sellers={sellers} check={check} reports={reports} alerts={userAlerts} />} />
             <Route exact path="/gestao-comercial" element={<Commercial user={user} userRef={userRef} leads={leads} activity={activity} listLeads={listLeads} members={members} sellers={sellers} check={check} reports={reports}/>} />
             {/* <Route path="/agenda/:year" element={<Schedule userRef={userRef} members={members} tecs={tecs} sellers={sellers} alerts={userAlerts} check={check} reports={reports} />} /> */}
             <Route path="*" element={<Schedules userRef={userRef} alerts={userAlerts} check={check} reports={reports} />} />

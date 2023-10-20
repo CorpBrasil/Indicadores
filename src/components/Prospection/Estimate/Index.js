@@ -1,11 +1,22 @@
-// import { updateDoc, doc } from 'firebase/firestore';
+import { addDoc, updateDoc, doc, collection } from 'firebase/firestore';
+import { getStorage, ref, uploadBytesResumable, getDownloadURL} from "firebase/storage";
 import { useEffect, useState } from 'react';
 import CurrencyInput from "react-currency-input-field";
-// import Swal from "sweetalert2"; // cria alertas personalizado
+import Swal from "sweetalert2"; // cria alertas personalizado
 // import { dataBase } from '../../../firebase/database';
 // import { Company } from '../../../data/Data'
+// import { usePlacesWidget } from "react-google-autocomplete";
+import {
+  DistanceMatrixService,
+  GoogleMap,
+  useLoadScript,
+} from "@react-google-maps/api";
 import { styled } from '@mui/material/styles';
 import styles from "./styles.module.scss";
+import moment from 'moment';
+import ArrowCircleRightIcon from '@mui/icons-material/ArrowCircleRight';
+import ArrowCircleLeftIcon from '@mui/icons-material/ArrowCircleLeft';
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 
 import Dialog from "@mui/material/Dialog";
 import useMediaQuery from '@mui/material/useMediaQuery';
@@ -20,13 +31,25 @@ import Button from "@mui/material/Button";
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import { theme } from '../../../data/theme';
 import { ThemeProvider } from "@mui/material";
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import Paper from '@mui/material/Paper';
+import Backdrop from '@mui/material/Backdrop';
+import CircularProgress from '@mui/material/CircularProgress';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import CheckIcon from '@mui/icons-material/Check';
+import { KeyMaps } from '../../../data/Data';
+import { dataBase } from '../../../firebase/database';
 
 
-const Estimate = ({data, openEstimate, close}) => {
-
+const Estimate = ({data, visits, openEstimate, close, open, userRef}) => {
+  const storage = getStorage();
+  const [nome, setNome] = useState();
   const [telefone, setTelefone] = useState();
   const [cpf, setCpf] = useState();
   const [dataNascimento, setDataNascimento] = useState();
@@ -40,7 +63,30 @@ const Estimate = ({data, openEstimate, close}) => {
   const [rawValue ,setRawValue] = useState("");
   const [openFatura, setOpenFatura] = useState(false);
   const [viewVisit, setviewVisit] = useState(false);
+  const [visitaNumero] = useState(3600);
+  const [tempoTexto, setTempoTexto] = useState(undefined);
+  const [saidaCliente, setSaidaCliente] = useState(undefined);
+  const [horarioTexto, setHorarioTexto] = useState(null);
+  const [dataTexto, setDataTexto] = useState(null);
+  const [lng, setLng] = useState();
+  const [lat, setLat] = useState();
+  const [rotaTempo, setRotaTempo] = useState(undefined);
+  const [hoursLimit, setHoursLimit] = useState(undefined);
+  const [visitsFindCount, setVisitsFindCount] = useState(undefined);
+  const [saidaTexto, setSaidaTexto] = useState(undefined);
+  const [chegadaTexto, setChegadaTexto] = useState(undefined);
+  const [loading, setLoading] = useState(false);
   const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
+  const [libraries] = useState(["places"]);
+
+  console.log(visits)
+
+  let isLoaded;
+  window.onload = { isLoaded } = useLoadScript({
+    id: "google-map-script",
+    googleMapsApiKey: KeyMaps,
+    libraries,
+  });
 
 
   const VisuallyHiddenInput = styled('input')({
@@ -54,7 +100,78 @@ const Estimate = ({data, openEstimate, close}) => {
     width: 1,
   })
 
-  console.log(data);
+  useEffect(() => {
+    const dataLoad = () => {
+      navigator.geolocation.getCurrentPosition(function (position) {
+        setLat(position.coords.latitude);
+        setLng(position.coords.longitude);
+      }) 
+    }
+    dataLoad();
+  },[])
+
+  useEffect(() => {
+    // console.log(visitaNumero);
+    if (horarioTexto && dataTexto) {
+      moment.locale("pt-br");
+
+      const saidaEmpresa = moment(horarioTexto, "hh:mm"); //Horario de chegada
+      const chegadaCliente = moment(horarioTexto, "hh:mm"); //Horario de chegada
+
+      saidaEmpresa.subtract(rotaTempo, "seconds").format("hh:mm"); // Pega o tempo que o tecnico vai precisar sair da empresa
+
+      setSaidaTexto(saidaEmpresa.format("kk:mm"));
+
+      chegadaCliente.add(visitaNumero, "seconds").format("hh:mm"); //Adiciona tempo de viagem volta
+      setSaidaCliente(chegadaCliente.format("kk:mm"));
+      chegadaCliente.add(rotaTempo, "seconds").format("hh:mm"); //Adiciona tempo de viagem volta
+      setChegadaTexto(chegadaCliente.format("kk:mm"));
+    }
+
+      let saidaEmpresaRef, ChegadaEmpresaRef;
+      moment.locale("pt-br");
+      saidaEmpresaRef = saidaTexto;
+      ChegadaEmpresaRef = chegadaTexto;
+
+      const saidaFormatada = moment(saidaEmpresaRef, "hh:mm");
+      const chegadaFormatada = moment(ChegadaEmpresaRef, "hh:mm");
+      let check = [];
+      let visitsFindData = [];
+
+
+      const dataRef = visits.filter(
+        (dia) => dia.data === dataTexto);
+
+        // console.log(dataRef)
+
+
+        dataRef.map((ref) => {
+          // console.log("eae");
+          if (
+            saidaFormatada <= moment(ref.saidaEmpresa, "hh:mm") &&
+            chegadaFormatada <= moment(ref.saidaEmpresa, "hh:mm")
+          ) {
+            check.push(ref);
+          } else {
+            if (saidaFormatada >= moment(ref.chegadaEmpresa, "hh:mm"))
+              check.push(ref);
+          }
+          return dataRef;
+        });
+      // console.log(visitsFindCount);
+
+      // eslint-disable-next-line array-callback-return
+      dataRef.map((a) => {
+        //Percorre todos os arrays de 'dataRef' e compara se os arrays são iguais
+        if (check.includes(a) === false) {
+          visitsFindData.push(a);
+        }
+        // return setVisitsFind(visitsFindData);
+      });
+      setVisitsFindCount(dataRef.length - check.length)
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [horarioTexto, visitaNumero, chegadaTexto, saidaTexto, rotaTempo]);
 
   const handleOnValueChange = (value) => {
     setRawValue(value === undefined ? "undefined" : value || " ");
@@ -64,151 +181,164 @@ const Estimate = ({data, openEstimate, close}) => {
   useEffect(() => {
     if(openEstimate) {
       setCidade(data && data.cidade);
+      setNome(data && data.nome);
+      setTelefone(data && data.telefone)
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   },[openEstimate])
-
-  // useLayoutEffect(() => {
-  //   // faz a solicitação do servidor assíncrono e preenche o formulário
-  //   setTimeout(() => {
-  //     reset({
-  //       nome: memberRef.nome,
-  //       veiculo: memberRef.veiculo,
-  //     });
-  //   }, 0);
-  // // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [memberRef]);
-
-  // useEffect(() => {
-  //   if(idCidade !== cidade.code && memberRef.cargo === 'Indicador') {
-  //     if(members && members.find((data) => data.id_user === cidade.code + ' - ' + idCidade)) {
-  //       setCheckID(true);
-  //     } else {
-  //       setCheckID(false);
-  //     }
-  //   }
-  // // eslint-disable-next-line react-hooks/exhaustive-deps
-  // },[idCidade])
-
-  // useEffect(() => {
-  //   const fethData = () => {
-  //     setIndicadores(members && members.filter((data) => data.cargo === 'Indicador'))
-  //     setOrcamentistaRef(members && members.filter((data) => data.cargo === 'Orçamentista'))
-  //   }
-  //   fethData();
-  // },[members])
-  
-  
-  
-  // useEffect(() => {
-  //   if(open && memberRef.cargo === "Indicador") {
-  //     if(cidade === null) {
-  //         setCheckCidade(true);
-  //       } else {
-  //         setCheckCidade(false);
-  //         if(cidade && cidade.code !== memberRef.cidade.code) {
-  //           setTimeout(() => {
-  //             setidCidade(indicadores && indicadores.find((data) => data.cidade.code === cidade.code) ? String(indicadores.filter((data) => data.cidade.code === cidade.code).length + 100) : '100')
-  //           }, 100);
-  //         } else if(memberRef && memberRef.cargo === 'Indicador') {
-  //           setidCidade(memberRef && memberRef.id_user.slice(5,9))
-  //         }
-  //       }
-  //   }
-    
-  // // eslint-disable-next-line react-hooks/exhaustive-deps
-  // },[cidade,indicadores, idCidade, open])
 
   const onVisit = (e) => {
     e.preventDefault();
     setviewVisit(true);
   }
 
-  // const onSubmit = async (e) => {
-  //       e.preventDefault();
-  //       try {
-  //         close();
-  //         Swal.fire({
-  //           title: Company,
-  //           text: `Você deseja alterar os dados?`,
-  //           icon: "question",
-  //           showCancelButton: true,
-  //           showCloseButton: true,
-  //           confirmButtonColor: "#F39200",
-  //           cancelButtonColor: "#d33",
-  //           confirmButtonText: "Sim",
-  //           cancelButtonText: "Não",
-  //         }).then(async (result) => {
-  //           if (result.isConfirmed) {
-  //             let data;
-  //             // switch(cargo) {
-  //             //   case 'Indicador':
-  //             //     data = {
-  //             //       cargo: cargo,
-  //             //       cidade: cidade,
-  //             //       id_user: cidade.code + ' - ' + idCidade,
-  //             //       telefone: telefone,
-  //             //       orcamentista: {
-  //             //         nome: orcamentista.nome,
-  //             //         uid: orcamentista.uid
-  //             //       }
-  //             //     }
-  //             //   break
-  //             //   case 'Orçamentista':
-  //             //     data = {
-  //             //       cargo: cargo,
-  //             //       id_crm: idCRM,
-  //             //       telefone: telefone
-  //             //     }
-  //             //   break
-  //             //   case 'Closer':
-  //             //     data = {
-  //             //       veiculo: veiculo,
-  //             //       cargo: cargo,
-  //             //       telefone: telefone
-  //             //     }
-  //             //   break
-  //             //   default: 
-  //             //     data = {
-  //             //       cargo: cargo,
-  //             //       telefone: telefone
-  //             //     }
-  //             // }
-  //             await updateDoc(doc(dataBase,"Leads", data.id), data).then((result) => {
-  //               Swal.fire({
-  //              title: Company,
-  //              html: 'Os dados do Colaborador(a) foi alterado com sucesso.',
-  //              icon: "success",
-  //              showConfirmButton: true,
-  //              showCloseButton: true,
-  //              confirmButtonColor: "#F39200"
-  //            }).then((result) => {
-  //              close();
-  //            })
-  //             })
-  //             } else {
-  //               close();
-  //             }   
-  //           })
-  //       } catch (error) {
-  //         // console.log(error);
-  //       }
-  //   }
+  const onSubmit = async (e) => {
+        e.preventDefault();
+        try {
+          close();
+          Swal.fire({
+            title: 'Company',
+            text: `Todos os dados estão corretos?`,
+            icon: "question",
+            showCancelButton: true,
+            showCloseButton: true,
+            confirmButtonColor: "#F39200",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Sim",
+            cancelButtonText: "Não",
+          }).then(async (result) => {
+            if (result.isConfirmed) {
+              setLoading(true);
+              await addDoc(collection(dataBase,"Visitas_2023", 'Apresentação', 'Bruna'), {
+                dia: moment(dataTexto).format("YYYY MM DD"),
+                saidaEmpresa: saidaTexto,
+                chegadaCliente: horarioTexto,
+                visita: moment('00:00', "HH:mm").add(visitaNumero, 'seconds').format('HH:mm'),
+                visitaNumero: visitaNumero,
+                saidaDoCliente: saidaCliente,
+                chegadaEmpresa: chegadaTexto,
+                consultora: userRef && userRef.nome,
+                uid: userRef && userRef.id,
+                id_user: userRef && userRef.id_user,
+                tecnico: userRef && userRef.orcamentista.nome,
+                tecnicoUID: userRef && userRef.orcamentista.uid,
+                cidade: cidade,
+                endereco: endereco,
+                veiculo: '004',
+                lat: lat,
+                lng: lng,
+                cliente: nome,
+                observacao: '',
+                tempoRota: rotaTempo,
+                tempo: tempoTexto,
+                data: dataTexto,
+                confirmar: false,
+                tipo: 'Visita',
+                categoria: 'comercial',
+                corTec: '#000',
+                createVisit: new Date(),
+                dataRef: new Date(`${dataTexto}T${horarioTexto}`) 
+              }).then(async (result) => {
+                await addDoc(collection(dataBase,"Orcamento"), {
+                  nome: nome,
+                  telefone: telefone,
+                  cpf: cpf,
+                  dataNascimento: dataNascimento,
+                  consumo: consumo,
+                  endereco: {
+                    rua: endereco,
+                    bairro: bairro,
+                    cidade: cidade
+                  },
+                  anotacao: anotacao,
+                  VisitRef: result.id
+                }).then(async (result) => {
+                  const storageRef = ref(storage, `Orcamento/Bruna/${result.id}/${fatura.complete.name}`);
+                  const uploadTask = uploadBytesResumable(storageRef, fatura.complete);
+                  uploadTask.on(
+                    "state_changed",
+                    (snapshot) => {
+                      const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                      console.log('Upload is ' + progress + '% done');
+                      // switch (snapshot.state) {
+                      //   case 'paused':
+                      //     console.log('Upload is paused');
+                      //     break;
+                      //   case 'running':
+                      //     console.log('Upload is running');
+                      //     break;
+                      // }
+                    },
+                    (error) => {
+                      alert(error);
+                    },
+                    () => {
+                      getDownloadURL(uploadTask.snapshot.ref).then(async (downloadURL) => {
+                        console.log('File available at', downloadURL);
+                        await updateDoc(doc(dataBase, "Orcamento", result.id), {
+                          fatura_url: downloadURL
+                        })
+                        await updateDoc(doc(dataBase, "Leads", data.id), {
+                          status: 'Orçamento',
+                          step: 2,
+                          consumo: consumo,
+                          telefone: telefone
+                        }).then(() => {
+                          setLoading(false);
+                          Swal.fire({
+                               title: 'CORPBRASIL',
+                               html: 'Orçamento solicitado com sucesso.',
+                               icon: "success",
+                               showConfirmButton: true,
+                               showCloseButton: true,
+                               confirmButtonColor: "#F39200"
+                             }).then((result) => {
+                               close();
+                             })
+                        })
+                      });
+                    }
+                  );
+                })
+              })
+              } else {
+                open();
+              }   
+            })
+        } catch (error) {
+          // console.log(error);
+        }
+    }
 
-    // console.log(openEstimate)
-    console.log(fatura)
+    console.log(fatura);
+
+    console.log(lat, lng);
+
+    const closeBox = () => {
+      close();
+      setTimeout(() => {
+        setviewVisit(false);
+      }, 500);
+    }
 
   return (
-    <><Dialog
+    <>
+    <Backdrop
+        sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        open={loading}
+      >
+        <CircularProgress color="inherit" />
+      </Backdrop>
+    <Dialog
       className={styles.dialog}
       open={openEstimate}
       fullScreen={fullScreen}
       maxWidth="md"
-      onClose={() => close()}
+      onClose={() => closeBox()}
     >
       <IconButton
         aria-label="close"
-        onClick={() => close()}
+        onClick={() => closeBox()}
         sx={{
           position: 'absolute',
           right: 8,
@@ -218,8 +348,133 @@ const Estimate = ({data, openEstimate, close}) => {
       ><CloseIcon /></IconButton>
       <DialogTitle align="center">Solicitar Orçamento</DialogTitle>
       {viewVisit && viewVisit ? 
-        <DialogContent>
-
+        <DialogContent className={styles.visit_content}>
+          <DialogContentText sx={{ textAlign: "center" }}>
+            Escolha a data de apresentação do <b>Orçamento</b>.
+          </DialogContentText>
+          <form onSubmit={onSubmit}>
+          <FormControl margin='dense' fullWidth>
+              <TextField
+                autoFocus
+                margin="dense"
+                id="name"
+                label="Endereço"
+                type="text"
+                // required
+                value={endereco ? endereco : ''}
+                onChange={(e) => setEndereco(e.target.value)}
+                variant="outlined" />
+            </FormControl>
+            <div className={styles.label_content}>
+              <div className={styles.input_endereco}>
+                <TextField
+                  autoFocus
+                  margin="dense"
+                  id="name"
+                  label="Bairro"
+                  type="text"
+                  value={bairro ? bairro : ''}
+                  onChange={(e) => setBairro(e.target.value)}
+                  fullWidth
+                  // required
+                  variant="outlined" /> </div>
+              <div className={styles.input_endereco}>
+                <TextField
+                  autoFocus
+                  margin="dense"
+                  id="name"
+                  label="Cidade"
+                  type="text"
+                  value={cidade ? cidade : ''}
+                  onChange={(e) => setCidade(e.target.value)}
+                  fullWidth
+                  // required
+                  variant="outlined" />
+              </div>
+            </div>
+          <div className={styles.label_content}>
+              <div style={{minWidth: '180px' }} className={styles.input_telefone}>
+                <span>Dia</span>
+                <input 
+                  type="date"
+                  value={dataTexto ? dataTexto : ''}
+                  min={moment(new Date()).add(3, 'days').format('YYYY-MM-DD')}
+                  onChange={(e) => setDataTexto(e.target.value)
+                  }
+                />
+              </div>
+              <div style={{minWidth: '180px' }} className={styles.input_telefone}>
+                <span>Horário</span>
+                <input 
+                  type="time"
+                  value={horarioTexto ? horarioTexto : ''}
+                  onBlur={(e) => moment(e.target.value, 'hh:mm') < moment('07:00', 'hh:mm') || moment(e.target.value, 'hh:mm') > moment('18:00', 'hh:mm') ? setHoursLimit(true) : setHoursLimit(false)}
+                  onChange={(e) => setHorarioTexto(e.target.value)
+                  }
+                />
+                 {hoursLimit && <p className={styles.hours_alert}>Limite: 07:00 ás 18:00</p>}
+              </div>
+            </div>
+            <div className={styles.visit_list}>      
+            {visits && visits.length > 0  ? 
+            <><h2>{dataTexto ? 'Apresentação do dia' : 'Apresentações Marcadas'}</h2>
+            <TableContainer className="table-visits" component={Paper} sx={{ maxHeight: 240 }}>
+            <Table size="small" stickyHeader aria-label="sticky table">
+              <TableHead>
+                <TableRow className="table-visits_header">
+                  <TableCell align="center">Data</TableCell>
+                  <TableCell align="center">Saida</TableCell>
+                  <TableCell align="center">Chegada</TableCell>
+                  <TableCell align="center">Cidade</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {visits.map((visita) => (
+                  <TableRow
+                    hover
+                    key={visita.id}
+                    sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                  >
+                    <TableCell sx={{ width: 30 }} align="center" scope="row">
+                      {moment(visita.dia).format("DD/MM")}
+                    </TableCell>
+                    <TableCell align="center">{visita.saidaEmpresa}</TableCell>
+                    <TableCell align="center">{visita.chegadaEmpresa}</TableCell>
+                      <TableCell align="center">{visita.cidade && visita.cidade}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+              </>:
+             <div style={{ display: 'none!important' }} className="visit-aviso">
+              <h2>Nenhuma Visita Encontrada</h2>
+             </div>
+             }
+               <div style={{ width: '98%', margin: '0' }} className={visitsFindCount < 0 || visitsFindCount > 0 ? `${styles.visit_info} ${styles.error_aviso}` : `${styles.visit_info} ${styles.check}`}>
+               <span className="">Previsão de Visita (Orçamentista) {(visitsFindCount < 0 || visitsFindCount > 0) ?
+               <div aria-label="Essa Apresentação ultrapassa o horário de uma Apresentação já existente. Verifique os horários disponiveis"
+                data-cooltipz-dir="top" data-cooltipz-size="large" ><ErrorOutlineIcon  sx={{ fill: 'red' }} /></div> 
+              :
+              <div aria-label="A Apresentação pode ser criada"
+                data-cooltipz-dir="top" ><CheckIcon sx={{ fill: 'green' }} /></div>
+              }
+                </span>
+               <p className={styles.notice}>
+               <ArrowCircleRightIcon />Saindo às <b>{saidaTexto ? saidaTexto : '00:00'}</b>
+               </p>
+               <p className={styles.notice}>
+               <ArrowCircleLeftIcon />Chegando às <b>{chegadaTexto ? chegadaTexto : "00:00"}</b>
+               </p>
+             </div>
+            </div>
+             <ThemeProvider theme={theme}>
+            <DialogActions sx={{ justifyContent: 'center' }}>
+              <Button variant='outlined' color='success' type="submit">Solicitar</Button>
+              <Button variant='outlined' color="error" onClick={() => setviewVisit(false)}>Voltar</Button>
+            </DialogActions>
+          </ThemeProvider>
+          </form>
         </DialogContent>
       : 
       <DialogContent>
@@ -231,12 +486,13 @@ const Estimate = ({data, openEstimate, close}) => {
             <TextField
               autoFocus
               margin="dense"
+              onChange={(e) => setNome(e.target.value)}
               id="name"
               label="Nome Completo"
               type="text"
-              value={data && data.nome}
+              value={nome ? nome : ''}
               fullWidth
-              required
+              // required
               variant="outlined" />
             <div className={styles.label_content}>
               <div className={styles.input_telefone}>
@@ -252,7 +508,8 @@ const Estimate = ({data, openEstimate, close}) => {
                   minLength={9}
                   variant="outlined"
                   color="primary"
-                  required />
+                  // required 
+                  />
               </div>
               <div className={styles.input_telefone}>
                 <span>CPF</span>
@@ -267,7 +524,8 @@ const Estimate = ({data, openEstimate, close}) => {
                   minLength={9}
                   variant="outlined"
                   color="primary"
-                  required />
+                  // required 
+                  />
               </div>
             </div>
             <div className={styles.label_content}>
@@ -284,7 +542,8 @@ const Estimate = ({data, openEstimate, close}) => {
                   minLength={9}
                   variant="outlined"
                   color="primary"
-                  required />
+                  // required 
+                  />
               </div>
               <div className={styles.input_telefone}>
                 <span>Gasto com Energia</span>
@@ -299,47 +558,8 @@ const Estimate = ({data, openEstimate, close}) => {
                   fixedDecimalLength={0}
                   value={consumo || ''}
                   min={50}
-                  required
+                  // required
                   color="primary" />
-              </div>
-            </div>
-            <FormControl margin='dense' fullWidth>
-              <TextField
-                autoFocus
-                margin="dense"
-                id="name"
-                label="Rua & Número"
-                type="text"
-                required
-                value={endereco ? endereco : ''}
-                onChange={(e) => setEndereco(e.target.value)}
-                variant="outlined" />
-            </FormControl>
-            <div className={styles.label_content}>
-              <div className={styles.input_endereco}>
-                <TextField
-                  autoFocus
-                  margin="dense"
-                  id="name"
-                  label="Bairro"
-                  type="text"
-                  value={bairro ? bairro : ''}
-                  onChange={(e) => setBairro(e.target.value)}
-                  fullWidth
-                  required
-                  variant="outlined" /> </div>
-              <div className={styles.input_endereco}>
-                <TextField
-                  autoFocus
-                  margin="dense"
-                  id="name"
-                  label="Cidade"
-                  type="text"
-                  value={cidade ? cidade : ''}
-                  onChange={(e) => setCidade(e.target.value)}
-                  fullWidth
-                  required
-                  variant="outlined" />
               </div>
             </div>
             <div className={styles.label_last}>
@@ -354,11 +574,11 @@ const Estimate = ({data, openEstimate, close}) => {
                   value={anotacao ? anotacao : ''}
                   onChange={(e) => setAnotacao(e.target.value)}
                   fullWidth
-                  required
+                  // required
                   variant="outlined" />
             </div>
             <div className={styles.input_file}>
-              <Button component="label" variant="contained" onChange={(e) => setFatura({ file: URL.createObjectURL(e.target.files[0]) })} startIcon={<CloudUploadIcon />}>
+              <Button component="label" variant="contained" onChange={(e) => setFatura({ file: URL.createObjectURL(e.target.files[0]), complete: e.target.files[0] })} startIcon={<CloudUploadIcon />}>
                 Enviar Fatura
                 <VisuallyHiddenInput type="file" />
               </Button>
@@ -402,7 +622,32 @@ const Estimate = ({data, openEstimate, close}) => {
               <Button variant='contained' onClick={() => setOpenFatura(false)}>FECHAR</Button>
             </DialogActions>
       </ThemeProvider>
-      </Dialog></>
+      </Dialog>
+      {isLoaded && 
+      <GoogleMap zoom={10} center={{lat: -23.1685077, lng: -47.7486243}}>
+          <DistanceMatrixService
+            options={{
+              destinations: [{ lat: lat, lng: lng }],
+              origins: [{ lng: -47.7486243, lat: -23.1685077}],
+              travelMode: "DRIVING",
+              drivingOptions: { departureTime: new Date(), trafficModel: 'bestguess'}, // Pega o trafico no tempo de criação da visita
+            }}
+            callback={(response, status) => {
+              if (status === "OK") {
+                // console.log(response);
+                if (
+                  rotaTempo === undefined || rotaTempo !== response?.rows[0].elements[0].duration.value
+                  ) {
+                  setRotaTempo(response?.rows[0].elements[0].duration.value);
+                  setTempoTexto(response?.rows[0].elements[0].duration.text);
+                  // setCheck(false);
+                }
+              }
+            }}
+          />
+        </GoogleMap>
+      }
+      </>
   )
 }
 

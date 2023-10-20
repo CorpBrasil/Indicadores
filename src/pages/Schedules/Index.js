@@ -396,6 +396,20 @@ const Schedules = ({ userRef, alerts, check, reports }) => {
          </li>
            </div>
       }
+       {userRef && (user.email === Users[0].email || userRef.cargo === "Indicador" || userRef.cargo === "Administrador") && userRef.nome !== 'Pós-Venda' &&
+       <div className='box-schedule'>
+         <li className='schedule'>
+           <Link className='schedule__content' to="/avisos">
+           <Badge sx={{ width: '5.6rem', height: '100%' }} badgeContent={reports && reports.length - userRef.relatorio} color="error">
+             <div className='schedule__icon report'><ReportIcon /></div>
+           </Badge>
+             <div className='schedule__text'>
+               <p>Aviso</p>
+             </div>
+             </Link>
+         </li>
+           </div>
+      }
        {/* {userRef && (user.email === Users[0].email || userRef.cargo === "Administrador" || userRef.cargo === "Técnico" || findTec) && 
         // <><div className='box-schedule'>
         //       <li className='schedule'>

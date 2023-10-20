@@ -84,6 +84,7 @@ const CreateProspection = ({
               createAt: serverTimestamp(),
               uid: userRef.uid,
               status: 'Ativo',
+              step: 0,
               endereco: `https://maps.google.com/?q=${lat},${lng}`
             }).then((result) => {
               console.log(result);
