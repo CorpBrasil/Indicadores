@@ -183,6 +183,7 @@ const Estimate = ({data, visits, openEstimate, close, open, userRef}) => {
       setCidade(data && data.cidade);
       setNome(data && data.nome);
       setTelefone(data && data.telefone)
+      setConsumo(data && data.consumo)
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   },[openEstimate])
@@ -193,6 +194,7 @@ const Estimate = ({data, visits, openEstimate, close, open, userRef}) => {
   }
 
   const onSubmit = async (e) => {
+        let visitID;
         e.preventDefault();
         try {
           close();
@@ -229,6 +231,7 @@ const Estimate = ({data, visits, openEstimate, close, open, userRef}) => {
                 lng: lng,
                 cliente: nome,
                 observacao: '',
+                data_completa: moment(dataTexto).format('DD MMMM YYYY') + '-' + horarioTexto,
                 tempoRota: rotaTempo,
                 tempo: tempoTexto,
                 data: dataTexto,
@@ -239,12 +242,24 @@ const Estimate = ({data, visits, openEstimate, close, open, userRef}) => {
                 createVisit: new Date(),
                 dataRef: new Date(`${dataTexto}T${horarioTexto}`) 
               }).then(async (result) => {
+                visitID = result.id
+                const day = new Date();
                 await addDoc(collection(dataBase,"Orcamento"), {
                   nome: nome,
                   telefone: telefone,
                   cpf: cpf,
+                  data: moment(day).format('DD MMM YYYY - HH:mm'),
+                  status: 'Em Espera',
                   dataNascimento: dataNascimento,
                   consumo: consumo,
+                  empresa: data.empresa,
+                  createAt: new Date(),
+                  orcamentista: userRef && userRef.orcamentista,
+                  indicador: {
+                    nome: userRef && userRef.nome,
+                    uid: userRef && userRef.uid,
+                    id: userRef && userRef.id_user
+                  },
                   endereco: {
                     rua: endereco,
                     bairro: bairro,
@@ -281,7 +296,11 @@ const Estimate = ({data, visits, openEstimate, close, open, userRef}) => {
                         await updateDoc(doc(dataBase, "Leads", data.id), {
                           status: 'Orçamento',
                           step: 2,
+                          pedido: {
+                            data: moment(day).format('DD MMM YYYY - HH:mm')
+                          },
                           consumo: consumo,
+                          visitRef: visitID,
                           telefone: telefone
                         }).then(() => {
                           setLoading(false);

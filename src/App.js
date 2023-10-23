@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import Login from './pages/Login/Index';
 import Schedules from './pages/Schedules/Index';
 import PanelAdmin from './pages/PanelAdmin/Index';
-import Alert from './pages/Alert/Index';
+// import Alert from './pages/Alert/Index';
 import useAuth from './hooks/useAuth';
 import PrivateRoute from './components/PrivateRoute';
 // import Schedule from './pages/Schedule/Index';
@@ -15,13 +15,14 @@ import { useNavigatorOnline } from '@oieduardorabelo/use-navigator-online';
 import Prospecction from "./pages/Prospection/Index";
 import Commercial from "./pages/Management_commercial/Index";
 import Report from "./pages/Report/Index";
+import Estimate from "./pages/Estimate/Index";
 
 function App() {
   const { user } = useAuth();
   const [members, setMembers] = useState();
   const [userRef, setUserRef] = useState();
-  const [userAlerts, setUserAlerts] = useState();
   const [leads, setLeads] = useState();
+  const [orcamento, setOrcamento] = useState();
   const [activity, setActivity] = useState();
   const [visits, setVisits] = useState();
   // const [tecs, setTecs] = useState();
@@ -31,9 +32,10 @@ function App() {
   const [reportsRef, setReportsRef] = useState();
   const [check, setCheck] = useState(false);
   const membersCollectionRef = collection(dataBase, "Membros");
-  const leadsCollectionRef = collection(dataBase, "Leads");
+  const orcamentoCollectionRef = collection(dataBase, "Orcamento");
   const activityCollectionRef = collection(dataBase, "Atividades_Total");
   const listCollectionRef = collection(dataBase, "Lista_Leads");
+  const leadsCollectionRef = collection(dataBase, "Leads");
   const relatorioCollectionRef = collection(dataBase, "Relatorio");
   const VisitasCollectionRef = collection(dataBase,"Visitas_2023", 'Apresentação', 'Bruna');
   let { status } = useNavigatorOnline();
@@ -53,13 +55,13 @@ function App() {
           // Atualiza os dados em tempo real
           setMembers(member.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
         });
-        onSnapshot(query(collection(dataBase, "Membros/" + user.id + "/Avisos"), orderBy("data")), (member) => {
-          // Atualiza os dados em tempo real
-          setUserAlerts(member.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
-        });
           onSnapshot(query(leadsCollectionRef, orderBy("createAt", 'desc')), (lead) => {
             // Atualiza os dados em tempo real
           setLeads(lead.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
+          });
+          onSnapshot(query(orcamentoCollectionRef, orderBy("createAt", 'desc')), (lead) => {
+            // Atualiza os dados em tempo real
+          setOrcamento(lead.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
           });
           onSnapshot(query(activityCollectionRef, orderBy("createAt", 'desc')), (activity) => {
             // Atualiza os dados em tempo real
@@ -117,19 +119,20 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route exact element={<PrivateRoute />}>
-            <Route exact path="/" element={<Schedules userRef={userRef} alerts={userAlerts} check={check} reports={reports} />} />
+            <Route exact path="/" element={<Schedules userRef={userRef} check={check} reports={reports} />} />
               {user && userRef && (user.email === Users[0].email) &&
-            <Route exact path="/admin" element={<PanelAdmin user={user} userRef={userRef} alerts={userAlerts} check={check} reports={reports} />} />
+            <Route exact path="/admin" element={<PanelAdmin user={user} userRef={userRef} alerts={orcamento} check={check} reports={reports} />} />
             }
             {/* {user && userRef && (user.email === Users[0].email || user.email === Users[1].email || userRef.cargo === "Técnico" || userRef.cargo === "Administrador") &&
               <Route exact path="/financeiro/:year" element={<Finance userRef={userRef} alerts={userAlerts} sellers={sellers} reports={reports} />} />
             } */}
-            <Route exact path="/leads" element={<Alert user={user} userRef={userRef} alerts={userAlerts} check={check} reports={reports} />} />
-            <Route exact path="/relatorio" element={<Report user={user} userRef={userRef} alerts={userAlerts} check={check} reports={reports} />} />
-            <Route exact path="/prospeccao" element={<Prospecction user={user} userRef={userRef} leads={leads} visits={visits} listLeads={listLeads} members={members} sellers={sellers} check={check} reports={reports} alerts={userAlerts} />} />
+            {/* <Route exact path="/orcamento" element={<Alert user={user} userRef={userRef} orcamento={orcamento} check={check} reports={reports} />} /> */}
+            <Route exact path="/relatorio" element={<Report user={user} userRef={userRef} check={check} reports={reports} />} />
+            <Route exact path="/prospeccao" element={<Prospecction user={user} userRef={userRef} leads={leads} visits={visits} listLeads={listLeads} members={members} sellers={sellers} check={check} reports={reports} />} />
+            <Route exact path="/orcamento" element={<Estimate user={user} userRef={userRef} orcamento={orcamento} visits={visits} members={members} sellers={sellers} check={check} />} />
             <Route exact path="/gestao-comercial" element={<Commercial user={user} userRef={userRef} leads={leads} activity={activity} listLeads={listLeads} members={members} sellers={sellers} check={check} reports={reports}/>} />
             {/* <Route path="/agenda/:year" element={<Schedule userRef={userRef} members={members} tecs={tecs} sellers={sellers} alerts={userAlerts} check={check} reports={reports} />} /> */}
-            <Route path="*" element={<Schedules userRef={userRef} alerts={userAlerts} check={check} reports={reports} />} />
+            <Route path="*" element={<Schedules userRef={userRef} check={check} reports={reports} />} />
           </Route>
           <Route exact path="/login" element={<Login />} />
         </Routes>

@@ -24,7 +24,7 @@ import Estimate from "../../components/Prospection/Estimate/Index";
 import Filter from "../../components/Filter/Index";
 import Dashboard from "../../components/Dashboard/Visit_and_Prospection/Index";
 // import ImportLeads from "../../components/Prospection/ImportLeads";
-import PostAddIcon from '@mui/icons-material/PostAdd';
+import ContentPasteGoIcon from '@mui/icons-material/ContentPasteGo';
 
 import { ReactComponent as ProspectionIcon } from '../../images/icons/Prospection.svg';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
@@ -59,6 +59,7 @@ import Paper from '@mui/material/Paper';
 import TablePagination from '@mui/material/TablePagination';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
+import RoomIcon from '@mui/icons-material/Room';
 import Collapse from '@mui/material/Collapse';
 import { Box, ThemeProvider } from "@mui/material";
 
@@ -87,6 +88,8 @@ const Prospection = ({ user, leads, visits, userRef, listLeads, members, sellers
   // eslint-disable-next-line no-unused-vars
   const [activityAll, setActivityAll] = useState();
   // const [viewImport, setViewImport] = useState(false);
+
+  console.log(visits)
 
 
   useEffect(() => {
@@ -517,8 +520,8 @@ const closeAnotacaoBox = () => {
                       <Collapse in={open[data.id]} timeout="auto" unmountOnExit colSpan={9}>
                       <Box className={styles.info_anotacao} margin={3}>
                         <Estimate data={data} visits={visits} openEstimate={openEstimate} close={close} open={openBox} userRef={userRef} />
-                        <Box sx={{ width: '100%', marginBottom: '1rem' }}>
-                          <Stepper activeStep={data && data.step} alternativeLabel>
+                        <Box sx={{ width: '90%', marginBottom: '1rem' }}>
+                          <Stepper activeStep={data && data.step}>
                             {steps.map((label) => (
                               <Step key={label}>
                                 <StepLabel>{label}</StepLabel>
@@ -526,6 +529,19 @@ const closeAnotacaoBox = () => {
                             ))}
                           </Stepper>
                         </Box>
+                        {data.status === 'Orçamento' && 
+                        <Box className={styles.info_step} sx={{ width: '87%', marginBottom: '1rem' }}>
+                          <p><b>{data.pedido && data.pedido.data.replace('-', 'às')}</b></p>
+                          <p>Aguardando Orçamento. A data de apresentação está prevista para o dia <b>{visits && visits.filter((visit) => visit.id === data.visitRef)[0].data_completa.replace('-', ' às')}</b>.</p>
+                        </Box>
+                        }
+                        {data.status === 'Apresentação' && 
+                        <Box className={styles.info_step} sx={{ width: '87%', marginBottom: '1rem' }}>
+                          <p><b>{data.orcamento && data.orcamento.data.replace('-', 'às')}</b></p>
+                          <p>Orçamento gerado pela <b>Bruna</b>. A data de apresentação está prevista para o dia <b>{visits && visits.filter((visit) => visit.id === data.visitRef)[0].data_completa.replace('-', ' às')}</b>.</p>
+                        </Box>
+                        }
+                        <EditProspection changeLoading={changeLoading} data={data} />
                           <h3>Anotação</h3>
                           {viewEdit && viewEdit === data.id ?
                             <textarea className={styles.edit_anotacao} value={anotacao} onChange={(e) => setAnotacao(e.target.value)} cols="30" rows="5"></textarea> :
@@ -562,6 +578,19 @@ const closeAnotacaoBox = () => {
                                 </Button>
                               </div> : 
                               <div className={styles.activity_button}>
+                                <ThemeProvider theme={theme}>
+                                {(userRef && userRef.cargo === 'Indicador') &&
+                                  <Button
+                                  variant="contained"
+                                  color="primary"
+                                  size="small"
+                                  type="submit"
+                                  startIcon={<RoomIcon />}
+                                  onClick={() => window.open(data.endereco, '_blank')}
+                                >
+                                  Localização
+                                </Button>}
+                                </ThemeProvider>
                                  {(data.status === "Ganho" || data.status === "Perdido") &&
                                   <><div className={styles.lead_status} aria-label={data.dataStatus && data.dataStatus.replace('-', 'às')} data-cooltipz-dir="top" style={data.status === 'Ganho' ? { color: 'green' } : { color: 'red' }}>
                                   <HowToRegIcon />
@@ -576,13 +605,13 @@ const closeAnotacaoBox = () => {
                                 >
                                     Reabrir
                                   </Button></>}
-                                  {(data.status === "Ativo") &&
+                                  {(data.status === "Ativo" && userRef && userRef.cargo === 'Indicador') &&
                                   <Button
                                   variant="contained"
                                   color="primary"
                                   size="small"
                                   type="submit"
-                                  startIcon={<PostAddIcon />}
+                                  startIcon={<ContentPasteGoIcon />}
                                   onClick={() => setOpenEstimate(true)}
                                 >
                                   Solicitar Orçamento
@@ -610,12 +639,6 @@ const closeAnotacaoBox = () => {
                                 
                             </div>
                             }
-                      </Box>
-                      <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-                      </Box>
-                      <Box className={styles.info_anotacao} margin={3}>
-                        <h3 className={styles.title_info}>Geral</h3>
-                        <EditProspection changeLoading={changeLoading} data={data} />
                       </Box>
                       {/* <Tabs value={TabsValue} onChange={(e, newValue) => setTabsValue(newValue)} aria-label="Informações do Lead" centered>
                         <Tab label="Atividades" {...a11yProps(1)} />

@@ -1,6 +1,6 @@
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { memo, useState, useEffect } from "react";
-import axios from "axios";
+// import axios from "axios";
 import Geocode from "react-geocode";
 import { PatternFormat } from "react-number-format";
 import { useForm } from "react-hook-form"; // cria formulário personalizado
@@ -84,31 +84,45 @@ const CreateProspection = ({
               createAt: serverTimestamp(),
               uid: userRef.uid,
               status: 'Ativo',
+              orcamentista: userRef.orcamentista,
               step: 0,
               endereco: `https://maps.google.com/?q=${lat},${lng}`
-            }).then((result) => {
-              console.log(result);
-              changeLoading(false);
-              axios.post('https://n8n.corpbrasil.cloud/webhook-test/60c9d4e8-670f-4c28-abfc-3c87aab8872f', {
-                ...userData,
-                telefone: '55' + telefoneFormatado,
-                consultora: userRef.nome,
-                status: 'Ativo',
-                ID: result.id,
-                endereco: `https://maps.google.com/?q=${lat},${lng}`
+            }).then(() => {
+              Swal.fire({
+                title: Company,
+                html: `O Lead foi cadastrado com sucesso.`,
+                icon: "success",
+                showConfirmButton: true,
+                showCloseButton: true,
+                confirmButtonColor: "#F39200",
               }).then(() => {
-                Swal.fire({
-                  title: Company,
-                  html: `O Lead foi cadastrado com sucesso.`,
-                  icon: "success",
-                  showConfirmButton: true,
-                  showCloseButton: true,
-                  confirmButtonColor: "#F39200",
-                }).then(() => {
-                  return returnPage();
-                })
+                return returnPage();
               })
             })
+            // .then((result) => {
+            //   console.log(result);
+            //   changeLoading(false);
+            //   axios.post('https://n8n.corpbrasil.cloud/webhook-test/9b99e112-2485-4079-9609-d8c54de86ce8', {
+            //     ...userData,
+            //     telefone: '55' + telefoneFormatado,
+            //     consultora: userRef.nome,
+            //     status: 'Ativo',
+            //     ID: result.id,
+            //     orcamentista: userRef.orcamentista,
+            //     endereco: `https://maps.google.com/?q=${lat},${lng}`
+            //   }).then(() => {
+            //     Swal.fire({
+            //       title: Company,
+            //       html: `O Lead foi cadastrado com sucesso.`,
+            //       icon: "success",
+            //       showConfirmButton: true,
+            //       showCloseButton: true,
+            //       confirmButtonColor: "#F39200",
+            //     }).then(() => {
+            //       return returnPage();
+            //     })
+            //   })
+            // })
           }})
       } else {
         Swal.fire({
