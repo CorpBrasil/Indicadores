@@ -77,7 +77,7 @@ const CreateVisit = ({
   const [typeVisit] = useState(type); // Escolhe o tipo de visita
   const [driver, setDriver] = useState(); // Para escolher o motorista/tecnico de acordo com o tipo de visita
   const [libraries] = useState(["places"]);
-  const { register, handleSubmit, setValue } = useForm(); 
+  const { register, handleSubmit} = useForm(); 
   const [visitsFindCount, setVisitsFindCount] = useState();
   const [visitsFind, setVisitsFind] = useState();
   const { createVisit } = useVisit(checkNet, scheduleRef, returnSchedule); // Custom Hook para Criar Visitas
@@ -133,14 +133,14 @@ const CreateVisit = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  useEffect(() => {
-    const fethData = async () => {
-      setValue('cliente', preData.nome);
-    }
-    fethData();
+  // useEffect(() => {
+  //   const fethData = async () => {
+  //     setValue('cliente', preData.nome);
+  //   }
+  //   fethData();
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  },[setValue])
+  // // eslint-disable-next-line react-hooks/exhaustive-deps
+  // },[setValue])
 
   useEffect(() => {
     // let visitsType = schedule.filter((visit) => visit.tecnico === "Lucas" && visit.tecnico === "Luis");
@@ -353,7 +353,7 @@ const CreateVisit = ({
               })
             } else {
               const visita = {
-                ...{preData},
+                // ...{preData},
                 dia: moment(dataTexto).format("YYYY MM DD"),
                 saidaEmpresa: saidaTexto,
                 chegadaCliente: horarioTexto,
@@ -503,6 +503,8 @@ const CreateVisit = ({
           })
         }
   }
+
+  console.log(tecRefUID)
 
   return (
     <div className="box-visit">
@@ -662,13 +664,13 @@ const CreateVisit = ({
                     <TableCell sx={{ width: 30 }} className="btn-add"
                         aria-label="Criar Visita Conjunta"
                         data-cooltipz-dir="right"
-                        onClick={() => createVisitGroupChoice({ visit: visita, type: type, data:preData })}
+                        onClick={() => createVisitGroupChoice({ visit: visita, type: type})} // data:preData
                       ></TableCell>}
                     {visita.categoria === 'pos_venda' && userRef && userRef.nome === 'Pós-Venda' && type !== 'lunch' &&
                     <TableCell sx={{ width: 30 }} className="btn-add"
                         aria-label="Criar Visita Conjunta"
                         data-cooltipz-dir="right"
-                        onClick={() => createVisitGroupChoice({ visit: visita, type: type, data:preData })}
+                        onClick={() => createVisitGroupChoice({ visit: visita, type: type})} // data:preData
                       ></TableCell>}
                     {(visita.categoria === 'lunch' || visita.categoria === 'pos_venda') &&
                      userRef && visita.confirmar && (userRef.cargo === 'Vendedor(a)' || userRef.cargo === 'Administrador') &&

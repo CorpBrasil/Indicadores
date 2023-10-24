@@ -79,7 +79,7 @@ const CreateProspection = ({
             await addDoc(collection(dataBase, 'Leads'), {
               ...userData,
               telefone: '55' + telefoneFormatado,
-              consultora: userRef.nome,
+              indicador: userRef.nome,
               data: moment(day).format('DD MMM YYYY - HH:mm'),
               createAt: serverTimestamp(),
               uid: userRef.uid,

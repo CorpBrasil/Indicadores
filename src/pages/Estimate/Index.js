@@ -299,7 +299,7 @@ const closeFatura = () => {
                     {data && data.status === 'Cancelado' && 
                       <TableCell align="center" className={styles.perdido}>{data.status}</TableCell>
                     }
-                  <TableCell align="center">{data && data.data.replace('-', 'às')}</TableCell>
+                  <TableCell align="center">{visits && visits.filter((visit) => visit.id === data.VisitRef)[0].data_completa.replace('-', ' às ')}</TableCell>
                   <TableCell align="center">{data.nome ? data.nome.substring(0, 30) + '...' : ""}</TableCell>
                   <TableCell align="center">{data.empresa}</TableCell>
                   <TableCell align="center">{data.endereco.cidade}</TableCell>
@@ -375,11 +375,11 @@ const closeFatura = () => {
                             <ul className={styles.info_content_item}>
                               <li>
                                 <h4>Data: </h4>
-                                <p>{data.data.replace('-', 'às')}</p>
+                                <p>{visits && visits.filter((visit) => visit.id === data.VisitRef)[0].data_completa.replace('-', ' às ')}</p>
                               </li>
                               <li>
                                 <h4>Responsável: </h4>
-                                <p>{visits.filter((visit) => visit.id === data.VisitRef)[0].consultora}</p>
+                                <p>{visits && visits.filter((visit) => visit.id === data.VisitRef)[0].consultora}</p>
                               </li>
                               </ul>
                               <ul className={styles.info_content_item}>

@@ -24,7 +24,7 @@ import { Users, KeyMaps } from '../../data/Data';
 // import MenuItem from '@mui/material/MenuItem';
 // import FormControl from '@mui/material/FormControl';
 // import Select from '@mui/material/Select';
-// import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 import Badge from '@mui/material/Badge';
@@ -33,7 +33,8 @@ import Badge from '@mui/material/Badge';
 // import LocalGasStationIcon from '@mui/icons-material/LocalGasStation';
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
 import { ReactComponent as Prospection } from '../../images/icons/Prospection.svg';
-import { ReactComponent as Management } from '../../images/icons/Management.svg';
+// import { ReactComponent as Management } from '../../images/icons/Management.svg';
+import ContentPasteIcon from '@mui/icons-material/ContentPaste';
 import { ReactComponent as ReportIcon } from '../../images/icons/Report.svg';
 import CachedIcon from '@mui/icons-material/Cached';
 
@@ -307,27 +308,27 @@ const Schedules = ({ userRef, alerts, check, reports }) => {
       </div>
        <div className='content-schedule'>
         <div className='buttons-content'>
-         {/* <div className='box-schedule'>
-        //  schedules && schedules.map((schedule, index) => (
-      //       <li key={index} className='schedule'>
-      //         {userRef && (user.email === Users[0].email || userRef.cargo === "Administrador") &&
-      //         <div className='schedule__button'>
-      //           <button onClick={() => deleteSchedule(schedule.id)}></button>
-      //         </div>
-      //         }
-      //         <div className='schedule__content' onClick={() => goToSchedule('/agenda/', schedule.id)}>
-      //         <div className='schedule__icon visits'><CalendarMonthIcon /></div>
-      //         <div className='schedule__text-box'>
-      //         <div className='schedule__text'>
-      //           <p>Agenda Visita</p>
-      //           <p>{schedule.id}</p>
-      //         </div>
-      //         </div>
-      //         </div>
-      //       </li>
-      //     ))}
-      //  </div>}
-      // {userRef && (user.email === Users[0].email || user.email === Users[1].email || userRef.cargo === "Técnico" || userRef.cargo === "Administrador") &&
+          {/* <div className='box-schedule'>
+          schedules && schedules.map((schedule, index) => (
+            {/* <li key={index} className='schedule'>
+               {/* {userRef && (user.email === Users[0].email || userRef.cargo === "Administrador") &&
+              <div className='schedule__button'>
+                <button onClick={() => deleteSchedule(schedule.id)}></button>
+              </div>
+               } 
+               <div className='schedule__content' onClick={() => goToSchedule('/agenda/', schedule.id)}>
+               <div className='schedule__icon visits'><CalendarMonthIcon /></div>
+               <div className='schedule__text-box'>
+               <div className='schedule__text'>
+                 <p>Agenda Visita</p>
+                 <p>{schedule.id}</p>
+               </div>
+               </div>
+               </div>
+             </li>
+           ))}
+       </div>}
+       {userRef && (user.email === Users[0].email || user.email === Users[1].email || userRef.cargo === "Técnico" || userRef.cargo === "Administrador") &&
         // <><div className='box-schedule'>
         //       {financeSchedules && financeSchedules.map((schedule, index) => (
         //         <li key={index} className='schedule'>
@@ -344,9 +345,9 @@ const Schedules = ({ userRef, alerts, check, reports }) => {
         //           </div>
         //         </li>
         //       ))}
-          </div>*/}
+          </div>
 
-            {userRef && (user.email === Users[0].email || userRef.cargo === "Administrador") && userRef.nome !== 'Pós-Venda' &&
+            {/* {userRef && (user.email === Users[0].email || userRef.cargo === "Administrador") && userRef.nome !== 'Pós-Venda' &&
          <div className='box-schedule'>
            <li className='schedule'>
              <Link className='schedule__content' to="/gestao-comercial">
@@ -357,32 +358,45 @@ const Schedules = ({ userRef, alerts, check, reports }) => {
                </Link>
            </li>
              </div>
-        }
-         {userRef && (user.email === Users[0].email || userRef.cargo === "Indicador" || userRef.cargo === "Administrador") && userRef.nome !== 'Pós-Venda' &&
-         <div className='box-schedule'>
-           <li className='schedule'>
-             <Link className='schedule__content' to="/prospeccao">
-               <div className='schedule__icon prospection'><Prospection /></div>
-               <div className='schedule__text'>
-                 <p>Prospecção</p>
-               </div>
-               </Link>
-           </li>
-             </div>
-        }
-       {/* {userRef && (user.email === Users[0].email || userRef.cargo === "Vendedor(a)" || userRef.cargo === "Administrador") && userRef.nome !== 'Pós-Venda' &&
+            } */}
+            {userRef && (user.email === Users[0].email || userRef.cargo !== "Técnico") && userRef.nome !== 'Pós-Venda' &&
+            <div className='box-schedule'>
+              <li className='schedule'>
+                <Link className='schedule__content' to="/agenda/2023">
+                  <div className='schedule__icon visit'><CalendarMonthIcon /></div>
+                  <div className='schedule__text'>
+                    <p>Agenda Visita</p>
+                    <p>2023</p>
+                  </div>
+                  </Link>
+              </li>
+                </div>
+           }
+            {userRef && (user.email === Users[0].email || userRef.cargo !== "Técnico") && userRef.nome !== 'Pós-Venda' &&
+            <div className='box-schedule'>
+              <li className='schedule'>
+                <Link className='schedule__content' to="/prospeccao">
+                  <div className='schedule__icon prospection'><Prospection /></div>
+                  <div className='schedule__text'>
+                    <p>Prospecção</p>
+                  </div>
+                  </Link>
+              </li>
+                </div>
+           }
+       {userRef && (userRef.cargo !== "Indicador" && userRef.cargo !== "Técnico") &&
        <div className='box-schedule'>
          <li className='schedule'>
-           <Link className='schedule__content' to="/leads">
-             <div className='schedule__icon alert'><PeopleIcon /></div>
+           <Link className='schedule__content' to="/orcamento">
+             <div className='schedule__icon alert'><ContentPasteIcon /></div>
              <div className='schedule__text'>
-               <p>Confirmar Leads</p>
+               <p>Orçamento</p>
              </div>
              </Link>
          </li>
            </div>
-      } */}
-       {userRef && (user.email === Users[0].email || userRef.cargo === "Indicador" || userRef.cargo === "Administrador") && userRef.nome !== 'Pós-Venda' &&
+      }
+       {/* {userRef && (user.email === Users[0].email || userRef.cargo !== "Técnico") && userRef.nome !== 'Pós-Venda' &&
        <div className='box-schedule'>
          <li className='schedule'>
            <Link className='schedule__content' to="/relatorio">
@@ -395,8 +409,7 @@ const Schedules = ({ userRef, alerts, check, reports }) => {
              </Link>
          </li>
            </div>
-      }
-       {userRef && (user.email === Users[0].email || userRef.cargo === "Indicador" || userRef.cargo === "Administrador") && userRef.nome !== 'Pós-Venda' &&
+      } */}
        <div className='box-schedule'>
          <li className='schedule'>
            <Link className='schedule__content' to="/avisos">
@@ -409,7 +422,6 @@ const Schedules = ({ userRef, alerts, check, reports }) => {
              </Link>
          </li>
            </div>
-      }
        {/* {userRef && (user.email === Users[0].email || userRef.cargo === "Administrador" || userRef.cargo === "Técnico" || findTec) && 
         // <><div className='box-schedule'>
         //       <li className='schedule'>

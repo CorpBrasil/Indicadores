@@ -147,8 +147,8 @@ console.log(orcamentista)
                       id_user: cidade.code + ' - ' + idCidade,
                       telefone: telefone,
                       orcamentista: {
-                        nome: orcamentista.nome,
-                        uid: orcamentista.uid
+                        nome: orcamentista[0].nome,
+                        uid: orcamentista[0].uid
                       }
                     }
                   break
@@ -160,6 +160,7 @@ console.log(orcamentista)
                       cargo: cargo,
                       uid: user.uid,
                       relatorio: 0,
+                      id_user: 0,
                       id_crm: idCRM,
                       telefone: telefone
                     }
@@ -168,6 +169,7 @@ console.log(orcamentista)
                     data = {
                       email: email,
                       nome: nome,
+                      id_user: 0,
                       senha: senha,
                       veiculo: veiculo,
                       cargo: cargo,
@@ -181,6 +183,7 @@ console.log(orcamentista)
                       email: email,
                       nome: nome,
                       senha: senha,
+                      id_user: 0,
                       cargo: cargo,
                       uid: user.uid,
                       relatorio: 0,

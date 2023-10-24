@@ -71,6 +71,8 @@ const EditVisit = ({
   const [visitsFind, setVisitsFind] = useState();
   const { register, handleSubmit, reset } = useForm();
 
+  console.log(tecnicoTexto)
+
   useLayoutEffect(() => {
     // faz a solicitação do servidor assíncrono e preenche o formulário
     setTimeout(() => {
@@ -645,7 +647,6 @@ const EditVisit = ({
       else
           return getmonweek(dt);
   }
-  // console.log(visitRef);
 
   return (
     <div className="box-visit">
@@ -682,8 +683,7 @@ const EditVisit = ({
                   value={dataTexto || ""}
                   className="label__input"
                   type="date"
-                  min={monthNumber && monthNumber.min}
-                  max={monthNumber && monthNumber.max}
+                  min={moment(new Date()).format('YYYY-MM-DD')}
                   onChange={(e) => setDataTexto(e.target.value)}
                   placeholder="Digite o dia"
                   autoComplete="off"
@@ -694,8 +694,7 @@ const EditVisit = ({
                   value={dataTexto || ""}
                   className="label__input"
                   type="date"
-                  min={monthNumber && monthNumber.min}
-                  max={monthNumber && monthNumber.max}
+                  min={moment(new Date()).format('YYYY-MM-DD')}
                   onChange={(e) => setDataTexto(e.target.value)}
                   placeholder="Digite o dia"
                   autoComplete="off"

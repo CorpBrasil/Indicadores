@@ -6,7 +6,7 @@ import PanelAdmin from './pages/PanelAdmin/Index';
 // import Alert from './pages/Alert/Index';
 import useAuth from './hooks/useAuth';
 import PrivateRoute from './components/PrivateRoute';
-// import Schedule from './pages/Schedule/Index';
+import Schedule from './pages/Schedule/Index';
 // import Finance from './pages/Finance/Index';
 import { collection, onSnapshot, query, orderBy } from "firebase/firestore";
 import { dataBase } from "./firebase/database";
@@ -25,7 +25,7 @@ function App() {
   const [orcamento, setOrcamento] = useState();
   const [activity, setActivity] = useState();
   const [visits, setVisits] = useState();
-  // const [tecs, setTecs] = useState();
+  const [tecs, setTecs] = useState();
   const [sellers, setSellers] = useState();
   const [listLeads, setListLeads] = useState();
   const [reports, setReports] = useState();
@@ -37,7 +37,7 @@ function App() {
   const listCollectionRef = collection(dataBase, "Lista_Leads");
   const leadsCollectionRef = collection(dataBase, "Leads");
   const relatorioCollectionRef = collection(dataBase, "Relatorio");
-  const VisitasCollectionRef = collection(dataBase,"Visitas_2023", 'Apresentação', 'Bruna');
+  const VisitasCollectionRef = collection(dataBase,"Visitas_2023");
   let { status } = useNavigatorOnline();
 
   useEffect(() => {
@@ -91,7 +91,7 @@ function App() {
       const fetchData = async () => {
         if (members) {
           setUserRef(members.find((doc) => doc.uid === user.id));
-          // setTecs(members.filter((member) => member.cargo === "Técnico"));
+          setTecs(members.filter((member) => member.cargo === "Técnico"));
           setSellers(members.filter((member) => member.cargo === "Indicador"));
         }
       };
@@ -131,7 +131,7 @@ function App() {
             <Route exact path="/prospeccao" element={<Prospecction user={user} userRef={userRef} leads={leads} visits={visits} listLeads={listLeads} members={members} sellers={sellers} check={check} reports={reports} />} />
             <Route exact path="/orcamento" element={<Estimate user={user} userRef={userRef} orcamento={orcamento} visits={visits} members={members} sellers={sellers} check={check} />} />
             <Route exact path="/gestao-comercial" element={<Commercial user={user} userRef={userRef} leads={leads} activity={activity} listLeads={listLeads} members={members} sellers={sellers} check={check} reports={reports}/>} />
-            {/* <Route path="/agenda/:year" element={<Schedule userRef={userRef} members={members} tecs={tecs} sellers={sellers} alerts={userAlerts} check={check} reports={reports} />} /> */}
+            <Route path="/agenda/:year" element={<Schedule userRef={userRef} members={members} visits={visits} tecs={tecs} sellers={sellers} check={check} reports={reports} />} /> 
             <Route path="*" element={<Schedules userRef={userRef} check={check} reports={reports} />} />
           </Route>
           <Route exact path="/login" element={<Login />} />

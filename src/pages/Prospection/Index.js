@@ -414,8 +414,6 @@ const closeAnotacaoBox = () => {
     setOpenEstimate(true);
   }
 
-  console.log(openEstimate)
-
   return (
     <div className={styles.container_panel}>
         {/* {loading && loading &&
@@ -467,8 +465,7 @@ const closeAnotacaoBox = () => {
                   <TableCell align="center">Empresa</TableCell>
                   <TableCell align="center">Cidade</TableCell>
                   <TableCell align="center">Indicador(a)</TableCell>
-                  <TableCell align="center">Código</TableCell>
-                  <TableCell align="center">Anotação</TableCell>
+                  {/* <TableCell align="center">Anotação</TableCell> */}
                   <TableCell align="center"></TableCell>
                 </TableRow>
               </TableHead>
@@ -501,10 +498,9 @@ const closeAnotacaoBox = () => {
                   <TableCell align="center">{data.nome ? data.nome.substring(0, 30) + '...' : ""}</TableCell>
                   <TableCell align="center">{data.empresa}</TableCell>
                   <TableCell align="center">{data.cidade}</TableCell>
-                  <TableCell align="center"><b>{data.consultora}</b></TableCell>
-                  <TableCell align="center">88-100</TableCell>
+                  <TableCell align="center"><b>{data.indicador} ({data && members.filter((member) => member.id === data.uid)[0].id_user})</b></TableCell>
                   {/* <TableCell align="center">{activity.filter((act) => act.idRef === data.id).length}</TableCell> */}
-                  <TableCell align="center" sx={{ width: 'auto' }}>{data.anotacao ? data.anotacao.substring(0, 30) + '...' : ""} </TableCell>
+                  {/* <TableCell align="center" sx={{ width: 'auto' }}>{data.anotacao ? data.anotacao.substring(0, 30) + '...' : ""} </TableCell> */}
                   <TableCell align="center" sx={{ width: '50px' }}>
                     <IconButton
                       aria-label="Expandir"
@@ -519,7 +515,7 @@ const closeAnotacaoBox = () => {
                   <TableCell style={{ paddingBottom: 0, paddingTop: 0, height: 0 }} colSpan={9}>
                       <Collapse in={open[data.id]} timeout="auto" unmountOnExit colSpan={9}>
                       <Box className={styles.info_anotacao} margin={3}>
-                        <Estimate data={data} visits={visits} openEstimate={openEstimate} close={close} open={openBox} userRef={userRef} />
+                        <Estimate data={data} visits={visits} members={members} openEstimate={openEstimate} close={close} open={openBox} userRef={userRef} />
                         <Box sx={{ width: '90%', marginBottom: '1rem' }}>
                           <Stepper activeStep={data && data.step}>
                             {steps.map((label) => (
@@ -529,22 +525,49 @@ const closeAnotacaoBox = () => {
                             ))}
                           </Stepper>
                         </Box>
+                        {data.status === 'Ativo' && 
+                        <Box className={styles.info_step} sx={{ width: '87%', marginBottom: '1rem' }}>
+                          <p><b>{data && data.data.replace('-', 'às')}</b></p>
+                          <p>Lead ativo</p>
+                        </Box>
+                        }
                         {data.status === 'Orçamento' && 
                         <Box className={styles.info_step} sx={{ width: '87%', marginBottom: '1rem' }}>
                           <p><b>{data.pedido && data.pedido.data.replace('-', 'às')}</b></p>
-                          <p>Aguardando Orçamento. A data de apresentação está prevista para o dia <b>{visits && visits.filter((visit) => visit.id === data.visitRef)[0].data_completa.replace('-', ' às')}</b>.</p>
+                          <p>Aguardando Orçamento. A data de apresentação está prevista para o dia <b>{visits && visits.filter((visit) => visit.id === data.visitRef)[0].data_completa.replace('-', ' às ')}</b>.</p>
                         </Box>
                         }
                         {data.status === 'Apresentação' && 
                         <Box className={styles.info_step} sx={{ width: '87%', marginBottom: '1rem' }}>
                           <p><b>{data.orcamento && data.orcamento.data.replace('-', 'às')}</b></p>
-                          <p>Orçamento gerado pela <b>Bruna</b>. A data de apresentação está prevista para o dia <b>{visits && visits.filter((visit) => visit.id === data.visitRef)[0].data_completa.replace('-', ' às')}</b>.</p>
+                          <p>Orçamento gerado pela <b>Bruna</b>. A data de apresentação está prevista para o dia <b>{visits && visits.filter((visit) => visit.id === data.visitRef)[0].data_completa.replace('-', ' às ')}</b>.</p>
                         </Box>
                         }
-                        <EditProspection changeLoading={changeLoading} data={data} />
                           <h3>Anotação</h3>
                           {viewEdit && viewEdit === data.id ?
-                            <textarea className={styles.edit_anotacao} value={anotacao} onChange={(e) => setAnotacao(e.target.value)} cols="30" rows="5"></textarea> :
+                            <><textarea className={styles.edit_anotacao} value={anotacao} onChange={(e) => setAnotacao(e.target.value)} cols="30" rows="5"></textarea>
+                            <div className={styles.activity_button}>
+                              <Button
+                                variant="outlined"
+                                color="success"
+                                size="small"
+                                type="submit"
+                                startIcon={<CheckCircleOutlineIcon />}
+                                onClick={() => confirmEdit(data.id)}
+                              >
+                                Confirmar
+                              </Button>
+                              <Button
+                                variant="outlined"
+                                color="error"
+                                size="small"
+                                type="submit"
+                                startIcon={<BlockIcon />}
+                                onClick={() => setViewEdit()}
+                              >
+                                Cancelar
+                              </Button>
+                            </div></>  :
                             <div className={styles.anotacao}>{data.anotacao}
                             <IconButton
                             aria-label="Editar Anotação"
@@ -554,29 +577,7 @@ const closeAnotacaoBox = () => {
                           > 
                             <EditIcon />
                           </IconButton></div>}
-                              {viewEdit && viewEdit === data.id ?
-                                <div className={styles.activity_button}>
-                                <Button
-                                variant="outlined"
-                                color="success"
-                                size="small"
-                                type="submit"
-                                startIcon={<CheckCircleOutlineIcon />}
-                                onClick={() => confirmEdit(data.id)}
-                                >
-                                  Confirmar
-                                </Button>
-                                <Button
-                                variant="outlined"
-                                color="error"
-                                size="small"
-                                type="submit"
-                                startIcon={<BlockIcon />}
-                                 onClick={() => setViewEdit()}
-                                >
-                                  Cancelar
-                                </Button>
-                              </div> : 
+                        <EditProspection changeLoading={changeLoading} data={data} />
                               <div className={styles.activity_button}>
                                 <ThemeProvider theme={theme}>
                                 {(userRef && userRef.cargo === 'Indicador') &&
@@ -638,7 +639,6 @@ const closeAnotacaoBox = () => {
                                   </Button>
                                 
                             </div>
-                            }
                       </Box>
                       {/* <Tabs value={TabsValue} onChange={(e, newValue) => setTabsValue(newValue)} aria-label="Informações do Lead" centered>
                         <Tab label="Atividades" {...a11yProps(1)} />

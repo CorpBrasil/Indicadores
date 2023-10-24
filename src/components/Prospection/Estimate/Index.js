@@ -3,6 +3,7 @@ import { getStorage, ref, uploadBytesResumable, getDownloadURL} from "firebase/s
 import { useEffect, useState } from 'react';
 import CurrencyInput from "react-currency-input-field";
 import Swal from "sweetalert2"; // cria alertas personalizado
+import axios from 'axios';
 // import { dataBase } from '../../../firebase/database';
 // import { Company } from '../../../data/Data'
 // import { usePlacesWidget } from "react-google-autocomplete";
@@ -47,7 +48,7 @@ import { KeyMaps } from '../../../data/Data';
 import { dataBase } from '../../../firebase/database';
 
 
-const Estimate = ({data, visits, openEstimate, close, open, userRef}) => {
+const Estimate = ({data, visits, members, openEstimate, close, open, userRef}) => {
   const storage = getStorage();
   const [nome, setNome] = useState();
   const [telefone, setTelefone] = useState();
@@ -198,6 +199,18 @@ const Estimate = ({data, visits, openEstimate, close, open, userRef}) => {
         e.preventDefault();
         try {
           close();
+          if(visitsFindCount < 0 || visitsFindCount > 0){
+            return Swal.fire({
+              title: 'CORPBRASIL',
+              text: `O horário da apresentação ultrapassa o horário de uma apresentação já existente. Verifique os horários disponiveis.`,
+              icon: "warning",
+              showCloseButton: true,
+              confirmButtonColor: "#F39200",
+              confirmButtonText: "Ok",
+            }).then(() => {
+              open();
+            })
+          }
           Swal.fire({
             title: 'Company',
             text: `Todos os dados estão corretos?`,
@@ -211,11 +224,11 @@ const Estimate = ({data, visits, openEstimate, close, open, userRef}) => {
           }).then(async (result) => {
             if (result.isConfirmed) {
               setLoading(true);
-              await addDoc(collection(dataBase,"Visitas_2023", 'Apresentação', 'Bruna'), {
+              await addDoc(collection(dataBase,"Visitas_2023"), {
                 dia: moment(dataTexto).format("YYYY MM DD"),
                 saidaEmpresa: saidaTexto,
                 chegadaCliente: horarioTexto,
-                visita: moment('00:00', "HH:mm").add(visitaNumero, 'seconds').format('HH:mm'),
+                visita: '01:00',
                 visitaNumero: visitaNumero,
                 saidaDoCliente: saidaCliente,
                 chegadaEmpresa: chegadaTexto,
@@ -304,6 +317,14 @@ const Estimate = ({data, visits, openEstimate, close, open, userRef}) => {
                           telefone: telefone
                         }).then(() => {
                           setLoading(false);
+                          axios.post(('https://backend.botconversa.com.br/api/v1/webhooks-automation/catch/45898/jm2oCs6G0B4Q/'), {
+                            nome: (userRef && userRef.nome) + ' (' + userRef.id_user + ')',
+                            cliente: nome,
+                            cidade: userRef.cidade && userRef.cidade.cidade,
+                            cidade_cliente: cidade,
+                            telefone: userRef.orcamentista && members.filter(member => member.id === userRef.orcamentista.uid)[0].telefone,
+                            visita: moment(dataTexto).format('DD MMMM YYYY') + ' às ' + horarioTexto
+                          })
                           Swal.fire({
                                title: 'CORPBRASIL',
                                html: 'Orçamento solicitado com sucesso.',
@@ -395,7 +416,7 @@ const Estimate = ({data, visits, openEstimate, close, open, userRef}) => {
                   value={bairro ? bairro : ''}
                   onChange={(e) => setBairro(e.target.value)}
                   fullWidth
-                  // required
+                  required
                   variant="outlined" /> </div>
               <div className={styles.input_endereco}>
                 <TextField
@@ -407,7 +428,7 @@ const Estimate = ({data, visits, openEstimate, close, open, userRef}) => {
                   value={cidade ? cidade : ''}
                   onChange={(e) => setCidade(e.target.value)}
                   fullWidth
-                  // required
+                  required
                   variant="outlined" />
               </div>
             </div>
@@ -427,6 +448,7 @@ const Estimate = ({data, visits, openEstimate, close, open, userRef}) => {
                 <input 
                   type="time"
                   value={horarioTexto ? horarioTexto : ''}
+                  required
                   onBlur={(e) => moment(e.target.value, 'hh:mm') < moment('07:00', 'hh:mm') || moment(e.target.value, 'hh:mm') > moment('18:00', 'hh:mm') ? setHoursLimit(true) : setHoursLimit(false)}
                   onChange={(e) => setHorarioTexto(e.target.value)
                   }
@@ -527,7 +549,7 @@ const Estimate = ({data, visits, openEstimate, close, open, userRef}) => {
                   minLength={9}
                   variant="outlined"
                   color="primary"
-                  // required 
+                  required 
                   />
               </div>
               <div className={styles.input_telefone}>
@@ -543,7 +565,7 @@ const Estimate = ({data, visits, openEstimate, close, open, userRef}) => {
                   minLength={9}
                   variant="outlined"
                   color="primary"
-                  // required 
+                  required 
                   />
               </div>
             </div>
@@ -561,7 +583,7 @@ const Estimate = ({data, visits, openEstimate, close, open, userRef}) => {
                   minLength={9}
                   variant="outlined"
                   color="primary"
-                  // required 
+                  required 
                   />
               </div>
               <div className={styles.input_telefone}>
@@ -577,7 +599,7 @@ const Estimate = ({data, visits, openEstimate, close, open, userRef}) => {
                   fixedDecimalLength={0}
                   value={consumo || ''}
                   min={50}
-                  // required
+                  required
                   color="primary" />
               </div>
             </div>
@@ -593,13 +615,13 @@ const Estimate = ({data, visits, openEstimate, close, open, userRef}) => {
                   value={anotacao ? anotacao : ''}
                   onChange={(e) => setAnotacao(e.target.value)}
                   fullWidth
-                  // required
+                  required
                   variant="outlined" />
             </div>
             <div className={styles.input_file}>
               <Button component="label" variant="contained" onChange={(e) => setFatura({ file: URL.createObjectURL(e.target.files[0]), complete: e.target.files[0] })} startIcon={<CloudUploadIcon />}>
                 Enviar Fatura
-                <VisuallyHiddenInput type="file" />
+                <VisuallyHiddenInput type="file"/>
               </Button>
               {fatura &&
                 <Button variant='outlined' color='success' onClick={() => setOpenFatura(true)} endIcon={<CheckIcon />}>Visualizar</Button>}
