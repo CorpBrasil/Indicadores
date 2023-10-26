@@ -149,7 +149,8 @@ console.log(orcamentista)
                       orcamentista: {
                         nome: orcamentista[0].nome,
                         uid: orcamentista[0].uid
-                      }
+                      },
+                      cor: cidade.cor
                     }
                   break
                   case 'Orçamentista':

@@ -1105,7 +1105,7 @@ const Schedule = ({ userRef, members, visits, tecs, sellers, alerts, check }) =>
                           {(visita.confirmar === false && visita.uid === user.id) ||
                           user.email === Users[0].email ||
                           (userRef && userRef.cargo === "Administrador") ||
-                          visita.consultora === "Orçamentista" ? (
+                          (userRef && userRef.cargo === "Closer") ? (
                             <>
                                 <IconButton
                                   id="basic-button"

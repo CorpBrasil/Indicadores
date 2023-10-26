@@ -191,8 +191,7 @@ const CreateProspection = ({
                     placeholder="(DD) 00000-0000"
                     label="Celular"
                     variant="outlined"
-                    color="primary"
-                    required />
+                    color="primary"/>
                   </label>
                     <label className="label">
                     <p>Email</p>

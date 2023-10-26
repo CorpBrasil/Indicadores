@@ -24,7 +24,7 @@
   gap: 0.5rem;
 }
 
-.ativo, .orcamento, .apresentacao, .ganho, .perdido {
+.ativo, .orcamento, .orcamento_negado, .apresentacao, .ganho, .perdido {
   font-size: 0.8rem!important;
   text-transform: uppercase;
   font-weight: bold!important;
@@ -42,6 +42,10 @@
 .orcamento {
   color: #f48c03!important;
   background-color: #fff9e9;
+}
+.orcamento_negado {
+  color: #f44b03!important;
+  background-color: #ffeee9;
 }
 
 .apresentacao {

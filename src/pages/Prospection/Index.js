@@ -5,7 +5,8 @@ import Swal from 'sweetalert2/dist/sweetalert2.js';
 import { Company } from "../../data/Data";
 import axios from "axios";
 import * as moment from "moment";
-import { collection, query, serverTimestamp, onSnapshot, orderBy, updateDoc, doc } from "firebase/firestore";
+import { collection, query, serverTimestamp, onSnapshot, orderBy, updateDoc, doc, deleteDoc } from "firebase/firestore";
+import { getStorage, ref, deleteObject } from "firebase/storage";
 
 // Css
 import "cooltipz-css";
@@ -33,6 +34,8 @@ import HowToRegIcon from '@mui/icons-material/HowToReg';
 import PersonOffIcon from '@mui/icons-material/PersonOff';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+
 import Button from "@mui/material/Button";
 import Dialog from '@mui/material/Dialog';
 import TextField from '@mui/material/TextField';
@@ -62,6 +65,7 @@ import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import RoomIcon from '@mui/icons-material/Room';
 import Collapse from '@mui/material/Collapse';
 import { Box, ThemeProvider } from "@mui/material";
+import { redTheme } from "../../data/theme";
 
 const steps = [
   'Ativo',
@@ -308,6 +312,54 @@ const Prospection = ({ user, leads, visits, userRef, listLeads, members, sellers
     }
   }
 
+  const deleteLead = async (data) => {
+    try {
+      console.log(data.storageRef)
+      setOpenDialog(false);
+      Swal.fire({
+        title: Company,
+        html: `Você deseja excluir o <b>Lead?</b>`,
+        icon: "question",
+        showCancelButton: true,
+        showCloseButton: true,
+        confirmButtonColor: "#F39200",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Sim",
+        cancelButtonText: "Não",
+      }).then(async (result) => {
+        if(result.isConfirmed) {
+        const storage = getStorage();
+        const faturatRef = ref(storage, data.storageRef);
+         await deleteDoc(doc(dataBase, 'Leads', data.id)).then(async() => {
+            if (data.visitRef) {
+              await deleteDoc(doc(dataBase, 'Visitas_2023', data.visitRef))
+            }
+            deleteObject(faturatRef).then(() => {
+              console.log('Fatura Deletada!')
+            }).catch((error) => {
+              // Uh-oh, an error occurred!
+            });
+            Swal.fire({
+              title: Company,
+              html: `O Lead foi excluido com sucesso.`,
+              icon: "success",
+              showConfirmButton: true,
+              showCloseButton: true,
+              confirmButtonColor: "#F39200",
+            })
+            axios.post('https://n8n.corpbrasil.cloud/webhook/271dd7a8-0354-4e37-8aaf-b4a955ac836b', {
+              Anotacao: anotacao,
+              ...data,
+              status: 'Perdido'
+            })
+          });
+        }
+      })
+    } catch(error) {
+      console.log(error)
+    }
+  }
+
 const openAnotacaoBox = (act, type) => {
   setAnotacao(act.anotacao);
   setOpenDialog(true);
@@ -483,6 +535,9 @@ const closeAnotacaoBox = () => {
                   {data.status === 'Orçamento' &&
                     <TableCell align="center" className={styles.orcamento}>{data.status}</TableCell>
                   }
+                  {data.status === 'Orçamento Negado' &&
+                    <TableCell align="center" className={styles.orcamento_negado}>{data.status}</TableCell>
+                  }
                   {data.status === 'Apresentação' &&
                     <TableCell align="center" className={styles.apresentacao}>{data.status}</TableCell>
                   }
@@ -535,6 +590,12 @@ const closeAnotacaoBox = () => {
                         <Box className={styles.info_step} sx={{ width: '87%', marginBottom: '1rem' }}>
                           <p><b>{data.pedido && data.pedido.data.replace('-', 'às')}</b></p>
                           <p>Aguardando Orçamento. A data de apresentação está prevista para o dia <b>{visits && visits.filter((visit) => visit.id === data.visitRef)[0].data_completa.replace('-', ' às ')}</b>.</p>
+                        </Box>
+                        }
+                        {data.status === 'Orçamento Negado' && 
+                        <Box className={styles.info_step} sx={{ width: '87%', marginBottom: '1rem' }}>
+                          <p><b>{data.pedido && data.orcamento.data.replace('-', 'às')}</b></p>
+                          <p>Orçamento foi cancelado pela <b>{data.orcamentista && data.orcamentista.nome}</b>. Motivo: <b>{data.orcamento && data.orcamento.anotacao}</b></p>
                         </Box>
                         }
                         {data.status === 'Apresentação' && 
@@ -606,7 +667,7 @@ const closeAnotacaoBox = () => {
                                 >
                                     Reabrir
                                   </Button></>}
-                                  {(data.status === "Ativo" && userRef && userRef.cargo === 'Indicador') &&
+                                  {((data.status === "Ativo" || data.status === "Orçamento Negado")  && userRef && userRef.cargo === 'Indicador') &&
                                   <Button
                                   variant="contained"
                                   color="primary"
@@ -637,6 +698,17 @@ const closeAnotacaoBox = () => {
                                 >
                                     Perdido
                                   </Button>
+                                  <ThemeProvider theme={redTheme}>
+                                <Button
+                                  variant="contained"
+                                  size="small"
+                                  type="submit"
+                                  startIcon={<DeleteIcon />}
+                                  onClick={() => deleteLead(data)}
+                                >
+                                    Excluir
+                                  </Button>
+                                  </ThemeProvider>
                                 
                             </div>
                       </Box>

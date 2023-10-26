@@ -26,3 +26,16 @@ export const darkTheme = createTheme({
     mode: 'dark',
   },
 });
+
+export const redTheme = createTheme({
+  palette: {
+    primary: {
+      main: '#f44336',
+      contrastText: '#fff'
+    },
+    secondary: {
+      main: '#b71c1c',
+      contrastText: '#fff'
+    },
+  }
+})

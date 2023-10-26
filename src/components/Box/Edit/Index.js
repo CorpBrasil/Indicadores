@@ -1,6 +1,6 @@
-import { deleteDoc, updateDoc, doc } from "firebase/firestore";
+import { deleteDoc, updateDoc, doc, addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { dataBase } from "../../../firebase/database";
-import axios from 'axios';
+// import axios from 'axios';
 import { useLayoutEffect, useState, useEffect } from "react";
 import { useForm } from "react-hook-form"; // cria formulário personalizado
 import Swal from 'sweetalert2/dist/sweetalert2.js';
@@ -25,8 +25,8 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 
-import { Company, Users } from "../../../data/Data";
-import useAuth from "../../../hooks/useAuth";
+import { Company } from "../../../data/Data";
+// import useAuth from "../../../hooks/useAuth";
 
 import "../style.scss";
 
@@ -46,7 +46,7 @@ const EditVisit = ({
   checkNet
 }) => {
   
-  const { user } = useAuth();
+  // const { user } = useAuth();
   const [rotaTempo, setRotaTempo] = useState();
   const [tempoTexto, setTempoTexto] = useState();
   const [visitaNumero, setVisitaNumero] = useState(1800);
@@ -108,27 +108,20 @@ const EditVisit = ({
       switch (type) {
         case 'lunch':
           setDriver(tecs.filter((ref) => ref.nome === userRef.nome))
-          //setVisits(schedule.filter((ref) => ref.data === visitRef.data && (ref.tecnico === "Bruna" || ref.tecnico === "Lia")))
           setTecnicoTexto(userRef.nome);
-          //driverRef.current = 'Bruna';
           break
         case 'comercial':
-          setDriver(tecs.filter((ref) => ref.nome === "Bruna" || ref.nome === "Lia"))
-          //setVisits(schedule.filter((ref) => ref.data === visitRef.data && (ref.tecnico === "Bruna" || ref.tecnico === "Lia")))
+          // setDriver(tecs.filter((ref) => ref.nome === "Bruna" || ref.nome === "Lia"))
+          setDriver(tecs)
           setTecnicoTexto('Bruna');
-          //driverRef.current = 'Bruna';
           break
         case 'comercial_tecnica':
-          setDriver(tecs.filter((ref) => ref.nome === "Lucas" || ref.nome === "Luis"))
-          //setVisits(schedule.filter((ref) => ref.data === visitRef.data && (ref.tecnico === "Lucas" || ref.tecnico === "Luis")))
+          setDriver(tecs)
           setTecnicoTexto('Lucas');
-          //driverRef.current = 'Lucas';
           break
         case 'pos_venda':
           setDriver(tecs.filter((ref) => ref.nome === "Lucas" || ref.nome === "Luis"))
-          //setVisits(schedule.filter((ref) =>ref.data === visitRef.data &&  (ref.tecnico === "Lucas" || ref.tecnico === "Luis")))
           setTecnicoTexto('Lucas');
-          //driverRef.current = 'Lucas';
           setConsultoraTexto('Pós-Venda')
           break
         default:
@@ -428,7 +421,7 @@ const EditVisit = ({
                 if(ref.cidade === visitRef.cidade) {
                   if(visitBefore) {
                     visitBefore.map(async (ref) => {
-                      await updateDoc(doc(dataBase, "Agendas", year, monthSelect, ref.id),
+                      await updateDoc(doc(dataBase, "Visitas_2023", ref.id),
                                   {
                                     chegadaEmpresa: moment(ref.saidaDoCliente, "hh:mm").add(ref.tempoRota, 'seconds').format('kk:mm'),
                                     groupRef: "",
@@ -439,10 +432,10 @@ const EditVisit = ({
                                 })
                     }
                   await deleteDoc(
-                    doc(dataBase, "Agendas", year, monthSelect, ref.id)
+                    doc(dataBase, "Visitas_2023", ref.id)
                   );
                 } else {
-                  await updateDoc(doc(dataBase, "Agendas", year, monthSelect, ref.id),
+                  await updateDoc(doc(dataBase, "Visitas_2023", ref.id),
                               {
                                 chegadaEmpresa: moment(ref.saidaDoCliente, "hh:mm").add(ref.tempoRota, 'seconds').format('kk:mm'),
                                 groupRef: "",
@@ -460,7 +453,7 @@ const EditVisit = ({
                 if(ref.cidade === visitRef.cidade) {
                   if(visitNext) {
                     visitNext.map(async (ref) => {
-                      await updateDoc(doc(dataBase, "Agendas", year, monthSelect, ref.id),
+                      await updateDoc(doc(dataBase, "Visitas_2023", year, monthSelect, ref.id),
                                   {
                                     saidaEmpresa: moment(ref.chegadaCliente, "hh:mm").subtract(ref.tempoRota, 'seconds').format('kk:mm'),
                                     groupRef: "",
@@ -471,10 +464,10 @@ const EditVisit = ({
                                 })
                     }
                  await deleteDoc(
-                  doc(dataBase, "Agendas", year, monthSelect, ref.id)
+                  doc(dataBase, "Visitas_2023", year, monthSelect, ref.id)
                 );
                 } else {
-                  await updateDoc(doc(dataBase, "Agendas", year, monthSelect, ref.id),
+                  await updateDoc(doc(dataBase, "Visitas_2023", year, monthSelect, ref.id),
                             {
                               saidaEmpresa: moment(ref.chegadaCliente, "hh:mm").subtract(ref.tempoRota, 'seconds').format('kk:mm'),
                               groupRef: "",
@@ -521,7 +514,7 @@ const EditVisit = ({
                 visitRef.categoria !== "lunch"
               ) {
                 await updateDoc(
-                  doc(dataBase, "Agendas", year, monthSelect, visitRef.id),
+                  doc(dataBase, "Visitas_2023", visitRef.id),
                   {
                     dia: moment(dataTexto).format("YYYY MM DD"),
                     data: dataTexto,
@@ -544,10 +537,11 @@ const EditVisit = ({
                     groupRef: "",
                     group: "",
                     tipo: "Visita",
-                    categoria: visitRef.categoria,
+                    categoria: tecRefUID.nome === 'Lucas' ? 'comercial_tecnica' : 'comercial',
                     corTec: tecRefUID.cor,
                     updateVisit: new Date(),
-                    dataRef: new Date(`${dataTexto}T${horarioTexto}`) 
+                    dataRef: new Date(`${dataTexto}T${horarioTexto}`),
+                    data_completa: moment(dataTexto).format('DD MMMM YYYY') + '-' + horarioTexto 
                   }
                 );
               } else if (
@@ -556,7 +550,7 @@ const EditVisit = ({
               ) {
                 // console.log(userData.consultora)
                 await updateDoc(
-                  doc(dataBase, "Agendas", year, monthSelect, visitRef.id),
+                  doc(dataBase, "Visitas_2023", visitRef.id),
                   {
                     dia: moment(dataTexto).format("YYYY MM DD"),
                     data: dataTexto,
@@ -575,31 +569,43 @@ const EditVisit = ({
                     consultora: consultoraTexto,
                     uid: sellerRef.id,
                     cor: sellerRef.cor,
-                    categoria: visitRef.categoria, //Alterar
+                    categoria: tecRefUID.nome === 'Lucas' ? 'comercial_tecnica' : 'comercial',
                     corTec: tecRefUID.cor,
                     updateVisit: new Date(),
-                    dataRef: new Date(`${dataTexto}T${horarioTexto}`) 
+                    dataRef: new Date(`${dataTexto}T${horarioTexto}`),
+                    data_completa: moment(dataTexto).format('DD MMMM YYYY') + '-' + horarioTexto 
                   }
                 );
               }
-              if(visitRef.categoria !== "lunch") {
-                const date = new Date(visitRef.data);
-                axios.post('https://n8n.corpbrasil.cloud/webhook/63b48297-3e22-4eba-8b21-45e87f52f3fb', {
-                  ID: visitRef.id,
-                  data: moment(visitRef.data).format("DD/MM/YYYY"),
-                  nome: tecRefUID.nome,
-                  cliente: userData.cliente,
-                  marcado: horarioTexto,
-                  consultora: consultoraTexto,
-                  city: visitRef.cidade,
-                  semana: getMonthlyWeekNumber(date),
-                  mes: moment(visitRef.data).format("M"),
-                  ende: visitRef.endereco,
-                  confirmada: 'Não',
-                  categoria: visitRef.categoria,
-                  extra: visitRef.preData,
+              if(visitRef.categoria !== 'lunch') {
+                let msg;
+                if(dataTexto !== visitRef.dia || horarioTexto !== visitRef.visita) msg = `A Apresentação do(a) <b>${visitRef.cliente}</b> foi alterada 
+                para o dia <b>${moment(dataTexto).format('DD/MM')} às ${horarioTexto}</b>.`
+                await addDoc(collection(dataBase, "Membros", visitRef.uid, 'Notificacao'), {
+                  createAt: serverTimestamp(),
+                  type: 'Visita',
+                  data: moment().format('YYYY-MM-DD'),
+                  text: msg
                 })
-              } 
+              }
+              // if(visitRef.categoria !== "lunch") {
+              //   const date = new Date(visitRef.data);
+              //   axios.post('https://n8n.corpbrasil.cloud/webhook/63b48297-3e22-4eba-8b21-45e87f52f3fb', {
+              //     ID: visitRef.id,
+              //     data: moment(visitRef.data).format("DD/MM/YYYY"),
+              //     nome: tecRefUID.nome,
+              //     cliente: userData.cliente,
+              //     marcado: horarioTexto,
+              //     consultora: consultoraTexto,
+              //     city: visitRef.cidade,
+              //     semana: getMonthlyWeekNumber(date),
+              //     mes: moment(visitRef.data).format("M"),
+              //     ende: visitRef.endereco,
+              //     confirmada: 'Não',
+              //     categoria: visitRef.categoria,
+              //     extra: visitRef.preData,
+              //   })
+              // } 
               Swal.fire({
                 title: Company,
                 html: `${msg2} com sucesso.`,
@@ -619,34 +625,34 @@ const EditVisit = ({
     }
   };
 
-  function getMonthlyWeekNumber(dt)
-  {
-      // como função interna, permite reuso
-      var getmonweek = function(myDate) {
-          var today = new Date(myDate.getFullYear(),myDate.getMonth(),myDate.getDate(),0,0,0);
-          var first_of_month = new Date(myDate.getFullYear(),myDate.getMonth(),1,0,0,0);
-          var p = Math.floor((today.getTime()-first_of_month.getTime())/1000/60/60/24/7);
-          // ajuste de contagem
-          if (today.getDay()<first_of_month.getDay()) ++p;
-          // ISO 8601.
-          if (first_of_month.getDay()<=3) p++;
-          return p;
-      }
-      // último dia do mês
-      var udm = (new Date(dt.getFullYear(),dt.getMonth()+1,0,0,0,0)).getDate();
-      /*  Nos seis primeiros dias de um mês: verifica se estamos antes do primeiro Domingo.
-       *  Caso positivo, usa o último dia do mês anterior para o cálculo.
-       */
-      if ((dt.getDate()<7) && ((dt.getDate()-dt.getDay())<-2))
-          return getmonweek(new Date(dt.getFullYear(),dt.getMonth(),0));
-      /*  Nos seis últimos dias de um mês: verifica se estamos dentro ou depois do último Domingo.
-       *  Caso positivo, retorna 1 "de pronto".
-       */
-      else if ((dt.getDate()>(udm-6)) && ((dt.getDate()-dt.getDay())>(udm-3)))
-          return 1;
-      else
-          return getmonweek(dt);
-  }
+  // function getMonthlyWeekNumber(dt)
+  // {
+  //     // como função interna, permite reuso
+  //     var getmonweek = function(myDate) {
+  //         var today = new Date(myDate.getFullYear(),myDate.getMonth(),myDate.getDate(),0,0,0);
+  //         var first_of_month = new Date(myDate.getFullYear(),myDate.getMonth(),1,0,0,0);
+  //         var p = Math.floor((today.getTime()-first_of_month.getTime())/1000/60/60/24/7);
+  //         // ajuste de contagem
+  //         if (today.getDay()<first_of_month.getDay()) ++p;
+  //         // ISO 8601.
+  //         if (first_of_month.getDay()<=3) p++;
+  //         return p;
+  //     }
+  //     // último dia do mês
+  //     var udm = (new Date(dt.getFullYear(),dt.getMonth()+1,0,0,0,0)).getDate();
+  //     /*  Nos seis primeiros dias de um mês: verifica se estamos antes do primeiro Domingo.
+  //      *  Caso positivo, usa o último dia do mês anterior para o cálculo.
+  //      */
+  //     if ((dt.getDate()<7) && ((dt.getDate()-dt.getDay())<-2))
+  //         return getmonweek(new Date(dt.getFullYear(),dt.getMonth(),0));
+  //     /*  Nos seis últimos dias de um mês: verifica se estamos dentro ou depois do último Domingo.
+  //      *  Caso positivo, retorna 1 "de pronto".
+  //      */
+  //     else if ((dt.getDate()>(udm-6)) && ((dt.getDate()-dt.getDay())>(udm-3)))
+  //         return 1;
+  //     else
+  //         return getmonweek(dt);
+  // }
 
   return (
     <div className="box-visit">
@@ -814,11 +820,11 @@ const EditVisit = ({
                     sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                   >
                     <TableCell
-                    aria-label={visita.consultora}
+                    aria-label={visita.consultora + ' (' + visita.id_user + ')'}
                     data-cooltipz-dir="right"
-                    sx={{ backgroundColor: `${visita.cor}`, color: '#fff', width: 30 }} 
+                    sx={{ backgroundColor: `${sellers && sellers.filter((data) => data.id === visita.uid)[0].cor}`, width: 30 }} 
                     align="center" component="th" scope="row">
-                      {visita.consultora.substring(0, 1)}
+                      <b>{visita.consultora.substring(0, 1)}</b>
                     </TableCell>
                     {visita.categoria === "lunch" && <TableCell style={{ filter: 'contrast' }} className="type-icon lunch" aria-label="Almoço" data-cooltipz-dir="right"><RestaurantIcon /></TableCell>}
                     {visita.categoria === "comercial" && <TableCell className="type-icon comercial" aria-label="Visita Comercial" data-cooltipz-dir="right"><RequestQuoteIcon /></TableCell>}
@@ -882,8 +888,7 @@ const EditVisit = ({
               </p>
             </div>
             <div className="box-visit__form">
-            {(user.email === Users[0].email || userRef.cargo === "Administrador") && visitRef.tipo !== "Almoço" &&
-            <><label className="label">
+            <label className="label">
                 <p>Cliente *</p>
                 <input
                   className="label__input"
@@ -891,19 +896,20 @@ const EditVisit = ({
                   {...register("cliente")}
                   required />
               </label><div className="label margin-top">
-                  <p>Consultora *</p>
+                  <p>Indicador *</p>
                   <select
                     value={consultoraTexto || ''}
                     className="label__select"
                     name="tec"
+                    disabled
                     onChange={(e) => setConsultoraTexto(e.target.value)}>
                     {sellers &&
                       sellers.map((seller, index) => (
                         <option key={index} value={seller.nome}>{seller.nome}</option>
                       ))}
                   </select>
-                </div></>}
-                {type !== 'lunch' && userRef && userRef.cargo !== 'Administrador' &&
+                </div>
+                {/* {type !== 'lunch' && userRef && userRef.cargo !== 'Administrador' &&
                 <label className="label">
                 <p>Cliente *</p>
                 <input
@@ -912,7 +918,7 @@ const EditVisit = ({
                   {...register("cliente")}
                   required />
               </label>
-                }
+                } */}
               {/* {userRef && userRef.cargo !== 'Administrador' &&
                   <label className="label">
                         <p>Consultora *</p>

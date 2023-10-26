@@ -143,7 +143,8 @@ const EditAdmin = ({members, memberRef, open, close, openBox }) => {
                     orcamentista: {
                       nome: orcamentista.nome,
                       uid: orcamentista.uid
-                    }
+                    },
+                    cor: cidade.cor
                   }
                 break
                 case 'Orçamentista':

@@ -159,14 +159,14 @@
                 width: 98%;
                 margin: 1rem 0;
                 padding: 1rem 0;
-                border: none;
+                border: 1px solid hsl(0deg, 0%, 80%);
                 border-radius: 5px;
                 color: #60666d;
                 font-size: 1rem;
                 -webkit-appearance: none!important;
                 -moz-appearance: none!important;
                 appearance: none!important;
-                background: url(../../images/icons/Arrow.svg) #eee 90% no-repeat;
+                background: url(../../images/icons/Arrow.svg) #fafafa 90% no-repeat;
                 background-size: 1rem;
                 text-align: center;
                 text-transform: capitalize;

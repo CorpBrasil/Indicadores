@@ -1,4 +1,4 @@
-import { addDoc, updateDoc, doc, collection } from 'firebase/firestore';
+import { addDoc, updateDoc, doc, collection, serverTimestamp } from 'firebase/firestore';
 import { getStorage, ref, uploadBytesResumable, getDownloadURL} from "firebase/storage";
 import { useEffect, useState } from 'react';
 import CurrencyInput from "react-currency-input-field";
@@ -223,6 +223,7 @@ const Estimate = ({data, visits, members, openEstimate, close, open, userRef}) =
             cancelButtonText: "Não",
           }).then(async (result) => {
             if (result.isConfirmed) {
+              let telefoneFormatado = telefone.replace(/\D/g, '');
               setLoading(true);
               await addDoc(collection(dataBase,"Visitas_2023"), {
                 dia: moment(dataTexto).format("YYYY MM DD"),
@@ -259,7 +260,7 @@ const Estimate = ({data, visits, members, openEstimate, close, open, userRef}) =
                 const day = new Date();
                 await addDoc(collection(dataBase,"Orcamento"), {
                   nome: nome,
-                  telefone: telefone,
+                  telefone: telefoneFormatado,
                   cpf: cpf,
                   data: moment(day).format('DD MMM YYYY - HH:mm'),
                   status: 'Em Espera',
@@ -279,7 +280,8 @@ const Estimate = ({data, visits, members, openEstimate, close, open, userRef}) =
                     cidade: cidade
                   },
                   anotacao: anotacao,
-                  VisitRef: result.id
+                  VisitRef: result.id,
+                  leadRef: data.id
                 }).then(async (result) => {
                   const storageRef = ref(storage, `Orcamento/Bruna/${result.id}/${fatura.complete.name}`);
                   const uploadTask = uploadBytesResumable(storageRef, fatura.complete);
@@ -314,8 +316,10 @@ const Estimate = ({data, visits, members, openEstimate, close, open, userRef}) =
                           },
                           consumo: consumo,
                           visitRef: visitID,
-                          telefone: telefone
-                        }).then(() => {
+                          telefone: telefoneFormatado,
+                          orcamentoRef: result.id,
+                          storageRef: storageRef.fullPath
+                        }).then(async () => {
                           setLoading(false);
                           axios.post(('https://backend.botconversa.com.br/api/v1/webhooks-automation/catch/45898/jm2oCs6G0B4Q/'), {
                             nome: (userRef && userRef.nome) + ' (' + userRef.id_user + ')',
@@ -324,6 +328,12 @@ const Estimate = ({data, visits, members, openEstimate, close, open, userRef}) =
                             cidade_cliente: cidade,
                             telefone: userRef.orcamentista && members.filter(member => member.id === userRef.orcamentista.uid)[0].telefone,
                             visita: moment(dataTexto).format('DD MMMM YYYY') + ' às ' + horarioTexto
+                          })
+                          await addDoc(collection(dataBase, "Membros", userRef && userRef.orcamentista.uid, 'Notificacao'), {
+                            createAt: serverTimestamp(),
+                            type: 'Orçamento',
+                            data: moment().format('YYYY-MM-DD'),
+                            text: `${userRef && userRef.nome} (${userRef && userRef.id_user}) solicitou um orçamento para <b>${nome}</b>.`
                           })
                           Swal.fire({
                                title: 'CORPBRASIL',
@@ -621,7 +631,7 @@ const Estimate = ({data, visits, members, openEstimate, close, open, userRef}) =
             <div className={styles.input_file}>
               <Button component="label" variant="contained" onChange={(e) => setFatura({ file: URL.createObjectURL(e.target.files[0]), complete: e.target.files[0] })} startIcon={<CloudUploadIcon />}>
                 Enviar Fatura
-                <VisuallyHiddenInput type="file"/>
+                <VisuallyHiddenInput type="file" accept="image/png,image/jpeg" />
               </Button>
               {fatura &&
                 <Button variant='outlined' color='success' onClick={() => setOpenFatura(true)} endIcon={<CheckIcon />}>Visualizar</Button>}

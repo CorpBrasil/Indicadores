@@ -5,7 +5,7 @@ import Swal from 'sweetalert2/dist/sweetalert2.js';
 import moment from "moment";
 // import axios from "axios";
 // import * as moment from "moment";
-import { updateDoc, doc } from "firebase/firestore";
+import { updateDoc, doc, collection, serverTimestamp, addDoc } from "firebase/firestore";
 
 // Css
 import "cooltipz-css";
@@ -175,28 +175,34 @@ const confirmEstimate = (data) => {
       cancelButtonText: "Não",
     }).then(async (result) => {
       if (result.isConfirmed) {
-        const day = new Date();
         await updateDoc(doc(dataBase, 'Orcamento', data.id), {
           status: 'Concluido',
-          dataStatus: moment(day).format('DD MMMM YYYY - HH:mm'),
+          dataStatus: moment().format('DD MMMM YYYY - HH:mm'),
         }).then(async() => {
           await updateDoc(doc(dataBase, 'Leads', data.leadRef), {
             status: 'Apresentação',
             step: 3,
             orcamento: {
-              data: moment(day).format('DD MMMM YYYY - HH:mm'),
+              data: moment().format('DD MMMM YYYY - HH:mm'),
               anotacao: result.value
             }
-          }).then(() => {
-                          Swal.fire({
-                               title: 'CORPBRASIL',
-                               html: 'Orçamento confirmado com sucesso.',
-                               icon: "success",
-                               showConfirmButton: true,
-                               showCloseButton: true,
-                               confirmButtonColor: "#F39200"
-                             })
-                        })
+          }).then(async () => {
+            await addDoc(collection(dataBase, "Membros", data.indicador.uid, 'Notificacao'), {
+              createAt: serverTimestamp(),
+              type: 'Orçamento',
+              data: moment().format('YYYY-MM-DD'),
+              text: `Orçamento do(a) <b>${data.nome}</b> está pronto! Apresentação está prevista para o dia
+               <b>${visits && visits.filter((visit) => visit.id === data.VisitRef)[0].data_completa.replace('-', ' às ')}</b>.`
+            })
+              Swal.fire({
+                title: 'CORPBRASIL',
+                html: 'Orçamento confirmado com sucesso.',
+                icon: "success",
+                showConfirmButton: true,
+                showCloseButton: true,
+                confirmButtonColor: "#F39200"
+              })
+            })
         })
       }
     })
@@ -217,10 +223,41 @@ const cancelEstimate = async (data) => {
       cancelButtonColor: "#d33",
       confirmButtonText: "Sim",
       cancelButtonText: "Não",
+      input: 'text',
+      inputLabel: 'Deixe uma anotação sobre o Orçamento para o indicador.',
+      inputValidator: (value) => {
+        if (!value) {
+          return 'Deixe uma observação sobre o Orçamento'
+        }
+      },
     }).then(async (result) => {
       if (result.isConfirmed) {
         await updateDoc(doc(dataBase, 'Orcamento', data.id), {
           status: 'Cancelado'
+        }).then(async () => {
+          await updateDoc(doc(dataBase, 'Leads', data.leadRef), {
+            status: 'Orçamento Negado',
+            step: 1,
+            orcamento: {
+              data: moment().format('DD MMMM YYYY - HH:mm'),
+              anotacao: result.value
+            }
+          }).then(async () => {
+            await addDoc(collection(dataBase, "Membros", data.indicador.uid, 'Notificacao'), {
+              createAt: serverTimestamp(),
+              type: 'Orçamento',
+              data: moment().format('YYYY-MM-DD'),
+              text: `Pedido de orçamento do(a) <b>${data.nome}</b> foi negado. Verifique o motivo pelo perfil do lead.`
+            })
+            Swal.fire({
+              title: 'CORPBRASIL',
+              html: 'Orçamento foi cancelado com sucesso.',
+              icon: "success",
+              showConfirmButton: true,
+              showCloseButton: true,
+              confirmButtonColor: "#F39200"
+            })
+          })
         })
       }
     })
