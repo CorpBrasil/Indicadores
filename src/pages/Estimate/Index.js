@@ -5,7 +5,7 @@ import Swal from 'sweetalert2/dist/sweetalert2.js';
 import moment from "moment";
 // import axios from "axios";
 // import * as moment from "moment";
-import { updateDoc, doc, collection, serverTimestamp, addDoc } from "firebase/firestore";
+import { updateDoc, doc, collection, serverTimestamp, addDoc, deleteDoc } from "firebase/firestore";
 
 // Css
 import "cooltipz-css";
@@ -236,7 +236,7 @@ const cancelEstimate = async (data) => {
           status: 'Cancelado'
         }).then(async () => {
           await updateDoc(doc(dataBase, 'Leads', data.leadRef), {
-            status: 'Orçamento Negado',
+            status: 'Orçamento Cancelado',
             step: 1,
             orcamento: {
               data: moment().format('DD MMMM YYYY - HH:mm'),
@@ -247,7 +247,11 @@ const cancelEstimate = async (data) => {
               createAt: serverTimestamp(),
               type: 'Orçamento',
               data: moment().format('YYYY-MM-DD'),
-              text: `Pedido de orçamento do(a) <b>${data.nome}</b> foi negado. Verifique o motivo pelo perfil do lead.`
+              text: `Pedido de orçamento do(a) <b>${data.nome}</b> foi cancelado. Verifique o motivo pelo perfil do lead.`
+            }).then(async () => {
+              await deleteDoc(doc(dataBase, "Orcamento", data.id)).then(async () => {
+                await deleteDoc(doc(dataBase, "Visitas_2023", data.VisitRef))
+              })
             })
             Swal.fire({
               title: 'CORPBRASIL',

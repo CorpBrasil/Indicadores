@@ -1,6 +1,6 @@
 import { useState, memo, forwardRef } from 'react';
 // import moment from "moment";
-import Geocode from "react-geocode";
+// import Geocode from "react-geocode";
 // import axios from 'axios';
 import { Link } from "react-router-dom";
 // import { useNavigate } from 'react-router-dom'; // import do hook
@@ -11,7 +11,7 @@ import { Link } from "react-router-dom";
 import Swal from 'sweetalert2/dist/sweetalert2.js';
 import useAuth from '../../hooks/useAuth';
 import Header from '../../components/Header/Index';
-import { Users, KeyMaps } from '../../data/Data';
+import { Users } from '../../data/Data';
 
 // import Button from '@mui/material/Button';
 // import TextField from '@mui/material/TextField';
@@ -27,7 +27,7 @@ import { Users, KeyMaps } from '../../data/Data';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
-import Badge from '@mui/material/Badge';
+// import Badge from '@mui/material/Badge';
 
 // import PeopleIcon from '@mui/icons-material/People';
 // import LocalGasStationIcon from '@mui/icons-material/LocalGasStation';
@@ -35,7 +35,7 @@ import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
 import { ReactComponent as Prospection } from '../../images/icons/Prospection.svg';
 // import { ReactComponent as Management } from '../../images/icons/Management.svg';
 import ContentPasteIcon from '@mui/icons-material/ContentPaste';
-import { ReactComponent as ReportIcon } from '../../images/icons/Report.svg';
+// import { ReactComponent as ReportIcon } from '../../images/icons/Report.svg';
 import CachedIcon from '@mui/icons-material/Cached';
 
 
@@ -43,10 +43,10 @@ import CachedIcon from '@mui/icons-material/Cached';
 import './_style.scss';
 
 const Schedules = ({ userRef, alerts, check, reports }) => {
-  Geocode.setLanguage("pt-BR");
-  Geocode.setRegion("br");
-  Geocode.setApiKey(KeyMaps);
-  Geocode.setLocationType("ROOFTOP");
+  // Geocode.setLanguage("pt-BR");
+  // Geocode.setRegion("br");
+  // Geocode.setApiKey(KeyMaps);
+  // Geocode.setLocationType("ROOFTOP");
 
   const Alert = forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -410,7 +410,7 @@ const Schedules = ({ userRef, alerts, check, reports }) => {
          </li>
            </div>
       } */}
-       <div className='box-schedule'>
+       {/* <div className='box-schedule'>
          <li className='schedule'>
            <Link className='schedule__content' to="/avisos">
            <Badge sx={{ width: '5.6rem', height: '100%' }} badgeContent={reports && reports.length - userRef.relatorio} color="error">
@@ -421,7 +421,7 @@ const Schedules = ({ userRef, alerts, check, reports }) => {
              </div>
              </Link>
          </li>
-           </div>
+           </div> */}
        {/* {userRef && (user.email === Users[0].email || userRef.cargo === "Administrador" || userRef.cargo === "Técnico" || findTec) && 
         // <><div className='box-schedule'>
         //       <li className='schedule'>

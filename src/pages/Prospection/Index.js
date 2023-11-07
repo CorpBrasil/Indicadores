@@ -535,7 +535,7 @@ const closeAnotacaoBox = () => {
                   {data.status === 'Orçamento' &&
                     <TableCell align="center" className={styles.orcamento}>{data.status}</TableCell>
                   }
-                  {data.status === 'Orçamento Negado' &&
+                  {data.status === 'Orçamento Cancelado' &&
                     <TableCell align="center" className={styles.orcamento_negado}>{data.status}</TableCell>
                   }
                   {data.status === 'Apresentação' &&
@@ -592,7 +592,7 @@ const closeAnotacaoBox = () => {
                           <p>Aguardando Orçamento. A data de apresentação está prevista para o dia <b>{visits && visits.filter((visit) => visit.id === data.visitRef)[0].data_completa.replace('-', ' às ')}</b>.</p>
                         </Box>
                         }
-                        {data.status === 'Orçamento Negado' && 
+                        {data.status === 'Orçamento Cancelado' && 
                         <Box className={styles.info_step} sx={{ width: '87%', marginBottom: '1rem' }}>
                           <p><b>{data.pedido && data.orcamento.data.replace('-', 'às')}</b></p>
                           <p>Orçamento foi cancelado pela <b>{data.orcamentista && data.orcamentista.nome}</b>. Motivo: <b>{data.orcamento && data.orcamento.anotacao}</b></p>
@@ -667,7 +667,7 @@ const closeAnotacaoBox = () => {
                                 >
                                     Reabrir
                                   </Button></>}
-                                  {((data.status === "Ativo" || data.status === "Orçamento Negado")  && userRef && userRef.cargo === 'Indicador') &&
+                                  {((data.status === "Ativo" || data.status === "Orçamento Cancelado")  && userRef && userRef.cargo === 'Indicador') &&
                                   <Button
                                   variant="contained"
                                   color="primary"
