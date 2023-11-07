@@ -153,7 +153,7 @@ const Prospection = ({ user, leads, visits, userRef, listLeads, members, sellers
       const docRef = doc(dataBase, 'Leads', data);
       Swal.fire({
         title: Company,
-        html: `Você deseja alterar a <b>Atividade?</b>`,
+        html: `Você deseja alterar a <b>Anotação?</b>`,
         icon: "question",
         showCancelButton: true,
         showCloseButton: true,
@@ -169,7 +169,7 @@ const Prospection = ({ user, leads, visits, userRef, listLeads, members, sellers
           }).then(() => {
             Swal.fire({
               title: Company,
-              html: `A Atividade foi alterada com sucesso.`,
+              html: `A Anotação foi alterada com sucesso.`,
               icon: "success",
               showConfirmButton: true,
               showCloseButton: true,
@@ -466,6 +466,8 @@ const closeAnotacaoBox = () => {
     setOpenEstimate(true);
   }
 
+  console.log(window.innerWidth)
+
   return (
     <div className={styles.container_panel}>
         {/* {loading && loading &&
@@ -474,15 +476,19 @@ const closeAnotacaoBox = () => {
           </Box>
         } */}
       <Header user={user} userRef={userRef}></Header>
-      <div className={styles.title_panel}>
+      <div className={`${styles.title_panel} ${styles.desktop}`}>
         <ProspectionIcon className={styles.prospecction_icon}/>
         <h2>Prospecção</h2>
           <Dashboard type={'prospeccao'} />
       </div>
       <div className={styles.content_panel}>
         <div className={styles.box_panel}>
-            <h2>Leads</h2>
-          <div className={styles.box_panel_add}>
+            <h2 class={styles.desktop}>Leads</h2>
+          <div className={`${styles.box_panel_add}`}>
+          <div className={`${styles.title_panel} ${styles.mobile}`}>
+            <ProspectionIcon className={styles.prospecction_icon}/>
+            <h2>Prospecção</h2>
+          </div>
             {!view && !view ? 
             <button className={styles.box_panel_add_activity} onClick={() => setView(true)}>
                 <ProspectionIcon className={styles.prospecction_icon} />
@@ -499,25 +505,30 @@ const closeAnotacaoBox = () => {
                     open={openImport} close={closeImport} userRef={userRef} changeLoading={changeLoading} /></>
                   } */}    
           </div>
-            <Filter tableData={leadsUser} 
+          <div style={{ padding: '0 1rem' }}>
+          <Filter tableData={leadsUser} 
             dataFull={leads} 
             sellers={sellersOrder} 
             userRef={userRef} 
             changeFilter={changeFilter}
             type={'prospeccao'}
             />
+          </div>  
           <div className={styles.box_activity}>
           <TableContainer className={styles.table_center} component={Paper}>
             <Table stickyHeader aria-label="sticky table">
               <TableHead>
                 <TableRow>
                   <TableCell align="center">Status</TableCell>
+                  {window.innerWidth > 650 && 
                   <TableCell align="center">Data de Criação</TableCell>
+                  }
                   <TableCell align="center">Responsável</TableCell>
                   <TableCell align="center">Empresa</TableCell>
                   <TableCell align="center">Cidade</TableCell>
+                  {window.innerWidth > 650 && 
                   <TableCell align="center">Indicador(a)</TableCell>
-                  {/* <TableCell align="center">Anotação</TableCell> */}
+                  }
                   <TableCell align="center"></TableCell>
                 </TableRow>
               </TableHead>
@@ -527,52 +538,80 @@ const closeAnotacaoBox = () => {
                   key={index}
                   hover
                   className={`list-visit`}
+                  onClick={() => handleToggle(data.id)}
                   // sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                   >
-                  {data.status === 'Ativo' &&
-                    <TableCell align="center" className={styles.ativo}>{data.status}</TableCell>
-                  }
-                  {data.status === 'Orçamento' &&
-                    <TableCell align="center" className={styles.orcamento}>{data.status}</TableCell>
-                  }
-                  {data.status === 'Orçamento Cancelado' &&
-                    <TableCell align="center" className={styles.orcamento_negado}>{data.status}</TableCell>
-                  }
-                  {data.status === 'Apresentação' &&
-                    <TableCell align="center" className={styles.apresentacao}>{data.status}</TableCell>
-                  }
-                  {data.status === 'Ganho' &&
-                    <TableCell align="center" aria-label={data.dataStatus && data.dataStatus.replace('-','às')}
-                    data-cooltipz-dir="right" className={styles.ganho}>{data.status}</TableCell>
-                  }
-                  {data.status === 'Perdido' &&
-                    <TableCell align="center" aria-label={data.dataStatus && data.dataStatus.replace('-','às')}
-                    data-cooltipz-dir="right" className={styles.perdido}>{data.status}</TableCell>
-                  }
-                  <TableCell align="center">{data.data.replace('-', 'às')}</TableCell>
+                    {data.status === 'Ativo' &&
+                      <TableCell align="center" className={styles.ativo}>{window.innerWidth > 650 ? data.status : 'AT'}</TableCell>
+                    }
+                    {data.status === 'Orçamento' &&
+                      <TableCell align="center" className={styles.orcamento}>{window.innerWidth > 650 ? data.status : 'O'}</TableCell>
+                    }
+                    {data.status === 'Orçamento Cancelado' &&
+                      <TableCell align="center" className={styles.orcamento_negado}>{window.innerWidth > 650 ? data.status : 'O.C'}</TableCell>
+                    }
+                    {data.status === 'Apresentação' &&
+                      <TableCell align="center" className={styles.apresentacao}>{window.innerWidth > 650 ? data.status : 'AP'}</TableCell>
+                    }
+                    {data.status === 'Ganho' &&
+                      <TableCell align="center" aria-label={data.dataStatus && data.dataStatus.replace('-','às')}
+                      data-cooltipz-dir="right" className={styles.ganho}>{window.innerWidth > 650 ? data.status : 'G'}</TableCell>
+                    }
+                    {data.status === 'Perdido' &&
+                      <TableCell align="center" aria-label={data.dataStatus && data.dataStatus.replace('-','às')}
+                      data-cooltipz-dir="right" className={styles.perdido}>{window.innerWidth > 650 ? data.status : 'P'}</TableCell>
+                    }
+                    {window.innerWidth > 650 && 
+                      <TableCell align="center">{data.data.replace('-', 'às')}</TableCell>
+                    }
                   <TableCell align="center">{data.nome ? data.nome.substring(0, 30) + '...' : ""}</TableCell>
                   <TableCell align="center">{data.empresa}</TableCell>
                   <TableCell align="center">{data.cidade}</TableCell>
+                  {window.innerWidth > 650 && 
                   <TableCell align="center"><b>{data.indicador} ({data && members.filter((member) => member.id === data.uid)[0].id_user})</b></TableCell>
+                  }
                   {/* <TableCell align="center">{activity.filter((act) => act.idRef === data.id).length}</TableCell> */}
                   {/* <TableCell align="center" sx={{ width: 'auto' }}>{data.anotacao ? data.anotacao.substring(0, 30) + '...' : ""} </TableCell> */}
                   <TableCell align="center" sx={{ width: '50px' }}>
                     <IconButton
                       aria-label="Expandir"
                       data-cooltipz-dir="left"
-                      size="small"
-                      onClick={() => handleToggle(data.id)}>
+                      size="small">
                       {open[data.id] ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
                     </IconButton>
                   </TableCell>
                 </TableRow>
                 <TableRow key={data.id}>
-                  <TableCell style={{ paddingBottom: 0, paddingTop: 0, height: 0 }} colSpan={9}>
-                      <Collapse in={open[data.id]} timeout="auto" unmountOnExit colSpan={9}>
+                  <TableCell style={{ paddingBottom: 0, paddingTop: 0, height: 0 }} colSpan={window.innerWidth < 650 ? 5 : 7}>
+                      <Collapse in={open[data.id]} timeout="auto" unmountOnExit colSpan={window.innerWidth < 650 ? 5 : 7}>
                       <Box className={styles.info_anotacao} margin={3}>
                         <Estimate data={data} visits={visits} members={members} openEstimate={openEstimate} close={close} open={openBox} userRef={userRef} />
-                        <Box sx={{ width: '90%', marginBottom: '1rem' }}>
-                          <Stepper activeStep={data && data.step}>
+                            {data.status === 'Ativo' && 
+                            <Box className={styles.info_step} sx={{ width: '87%', marginBottom: '1rem' }}>
+                              <p><b>{data && data.data.replace('-', 'às')}</b></p>
+                              <p>Lead ativo</p>
+                            </Box>
+                            }
+                            {data.status === 'Orçamento' && 
+                            <Box className={styles.info_step} sx={{ width: '87%', marginBottom: '1rem' }}>
+                              <p><b>{data.pedido && data.pedido.data.replace('-', 'às')}</b></p>
+                              <p>Aguardando Orçamento. A data de apresentação está prevista para o dia <b>{visits && visits.filter((visit) => visit.id === data.visitRef)[0].data_completa.replace('-', ' às ')}</b>.</p>
+                            </Box>
+                            }
+                            {data.status === 'Orçamento Cancelado' && 
+                            <Box className={styles.info_step} sx={{ width: '87%', marginBottom: '1rem' }}>
+                              <p><b>{data.pedido && data.orcamento.data.replace('-', 'às')}</b></p>
+                              <p>Orçamento foi cancelado pela <b>{data.orcamentista && data.orcamentista.nome}</b>. Motivo: <b>{data.orcamento && data.orcamento.anotacao}</b></p>
+                            </Box>
+                            }
+                            {data.status === 'Apresentação' && 
+                            <Box className={styles.info_step} sx={{ width: '87%', marginBottom: '1rem' }}>
+                              <p><b>{data.orcamento && data.orcamento.data.replace('-', 'às')}</b></p>
+                              <p>Orçamento gerado pela <b>Bruna</b>. A data de apresentação está prevista para o dia <b>{visits && visits.filter((visit) => visit.id === data.visitRef)[0].data_completa.replace('-', ' às ')}</b>.</p>
+                            </Box>
+                            }
+                        <Box class={styles.box_stepper}>
+                          <Stepper activeStep={data && data.step} orientation={'horizontal'}>
                             {steps.map((label) => (
                               <Step key={label}>
                                 <StepLabel>{label}</StepLabel>
@@ -580,30 +619,6 @@ const closeAnotacaoBox = () => {
                             ))}
                           </Stepper>
                         </Box>
-                        {data.status === 'Ativo' && 
-                        <Box className={styles.info_step} sx={{ width: '87%', marginBottom: '1rem' }}>
-                          <p><b>{data && data.data.replace('-', 'às')}</b></p>
-                          <p>Lead ativo</p>
-                        </Box>
-                        }
-                        {data.status === 'Orçamento' && 
-                        <Box className={styles.info_step} sx={{ width: '87%', marginBottom: '1rem' }}>
-                          <p><b>{data.pedido && data.pedido.data.replace('-', 'às')}</b></p>
-                          <p>Aguardando Orçamento. A data de apresentação está prevista para o dia <b>{visits && visits.filter((visit) => visit.id === data.visitRef)[0].data_completa.replace('-', ' às ')}</b>.</p>
-                        </Box>
-                        }
-                        {data.status === 'Orçamento Cancelado' && 
-                        <Box className={styles.info_step} sx={{ width: '87%', marginBottom: '1rem' }}>
-                          <p><b>{data.pedido && data.orcamento.data.replace('-', 'às')}</b></p>
-                          <p>Orçamento foi cancelado pela <b>{data.orcamentista && data.orcamentista.nome}</b>. Motivo: <b>{data.orcamento && data.orcamento.anotacao}</b></p>
-                        </Box>
-                        }
-                        {data.status === 'Apresentação' && 
-                        <Box className={styles.info_step} sx={{ width: '87%', marginBottom: '1rem' }}>
-                          <p><b>{data.orcamento && data.orcamento.data.replace('-', 'às')}</b></p>
-                          <p>Orçamento gerado pela <b>Bruna</b>. A data de apresentação está prevista para o dia <b>{visits && visits.filter((visit) => visit.id === data.visitRef)[0].data_completa.replace('-', ' às ')}</b>.</p>
-                        </Box>
-                        }
                           <h3>Anotação</h3>
                           {viewEdit && viewEdit === data.id ?
                             <><textarea className={styles.edit_anotacao} value={anotacao} onChange={(e) => setAnotacao(e.target.value)} cols="30" rows="5"></textarea>
@@ -629,7 +644,7 @@ const closeAnotacaoBox = () => {
                                 Cancelar
                               </Button>
                             </div></>  :
-                            <div className={styles.anotacao}>{data.anotacao}
+                            <div className={styles.anotacao}>{data.anotacao ? data.anotacao : <br />}
                             <IconButton
                             aria-label="Editar Anotação"
                             data-cooltipz-dir="top"
@@ -641,7 +656,7 @@ const closeAnotacaoBox = () => {
                         <EditProspection changeLoading={changeLoading} data={data} />
                               <div className={styles.activity_button}>
                                 <ThemeProvider theme={theme}>
-                                {(userRef && userRef.cargo === 'Indicador') &&
+                                {(userRef && userRef.cargo !== 'Indicador') &&
                                   <Button
                                   variant="contained"
                                   color="primary"
@@ -667,17 +682,6 @@ const closeAnotacaoBox = () => {
                                 >
                                     Reabrir
                                   </Button></>}
-                                  {((data.status === "Ativo" || data.status === "Orçamento Cancelado")  && userRef && userRef.cargo === 'Indicador') &&
-                                  <Button
-                                  variant="contained"
-                                  color="primary"
-                                  size="small"
-                                  type="submit"
-                                  startIcon={<ContentPasteGoIcon />}
-                                  onClick={() => setOpenEstimate(true)}
-                                >
-                                  Solicitar Orçamento
-                                </Button>}
                                 <Button
                                   variant="contained"
                                   color="success"
@@ -698,6 +702,17 @@ const closeAnotacaoBox = () => {
                                 >
                                     Perdido
                                   </Button>
+                                  {((data.status === "Ativo" || data.status === "Orçamento Cancelado")  && userRef && userRef.cargo === 'Indicador') &&
+                                  <Button
+                                  variant="contained"
+                                  color="primary"
+                                  size="small"
+                                  type="submit"
+                                  startIcon={<ContentPasteGoIcon />}
+                                  onClick={() => setOpenEstimate(true)}
+                                >
+                                  Gerar Orçamento
+                                </Button>}
                                   <ThemeProvider theme={redTheme}>
                                 <Button
                                   variant="contained"

@@ -1,5 +1,17 @@
 @import '../../styles/mixins.scss';
 
+@media (max-width: 650px) {
+  .desktop {
+    display: none!important;
+  }
+}
+
+@media (min-width: 650px) {
+  .mobile {
+    display: none!important;
+  }
+}
+
 .prospecction_icon {
   width: 50px;
   height: 50px;
@@ -9,13 +21,20 @@
   }
 }
 
-.table-center {
-  margin: auto;
-}
-
 .activity_button {
   display: flex;
   gap: 1rem;
+  width: 100%;
+  flex-wrap: wrap;
+  justify-content: center;
+
+  @media (max-width: 650px) {
+    gap: 0.5rem;
+
+    button {
+      width: 48%!important;
+    }
+  }
 }
 
 .lead_status {
@@ -74,6 +93,10 @@
     flex-direction: column;
     align-items: center;
 
+    @media (max-width: 650px) {
+      padding: 0!important;
+    }
+
     h2 {
       font-size: 1.7rem;
     }
@@ -92,9 +115,17 @@
     margin: auto;
     height: 100%;
 
+    @media (max-width: 650px) {
+      width: 100%!important;
+    }
+
     h2 {
       margin: 1rem 0;
       text-align: center;
+
+      @media (max-width: 650px) {
+        margin: 0.2rem 0!important;
+      }
     }
 
     .content_list {
@@ -109,12 +140,14 @@
       flex-wrap: wrap;
       justify-content: space-around;
       padding: 3rem 0;
-      gap: 0.5rem;
+      gap: 1rem;
       text-align: center;
 
       &_add {
         display: flex;
         justify-content: center;
+        flex-direction: column;
+        align-items: center;
         gap: 1rem;
 
         &_activity {
@@ -206,6 +239,8 @@
             align-items: center;
             gap: 0.3rem;
             border: 1px solid #ccc;
+            text-wrap: wrap;
+            text-align: center;
           }
 
           .info_anotacao {
@@ -214,8 +249,33 @@
             align-items: center;
             gap: 1rem;
 
+            @media (max-width: 650px) {
+              margin: 1rem 0 2rem 0!important;
+            }
+
             h3 {
               text-align: center;
+            }
+
+            .box_stepper {
+              width: 90%;
+              margin: 0.5rem 0;
+              overflow-x: auto;
+              display: flex;
+              padding: 1rem;
+              
+              @media (min-width: 650px) {
+                justify-content: center;
+              }
+
+              @media (max-width: 650px) {
+                padding: 1rem;
+                max-width: 300px;
+              }
+
+              div {
+                width: 780px;
+              }
             }
 
             .anotacao {

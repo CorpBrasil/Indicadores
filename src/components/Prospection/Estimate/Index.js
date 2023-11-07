@@ -198,7 +198,7 @@ const Estimate = ({data, visits, members, openEstimate, close, open, userRef}) =
         let visitID;
         e.preventDefault();
         try {
-          close();
+          // close();
           if(visitsFindCount < 0 || visitsFindCount > 0){
             return Swal.fire({
               title: 'CORPBRASIL',
@@ -212,7 +212,7 @@ const Estimate = ({data, visits, members, openEstimate, close, open, userRef}) =
             })
           }
           Swal.fire({
-            title: 'Company',
+            title: 'Orçamento',
             text: `Todos os dados estão corretos?`,
             icon: "question",
             showCancelButton: true,
@@ -283,6 +283,7 @@ const Estimate = ({data, visits, members, openEstimate, close, open, userRef}) =
                   VisitRef: result.id,
                   leadRef: data.id
                 }).then(async (result) => {
+                  console.log(`${result.id}/${fatura.complete.name}`)
                   const storageRef = ref(storage, `Orcamento/Bruna/${result.id}/${fatura.complete.name}`);
                   const uploadTask = uploadBytesResumable(storageRef, fatura.complete);
                   uploadTask.on(
@@ -373,8 +374,11 @@ const Estimate = ({data, visits, members, openEstimate, close, open, userRef}) =
 
   return (
     <>
+    {/* Parei aqui */}
     <Backdrop
-        sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        sx={{ color: '#fff', zIndex: (theme) => 
+        Math.max.apply(Math, Object.values(theme.zIndex)) + 1,
+    }}
         open={loading}
       >
         <CircularProgress color="inherit" />
@@ -410,7 +414,7 @@ const Estimate = ({data, visits, members, openEstimate, close, open, userRef}) =
                 id="name"
                 label="Endereço"
                 type="text"
-                // required
+                required
                 value={endereco ? endereco : ''}
                 onChange={(e) => setEndereco(e.target.value)}
                 variant="outlined" />
@@ -418,7 +422,6 @@ const Estimate = ({data, visits, members, openEstimate, close, open, userRef}) =
             <div className={styles.label_content}>
               <div className={styles.input_endereco}>
                 <TextField
-                  autoFocus
                   margin="dense"
                   id="name"
                   label="Bairro"
@@ -430,7 +433,6 @@ const Estimate = ({data, visits, members, openEstimate, close, open, userRef}) =
                   variant="outlined" /> </div>
               <div className={styles.input_endereco}>
                 <TextField
-                  autoFocus
                   margin="dense"
                   id="name"
                   label="Cidade"
