@@ -258,6 +258,7 @@ const Estimate = ({data, visits, members, openEstimate, close, open, userRef}) =
               }).then(async (result) => {
                 visitID = result.id
                 const day = new Date();
+
                 await addDoc(collection(dataBase,"Orcamento"), {
                   nome: nome,
                   telefone: telefoneFormatado,
@@ -283,7 +284,6 @@ const Estimate = ({data, visits, members, openEstimate, close, open, userRef}) =
                   VisitRef: result.id,
                   leadRef: data.id
                 }).then(async (result) => {
-                  console.log(`${result.id}/${fatura.complete.name}`)
                   const storageRef = ref(storage, `Orcamento/Bruna/${result.id}/${fatura.complete.name}`);
                   const uploadTask = uploadBytesResumable(storageRef, fatura.complete);
                   uploadTask.on(
@@ -291,14 +291,6 @@ const Estimate = ({data, visits, members, openEstimate, close, open, userRef}) =
                     (snapshot) => {
                       const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
                       console.log('Upload is ' + progress + '% done');
-                      // switch (snapshot.state) {
-                      //   case 'paused':
-                      //     console.log('Upload is paused');
-                      //     break;
-                      //   case 'running':
-                      //     console.log('Upload is running');
-                      //     break;
-                      // }
                     },
                     (error) => {
                       alert(error);
@@ -307,7 +299,8 @@ const Estimate = ({data, visits, members, openEstimate, close, open, userRef}) =
                       getDownloadURL(uploadTask.snapshot.ref).then(async (downloadURL) => {
                         console.log('File available at', downloadURL);
                         await updateDoc(doc(dataBase, "Orcamento", result.id), {
-                          fatura_url: downloadURL
+                          fatura_url: downloadURL,
+                          storageRef: storageRef.fullPath
                         })
                         await updateDoc(doc(dataBase, "Leads", data.id), {
                           status: 'Orçamento',

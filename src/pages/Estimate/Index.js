@@ -3,6 +3,7 @@ import { dataBase } from "../../firebase/database";
 import Header from "../../components/Header/Index";
 import Swal from 'sweetalert2/dist/sweetalert2.js';
 import moment from "moment";
+import { getStorage, ref, deleteObject } from "firebase/storage";
 // import axios from "axios";
 // import * as moment from "moment";
 import { updateDoc, doc, collection, serverTimestamp, addDoc, deleteDoc } from "firebase/firestore";
@@ -243,15 +244,22 @@ const cancelEstimate = async (data) => {
               anotacao: result.value
             }
           }).then(async () => {
+              const storage = getStorage();
+              const faturatRef = ref(storage, data.storageRef);
+              await deleteDoc(doc(dataBase, "Orcamento", data.id)).then(async () => {
+                await deleteDoc(doc(dataBase, "Visitas_2023", data.VisitRef)).then(async() =>{
+                  deleteObject(faturatRef).then(() => {
+                    console.log('Fatura Deletada!')
+                  }).catch((error) => {
+                    // Uh-oh, an error occurred!
+                  });
+                })
+              })
             await addDoc(collection(dataBase, "Membros", data.indicador.uid, 'Notificacao'), {
               createAt: serverTimestamp(),
               type: 'Orçamento',
               data: moment().format('YYYY-MM-DD'),
               text: `Pedido de orçamento do(a) <b>${data.nome}</b> foi cancelado. Verifique o motivo pelo perfil do lead.`
-            }).then(async () => {
-              await deleteDoc(doc(dataBase, "Orcamento", data.id)).then(async () => {
-                await deleteDoc(doc(dataBase, "Visitas_2023", data.VisitRef))
-              })
             })
             Swal.fire({
               title: 'CORPBRASIL',
