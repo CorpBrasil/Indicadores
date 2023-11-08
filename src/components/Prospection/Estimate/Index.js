@@ -31,7 +31,7 @@ import FormControl from "@mui/material/FormControl";
 import Button from "@mui/material/Button";
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import { theme } from '../../../data/theme';
-import { ThemeProvider } from "@mui/material";
+import { CircularProgress, ThemeProvider } from "@mui/material";
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -39,8 +39,6 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
-import Backdrop from '@mui/material/Backdrop';
-import CircularProgress from '@mui/material/CircularProgress';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import CheckIcon from '@mui/icons-material/Check';
@@ -63,7 +61,7 @@ const Estimate = ({data, visits, members, openEstimate, close, open, userRef}) =
   // eslint-disable-next-line no-unused-vars
   const [rawValue ,setRawValue] = useState("");
   const [openFatura, setOpenFatura] = useState(false);
-  const [viewVisit, setviewVisit] = useState(false);
+  const [viewVisit, setviewVisit] = useState('dados');
   const [visitaNumero] = useState(3600);
   const [tempoTexto, setTempoTexto] = useState(undefined);
   const [saidaCliente, setSaidaCliente] = useState(undefined);
@@ -183,15 +181,16 @@ const Estimate = ({data, visits, members, openEstimate, close, open, userRef}) =
     if(openEstimate) {
       setCidade(data && data.cidade);
       setNome(data && data.nome);
-      setTelefone(data && data.telefone)
-      setConsumo(data && data.consumo)
+      setTelefone(data && data.telefone);
+      setConsumo(data && data.consumo);
+      setLoading(true);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   },[openEstimate])
 
   const onVisit = (e) => {
     e.preventDefault();
-    setviewVisit(true);
+    setviewVisit('visita');
   }
 
   const onSubmit = async (e) => {
@@ -224,7 +223,7 @@ const Estimate = ({data, visits, members, openEstimate, close, open, userRef}) =
           }).then(async (result) => {
             if (result.isConfirmed) {
               let telefoneFormatado = telefone.replace(/\D/g, '');
-              setLoading(true);
+              setviewVisit('loading');
               await addDoc(collection(dataBase,"Visitas_2023"), {
                 dia: moment(dataTexto).format("YYYY MM DD"),
                 saidaEmpresa: saidaTexto,
@@ -258,7 +257,6 @@ const Estimate = ({data, visits, members, openEstimate, close, open, userRef}) =
               }).then(async (result) => {
                 visitID = result.id
                 const day = new Date();
-
                 await addDoc(collection(dataBase,"Orcamento"), {
                   nome: nome,
                   telefone: telefoneFormatado,
@@ -338,6 +336,7 @@ const Estimate = ({data, visits, members, openEstimate, close, open, userRef}) =
                                confirmButtonColor: "#F39200"
                              }).then((result) => {
                                close();
+                               setviewVisit('dados');
                              })
                         })
                       });
@@ -354,33 +353,25 @@ const Estimate = ({data, visits, members, openEstimate, close, open, userRef}) =
         }
     }
 
-    console.log(fatura);
+    console.log(loading);
 
     console.log(lat, lng);
 
     const closeBox = () => {
       close();
       setTimeout(() => {
-        setviewVisit(false);
+        setviewVisit('dados');
       }, 500);
     }
 
   return (
     <>
-    {/* Parei aqui */}
-    <Backdrop
-        sx={{ color: '#fff', zIndex: (theme) => 
-        Math.max.apply(Math, Object.values(theme.zIndex)) + 1,
-    }}
-        open={loading}
-      >
-        <CircularProgress color="inherit" />
-      </Backdrop>
     <Dialog
       className={styles.dialog}
       open={openEstimate}
       fullScreen={fullScreen}
       maxWidth="md"
+      sx={{ zIndex: 90 }}
       onClose={() => closeBox()}
     >
       <IconButton
@@ -392,9 +383,14 @@ const Estimate = ({data, visits, members, openEstimate, close, open, userRef}) =
           top: 8,
           color: (theme) => theme.palette.grey[500],
         }}
-      ><CloseIcon /></IconButton>
+        ><CloseIcon /></IconButton>
       <DialogTitle align="center">Solicitar Orçamento</DialogTitle>
-      {viewVisit && viewVisit ? 
+      {viewVisit && viewVisit === 'loading' &&
+      <div className={styles.loading}>
+        <CircularProgress color='primary' />
+      </div>
+      }
+      {viewVisit && viewVisit === 'visita' && 
         <DialogContent className={styles.visit_content}>
           <DialogContentText sx={{ textAlign: "center" }}>
             Escolha a data de apresentação do <b>Orçamento</b>.
@@ -522,126 +518,128 @@ const Estimate = ({data, visits, members, openEstimate, close, open, userRef}) =
           </ThemeProvider>
           </form>
         </DialogContent>
-      : 
-      <DialogContent>
-        <DialogContentText sx={{ textAlign: "center" }}>
-          Preencha os campos abaixo para solicitar um <b>Orçamento</b>.
-        </DialogContentText>
-        <form onSubmit={onVisit}>
-          <ThemeProvider theme={theme}>
-            <TextField
-              autoFocus
-              margin="dense"
-              onChange={(e) => setNome(e.target.value)}
-              id="name"
-              label="Nome Completo"
-              type="text"
-              value={nome ? nome : ''}
-              fullWidth
-              // required
-              variant="outlined" />
-            <div className={styles.label_content}>
-              <div className={styles.input_telefone}>
-                <span>Telefone</span>
-                <PatternFormat
-                  className="label__input"
-                  onChange={(e) => setTelefone(e.target.value)}
-                  format="## (##) ##### ####"
-                  mask="_"
-                  placeholder="00 (00) 00000 0000"
-                  value={telefone ? telefone : ''}
-                  label="Telefone"
-                  minLength={9}
-                  variant="outlined"
-                  color="primary"
-                  required 
-                  />
-              </div>
-              <div className={styles.input_telefone}>
-                <span>CPF</span>
-                <PatternFormat
-                  className="label__input"
-                  onChange={(e) => setCpf(e.target.value)}
-                  format="###.###.###-##"
-                  mask="_"
-                  placeholder="000.000.000-00"
-                  value={cpf ? cpf : ''}
-                  label="Telefone"
-                  minLength={9}
-                  variant="outlined"
-                  color="primary"
-                  required 
-                  />
-              </div>
-            </div>
-            <div className={styles.label_content}>
-              <div className={styles.input_telefone}>
-                <span>Data de Nascimento</span>
-                <PatternFormat
-                  className="label__input"
-                  onChange={(e) => setDataNascimento(e.target.value)}
-                  format="##/##/####"
-                  mask="_"
-                  placeholder="00/00/0000"
-                  value={dataNascimento ? dataNascimento : ''}
-                  label="Data de Nascimento"
-                  minLength={9}
-                  variant="outlined"
-                  color="primary"
-                  required 
-                  />
-              </div>
-              <div className={styles.input_telefone}>
-                <span>Gasto com Energia</span>
-                <CurrencyInput
-                  fullWidth
-                  // customInput={TextField}
-                  className="label__text"
-                  label="Consumo Médio de Energia"
-                  placeholder="R$ 00"
-                  intlConfig={{ locale: "pt-BR", currency: "BRL" }}
-                  onValueChange={handleOnValueChange}
-                  fixedDecimalLength={0}
-                  value={consumo || ''}
-                  min={50}
-                  required
-                  color="primary" />
-              </div>
-            </div>
-            <div className={styles.label_last}>
-            <p>Cliente pretende adquirir equipamento elétrico de alto consumo após a instalação do sistema FV?</p>
-            <TextField
-                  margin="dense"
-                  id="name"
-                  type="text"
-                  rows={2}
-                  label="Resposta"
-                  multiline
-                  value={anotacao ? anotacao : ''}
-                  onChange={(e) => setAnotacao(e.target.value)}
-                  fullWidth
-                  required
-                  variant="outlined" />
-            </div>
-            <div className={styles.input_file}>
-              <Button component="label" variant="contained" onChange={(e) => setFatura({ file: URL.createObjectURL(e.target.files[0]), complete: e.target.files[0] })} startIcon={<CloudUploadIcon />}>
-                Enviar Fatura
-                <VisuallyHiddenInput type="file" accept="image/png,image/jpeg" />
-              </Button>
-              {fatura &&
-                <Button variant='outlined' color='success' onClick={() => setOpenFatura(true)} endIcon={<CheckIcon />}>Visualizar</Button>}
-              <div className={styles.input_file_icon}></div>
-            </div>
-          </ThemeProvider>
-          <ThemeProvider theme={theme}>
-            <DialogActions sx={{ justifyContent: 'center' }}>
-              <Button variant='outlined' type="submit">Proximo</Button>
-              <Button variant='outlined' color="error" onClick={() => close()}>Cancelar</Button>
-            </DialogActions>
-          </ThemeProvider>
-        </form>
-      </DialogContent>
       }
+      {viewVisit && viewVisit === 'dados' &&
+        <DialogContent>
+          <DialogContentText sx={{ textAlign: "center" }}>
+            Preencha os campos abaixo para solicitar um <b>Orçamento</b>.
+          </DialogContentText>
+          <form onSubmit={onVisit}>
+            <ThemeProvider theme={theme}>
+              <TextField
+                autoFocus
+                margin="dense"
+                onChange={(e) => setNome(e.target.value)}
+                id="name"
+                label="Nome Completo"
+                type="text"
+                value={nome ? nome : ''}
+                fullWidth
+                // required
+                variant="outlined" />
+              <div className={styles.label_content}>
+                <div className={styles.input_telefone}>
+                  <span>Telefone</span>
+                  <PatternFormat
+                    className="label__input"
+                    onChange={(e) => setTelefone(e.target.value)}
+                    format="## (##) ##### ####"
+                    mask="_"
+                    placeholder="00 (00) 00000 0000"
+                    value={telefone ? telefone : ''}
+                    label="Telefone"
+                    minLength={9}
+                    variant="outlined"
+                    color="primary"
+                    required 
+                    />
+                </div>
+                <div className={styles.input_telefone}>
+                  <span>CPF</span>
+                  <PatternFormat
+                    className="label__input"
+                    onChange={(e) => setCpf(e.target.value)}
+                    format="###.###.###-##"
+                    mask="_"
+                    placeholder="000.000.000-00"
+                    value={cpf ? cpf : ''}
+                    label="Telefone"
+                    minLength={9}
+                    variant="outlined"
+                    color="primary"
+                    required 
+                    />
+                </div>
+              </div>
+              <div className={styles.label_content}>
+                <div className={styles.input_telefone}>
+                  <span>Data de Nascimento</span>
+                  <PatternFormat
+                    className="label__input"
+                    onChange={(e) => setDataNascimento(e.target.value)}
+                    format="##/##/####"
+                    mask="_"
+                    placeholder="00/00/0000"
+                    value={dataNascimento ? dataNascimento : ''}
+                    label="Data de Nascimento"
+                    minLength={9}
+                    variant="outlined"
+                    color="primary"
+                    required 
+                    />
+                </div>
+                <div className={styles.input_telefone}>
+                  <span>Gasto com Energia</span>
+                  <CurrencyInput
+                    fullWidth
+                    // customInput={TextField}
+                    className="label__text"
+                    label="Consumo Médio de Energia"
+                    placeholder="R$ 00"
+                    intlConfig={{ locale: "pt-BR", currency: "BRL" }}
+                    onValueChange={handleOnValueChange}
+                    fixedDecimalLength={0}
+                    value={consumo || ''}
+                    min={50}
+                    required
+                    color="primary" />
+                </div>
+              </div>
+              <div className={styles.label_last}>
+              <p>Cliente pretende adquirir equipamento elétrico de alto consumo após a instalação do sistema FV?</p>
+              <TextField
+                    margin="dense"
+                    id="name"
+                    type="text"
+                    rows={2}
+                    label="Resposta"
+                    multiline
+                    value={anotacao ? anotacao : ''}
+                    onChange={(e) => setAnotacao(e.target.value)}
+                    fullWidth
+                    required
+                    variant="outlined" />
+              </div>
+              <div className={styles.input_file}>
+                <Button component="label" variant="contained" onChange={(e) => setFatura({ file: URL.createObjectURL(e.target.files[0]), complete: e.target.files[0] })} startIcon={<CloudUploadIcon />}>
+                  Enviar Fatura
+                  <VisuallyHiddenInput type="file" accept="image/png,image/jpeg" />
+                </Button>
+                {fatura &&
+                  <Button variant='outlined' color='success' onClick={() => setOpenFatura(true)} endIcon={<CheckIcon />}>Visualizar</Button>}
+                <div className={styles.input_file_icon}></div>
+              </div>
+            </ThemeProvider>
+            <ThemeProvider theme={theme}>
+              <DialogActions sx={{ justifyContent: 'center' }}>
+                <Button variant='outlined' type="submit">Proximo</Button>
+                <Button variant='outlined' color="error" onClick={() => close()}>Cancelar</Button>
+              </DialogActions>
+            </ThemeProvider>
+          </form>
+        </DialogContent>
+      }
+      
     </Dialog>
     <Dialog
     className={styles.fatura_container}
