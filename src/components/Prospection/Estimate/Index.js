@@ -188,7 +188,18 @@ const Estimate = ({data, visits, members, openEstimate, close, open, userRef}) =
 
   const onVisit = (e) => {
     e.preventDefault();
-    setviewVisit('visita');
+    if(fatura) {
+      setviewVisit('visita');
+    } else {
+      Swal.fire({
+        title: 'Fatura',
+        html: `Envie a <b>Fatura</b> para continuar o Orçamento.`,
+        icon: "error",
+        showCloseButton: true,
+        confirmButtonColor: "#F39200",
+        confirmButtonText: "Ok",
+      })
+    }
   }
 
   const onSubmit = async (e) => {
@@ -366,7 +377,7 @@ const Estimate = ({data, visits, members, openEstimate, close, open, userRef}) =
     <Dialog
       className={styles.dialog}
       open={openEstimate}
-      fullScreen
+      fullScreen={fullScreen}
       maxWidth="md"
       sx={{ zIndex: 90 }}
       onClose={() => closeBox()}
@@ -510,7 +521,7 @@ const Estimate = ({data, visits, members, openEstimate, close, open, userRef}) =
              <ThemeProvider theme={theme}>
             <DialogActions sx={{ justifyContent: 'center' }}>
               <Button variant='outlined' color='success' type="submit">Solicitar</Button>
-              <Button variant='outlined' color="error" onClick={() => setviewVisit(false)}>Voltar</Button>
+              <Button variant='outlined' color="error" onClick={() => setviewVisit('dados')}>Voltar</Button>
             </DialogActions>
           </ThemeProvider>
           </form>

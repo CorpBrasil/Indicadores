@@ -1,7 +1,12 @@
 import React from 'react'
 import { useState, useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import moment from 'moment';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
 
 import { ReactComponent as ScheduleIcon2 } from "../../../images/icons/Schedule2.svg";
 import { ReactComponent as CheckIcon } from "../../../images/icons/Check.svg";
@@ -10,29 +15,32 @@ import { ReactComponent as ProspectionIcon } from '../../../images/icons/Prospec
 import RequestQuoteIcon from '@mui/icons-material/RequestQuote'; // Visita Comercial
 import PeopleIcon from '@mui/icons-material/People'; // Tecnica + Comercial
 import EngineeringIcon from '@mui/icons-material/Engineering'; // Pós Venda
-import { ReactComponent as Email } from '../../../images/icons/Mail.svg';
-import { ReactComponent as Phone } from '../../../images/icons/Phone.svg';
-import { ReactComponent as WhatsApp } from '../../../images/icons/WhatsApp.svg';
+import PersonIcon from '@mui/icons-material/Person'; // Ativo
+import HowToRegIcon from '@mui/icons-material/HowToReg'; // Ganho
+import PersonOffIcon from '@mui/icons-material/PersonOff'; // Perdido
+import ContactPageIcon from '@mui/icons-material/ContactPage'; // Orçamento
+import AssignmentIndIcon from '@mui/icons-material/AssignmentInd'; // Apresentação
 
-const Dashboard = ({ schedule, monthSelect, type, total }) => {
+const Dashboard = ({ data, monthSelect, type, total, sellers }) => {
   const [dataChart, setdataChart] = useState();
   const [data1, setData1] = useState();
   const [data2, setData2] = useState();
   const [data3, setData3] = useState();
+  const [ganho, setGanho] = useState();
+  const [perdido, setPerdido] = useState();
   const [confirmar, setConfirmar] = useState();
   const [nconfirmar, setNconfirmar] = useState();
   const [visitas, setVisitas] = useState();
-  const [atividadesHoje, setAtividadesHoje] = useState();
   const [mes, setMes] = useState();
 
   useEffect(() => {
-    if (schedule && monthSelect && type !== 'prospeccao') {
-          setData1(schedule.filter((vis) => vis.categoria === 'comercial').length);
-          setData2(schedule.filter((vis) => vis.categoria === 'comercial_tecnica').length);
-          setData3(schedule.filter((vis) => vis.categoria === 'pos_venda').length);
-          setConfirmar(schedule.filter((vis) => vis.confirmar === true).length);
-          setNconfirmar(schedule.filter((vis) => vis.confirmar === false).length);
-          setVisitas(schedule.filter((vis) => vis.categoria !== 'lunch').length);
+    if (data && monthSelect && type !== 'prospeccao') {
+          setData1(data.filter((vis) => vis.categoria === 'comercial').length);
+          setData2(data.filter((vis) => vis.categoria === 'comercial_tecnica').length);
+          setData3(data.filter((vis) => vis.categoria === 'pos_venda').length);
+          setConfirmar(data.filter((vis) => vis.confirmar === true).length);
+          setNconfirmar(data.filter((vis) => vis.confirmar === false).length);
+          setVisitas(data.filter((vis) => vis.categoria !== 'lunch').length);
           switch(monthSelect) {
               case '01':
                 setMes('Janeiro');
@@ -74,76 +82,43 @@ const Dashboard = ({ schedule, monthSelect, type, total }) => {
                 break;
             }
       }
-    if(schedule && type === 'prospeccao') {
-      setData1(schedule.filter((vis) => vis.atividade === 'Email').length);
-      setData2(schedule.filter((vis) => vis.atividade === 'Ligação').length);
-      setData3(schedule.filter((vis) => vis.atividade === 'WhatsApp').length);
-      setAtividadesHoje(schedule.filter((act) => act.dataRef === moment(new Date()).format('YYYY-MM-DD')));
+    if(data && type === 'prospeccao') {
+      setGanho(data.filter((vis) => vis.status === 'Ganho').length)
+      setPerdido(data.filter((vis) => vis.status === 'Perdido').length)
+      setData1(data.filter((vis) => vis.status === 'Ativo').length);
+      setData2(data.filter((vis) => vis.status === 'Orçamento').length);
+      setData3(data.filter((vis) => vis.status === 'Apresentação').length);
     }
-  }, [monthSelect, schedule, type]);
+  }, [monthSelect, data, type]);
+
+  console.log(data)
 
   useEffect(() => {
-    if(schedule) {
-      if(type === 'prospeccao') {
+    if(data) {
+      if(type === 'visit') {
         setdataChart([
           {
             name: 'Ana',
-            Atividades: schedule.filter((con) => con.consultora === 'Ana').length,
+            Visitas: data.filter((con) => con.consultora === 'Ana').length,
             fill: '#F28500'
           },
           {
             name: 'Bruna',
-            Atividades: schedule.filter((con) => con.consultora === 'Bruna').length,
+            Visitas: data.filter((con) => con.consultora === 'Bruna').length,
             fill: '#44BF2B'
           },
           {
             name: 'Lia',
-            Atividades: schedule.filter((con) => con.consultora === 'Lia').length,
+            Visitas: data.filter((con) => con.consultora === 'Lia').length,
             fill: '#E892DD'
-          },
-          {
-            name: 'Fernanda',
-            Atividades: schedule.filter((con) => con.consultora === 'Fernanda').length,
-            fill: '#FFC107'
-          },
-          {
-            name: 'Leticia',
-            Atividades: schedule.filter((con) => con.consultora === 'Leticia').length,
-            fill: '#B901C6'
-          }
-        ])
-      } else {
-        setdataChart([
-          {
-            name: 'Ana',
-            Visitas: schedule.filter((con) => con.consultora === 'Ana').length,
-            fill: '#F28500'
-          },
-          {
-            name: 'Bruna',
-            Visitas: schedule.filter((con) => con.consultora === 'Bruna').length,
-            fill: '#44BF2B'
-          },
-          {
-            name: 'Lia',
-            Visitas: schedule.filter((con) => con.consultora === 'Lia').length,
-            fill: '#E892DD'
-          },
-          {
-            name: 'Fernanda',
-            Visitas: schedule.filter((con) => con.consultora === 'Fernanda').length,
-            fill: '#FFC107'
-          },
-          {
-            name: 'Leticia',
-            Visitas: schedule.filter((con) => con.consultora === 'Leticia').length,
-            fill: '#B901C6'
           }
         ])
       }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  },[schedule])
+  },[data])
+
+  console.log(data)
 
   return (
     <div className="dashboard">
@@ -152,8 +127,8 @@ const Dashboard = ({ schedule, monthSelect, type, total }) => {
           <div className="dashboard__box1">
             {type === 'prospeccao' ? 
             <div className="dashboard__box1-info">
-              <h1>{schedule && schedule.length}</h1>
-              <h2>Atividades Totais</h2>
+              <h1>{data && data.length}</h1>
+              <h2>Leads</h2>
             </div> :
             <div className="dashboard__box1-info">
               <h1>{visitas}</h1>
@@ -182,8 +157,16 @@ const Dashboard = ({ schedule, monthSelect, type, total }) => {
             }
             {type === 'prospeccao' && 
               <div className="dashboard__box1-info">
-              <h1>{atividadesHoje && atividadesHoje.length}</h1>
-              <h2>Atividades Hoje</h2>
+              <div>
+                <HowToRegIcon sx={{ fill: 'green' }} />
+                <h1>{ganho ? ganho : 0}</h1>
+                <p>Ganho(s)</p>
+              </div>
+              <div>
+                <PersonOffIcon sx={{ fill: 'red' }} />
+                <h1>{perdido ? perdido : 0}</h1>
+                <p>Perdido(s)</p>
+              </div>
             </div>
             }
           </div>
@@ -192,26 +175,26 @@ const Dashboard = ({ schedule, monthSelect, type, total }) => {
             <div className="dashboard__box2-icon">
               <ProspectionIcon />
             </div>
-            <h2>Atividades</h2>
+            <h2>Leads</h2>
             <ul className="dashboard__box2-visits">
               <li>
                 <div className="dashboard__box2-visits-info">
-                  <span className="visit-icon mail"><Email /></span>
-                  <p>Email</p>
+                  <span className="visit-icon ativo"><PersonIcon /></span>
+                  <p>Ativo</p>
                 </div>
               <h3>{data1}</h3>
               </li>
               <li>
                 <div className="dashboard__box2-visits-info">
-                  <span className="visit-icon phone"><Phone /></span>
-                  <p>Ligação</p>
+                  <span className="visit-icon orcamento"><ContactPageIcon /></span>
+                  <p>Orçamento</p>
                 </div>
               <h3>{data2}</h3>
               </li>
               <li>
                 <div className="dashboard__box2-visits-info">
-                  <span className="visit-icon whatsapp"><WhatsApp /></span>
-                  <p>WhatsApp</p>
+                  <span className="visit-icon apresentacao"><AssignmentIndIcon /></span>
+                  <p>Apresentação</p>
                 </div>
               <h3>{data3}</h3>
               </li>
@@ -249,28 +232,36 @@ const Dashboard = ({ schedule, monthSelect, type, total }) => {
         }
           {type === 'prospeccao' ?
           <div className="dashboard__box3">
-            <h2>Atividades por Consultoras</h2>
-            <ResponsiveContainer width="90%" height="80%">
-            <BarChart
-              width='100%'
-              height='100%'
-              data={dataChart}
-              margin={{
-                top: 5,
-                right: 30,
-                bottom: 5,
-              }}
-            >
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" />
-              <YAxis />
-              <Tooltip />
-              {type === 'prospeccao' ? 
-              <Bar dataKey="Atividades" fill="#8884d8" /> :
-              <Bar dataKey="Visitas" fill="#8884d8" />
-            }
-            </BarChart>
-            </ResponsiveContainer>
+            <h2>Ranking de Indicadores</h2>
+            <TableContainer>
+              <Table stickyHeader aria-label="sticky table">
+                <TableHead>
+                  <TableRow>
+                    <TableCell align="center">Nome</TableCell>
+                    <TableCell align="center">Cidade</TableCell>
+                    <TableCell align="center">Leads</TableCell>
+                    <TableCell align="center">Ganho</TableCell>
+                    <TableCell align="center">Perdido</TableCell>
+                  </TableRow>
+                </TableHead>
+                {sellers && sellers.map((seller, index) => (
+                <TableBody>
+                  <TableRow
+                    key={index}
+                    hover
+                    className={`list-visit`}
+                    sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+                    <TableCell align="center">{seller.nome}</TableCell>
+                    <TableCell align="center">{seller.cidade.cidade}</TableCell>
+                    <TableCell align="center">{data && data.filter((item) => item.uid === seller.id).length}</TableCell>
+                    <TableCell align="center">{data && data.filter((item) => item.uid === seller.id && item.status === 'Ganho').length}</TableCell>
+                    <TableCell align="center">{data && data.filter((item) => item.uid === seller.id && item.status === 'Perdido').length}</TableCell>
+                  </TableRow>
+              </TableBody>
+                ))}
+              </Table>
+            </TableContainer>
+            {/* Parei aqui */}
           </div> :
           <div className="dashboard__box3">
           <h2>Visitas por Consultoras</h2>

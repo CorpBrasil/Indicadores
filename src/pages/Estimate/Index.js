@@ -162,12 +162,6 @@ const confirmEstimate = (data) => {
       icon: "question",
       text: 'Deseja confirmar que o orçamento foi criado?',
       input: 'text',
-      inputLabel: 'Deixe uma anotação sobre o Orçamento para o indicador.',
-      inputValidator: (value) => {
-        if (!value) {
-          return 'Deixe uma observação sobre o Orçamento'
-        }
-      },
       showCancelButton: true,
       showCloseButton: true,
       confirmButtonColor: "#F39200",
@@ -287,11 +281,6 @@ const closeFatura = () => {
 
   return (
     <div className={styles.container_panel}>
-        {/* {loading && loading &&
-          <Box className="loading">
-              <CircularProgress />
-          </Box>
-        } */}
       <Header user={user} userRef={userRef}></Header>
       <div className={styles.title_panel}>
         <ContentPasteIcon className={styles.prospecction_icon}/>
@@ -300,16 +289,6 @@ const closeFatura = () => {
       </div>
       <div className={styles.content_panel}>
         <div className={styles.box_panel}>
-            {/* <h2>Leads</h2> */}
-          {/* <div className={styles.box_panel_add}> */}
-              {/* {userRef && userRef.cargo === "Administrador" && 
-              <><button className={styles.box_panel_add_activity} onClick={() => setViewImport(true)}>
-                    <PersonAddAltIcon className={styles.prospecction_icon} />
-                    <p>Importar Leads</p>
-                  </button><ImportLeads members={members} company={Company} dataBase={dataBase} view={viewImport}
-                    open={openImport} close={closeImport} userRef={userRef} changeLoading={changeLoading} /></>
-                  } */}    
-          {/* </div> */}
             <Filter tableData={orcamentosUser} 
             dataFull={orcamento} 
             sellers={sellersOrder} 
@@ -465,7 +444,7 @@ const closeFatura = () => {
                                   Visualizar Fatura
                                 </Button>
                                 </ThemeProvider>
-                                {data && data.status !== "Ativo" && 
+                                {data && data.status === "Ativo" && 
                                 <><Button
                                 variant="contained"
                                 color="success"

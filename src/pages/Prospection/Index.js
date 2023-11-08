@@ -484,7 +484,7 @@ const closeAnotacaoBox = () => {
       <div className={`${styles.title_panel} ${styles.desktop}`}>
         <ProspectionIcon className={styles.prospecction_icon}/>
         <h2>Prospecção</h2>
-          <Dashboard type={'prospeccao'} />
+          <Dashboard data={leads} type={'prospeccao'} sellers={sellers} />
       </div>
       <div className={styles.content_panel}>
         <div className={styles.box_panel}>
@@ -770,7 +770,6 @@ const closeAnotacaoBox = () => {
               open={openDialog}
               fullWidth={true}
               maxWidth='sm'
-              size
               onClose={() => setAnotacaoBox({state:false})}
             >
                 <DialogTitle>
