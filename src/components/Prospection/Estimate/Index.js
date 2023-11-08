@@ -100,14 +100,13 @@ const Estimate = ({data, visits, members, openEstimate, close, open, userRef}) =
   })
 
   useEffect(() => {
-    const dataLoad = () => {
+    if(openEstimate){
       navigator.geolocation.getCurrentPosition(function (position) {
-        setLat(position.coords.latitude);
-        setLng(position.coords.longitude);
-      }) 
+          setLat(position.coords.latitude);
+          setLng(position.coords.longitude);
+    })
     }
-    dataLoad();
-  },[])
+  },[openEstimate])
 
   useEffect(() => {
     // console.log(visitaNumero);
@@ -183,7 +182,6 @@ const Estimate = ({data, visits, members, openEstimate, close, open, userRef}) =
       setNome(data && data.nome);
       setTelefone(data && data.telefone);
       setConsumo(data && data.consumo);
-      setLoading(true);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   },[openEstimate])
@@ -197,7 +195,6 @@ const Estimate = ({data, visits, members, openEstimate, close, open, userRef}) =
         let visitID;
         e.preventDefault();
         try {
-          // close();
           if(visitsFindCount < 0 || visitsFindCount > 0){
             return Swal.fire({
               title: 'CORPBRASIL',
@@ -369,7 +366,7 @@ const Estimate = ({data, visits, members, openEstimate, close, open, userRef}) =
     <Dialog
       className={styles.dialog}
       open={openEstimate}
-      fullScreen={fullScreen}
+      fullScreen
       maxWidth="md"
       sx={{ zIndex: 90 }}
       onClose={() => closeBox()}

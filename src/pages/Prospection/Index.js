@@ -463,18 +463,23 @@ const closeAnotacaoBox = () => {
   }
 
   const openBox = () => {
-    setOpenEstimate(true);
+    navigator.geolocation.getCurrentPosition((position) => {
+      setOpenEstimate(true);
+    },
+    (error) => {
+      Swal.fire({
+        title: 'GPS Desativado',
+        html: `Ative o <b>GPS</b> para solicitar o Orçamento.`,
+        icon: "error",
+        showCloseButton: true,
+        confirmButtonColor: "#F39200",
+        confirmButtonText: "Ok",
+      })
+  })
   }
-
-  console.log(window.innerWidth)
 
   return (
     <div className={styles.container_panel}>
-        {/* {loading && loading &&
-          <Box className="loading">
-              <CircularProgress />
-          </Box>
-        } */}
       <Header user={user} userRef={userRef}></Header>
       <div className={`${styles.title_panel} ${styles.desktop}`}>
         <ProspectionIcon className={styles.prospecction_icon}/>
@@ -496,14 +501,7 @@ const closeAnotacaoBox = () => {
               </button> 
               :
               <CreateProspection userRef={userRef} returnPage={returnPage} changeLoading={changeLoading} />
-            }
-              {/* {userRef && userRef.cargo === "Administrador" && 
-              <><button className={styles.box_panel_add_activity} onClick={() => setViewImport(true)}>
-                    <PersonAddAltIcon className={styles.prospecction_icon} />
-                    <p>Importar Leads</p>
-                  </button><ImportLeads members={members} company={Company} dataBase={dataBase} view={viewImport}
-                    open={openImport} close={closeImport} userRef={userRef} changeLoading={changeLoading} /></>
-                  } */}    
+            }  
           </div>
           <div style={{ padding: '0 1rem' }}>
           <Filter tableData={leadsUser} 
@@ -709,7 +707,7 @@ const closeAnotacaoBox = () => {
                                   size="small"
                                   type="submit"
                                   startIcon={<ContentPasteGoIcon />}
-                                  onClick={() => setOpenEstimate(true)}
+                                  onClick={() => openBox()}
                                 >
                                   Gerar Orçamento
                                 </Button>}
