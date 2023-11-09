@@ -6,6 +6,18 @@
   }
 }
 
+@media (max-width: 650px) {
+  .desktop-650 {
+    display: none!important;
+  }
+}
+
+@media (min-width: 750px) {
+  .mobile{
+    display: none!important;
+  }
+}
+
 /* Scroll bar */
 * {
   margin: 0;
@@ -15,6 +27,7 @@
 .swal2-container {
   z-index: 11111;
 }
+
 
 body {
   margin: 0;

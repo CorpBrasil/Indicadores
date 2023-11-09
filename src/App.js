@@ -127,11 +127,17 @@ function App() {
               <Route exact path="/financeiro/:year" element={<Finance userRef={userRef} alerts={userAlerts} sellers={sellers} reports={reports} />} />
             } */}
             {/* <Route exact path="/orcamento" element={<Alert user={user} userRef={userRef} orcamento={orcamento} check={check} reports={reports} />} /> */}
-            <Route exact path="/relatorio" element={<Report user={user} userRef={userRef} check={check} reports={reports} />} />
             <Route exact path="/prospeccao" element={<Prospecction user={user} userRef={userRef} leads={leads} visits={visits} listLeads={listLeads} members={members} sellers={sellers} check={check} reports={reports} />} />
-            <Route exact path="/orcamento" element={<Estimate user={user} userRef={userRef} orcamento={orcamento} visits={visits} members={members} sellers={sellers} check={check} />} />
-            <Route exact path="/gestao-comercial" element={<Commercial user={user} userRef={userRef} leads={leads} activity={activity} listLeads={listLeads} members={members} sellers={sellers} check={check} reports={reports}/>} />
-            <Route path="/agenda/:year" element={<Schedule userRef={userRef} members={members} visits={visits} tecs={tecs} sellers={sellers} check={check} reports={reports} />} /> 
+            {userRef && (userRef.cargo !== 'Indicador' && userRef.cargo !== 'Técnico') && 
+              <><Route exact path="/relatorio" element={<Report user={user} userRef={userRef} check={check} reports={reports} />} />
+              <Route exact path="/orcamento" element={<Estimate user={user} userRef={userRef} orcamento={orcamento} visits={visits} members={members} sellers={sellers} check={check} />} /></> 
+            }
+            {userRef && userRef.cargo !== 'Indicador' && 
+              <Route path="/agenda/:year" element={<Schedule userRef={userRef} members={members} visits={visits} tecs={tecs} sellers={sellers} check={check} reports={reports} />} />
+            }
+            {userRef && userRef.cargo === 'Gestor' && 
+              <Route exact path="/gestao-comercial" element={<Commercial user={user} userRef={userRef} leads={leads} activity={activity} listLeads={listLeads} members={members} sellers={sellers} check={check} reports={reports}/>} />
+            }
             <Route path="*" element={<Schedules userRef={userRef} check={check} reports={reports} />} />
           </Route>
           <Route exact path="/login" element={<Login />} />

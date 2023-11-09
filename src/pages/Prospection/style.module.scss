@@ -43,7 +43,7 @@
   gap: 0.5rem;
 }
 
-.ativo, .orcamento, .orcamento_negado, .apresentacao, .ganho, .perdido {
+.ativo, .orcamento, .orcamento_negado, .apresentacao_wait, .apresentacao, .ganho, .perdido {
   font-size: 0.8rem!important;
   text-transform: uppercase;
   font-weight: bold!important;
@@ -64,9 +64,12 @@
 }
 .orcamento_negado {
   color: #f44b03!important;
-  background-color: #ffeee9;
+  background-color: #fff3e9;
 }
-
+.apresentacao_wait {
+  color: rgb(78 18 252)!important;
+  background-color: #dfdcfa;
+}
 .apresentacao {
   color: rgb(18, 108, 252)!important;
   background-color: #dce9fa;
@@ -206,6 +209,18 @@
           }
 
           tbody {
+            .icon_status {
+              padding: 0!important;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              border: none!important;
+
+              path {
+                width: 20px;
+                fill: #fff;
+              }
+            }
             td {
               height: 39px;
               font-weight: 100;

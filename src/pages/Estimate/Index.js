@@ -175,7 +175,7 @@ const confirmEstimate = (data) => {
           dataStatus: moment().format('DD MMMM YYYY - HH:mm'),
         }).then(async() => {
           await updateDoc(doc(dataBase, 'Leads', data.leadRef), {
-            status: 'Apresentação',
+            status: 'Aguardando Apresentação',
             step: 3,
             orcamento: {
               data: moment().format('DD MMMM YYYY - HH:mm'),
@@ -444,7 +444,7 @@ const closeFatura = () => {
                                   Visualizar Fatura
                                 </Button>
                                 </ThemeProvider>
-                                {data && data.status === "Ativo" && 
+                                {data && data.status === "Em Espera" && 
                                 <><Button
                                 variant="contained"
                                 color="success"

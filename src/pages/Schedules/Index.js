@@ -359,7 +359,7 @@ const Schedules = ({ userRef, alerts, check, reports }) => {
            </li>
              </div>
             } */}
-            {userRef && (user.email === Users[0].email || userRef.cargo !== "Técnico") && userRef.nome !== 'Pós-Venda' &&
+            {userRef && userRef.cargo !== 'Indicador' &&
             <div className='box-schedule'>
               <li className='schedule'>
                 <Link className='schedule__content' to="/agenda/2023">

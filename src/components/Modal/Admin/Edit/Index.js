@@ -40,6 +40,7 @@ const EditAdmin = ({members, memberRef, open, close, openBox }) => {
   const [indicadores, setIndicadores] = useState([]);
   const [orcamentistaRef, setOrcamentistaRef] = useState([]);
   const [orcamentista, setOrcamentista] = useState([]);
+  const [pix, setPix] = useState('');
 
   console.log(idCidade)
 
@@ -97,6 +98,7 @@ const EditAdmin = ({members, memberRef, open, close, openBox }) => {
  useEffect(() => {
   if(open) {
     // setCor(memberRef && memberRef.cor);
+    setPix(memberRef && memberRef.pix);
     setTelefone(memberRef && memberRef.telefone);
     setCargo(memberRef && memberRef.cargo);
     if(memberRef && memberRef.cargo === 'Orçamentista') {
@@ -144,27 +146,31 @@ const EditAdmin = ({members, memberRef, open, close, openBox }) => {
                       nome: orcamentista.nome,
                       uid: orcamentista.uid
                     },
-                    cor: cidade.cor
+                    cor: cidade.cor,
+                    pix: pix
                   }
                 break
                 case 'Orçamentista':
                   data = {
                     cargo: cargo,
                     id_crm: idCRM,
-                    telefone: telefone
+                    telefone: telefone,
+                    pix: pix
                   }
                 break
                 case 'Closer':
                   data = {
                     veiculo: veiculo,
                     cargo: cargo,
-                    telefone: telefone
+                    telefone: telefone,
+                    pix: pix
                   }
                 break
                 default: 
                   data = {
                     cargo: cargo,
-                    telefone: telefone
+                    telefone: telefone,
+                    pix: pix
                   }
               }
               await updateDoc(doc(dataBase,"Membros", memberRef.id), data).then((result) => {
@@ -244,51 +250,70 @@ const EditAdmin = ({members, memberRef, open, close, openBox }) => {
               </Select>
             </FormControl>
             {cargo && cargo === 'Indicador' && 
+          <><div className={styles.label_content}>
+          <TextField
+            autoFocus
+            margin="dense"
+            id="name"
+            label="CPF"
+            type="text"
+            value={memberRef.cpf ? memberRef.cpf : ''}
+            fullWidth
+            disabled
+            variant="outlined" />
+          <TextField
+            autoFocus
+            margin="dense"
+            id="name"
+            label="CNPJ"
+            type="text"
+            value={memberRef.cnpj ? memberRef.cnpj : ''}
+            fullWidth
+            disabled
+            variant="outlined" />
+        </div>
           <FormControl sx={{ margin: "0.3rem 0" }} fullWidth>
-            <InputLabel id="simple-select-label">Orçamentista</InputLabel>
-            <Select
-              labelId="simple-select-label"
-              id="simple-select"
-              displayEmpty
-              sx={{ margin: '0.3rem 0' }}
-              value={orcamentista ? orcamentista : ''}
-              label="Orçament"
-              onChange={(e) => setOrcamentista(e.target.value)}
-              required
-              >
-                {orcamentistaRef && orcamentistaRef.map((data) => (
-                <MenuItem value={data}>{data.nome}</MenuItem>
-                ))}
-            </Select>
-          </FormControl> 
-          }
-            {cargo && cargo === 'Indicador' && 
-            <><FormControl sx={{ margin: "0.3rem 0" }} fullWidth>
-                <Autocomplete
-                  disablePortal
-                  fullWidth
+                <InputLabel id="simple-select-label">Orçamentista</InputLabel>
+                <Select
+                  labelId="simple-select-label"
+                  id="simple-select"
+                  displayEmpty
                   sx={{ margin: '0.3rem 0' }}
-                  value={cidade ? cidade : { code: '00', cidade: 'Nenhuma' }}
-                  onChange={(event, newValue) => {
-                    setCidade(newValue);
-                  } }
-                  color="primary"
-                  clearText='Escolha uma cidade'
-                  clearOnEscape={true}
-                  isOptionEqualToValue={(option, value) => option.id === value.id}
-                  getOptionLabel={(option) => option.cidade + ' - ' + option.code}
-                  options={listCidades ? listCidades : ['']}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      label="Cidade"
-                      required
-                      helperText={checkCidade ? 'Selecione uma cidade' : ''}
-                      error={checkCidade}
-                      style={{ zindex: 111111 }}
-                      color="primary" />
-                  )} />
-              </FormControl><TextField
+                  value={orcamentista ? orcamentista : ''}
+                  label="Orçament"
+                  onChange={(e) => setOrcamentista(e.target.value)}
+                  required
+                >
+                  {orcamentistaRef && orcamentistaRef.map((data) => (
+                    <MenuItem value={data}>{data.nome}</MenuItem>
+                  ))}
+                </Select>
+              </FormControl><FormControl sx={{ margin: "0.3rem 0" }} fullWidth>
+                  <Autocomplete
+                    disablePortal
+                    fullWidth
+                    sx={{ margin: '0.3rem 0' }}
+                    value={cidade ? cidade : { code: '00', cidade: 'Nenhuma' }}
+                    onChange={(event, newValue) => {
+                      setCidade(newValue);
+                    } }
+                    color="primary"
+                    clearText='Escolha uma cidade'
+                    clearOnEscape={true}
+                    isOptionEqualToValue={(option, value) => option.id === value.id}
+                    getOptionLabel={(option) => option.cidade + ' - ' + option.code}
+                    options={listCidades ? listCidades : ['']}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        label="Cidade"
+                        required
+                        helperText={checkCidade ? 'Selecione uma cidade' : ''}
+                        error={checkCidade}
+                        style={{ zindex: 111111 }}
+                        color="primary" />
+                    )} />
+                </FormControl><TextField
                   label="ID"
                   disabled
                   fullWidth
@@ -344,6 +369,19 @@ const EditAdmin = ({members, memberRef, open, close, openBox }) => {
               required
             />
           </div>
+          <div className={styles.label_content}>
+          <div className={styles.input_telefone}>
+            <span>Chave Pix</span>
+            <input
+              id="name"
+              type="text"
+              value={pix ? pix : ''}
+              onChange={(e) => setPix(e.target.value)}
+              required
+            />
+
+          </div>
+          </div>
           {/* <div>
           <span>Cor</span>
           <input type="color"
@@ -366,59 +404,6 @@ const EditAdmin = ({members, memberRef, open, close, openBox }) => {
         </form>
       </DialogContent>
     </Dialog>
-    // <div className='modal-visit'>
-    //    <div className='modal-box-visit'>
-    //         <div className='modal-box-visit__close'>
-    //             <button onClick={returnAdmin} className='btn-close' />
-    //         </div>
-    //         <h4>Editar {memberRef.cargo === 'Técnico' ? 'Veículo do Técnico' : 'Cor'}</h4> 
-    //     <form className='form-visit' onSubmit={handleSubmit(onSubmit)}>
-    //     <label className="form-visit__label">
-    //     <p>Colaborador(a)</p>
-    //         <input
-    //           className="form-visit__text"
-    //           type="text"
-    //           {...register("nome")}
-    //           disabled
-    //         />
-    //       </label>
-           
-    //       {memberRef.cargo !== 'Técnico' ? 
-    //         (<><div className='form-visit__color' style={{ flexDirection: 'column' }}>
-    //           <p>Escolha uma cor de destaque</p>
-    //           <input
-    //             type="color"
-    //             autoComplete="off"
-    //             value={cor}
-    //             onChange={(e) => setCor(e.target.value)}
-    //             required />
-    //         </div><div className='form-visit__exemple'>
-    //             <h3>Resultado:</h3>
-    //             <p style={cor && {
-    //               backgroundColor: cor,
-    //               borderBottom: '1px solid' + cor,
-    //               borderRight: '1px solid' + cor,
-    //               borderLeft: '1px solid' + cor,
-    //               color: "#fff",
-    //               textShadow: '#5a5a5a -1px 0px 5px',
-    //             }}>{memberRef.nome}</p>
-    //           </div></>) : (<label className="form-visit__label">
-    //        <p>Veículo</p>
-    //         <input
-    //           className="form-visit__text"
-    //           type="number"
-    //           placeholder="Digite o número do Veículo"
-    //           autoComplete="off"
-    //           onInput={(e) => e.target.value = e.target.value.slice(0, 3)}
-    //           {...register("veiculo")}
-    //           required
-    //         />
-    //       </label>)
-    //         }
-    //     <input className='form-visit__btn' type="submit" value="CONFIRMAR"/>
-    //   </form> 
-    //     </div> 
-    // </div>
   )
 }
 

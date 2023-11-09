@@ -123,12 +123,14 @@ useEffect(() => {
         return setTecs(docs.sort());
       })
       tecs && tecs.map((tec, index) => (
-        setTotal(schedule.filter((ref) => ref.tecnico && ref.tecnico !== 'Nenhum' && ref.tecnico !== 'Bruna' && ref.tecnico !== 'Lia').length * 20)
+        setTotal(schedule.filter((ref) => ref.tecnico && ref.tecnico !== 'Nenhum' && ref.tecnico !== 'Bruna' && ref.tecnico !== 'Lia' && ref.consultora !== 'Pós-Venda').length * 20)
       ))
     }
     // console.log(tecs);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   },[members, monthSelect, schedule, scheduleNew])
+
+  console.log(total)
 
   useEffect(
     () => {
@@ -212,7 +214,7 @@ useEffect(() => {
                     ))}
                     <tr className="bg-total">
                       <td>{schedule.filter((ref) => ref.tecnico === tec && ref.tecnico !== "Bruna" && ref.tecnico !== "Lia").length}</td>
-                      <td>{(schedule.filter((ref) => ref.tecnico === tec && ref.tecnico !== 'Bruna' && ref.tecnico !== 'Lia').length * 20).toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})}</td>
+                      <td>{(schedule.filter((ref) => ref.tecnico === tec && ref.tecnico !== 'Bruna' && ref.tecnico !== 'Lia' && ref.consultora !== 'Pós-Venda').length * 20).toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})}</td>
                     </tr>
                   </tbody>
                 </table>
@@ -237,14 +239,14 @@ useEffect(() => {
                       </td>
                       <td>{schedule.filter((ref) => ref.consultora === vend && ref.tecnico === tec).length}</td>
                       <td>
-                      {(schedule.filter((ref) => ref.consultora === vend && ref.tecnico === tec && ref.tecnico !== 'Bruna' && ref.tecnico !== 'Lia').length * 20).toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})}
+                      {(schedule.filter((ref) => ref.consultora === vend && ref.tecnico === tec && ref.tecnico !== 'Bruna' && ref.tecnico !== 'Lia' && ref.consultora !== 'Pós-Venda').length * 20).toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})}
                       </td>
                     </tr>
                     ))}
                     <tr className="bg-total">
                       <td>Total</td>
                       <td>{schedule.filter((ref) => ref.tecnico === tec).length}</td>
-                      <td>{(schedule.filter((ref) => ref.tecnico === tec && ref.tecnico !== 'Bruna' && ref.tecnico !== 'Lia').length * 20).toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})}</td>
+                      <td>{(schedule.filter((ref) => ref.tecnico === tec && ref.tecnico !== 'Bruna' && ref.tecnico !== 'Lia' && ref.consultora !== 'Pós-Venda').length * 20).toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})}</td>
                     </tr>
                   </tbody>
                 </table>
@@ -265,13 +267,13 @@ useEffect(() => {
                       <tr className="table" key={index}>
                       <td>{schedule.filter((ref) => ref.consultora === vend).length}</td>
                       <td>
-                      {(schedule.filter((ref) => ref.consultora === vend && ref.tecnico !== 'Nenhum' && ref.tecnico !== 'Bruna' && ref.tecnico !== 'Lia').length * 20).toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})}
+                      {(schedule.filter((ref) => ref.consultora === vend && ref.tecnico !== 'Nenhum' && ref.tecnico !== 'Bruna' && ref.tecnico !== 'Lia' && ref.consultora !== 'Pós-Venda').length * 20).toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})}
                       </td>
                     </tr>
                     ))}
                     <tr className="bg-total">
                       <td>{schedule.filter((ref) => ref.tecnico).length}</td>
-                      <td>{(schedule.filter((ref) => ref.tecnico && ref.tecnico !== 'Nenhum' && ref.tecnico !== 'Bruna' && ref.tecnico !== 'Lia').length * 20).toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})}</td>
+                      <td>{(schedule.filter((ref) => ref.tecnico && ref.tecnico !== 'Nenhum' && ref.tecnico !== 'Bruna' && ref.tecnico !== 'Lia' && ref.consultora !== 'Pós-Venda').length * 20).toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})}</td>
                     </tr>
                   </tbody>
                 </table>

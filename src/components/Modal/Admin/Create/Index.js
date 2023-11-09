@@ -40,14 +40,17 @@ const CreateAdmin = ({ members, open, close, openBox}) => {
   const [idCRM, setIdCRM] = useState("");
   const [telefone, setTelefone] = useState("");
   const [veiculo, setVeiculo] = useState("");
-  const [idCidade, setidCidade] = useState("");
-  const [cidade, setCidade] = useState({ code: '01', cidade: 'Tietê' });
+  const [idCidade, setidCidade] = useState('100');
+  const [cidade, setCidade] = useState({ code: '01', cidade: 'Tietê', cor: "#FFF2CC" });
   const [checkID, setCheckID] = useState(false);
   const [checkEmail, setCheckEmail] = useState(false);
   const [checkCidade, setCheckCidade] = useState(false);
   const [indicadores, setIndicadores] = useState([]);
   const [orcamentistaRef, setOrcamentistaRef] = useState([]);
   const [orcamentista, setOrcamentista] = useState([]);
+  const [cpf, setCPF] = useState('');
+  const [cnpj, setCNPJ] = useState('');
+  const [pix, setPix] = useState('');
 
   console.log(idCidade);
 
@@ -105,6 +108,7 @@ console.log(orcamentista)
       return null
     } else {
       close();
+      console.log(cidade.cor)
       try {
         Swal.fire({
           title: Company,
@@ -150,7 +154,10 @@ console.log(orcamentista)
                         nome: orcamentista[0].nome,
                         uid: orcamentista[0].uid
                       },
-                      cor: cidade.cor
+                      cor: cidade.cor,
+                      cpf: cpf,
+                      cnpj: cnpj,
+                      pix: pix
                     }
                   break
                   case 'Orçamentista':
@@ -163,7 +170,8 @@ console.log(orcamentista)
                       relatorio: 0,
                       id_user: 0,
                       id_crm: idCRM,
-                      telefone: telefone
+                      telefone: telefone,
+                      pix: pix
                     }
                   break
                   case 'Closer':
@@ -176,7 +184,8 @@ console.log(orcamentista)
                       cargo: cargo,
                       uid: user.uid,
                       relatorio: 0,
-                      telefone: telefone
+                      telefone: telefone,
+                      pix: pix
                     }
                   break
                   default: 
@@ -192,8 +201,6 @@ console.log(orcamentista)
                     }
                 }
                 setDoc(doc(dataBase, "Membros", user.uid), data);
-                // console.log(user);
-                // ...
               })
               .catch((error) => {
                 const errorCode = error.code;
@@ -218,19 +225,6 @@ console.log(orcamentista)
         // console.log(error);
       }
     }
-    // const findEmail = members.find((member) => member.email === email);
-    // if (findEmail) {
-    //   Swal.fire({
-    //     title: Company,
-    //     html: `O email <b>${email}</b> já está cadastrado no sistema.`,
-    //     icon: "warning",
-    //     showConfirmButton: true,
-    //     showCloseButton: true,
-    //     confirmButtonColor: "#F39200",
-    //   });
-    //   return openBox('create');
-    // } else {
-    // }
   };
 
   console.log(cidade)
@@ -318,22 +312,45 @@ console.log(orcamentista)
             </Select>
           </FormControl>
           {cargo && cargo === 'Indicador' && 
-          <FormControl sx={{ margin: "0.3rem 0" }} fullWidth>
-            <InputLabel id="simple-select-label">Orçamentista</InputLabel>
-            <Select
-              labelId="simple-select-label"
-              id="simple-select"
-              sx={{ margin: '0.3rem 0' }}
-              value={orcamentista ? orcamentista[0] : ''}
-              label="Orçament"
-              onChange={(e) => setOrcamentista(e.target.value)}
-              required
-              >
-                {orcamentistaRef && orcamentistaRef.map((data) => (
-                <MenuItem value={data}>{data.nome}</MenuItem>
-                ))}
-            </Select>
-          </FormControl> 
+          <><div className={styles.label_content}>
+                <TextField
+                  autoFocus
+                  margin="dense"
+                  id="name"
+                  label="CPF"
+                  type="text"
+                  value={cpf ? cpf : ''}
+                  onChange={(e) => setCPF(e.target.value)}
+                  fullWidth
+                  required
+                  variant="outlined" />
+                <TextField
+                  autoFocus
+                  margin="dense"
+                  id="name"
+                  label="CNPJ"
+                  type="text"
+                  value={cnpj ? cnpj : ''}
+                  onChange={(e) => setCNPJ(e.target.value)}
+                  fullWidth
+                  required
+                  variant="outlined" />
+              </div><FormControl sx={{ margin: "0.3rem 0" }} fullWidth>
+                  <InputLabel id="simple-select-label">Orçamentista</InputLabel>
+                  <Select
+                    labelId="simple-select-label"
+                    id="simple-select"
+                    sx={{ margin: '0.3rem 0' }}
+                    value={orcamentista ? orcamentista[0] : ''}
+                    label="Orçament"
+                    onChange={(e) => setOrcamentista(e.target.value)}
+                    required
+                  >
+                    {orcamentistaRef && orcamentistaRef.map((data) => (
+                      <MenuItem value={data}>{data.nome}</MenuItem>
+                    ))}
+                  </Select>
+                </FormControl></> 
           }
           <div className={styles.label_content}>
               {cargo && cargo === 'Indicador' && 
@@ -341,7 +358,7 @@ console.log(orcamentista)
                 disablePortal
                 fullWidth
                 sx={{ margin: '0.3rem 0' }}
-                value={cidade ? cidade : { code: '00', cidade: 'Nenhuma' }}
+                value={cidade ? cidade : { code: '00', cidade: 'Nenhuma', cor: '#fff' }}
                 onChange={(event, newValue) => {
                   setCidade(newValue);
                 } }
@@ -420,6 +437,19 @@ console.log(orcamentista)
               required
             />
           </div>
+          <div className={styles.label_content}>
+          <div className={styles.input_telefone}>
+            <span>Chave Pix</span>
+            <input
+              id="name"
+              type="text"
+              value={pix ? pix : ''}
+              onChange={(e) => setPix(e.target.value)}
+              required
+            />
+
+          </div>
+          </div>
           {/* <div>
           <span>Cor</span>
           <input type="color"
@@ -442,105 +472,6 @@ console.log(orcamentista)
         </form>
       </DialogContent>
     </Dialog>
-    // <div className="modal-visit">
-    //   <div className="modal-box-visit">
-    //     <div className="modal-box-visit__close">
-    //       <button onClick={returnAdmin} className="btn-close" />
-    //     </div>
-    //     <h4>Cadastrar novo Colaborador</h4>
-    //     <form className="form-visit" onSubmit={handleSubmit(onSubmit)}>
-    //       <label className="form-visit__label">
-    //         <input
-    //           className="form-visit__text"
-    //           type="text"
-    //           placeholder="Digite o nome"
-    //           autoComplete="off"
-    //           onBlur={(e) => setNome(e.target.value)}
-    //           required
-    //           minLength={3}
-    //         />
-    //       </label>
-    //       <label className="form-visit__label">
-    //         <input
-    //           className="form-visit__text"
-    //           type="email"
-    //           placeholder="Digite o email"
-    //           autoComplete="off"
-    //           {...register("email")}
-    //           required
-    //         />
-    //       </label>
-    //       <div className="form-visit__double">
-    //         <label className="form-visit__label">
-    //           <input
-    //             className="form-visit__text"
-    //             type="text"
-    //             placeholder="Digite a senha"
-    //             autoComplete="off"
-    //             {...register("senha")}
-    //             required
-    //             minLength={6}
-    //           />
-    //         </label>
-    //         <select
-    //           value={cargo}
-    //           name="cargo"
-    //           onChange={(e) => setCargo(e.target.value)}
-    //         >
-    //           <option value="Vendedor(a)">Vendedor(a)</option>
-    //           <option value="Técnico">Técnico</option>
-    //           <option value="Administrador">Administrador</option>
-    //         </select>
-    //       </div>
-    //       {cargo === "Vendedor(a)" || cargo === "Administrador" ? (
-    //         <>
-    //           <div className="form-visit__color">
-    //             <p>Escolha uma cor de destaque</p>
-    //             <input
-    //               type="color"
-    //               autoComplete="off"
-    //               value={cor}
-    //               onChange={(e) => setCor(e.target.value)}
-    //               required
-    //             />
-    //           </div>
-    //           {nome && (
-    //             <div className="form-visit__exemple">
-    //               <h3>Resultado:</h3>
-    //               <p
-    //                 style={
-    //                   cor && {
-    //                     backgroundColor: cor,
-    //                     borderBottom: "1px solid" + cor,
-    //                     borderRight: "1px solid" + cor,
-    //                     borderLeft: "1px solid" + cor,
-    //                     color: "#fff",
-    //                     textShadow: "#5a5a5a -1px 0px 5px",
-    //                   }
-    //                 }
-    //               >
-    //                 {nome}
-    //               </p>
-    //             </div>
-    //           )}
-    //         </>
-    //       ) : (
-    //         <label className="form-visit__label">
-    //           <input
-    //             className="form-visit__text"
-    //             type="number"
-    //             placeholder="Digite o número do veículo"
-    //             autoComplete="off"
-    //             onInput={(e) => (e.target.value = e.target.value.slice(0, 3))}
-    //             {...register("veiculo")}
-    //             required
-    //           />
-    //         </label>
-    //       )}
-    //       <input className="form-visit__btn" type="submit" value="CRIAR" />
-    //     </form>
-    //   </div>
-    // </div>
   );
 };
 

@@ -15,7 +15,7 @@ import '../../styles/_filter.scss';
 import '@wojtekmaj/react-daterange-picker/dist/DateRangePicker.css';
 import 'react-calendar/dist/Calendar.css';
 import "../../components/Dashboard/Visit_and_Prospection/_styles.scss";
-import { theme } from "../../data/theme"
+import { theme } from "../../data/theme";
 
 // Components
 import CreateProspection from "../../components/Prospection/Create/Index";
@@ -30,11 +30,13 @@ import ContentPasteGoIcon from '@mui/icons-material/ContentPasteGo';
 import { ReactComponent as ProspectionIcon } from '../../images/icons/Prospection.svg';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import BlockIcon from '@mui/icons-material/Block';
-import HowToRegIcon from '@mui/icons-material/HowToReg';
-import PersonOffIcon from '@mui/icons-material/PersonOff';
-import RefreshIcon from '@mui/icons-material/Refresh';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import PersonIcon from '@mui/icons-material/Person'; // Ativo
+import HowToRegIcon from '@mui/icons-material/HowToReg'; // Ganho
+import PersonOffIcon from '@mui/icons-material/PersonOff'; // Perdido
+import ContactPageIcon from '@mui/icons-material/ContactPage'; // Orçamento
+import AssignmentIndIcon from '@mui/icons-material/AssignmentInd'; // Apresentação
 
 import Button from "@mui/material/Button";
 import Dialog from '@mui/material/Dialog';
@@ -47,9 +49,6 @@ import FormControl from '@mui/material/FormControl';
 import Stepper from '@mui/material/Stepper';
 import Step from '@mui/material/Step';
 import StepLabel from '@mui/material/StepLabel';
-// import DeleteIcon from '@mui/icons-material/Delete';
-// import PersonAddAltIcon from '@mui/icons-material/PersonAddAlt';
-// import DeleteIcon from '@mui/icons-material/Delete';
 
 import IconButton from '@mui/material/IconButton';
 import Table from '@mui/material/Table';
@@ -184,43 +183,43 @@ const Prospection = ({ user, leads, visits, userRef, listLeads, members, sellers
     }
   }
 
-  const openLead = async (data) => {
-    try {
-      const docRef = doc(dataBase, 'Leads', data.id);
-      Swal.fire({
-        title: Company,
-        html: `Você deseja reabrir o <b>Lead?</b>`,
-        icon: "question",
-        showCancelButton: true,
-        showCloseButton: true,
-        confirmButtonColor: "#F39200",
-        cancelButtonColor: "#d33",
-        confirmButtonText: "Sim",
-        cancelButtonText: "Não",
-      }).then(async (result) => {
-        if(result.isConfirmed) {
-          await updateDoc(docRef, {
-            status: 'Ativo'
-          }).then((result) => {
-            Swal.fire({
-              title: Company,
-              html: `O Lead foi reaberto com sucesso.`,
-              icon: "success",
-              showConfirmButton: true,
-              showCloseButton: true,
-              confirmButtonColor: "#F39200",
-            })
-            axios.post('https://n8n.corpbrasil.cloud/webhook/271dd7a8-0354-4e37-8aaf-b4a955ac836b', {
-              ...data,
-              status: 'Ativo'
-            })
-          });
-        }
-      })
-    } catch(error) {
-      console.log(error)
-    }
-  }
+  // const openLead = async (data) => {
+  //   try {
+  //     const docRef = doc(dataBase, 'Leads', data.id);
+  //     Swal.fire({
+  //       title: Company,
+  //       html: `Você deseja reabrir o <b>Lead?</b>`,
+  //       icon: "question",
+  //       showCancelButton: true,
+  //       showCloseButton: true,
+  //       confirmButtonColor: "#F39200",
+  //       cancelButtonColor: "#d33",
+  //       confirmButtonText: "Sim",
+  //       cancelButtonText: "Não",
+  //     }).then(async (result) => {
+  //       if(result.isConfirmed) {
+  //         await updateDoc(docRef, {
+  //           status: 'Ativo'
+  //         }).then((result) => {
+  //           Swal.fire({
+  //             title: Company,
+  //             html: `O Lead foi reaberto com sucesso.`,
+  //             icon: "success",
+  //             showConfirmButton: true,
+  //             showCloseButton: true,
+  //             confirmButtonColor: "#F39200",
+  //           })
+  //           axios.post('https://n8n.corpbrasil.cloud/webhook/271dd7a8-0354-4e37-8aaf-b4a955ac836b', {
+  //             ...data,
+  //             status: 'Ativo'
+  //           })
+  //         });
+  //       }
+  //     })
+  //   } catch(error) {
+  //     console.log(error)
+  //   }
+  // }
 
   
 
@@ -244,6 +243,7 @@ const Prospection = ({ user, leads, visits, userRef, listLeads, members, sellers
           await updateDoc(docRef, {
             status: 'Ganho',
             anotacao: anotacao,
+            step: 5,
             dataStatus: moment(day).format('DD MMM YYYY - HH:mm')
           }).then((result) => {
             Swal.fire({
@@ -288,7 +288,7 @@ const Prospection = ({ user, leads, visits, userRef, listLeads, members, sellers
         if(result.isConfirmed) {
           await updateDoc(docRef, {
             status: 'Perdido',
-            anotacao: anotacao,
+            motivo: anotacao,
             dataStatus: moment(day).format('DD MMM YYYY - HH:mm')
           }).then((result) => {
             Swal.fire({
@@ -361,7 +361,9 @@ const Prospection = ({ user, leads, visits, userRef, listLeads, members, sellers
   }
 
 const openAnotacaoBox = (act, type) => {
-  setAnotacao(act.anotacao);
+  if(type === 'ganho'){
+    setAnotacao(act.anotacao);
+  }
   setOpenDialog(true);
   setAnotacaoBox({info:act, type:type});
 }
@@ -518,15 +520,11 @@ const closeAnotacaoBox = () => {
               <TableHead>
                 <TableRow>
                   <TableCell align="center">Status</TableCell>
-                  {window.innerWidth > 650 && 
-                  <TableCell align="center">Data de Criação</TableCell>
-                  }
+                  <TableCell align="center" className="desktop-650">Data de Criação</TableCell>
                   <TableCell align="center">Responsável</TableCell>
                   <TableCell align="center">Empresa</TableCell>
                   <TableCell align="center">Cidade</TableCell>
-                  {window.innerWidth > 650 && 
-                  <TableCell align="center">Indicador(a)</TableCell>
-                  }
+                  <TableCell align="center" className="desktop-650">Indicador(a)</TableCell>
                   <TableCell align="center"></TableCell>
                 </TableRow>
               </TableHead>
@@ -540,34 +538,40 @@ const closeAnotacaoBox = () => {
                   // sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                   >
                     {data.status === 'Ativo' &&
-                      <TableCell align="center" className={styles.ativo}>{window.innerWidth > 650 ? data.status : 'AT'}</TableCell>
+                    <><TableCell align="center" sx={{ backgroundColor: "#03a9f4" }} className={`${styles.icon_status} mobile`}><PersonIcon /></TableCell>
+                      <TableCell align="center" className={`${styles.ativo} desktop`}>{data.status}</TableCell></>
                     }
                     {data.status === 'Orçamento' &&
-                      <TableCell align="center" className={styles.orcamento}>{window.innerWidth > 650 ? data.status : 'O'}</TableCell>
+                      <><TableCell align="center" sx={{ backgroundColor: "#f44b03" }} className={`${styles.icon_status} mobile`}><ContactPageIcon /></TableCell>
+                      <TableCell align="center" className={`${styles.orcamento} desktop`}>{data.status}</TableCell></>
                     }
                     {data.status === 'Orçamento Cancelado' &&
-                      <TableCell align="center" className={styles.orcamento_negado}>{window.innerWidth > 650 ? data.status : 'O.C'}</TableCell>
+                      <><TableCell align="center" sx={{ backgroundColor: "#f44b03" }} className={`${styles.icon_status} mobile`}><ContactPageIcon /></TableCell>
+                      <TableCell align="center" className={`${styles.orcamento_negado} desktop`}>{data.status}</TableCell></>
+                    }
+                    {data.status === 'Aguardando Apresentação' &&
+                      <><TableCell align="center" sx={{ backgroundColor: "#4e12fc" }} className={`${styles.icon_status} mobile`}><AssignmentIndIcon /></TableCell>
+                      <TableCell align="center" className={`${styles.apresentacao_wait} desktop`}>{data.status}</TableCell></>
                     }
                     {data.status === 'Apresentação' &&
-                      <TableCell align="center" className={styles.apresentacao}>{window.innerWidth > 650 ? data.status : 'AP'}</TableCell>
+                      <><TableCell align="center" sx={{ backgroundColor: "#126cfc" }} className={`${styles.icon_status} mobile`}><AssignmentIndIcon /></TableCell>
+                      <TableCell align="center" className={`${styles.apresentacao} desktop`}>{data.status}</TableCell></>
                     }
                     {data.status === 'Ganho' &&
+                    <><TableCell align="center" sx={{ backgroundColor: "green" }} className={`${styles.icon_status} mobile`}><HowToRegIcon /></TableCell>
                       <TableCell align="center" aria-label={data.dataStatus && data.dataStatus.replace('-','às')}
-                      data-cooltipz-dir="right" className={styles.ganho}>{window.innerWidth > 650 ? data.status : 'G'}</TableCell>
+                      data-cooltipz-dir="right" className={`${styles.ganho} desktop`}>{data.status}</TableCell></>
                     }
                     {data.status === 'Perdido' &&
+                    <><TableCell align="center" sx={{ backgroundColor: "#db2324" }} className={`${styles.icon_status} mobile`}><PersonOffIcon /></TableCell>
                       <TableCell align="center" aria-label={data.dataStatus && data.dataStatus.replace('-','às')}
-                      data-cooltipz-dir="right" className={styles.perdido}>{window.innerWidth > 650 ? data.status : 'P'}</TableCell>
+                      data-cooltipz-dir="right" className={`${styles.perdido} desktop`}>{data.status}</TableCell></>
                     }
-                    {window.innerWidth > 650 && 
-                      <TableCell align="center">{data.data.replace('-', 'às')}</TableCell>
-                    }
+                  <TableCell align="center" className="desktop">{data.data.replace('-', 'às')}</TableCell>
                   <TableCell align="center">{data.nome ? data.nome.substring(0, 30) + '...' : ""}</TableCell>
                   <TableCell align="center">{data.empresa}</TableCell>
-                  <TableCell align="center">{data.cidade}</TableCell>
-                  {window.innerWidth > 650 && 
-                  <TableCell align="center"><b>{data.indicador} ({data && members.filter((member) => member.id === data.uid)[0].id_user})</b></TableCell>
-                  }
+                  <TableCell align="center">{data.cidade ? data.cidade.substring(0, 10) + '...' : ""}</TableCell>
+                  <TableCell align="center" className="desktop-650"><b>{data.indicador} ({data && members.filter((member) => member.id === data.uid)[0].id_user})</b></TableCell>
                   {/* <TableCell align="center">{activity.filter((act) => act.idRef === data.id).length}</TableCell> */}
                   {/* <TableCell align="center" sx={{ width: 'auto' }}>{data.anotacao ? data.anotacao.substring(0, 30) + '...' : ""} </TableCell> */}
                   <TableCell align="center" sx={{ width: '50px' }}>
@@ -602,19 +606,44 @@ const closeAnotacaoBox = () => {
                               <p>Orçamento foi cancelado pela <b>{data.orcamentista && data.orcamentista.nome}</b>. Motivo: <b>{data.orcamento && data.orcamento.anotacao}</b></p>
                             </Box>
                             }
-                            {data.status === 'Apresentação' && 
+                            {data.status === 'Aguardando Apresentação' && 
                             <Box className={styles.info_step} sx={{ width: '87%', marginBottom: '1rem' }}>
                               <p><b>{data.orcamento && data.orcamento.data.replace('-', 'às')}</b></p>
                               <p>Orçamento gerado pela <b>Bruna</b>. A data de apresentação está prevista para o dia <b>{visits && visits.filter((visit) => visit.id === data.visitRef)[0].data_completa.replace('-', ' às ')}</b>.</p>
                             </Box>
                             }
+                            {data.status === 'Apresentação' && 
+                            <Box className={styles.info_step} sx={{ width: '87%', marginBottom: '1rem' }}>
+                              <p><b>{data.orcamento && data.orcamento.data.replace('-', 'às')}</b></p>
+                              <p>Apresentação realizada com sucesso no dia <b>{visits && visits.filter((visit) => visit.id === data.visitRef)[0].data_completa.replace('-', ' às ')}</b>. Aguardando a resposta do lead.</p>
+                            </Box>
+                            }
+                            {data.status === 'Ganho' && 
+                            <Box className={styles.info_step} sx={{ width: '87%', marginBottom: '1rem', backgroundColor: '#f3ffed!important', borderColor: "#4cb817!important" }}>
+                              <p><b>{data && data.dataStatus.replace('-', 'às')}</b></p>
+                              <p>O lead aceitou a proposta! 🥳</p>
+                            </Box>
+                            }
+                            {data.status === 'Perdido' && 
+                            <Box className={styles.info_step} sx={{ width: '87%', marginBottom: '1rem', backgroundColor: '#ffe6e6!important', borderColor: "#ff9191!important"  }}>
+                              <p><b>{data && data.dataStatus.replace('-', 'às')}</b></p>
+                              <p>O lead negou a proposta. Motivo: <b>{data && data.motivo}</b></p>
+                            </Box>
+                            }
                         <Box class={styles.box_stepper}>
                           <Stepper activeStep={data && data.step} orientation={'horizontal'}>
-                            {steps.map((label) => (
+                            {steps.map((label, index) => {
+                              const labelProps = {};
+                              if(data && data.status === 'Perdido' && index === data.step - 1) { // Pega a ultima etapa e gera um erro
+                                labelProps.error = true;
+                              }
+                              return (
                               <Step key={label}>
-                                <StepLabel>{label}</StepLabel>
+                                <StepLabel
+                                  {...labelProps}>{label}</StepLabel> 
                               </Step>
-                            ))}
+                              );
+                            })}
                           </Stepper>
                         </Box>
                           <h3>Anotação</h3>
@@ -666,11 +695,12 @@ const closeAnotacaoBox = () => {
                                   Localização
                                 </Button>}
                                 </ThemeProvider>
-                                 {(data.status === "Ganho" || data.status === "Perdido") &&
+                                 {/* {(data.status === "Ganho" || data.status === "Perdido") &&
                                   <><div className={styles.lead_status} aria-label={data.dataStatus && data.dataStatus.replace('-', 'às')} data-cooltipz-dir="top" style={data.status === 'Ganho' ? { color: 'green' } : { color: 'red' }}>
                                   <HowToRegIcon />
                                   <h3>{data.status}</h3>
-                                </div><Button
+                                </div>
+                                <Button
                                   variant="contained"
                                   color="primary"
                                   size="small"
@@ -679,7 +709,8 @@ const closeAnotacaoBox = () => {
                                   onClick={() => openLead(data)}
                                 >
                                     Reabrir
-                                  </Button></>}
+                                  </Button></>} */}
+                                {data && data.status !== 'Apresentação' && 
                                 <Button
                                   variant="contained"
                                   color="success"
@@ -690,13 +721,14 @@ const closeAnotacaoBox = () => {
                                 >
                                     Ganho
                                   </Button>
+                                }
                                 <Button
                                   variant="contained"
                                   color="error"
                                   size="small"
                                   type="submit"
                                   startIcon={<PersonOffIcon />}
-                                  onClick={() => openAnotacaoBox(data, 'perdido')}
+                                  onClick={() => openAnotacaoBox(data,'perdido')}
                                 >
                                     Perdido
                                   </Button>
@@ -780,25 +812,28 @@ const closeAnotacaoBox = () => {
                 </DialogTitle>
                 <DialogContent>
                   <DialogContentText sx={{ textAlign: 'center' }}>
-                    Complemente a anotação com um feedback sobre o Lead de acordo com a sua experiência. ✍️
+                  {openDialog && anotacaoBox.type === 'ganho' ? 
+                  'Complemente a anotação com um feedback sobre o Lead de acordo com a sua experiência. ✍️' :
+                  'Digite o motivo do lead não ter aceito a proposta'
+                  }
                   </DialogContentText>
                   <div className="alert-message" style={{ margin: '1rem' }}>
                   <FormControl sx={{ margin: '0.3rem 0' }} fullWidth>
                 </FormControl>
-                <TextField
-                  autoFocus
-                  margin="dense"
-                  id="name"
-                  label="Anotação"
-                  type="text"
-                  onChange={(e) => setAnotacao(e.target.value)}
-                  value={anotacao}
-                  fullWidth
-                  required
-                  multiline
-                  rows={5}
-                  variant="outlined"
-                />
+                  <TextField
+                    autoFocus
+                    margin="dense"
+                    id="name"
+                    label={openDialog && anotacaoBox.type === 'ganho' ? 'Anotação' : 'Motivo'}
+                    type="text"
+                    onChange={(e) => setAnotacao(e.target.value)}
+                    value={anotacao}
+                    fullWidth
+                    required
+                    multiline
+                    rows={5}
+                    variant="outlined"
+                  />
                   </div>
                 </DialogContent>
                 <DialogActions>

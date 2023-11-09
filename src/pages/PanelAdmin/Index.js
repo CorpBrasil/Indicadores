@@ -86,6 +86,7 @@ const PanelAdmin = ({ user, alerts, userRef }) => {
                 <TableRow>
                   <TableCell align="center">Nome</TableCell>
                   <TableCell align="center" padding="none">Email</TableCell>
+                  <TableCell align="center" padding="none">Pix</TableCell>
                   <TableCell align="center">Senha</TableCell>
                   <TableCell align="center">Código</TableCell>
                   <TableCell align="center">Cidade</TableCell>
@@ -104,6 +105,7 @@ const PanelAdmin = ({ user, alerts, userRef }) => {
                   >
                      <TableCell align="center">{member.nome}</TableCell>
                       <TableCell align="center">{member.email}</TableCell>
+                      <TableCell align="center">{member && member.pix}</TableCell>
                       <TableCell align="center">{member.senha}</TableCell>
                       <TableCell align="center">{member.id_user ? member.id_user : '000'}</TableCell>
                       <TableCell align="center">{member.cidade ? member.cidade.cidade : 'Tietê'}</TableCell>
