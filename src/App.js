@@ -7,7 +7,7 @@ import PanelAdmin from './pages/PanelAdmin/Index';
 import useAuth from './hooks/useAuth';
 import PrivateRoute from './components/PrivateRoute';
 import Schedule from './pages/Schedule/Index';
-// import Finance from './pages/Finance/Index';
+import Finance from './pages/Finance/Index';
 import { collection, onSnapshot, query, orderBy } from "firebase/firestore";
 import { dataBase } from "./firebase/database";
 import { Users } from "./data/Data";
@@ -16,6 +16,8 @@ import Prospecction from "./pages/Prospection/Index";
 import Commercial from "./pages/Management_commercial/Index";
 import Report from "./pages/Report/Index";
 import Estimate from "./pages/Estimate/Index";
+// import { home } from "./joyride/home";
+// import { prospection } from "./joyride/prospection";
 
 function App() {
   const { user } = useAuth();
@@ -37,8 +39,21 @@ function App() {
   const listCollectionRef = collection(dataBase, "Lista_Leads");
   const leadsCollectionRef = collection(dataBase, "Leads");
   const relatorioCollectionRef = collection(dataBase, "Relatorio");
-  const VisitasCollectionRef = collection(dataBase,"Visitas_2023");
+  const VisitasCollectionRef = collection(dataBase,"Visitas");
   let { status } = useNavigatorOnline();
+  // const location = useLocation();
+
+  // useEffect(() => {
+  //   if(location) {
+  //     if (location.pathname === '/') {
+  //       setSteps(home);
+  //       console.log('eeeee')
+  //     } else if (location.pathname === '/prospecção') {
+  //       setSteps(prospection);
+  //       console.log('eeeee')
+  //     }
+  //   }
+  // },[location])
 
   useEffect(() => {
     if(status === 'online') {
@@ -75,7 +90,7 @@ function App() {
             // Atualiza os dados em tempo real
           setReportsRef(list.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
           });
-          onSnapshot(query(VisitasCollectionRef, orderBy("dataRef", 'desc')), (list) => {
+          onSnapshot(query(VisitasCollectionRef, orderBy("dataRef", 'asc')), (list) => {
             // Atualiza os dados em tempo real
           setVisits(list.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
           });
@@ -123,9 +138,9 @@ function App() {
               {user && userRef && (user.email === Users[0].email) &&
             <Route exact path="/admin" element={<PanelAdmin user={user} userRef={userRef} alerts={orcamento} check={check} reports={reports} />} />
             }
-            {/* {user && userRef && (user.email === Users[0].email || user.email === Users[1].email || userRef.cargo === "Técnico" || userRef.cargo === "Administrador") &&
-              <Route exact path="/financeiro/:year" element={<Finance userRef={userRef} alerts={userAlerts} sellers={sellers} reports={reports} />} />
-            } */}
+            {user && userRef &&  (userRef.cargo === "Técnico" || userRef.cargo === "Gestor") &&
+              <Route exact path="/financeiro" element={<Finance userRef={userRef} sellers={sellers} reports={reports} />} />
+            }
             {/* <Route exact path="/orcamento" element={<Alert user={user} userRef={userRef} orcamento={orcamento} check={check} reports={reports} />} /> */}
             <Route exact path="/prospeccao" element={<Prospecction user={user} userRef={userRef} leads={leads} visits={visits} listLeads={listLeads} members={members} sellers={sellers} check={check} reports={reports} />} />
             {userRef && (userRef.cargo !== 'Indicador' && userRef.cargo !== 'Técnico') && 
@@ -133,7 +148,7 @@ function App() {
               <Route exact path="/orcamento" element={<Estimate user={user} userRef={userRef} orcamento={orcamento} visits={visits} members={members} sellers={sellers} check={check} />} /></> 
             }
             {userRef && userRef.cargo !== 'Indicador' && 
-              <Route path="/agenda/:year" element={<Schedule userRef={userRef} members={members} visits={visits} tecs={tecs} sellers={sellers} check={check} reports={reports} />} />
+              <Route path="/agenda" element={<Schedule userRef={userRef} members={members} visits={visits} tecs={tecs} sellers={sellers} check={check} reports={reports} />} />
             }
             {userRef && userRef.cargo === 'Gestor' && 
               <Route exact path="/gestao-comercial" element={<Commercial user={user} userRef={userRef} leads={leads} activity={activity} listLeads={listLeads} members={members} sellers={sellers} check={check} reports={reports}/>} />

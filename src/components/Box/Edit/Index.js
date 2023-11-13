@@ -550,7 +550,7 @@ const EditVisit = ({
               ) {
                 // console.log(userData.consultora)
                 await updateDoc(
-                  doc(dataBase, "Visitas_2023", visitRef.id),
+                  doc(dataBase, "Visitas", visitRef.id),
                   {
                     dia: moment(dataTexto).format("YYYY MM DD"),
                     data: dataTexto,

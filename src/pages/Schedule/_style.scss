@@ -91,6 +91,17 @@
     }
   }
 
+  .date_range {
+    max-height: 45px;
+  
+    &>div {
+      padding: 0.7rem;
+      border: none!important;
+      background-color: #fff;
+      border-radius: 5px;
+    }
+  }
+
   .schedule-month { // ============= Botão que altera os meses ================== //
     width: 100%;
     display: flex;

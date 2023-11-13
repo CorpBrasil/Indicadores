@@ -13,9 +13,9 @@ import "cooltipz-css";
 import styles from "./style.module.scss";
 import '../../styles/_filter.scss';
 import '@wojtekmaj/react-daterange-picker/dist/DateRangePicker.css';
+import DateRangePicker from '@wojtekmaj/react-daterange-picker';
 import 'react-calendar/dist/Calendar.css';
 import { theme } from "../../data/theme"
-import DateRangePicker from '@wojtekmaj/react-daterange-picker';
 
 // Components
 import EditProspection from "../../components/Prospection/Edit/Index";
@@ -64,7 +64,7 @@ const Commercial = ({ user, leads, activity, userRef, members}) => {
   const [anotacao, setAnotacao] = useState('');
   const [anotacaoBox, setAnotacaoBox] = useState(false);
   const [view, setView] = useState(false);
-  const [value, onChange] = useState(null)
+  const [value, onChange] = useState(null);
   const [openDialog, setOpenDialog] = useState(false);
   const [viewEdit, setViewEdit] = useState(false);
   const [open, setOpen] = useState(false);

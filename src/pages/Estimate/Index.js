@@ -81,15 +81,15 @@ const Estimate = ({ user, orcamento, visits, userRef, sellers }) => {
     [sellers]
   );
 
-  console.log(orcamento)
-
   const changeFilter = (data) => {
     setOrcamentoUser(data);
   }
 
+  console.log(orcamento);
+
   useEffect(() => {
-    if(userRef && userRef.cargo === 'Vendedor(a)') {
-      setOrcamentoUser(orcamento.filter((act) => act.uid === user.id))
+    if(userRef && userRef.cargo === 'Orçamentista') {
+      setOrcamentoUser(orcamento.filter((act) => act.orcamentista.uid === user.id))
     } else if(userRef && userRef.cargo !== 'Vendedor(a)') {
       setOrcamentoUser(orcamento);
     }
@@ -241,7 +241,7 @@ const cancelEstimate = async (data) => {
               const storage = getStorage();
               const faturatRef = ref(storage, data.storageRef);
               await deleteDoc(doc(dataBase, "Orcamento", data.id)).then(async () => {
-                await deleteDoc(doc(dataBase, "Visitas_2023", data.VisitRef)).then(async() =>{
+                await deleteDoc(doc(dataBase, "Visitas", data.VisitRef)).then(async() =>{
                   deleteObject(faturatRef).then(() => {
                     console.log('Fatura Deletada!')
                   }).catch((error) => {

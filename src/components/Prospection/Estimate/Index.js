@@ -232,7 +232,7 @@ const Estimate = ({data, visits, members, openEstimate, close, open, userRef}) =
             if (result.isConfirmed) {
               let telefoneFormatado = telefone.replace(/\D/g, '');
               setviewVisit('loading');
-              await addDoc(collection(dataBase,"Visitas_2023"), {
+              await addDoc(collection(dataBase,"Visitas"), {
                 dia: moment(dataTexto).format("YYYY MM DD"),
                 saidaEmpresa: saidaTexto,
                 chegadaCliente: horarioTexto,
@@ -243,8 +243,9 @@ const Estimate = ({data, visits, members, openEstimate, close, open, userRef}) =
                 consultora: userRef && userRef.nome,
                 uid: userRef && userRef.id,
                 id_user: userRef && userRef.id_user,
-                tecnico: userRef && userRef.orcamentista.nome,
-                tecnicoUID: userRef && userRef.orcamentista.uid,
+                tecnico: 'Bruna', // Alterar no futuro
+                tecnicoUID: 'YBRHcsruCibMjGJBGG6JegVM0O02',
+                leadRef: data && data.id,
                 cidade: cidade,
                 endereco: endereco,
                 veiculo: '004',

@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
 import { dataBase } from "../../firebase/database";
 import Header from "../../components/Header/Index";
 import useAuth from "../../hooks/useAuth";
@@ -33,16 +32,13 @@ import "../../components/Dashboard/Visit_and_Prospection/_styles.scss";
 
 const Finance = ({ userRef, alerts, sellers }) => {
   const data = new Date();
-  const { year } = useParams();
   const { user } = useAuth();
-  const month = ['','Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
   const [schedule, setSchedule] = useState();
   const [scheduleFull, setScheduleFull] = useState();
-  const [scheduleNew, setScheduleNew] = useState();
   const [members, setMembers] = useState();
   const [tecs, setTecs] = useState();
   const [sales, setSales] = useState();
-  const [total, setTotal] = useState();
+  const [year, setYear] = useState('2023');
   const [monthSelect, setMonthSelect] = useState(
     String(data.getMonth() + 1).padStart(2, "0")
   );
@@ -53,12 +49,10 @@ const Finance = ({ userRef, alerts, sellers }) => {
     () => {
       const schedulesCollectionRef = collection(
         dataBase,
-        "Financeiro",
-        year,
-        monthSelect
+        "Financeiro"
       );
       const fetchData = async () => {
-        const q = query(schedulesCollectionRef, orderBy("dia"));
+        const q = query(schedulesCollectionRef, orderBy("dataRef"));
         onSnapshot(await q, (schedule) => {
           // Atualiza os dados em tempo real
           setSchedule(
@@ -76,7 +70,7 @@ const Finance = ({ userRef, alerts, sellers }) => {
       fetchData();
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [monthSelect]
+    []
   );
 
   useEffect(
@@ -108,13 +102,6 @@ const Finance = ({ userRef, alerts, sellers }) => {
 
 useEffect(() => {
     if(schedule && monthSelect && members) {
-      setScheduleNew(schedule.sort(function(a, b) { // Força a renderizaram da tabela ordenada
-        if(a.data === b.data) {
-          if(a.horario < b.horario) return -1;
-          if(a.horario > b.horario) return 1;
-        }
-        return 0;
-      }))
       let docs = [];
       members.map((ref) => {
         if(ref.cargo === 'Técnico' && schedule.find(name => name.tecnico === ref.nome)) {
@@ -122,15 +109,19 @@ useEffect(() => {
         }
         return setTecs(docs.sort());
       })
-      tecs && tecs.map((tec, index) => (
-        setTotal(schedule.filter((ref) => ref.tecnico && ref.tecnico !== 'Nenhum' && ref.tecnico !== 'Bruna' && ref.tecnico !== 'Lia' && ref.consultora !== 'Pós-Venda').length * 20)
-      ))
     }
     // console.log(tecs);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  },[members, monthSelect, schedule, scheduleNew])
+  },[members, monthSelect, schedule])
 
-  console.log(total)
+  useEffect(() => {
+    if(monthSelect || year) {
+      setSchedule(scheduleFull && scheduleFull.filter(data => data.data.substring(0,7) === year+'-'+monthSelect));
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [monthSelect, year]);
+
+  console.log(schedule);
 
   useEffect(
     () => {
@@ -138,8 +129,8 @@ useEffect(() => {
         if (members) {
           let docs = [];
         members.map((ref) => {
-        if(ref.cargo === 'Vendedor(a)') {
-          docs.push(ref.nome)
+        if(ref.cargo === 'Indicador') {
+          docs.push(ref.nome + ' (' + ref.id_user + ')')
         }
         return setSales(docs.sort());
       })
@@ -162,7 +153,7 @@ useEffect(() => {
       <div className="title-schedule">
         <ScheduleIcon />
         <h2>Agenda {year} </h2>
-        <h2>Relátorio Mensal - {month[parseFloat(monthSelect)]} </h2>
+        <h2>Relátorio Mensal</h2>
             <div className="schedule-month">
             <select
               value={monthSelect}
@@ -183,10 +174,19 @@ useEffect(() => {
               <option value="11">Novembro</option>
               <option value="12">Dezembro</option>
             </select>
+            <select
+                value={year}
+                className="schedule-month__select"
+                name="year"
+                onChange={(e) => setYear(e.target.value)}
+              >
+                <option value="2023">2023</option>
+                <option value="2024">2024</option>
+              </select>
           </div>
       </div>
       <div className="content-schedule-visit">
-        <Dashboard schedule={schedule} monthSelect={monthSelect} type={'financeiro'} total={total} />
+        <Dashboard data={schedule} monthSelect={monthSelect} type={'financeiro'} sellers={sellers} />
         <div className="box-schedule-visit">
           <div className="container-table">
           {tecs && tecs.length > 0 &&
@@ -206,9 +206,9 @@ useEffect(() => {
                   <tbody>
                     {schedule && sales && sales.map((vend, index) => (
                       <tr className="table" key={index}>
-                      <td>{schedule.filter((ref) => ref.consultora === vend && ref.tecnico === tec && ref.tecnico !== 'Bruna' && ref.tecnico !== 'Lia').length}</td>
+                      <td>{schedule.filter((ref) => ref.indicador === vend && ref.tecnico === tec && ref.tecnico !== 'Bruna' && ref.tecnico !== 'Lia').length}</td>
                       <td>
-                      {(schedule.filter((ref) => ref.consultora === vend && ref.tecnico === tec && ref.tecnico !== 'Bruna' && ref.tecnico !== 'Lia').length * 20).toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})}
+                      {(schedule.filter((ref) => ref.indicador === vend && ref.tecnico === tec && ref.tecnico !== 'Bruna' && ref.tecnico !== 'Lia').length * 20).toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})}
                       </td>
                     </tr>
                     ))}
@@ -223,7 +223,7 @@ useEffect(() => {
                 <table key={index} className="table-finance">
                   <thead>
                     <tr>
-                      <th rowSpan={2}>Vendedor(a)</th>
+                      <th rowSpan={2}>Indicador(a)</th>
                       <th colSpan={3}>{tec}</th>
                     </tr>
                     <tr>
@@ -237,9 +237,9 @@ useEffect(() => {
                       <td className="bold">
                         {vend}
                       </td>
-                      <td>{schedule.filter((ref) => ref.consultora === vend && ref.tecnico === tec).length}</td>
+                      <td>{schedule.filter((ref) => ref.indicadorFull === vend && ref.tecnico === tec).length}</td>
                       <td>
-                      {(schedule.filter((ref) => ref.consultora === vend && ref.tecnico === tec && ref.tecnico !== 'Bruna' && ref.tecnico !== 'Lia' && ref.consultora !== 'Pós-Venda').length * 20).toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})}
+                      {(schedule.filter((ref) => ref.indicadorFull === vend && ref.tecnico === tec && ref.tecnico !== 'Bruna' && ref.tecnico !== 'Lia' && ref.consultora !== 'Pós-Venda').length * 20).toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})}
                       </td>
                     </tr>
                     ))}
@@ -265,9 +265,9 @@ useEffect(() => {
                   <tbody>
                     {schedule && sales && sales.map((vend, index) => (
                       <tr className="table" key={index}>
-                      <td>{schedule.filter((ref) => ref.consultora === vend).length}</td>
+                      <td>{schedule.filter((ref) => ref.indicadorFull === vend).length}</td>
                       <td>
-                      {(schedule.filter((ref) => ref.consultora === vend && ref.tecnico !== 'Nenhum' && ref.tecnico !== 'Bruna' && ref.tecnico !== 'Lia' && ref.consultora !== 'Pós-Venda').length * 20).toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})}
+                      {(schedule.filter((ref) => ref.indicadorFull === vend && ref.tecnico !== 'Nenhum' && ref.tecnico !== 'Bruna' && ref.tecnico !== 'Lia' && ref.consultora !== 'Pós-Venda').length * 20).toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})}
                       </td>
                     </tr>
                     ))}
@@ -291,7 +291,7 @@ useEffect(() => {
                   <TableCell align="center">Cidade</TableCell>
                   <TableCell align="center" padding="none">Cliente</TableCell>
                   <TableCell align="center">Horário Marcado</TableCell>
-                  <TableCell align="center">Consultora</TableCell>
+                  <TableCell align="center">Indicador</TableCell>
                   <TableCell align="center">Técnico / Motorista</TableCell>
                   <TableCell align="center">Veiculo</TableCell>
                 </TableRow>
@@ -319,9 +319,8 @@ useEffect(() => {
                     align="center"
                     >{visita.horario}</TableCell>
                     <TableCell className="td-finance"
-                    sx={{ backgroundColor: `${visita.cor}`, color: '#fff', fontWeight: 'bold' }} 
                     align="center" scope="row">
-                      {visita.consultora}
+                      <b>{visita.indicadorFull}</b>
                     </TableCell>
                     <TableCell className="td-finance" align="center">{visita.tecnico}</TableCell>
                     <TableCell className="td-finance" align="center">{visita.veiculo}</TableCell>

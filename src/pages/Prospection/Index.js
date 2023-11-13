@@ -75,7 +75,7 @@ const steps = [
 ];
 
 
-const Prospection = ({ user, leads, visits, userRef, listLeads, members, sellers }) => {
+const Prospection = ({ user, leads, visits, userRef, members, sellers }) => {
   const [anotacao, setAnotacao] = useState('');
   const [anotacaoBox, setAnotacaoBox] = useState(false);
   const [view, setView] = useState(false);
@@ -121,10 +121,12 @@ const Prospection = ({ user, leads, visits, userRef, listLeads, members, sellers
   };
 
   useEffect(() => {
-    if(userRef && userRef.cargo === 'Vendedor(a)') {
+    if(userRef && userRef.cargo === 'Indicador') {
       setLeadsUser(leads.filter((act) => act.uid === user.id))
-    } else if(userRef && userRef.cargo !== 'Vendedor(a)') {
+    } else if(userRef && userRef.cargo !== 'Orçamentista') {
       setLeadsUser(leads);
+    } else if(userRef && userRef.cargo === 'Orçamentista') {
+      setLeadsUser(leads.filter((act) => act.orcamentista.uid === user.id));
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   },[leads,userRef])
@@ -332,7 +334,7 @@ const Prospection = ({ user, leads, visits, userRef, listLeads, members, sellers
         const faturatRef = ref(storage, data.storageRef);
          await deleteDoc(doc(dataBase, 'Leads', data.id)).then(async() => {
             if (data.visitRef) {
-              await deleteDoc(doc(dataBase, 'Visitas_2023', data.visitRef))
+              await deleteDoc(doc(dataBase, 'Visitas', data.visitRef))
             }
             deleteObject(faturatRef).then(() => {
               console.log('Fatura Deletada!')
@@ -486,7 +488,9 @@ const closeAnotacaoBox = () => {
       <div className={`${styles.title_panel} ${styles.desktop}`}>
         <ProspectionIcon className={styles.prospecction_icon}/>
         <h2>Prospecção</h2>
-          <Dashboard data={leads} type={'prospeccao'} sellers={sellers} />
+        { userRef && userRef.cargo !== 'Indicador' &&
+         <Dashboard data={leads} type={'prospeccao'} sellers={sellers} />
+        }
       </div>
       <div className={styles.content_panel}>
         <div className={styles.box_panel}>
@@ -609,7 +613,7 @@ const closeAnotacaoBox = () => {
                             {data.status === 'Aguardando Apresentação' && 
                             <Box className={styles.info_step} sx={{ width: '87%', marginBottom: '1rem' }}>
                               <p><b>{data.orcamento && data.orcamento.data.replace('-', 'às')}</b></p>
-                              <p>Orçamento gerado pela <b>Bruna</b>. A data de apresentação está prevista para o dia <b>{visits && visits.filter((visit) => visit.id === data.visitRef)[0].data_completa.replace('-', ' às ')}</b>.</p>
+                              <p>Orçamento gerado pela <b>{data.orcamentista && data.orcamentista.nome}</b>. A data de apresentação está prevista para o dia <b>{visits && visits.filter((visit) => visit.id === data.visitRef)[0].data_completa.replace('-', ' às ')}</b>.</p>
                             </Box>
                             }
                             {data.status === 'Apresentação' && 
@@ -710,28 +714,26 @@ const closeAnotacaoBox = () => {
                                 >
                                     Reabrir
                                   </Button></>} */}
-                                {data && data.status !== 'Apresentação' && 
-                                <Button
-                                  variant="contained"
-                                  color="success"
-                                  size="small"
-                                  type="submit"
-                                  startIcon={<PersonOffIcon />}
-                                  onClick={() => openAnotacaoBox(data, 'ganho')}
+                                {data && userRef && data.status !== 'Apresentação' && userRef.cargo !== 'Indicador' &&
+                                <><Button
+                                variant="contained"
+                                color="success"
+                                size="small"
+                                type="submit"
+                                startIcon={<PersonOffIcon />}
+                                onClick={() => openAnotacaoBox(data, 'ganho')}
+                              >
+                                Ganho
+                              </Button><Button
+                                variant="contained"
+                                color="error"
+                                size="small"
+                                type="submit"
+                                startIcon={<PersonOffIcon />}
+                                onClick={() => openAnotacaoBox(data, 'perdido')}
                                 >
-                                    Ganho
-                                  </Button>
-                                }
-                                <Button
-                                  variant="contained"
-                                  color="error"
-                                  size="small"
-                                  type="submit"
-                                  startIcon={<PersonOffIcon />}
-                                  onClick={() => openAnotacaoBox(data,'perdido')}
-                                >
-                                    Perdido
-                                  </Button>
+                                  Perdido
+                                </Button></>}
                                   {((data.status === "Ativo" || data.status === "Orçamento Cancelado")  && userRef && userRef.cargo === 'Indicador') &&
                                   <Button
                                   variant="contained"

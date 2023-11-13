@@ -1,6 +1,6 @@
-import React from 'react'
+import { memo, useRef } from 'react';
 import { useState, useEffect } from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+// import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -22,7 +22,7 @@ import ContactPageIcon from '@mui/icons-material/ContactPage'; // Orçamento
 import AssignmentIndIcon from '@mui/icons-material/AssignmentInd'; // Apresentação
 
 const Dashboard = ({ data, monthSelect, type, total, sellers }) => {
-  const [dataChart, setdataChart] = useState();
+  // const [dataChart, setdataChart] = useState();
   const [data1, setData1] = useState();
   const [data2, setData2] = useState();
   const [data3, setData3] = useState();
@@ -30,8 +30,8 @@ const Dashboard = ({ data, monthSelect, type, total, sellers }) => {
   const [perdido, setPerdido] = useState();
   const [confirmar, setConfirmar] = useState();
   const [nconfirmar, setNconfirmar] = useState();
-  const [visitas, setVisitas] = useState();
   const [mes, setMes] = useState();
+  const totalValue = useRef();
 
   useEffect(() => {
     if (data && monthSelect && type !== 'prospeccao') {
@@ -40,7 +40,7 @@ const Dashboard = ({ data, monthSelect, type, total, sellers }) => {
           setData3(data.filter((vis) => vis.categoria === 'pos_venda').length);
           setConfirmar(data.filter((vis) => vis.confirmar === true).length);
           setNconfirmar(data.filter((vis) => vis.confirmar === false).length);
-          setVisitas(data.filter((vis) => vis.categoria !== 'lunch').length);
+          totalValue.current = data.filter((ref) => ref.tecnico && ref.tecnico !== 'Nenhum' && ref.tecnico !== 'Bruna' && ref.tecnico !== 'Lia' && ref.consultora !== 'Pós-Venda').length * 20;
           switch(monthSelect) {
               case '01':
                 setMes('Janeiro');
@@ -86,39 +86,38 @@ const Dashboard = ({ data, monthSelect, type, total, sellers }) => {
       setGanho(data.filter((vis) => vis.status === 'Ganho').length)
       setPerdido(data.filter((vis) => vis.status === 'Perdido').length)
       setData1(data.filter((vis) => vis.status === 'Ativo').length);
-      setData2(data.filter((vis) => vis.status === 'Orçamento').length);
+      setData2(data.filter((vis) => vis.status === 'Orçamento' || vis.status === 'Aguardando Apresentação').length);
       setData3(data.filter((vis) => vis.status === 'Apresentação').length);
     }
   }, [monthSelect, data, type]);
 
-  console.log(data)
 
-  useEffect(() => {
-    if(data) {
-      if(type === 'visit') {
-        setdataChart([
-          {
-            name: 'Ana',
-            Visitas: data.filter((con) => con.consultora === 'Ana').length,
-            fill: '#F28500'
-          },
-          {
-            name: 'Bruna',
-            Visitas: data.filter((con) => con.consultora === 'Bruna').length,
-            fill: '#44BF2B'
-          },
-          {
-            name: 'Lia',
-            Visitas: data.filter((con) => con.consultora === 'Lia').length,
-            fill: '#E892DD'
-          }
-        ])
-      }
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  },[data])
+  // useEffect(() => {
+  //   if(data) {
+  //     if(type === 'visit') {
+  //       setdataChart([
+  //         {
+  //           name: 'Ana',
+  //           Visitas: data.filter((con) => con.consultora === 'Ana').length,
+  //           fill: '#F28500'
+  //         },
+  //         {
+  //           name: 'Bruna',
+  //           Visitas: data.filter((con) => con.consultora === 'Bruna').length,
+  //           fill: '#44BF2B'
+  //         },
+  //         {
+  //           name: 'Lia',
+  //           Visitas: data.filter((con) => con.consultora === 'Lia').length,
+  //           fill: '#E892DD'
+  //         }
+  //       ])
+  //     }
+  //   }
+  // // eslint-disable-next-line react-hooks/exhaustive-deps
+  // },[data])
 
-  console.log(data)
+  console.log(total)
 
   return (
     <div className="dashboard">
@@ -131,13 +130,13 @@ const Dashboard = ({ data, monthSelect, type, total, sellers }) => {
               <h2>Leads</h2>
             </div> :
             <div className="dashboard__box1-info">
-              <h1>{visitas}</h1>
+              <h1>{data && data.length}</h1>
               <h2>Visitas em {mes}</h2>
             </div> 
           }
             {type === 'financeiro' &&
             <div className="dashboard__box1-info">
-              <h1>{total && total.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})}</h1>
+              <h1>{totalValue.current && totalValue.current.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})}</h1>
               <h2>Comissão em {mes}</h2>
             </div>
             }
@@ -230,18 +229,24 @@ const Dashboard = ({ data, monthSelect, type, total, sellers }) => {
           </ul>
         </div>
         }
-          {type === 'prospeccao' ?
           <div className="dashboard__box3">
-            <h2>Ranking de Indicadores</h2>
+            {type === 'visit' ? 
+              <h2>Visitas por Indicador</h2> :
+              <h2>Ranking de Indicadores</h2>
+            }
             <TableContainer>
               <Table stickyHeader aria-label="sticky table">
                 <TableHead>
                   <TableRow>
                     <TableCell align="center">Nome</TableCell>
                     <TableCell align="center">Cidade</TableCell>
-                    <TableCell align="center">Leads</TableCell>
-                    <TableCell align="center">Ganho</TableCell>
-                    <TableCell align="center">Perdido</TableCell>
+                    {type !== 'prospeccao' && 
+                      <TableCell align="center">Visitas</TableCell>
+                    }
+                    {type === 'prospeccao' &&
+                      <><TableCell align="center">Leads</TableCell>
+                      <TableCell align="center">Orçamento</TableCell></>
+                    }
                   </TableRow>
                 </TableHead>
                 {sellers && sellers.map((seller, index) => (
@@ -251,43 +256,49 @@ const Dashboard = ({ data, monthSelect, type, total, sellers }) => {
                     hover
                     className={`list-visit`}
                     sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-                    <TableCell align="center">{seller.nome}</TableCell>
+                    <TableCell align="center">{seller.nome} ({seller.id_user})</TableCell>
                     <TableCell align="center">{seller.cidade.cidade}</TableCell>
-                    <TableCell align="center">{data && data.filter((item) => item.uid === seller.id).length}</TableCell>
-                    <TableCell align="center">{data && data.filter((item) => item.uid === seller.id && item.status === 'Ganho').length}</TableCell>
-                    <TableCell align="center">{data && data.filter((item) => item.uid === seller.id && item.status === 'Perdido').length}</TableCell>
+                    {type === 'financeiro' &&
+                      <TableCell align="center">{data && data.filter((item) => item.indicadorUID === seller.id).length}</TableCell>
+                    }
+                    {type === 'visit' &&
+                      <TableCell align="center">{data && data.filter((item) => item.uid === seller.id).length}</TableCell>
+                    }
+                    {type === 'prospeccao' &&
+                      <><TableCell align="center" aria-label={`Ganho: ${data && data.filter((item) => item.uid === seller.id && item.status === 'Ganho').length} Perdido: ${data && data.filter((item) => item.uid === seller.id && item.status === 'Perdido').length}`} data-cooltipz-dir="top">{data && data.filter((item) => item.uid === seller.id).length}</TableCell>
+                      <TableCell align="center">{data && data.filter((item) => item.uid === seller.id &&
+                       item.status !== 'Orçamento Cancelado' && item.status !== 'Ativo' && item.status !== 'Perdido').length}</TableCell></>
+                    }
                   </TableRow>
               </TableBody>
                 ))}
               </Table>
             </TableContainer>
-            {/* Parei aqui */}
-          </div> :
-          <div className="dashboard__box3">
-          <h2>Visitas por Consultoras</h2>
-          <ResponsiveContainer width="90%" height="80%">
-          <BarChart
-            width='100%'
-            height='100%'
-            data={dataChart}
-            margin={{
-              top: 5,
-              right: 30,
-              bottom: 5,
-            }}
-          >
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="name" />
-            <YAxis />
-            <Tooltip />
-            <Bar dataKey="Visitas" fill="#8884d8" />
-          </BarChart>
-          </ResponsiveContainer>
-        </div>
-        }
+          </div>
+        {/* <div className="dashboard__box3"> 
+        //   <h2>Visitas por Consultoras</h2>
+        //   <ResponsiveContainer width="90%" height="80%">
+        //   <BarChart
+        //     width='100%'
+        //     height='100%'
+        //     data={dataChart}
+        //     margin={{
+        //       top: 5,
+        //       right: 30,
+        //       bottom: 5,
+        //     }}
+        //   >
+        //     <CartesianGrid strokeDasharray="3 3" />
+        //     <XAxis dataKey="name" />
+        //     <YAxis />
+        //     <Tooltip />
+        //     <Bar dataKey="Visitas" fill="#8884d8" />
+        //   </BarChart>
+        //   </ResponsiveContainer>
+                  // </div>*/}
           </div>
         </div>
   )
 }
 
-export default Dashboard;
+export default memo(Dashboard);

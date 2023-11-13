@@ -2,7 +2,6 @@ import axios from "axios";
 import { useEffect, useState, useRef, forwardRef } from "react";
 import moment from "moment";
 import Swal from 'sweetalert2/dist/sweetalert2.js';
-import { useParams } from "react-router-dom";
 import { dataBase } from "../../firebase/database";
 import Header from "../../components/Header/Index";
 import useAuth from "../../hooks/useAuth";
@@ -22,7 +21,7 @@ import { ReactComponent as ScheduleIcon } from "../../images/icons/Schedule1.svg
 import { ReactComponent as CheckIcon } from "../../images/icons/Check.svg";
 import { ReactComponent as BlockIcon } from "../../images/icons/Block.svg";
 import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
+// import DeleteIcon from '@mui/icons-material/Delete';
 
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -37,7 +36,7 @@ import {
   collection,
   deleteDoc,
   updateDoc,
-  setDoc
+  setDoc 
 } from "firebase/firestore";
 
 import "cooltipz-css";
@@ -53,7 +52,7 @@ const Schedule = ({ userRef, members, visits, tecs, sellers, alerts, check }) =>
   const date = new Date();
   const checked = JSON.parse(localStorage.getItem("foco"));
   const [focoCheck, setFocoCheck] = useState(false);
-  const { year } = useParams();
+  const [year, setYear] = useState('2023');
   const { user } = useAuth();
   const Alert = forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -69,7 +68,7 @@ const Schedule = ({ userRef, members, visits, tecs, sellers, alerts, check }) =>
   const [createVisitGroup, setCreateVisitGroup] = useState({ check: false });
   const [dayVisits, setDayVisits] = useState(undefined);
   const [scheduleRef] = useState();
-  const [monthNumber, setMonthNumber] = useState();
+  // const [monthNumber, setMonthNumber] = useState();
   const [sellersOrder, setSellersOrder] = useState();
   // const [view, setView] = useState(false);
   // const [type, setType] = useState({});
@@ -126,6 +125,13 @@ const Schedule = ({ userRef, members, visits, tecs, sellers, alerts, check }) =>
   }, [visits]);
 
   useEffect(() => {
+    if(monthSelect) {
+      setSchedule(visits.filter(data => data.data.substring(0,7) === year+'-'+monthSelect));
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [monthSelect, year]);
+
+  useEffect(() => {
     if (checked === true) {
       // Altera o valor da input 'toggle'
       setFocoCheck(true);
@@ -171,21 +177,6 @@ const Schedule = ({ userRef, members, visits, tecs, sellers, alerts, check }) =>
 
   // console.log(monthSelect);
 
-  useEffect(() => {
-    const findMonth = () => {
-      const ano = year.toString();
-      const dia = moment(ano + "-" + monthSelect, "YYYY-MM")
-        .daysInMonth()
-        .toString();
-      setMonthNumber({
-        min: ano + "-" + monthSelect + "-01",
-        max: ano + "-" + monthSelect + "-" + dia,
-      });
-    };
-
-    findMonth();
-  }, [monthSelect, year]);
-
   const handleBoxVisitRef = () => {
     boxVisitRef.current.scrollIntoView({
       behavior: "smooth",
@@ -229,111 +220,111 @@ const Schedule = ({ userRef, members, visits, tecs, sellers, alerts, check }) =>
       );
   };
 
-  const deleteVisit = async (visit) => {
-    try {
-      if(check) {
-        Swal.fire({
-          title: 'Sem Conexão',
-          icon: "error",
-          html: `Não é possível Excluir ${visit.categoria === 'lunch' ? 'um Almoço' : 'uma Visita'} <b>sem internet.</b> Verifique a sua conexão.`,
-          confirmButtonText: "Fechar",
-          showCloseButton: true,
-          confirmButtonColor: "#d33" 
-        })
-      } else {
-        if(permission(visit)) {
-          Swal.fire({
-            title: Company,
-            html: `Você deseja excluir essa <b>Visita</b>?`,
-            icon: "warning",
-            showCancelButton: true,
-            showCloseButton: true,
-            confirmButtonColor: "#F39200",
-            cancelButtonColor: "#d33",
-            confirmButtonText: "Sim",
-            cancelButtonText: "Não",
-          }).then(async (result) => {
-            if (result.isConfirmed) {
-              const visitsAntes = visitsFind("antes", visit);
-              const visitsDepois = visitsFind("depois", visit);
-              if (visitsAntes.length > 0) {
-                visitsAntes.map(async (ref) => {
-                    await updateDoc(
-                      doc(dataBase, "Agendas", year, monthSelect, ref.id),
-                      {
-                        chegadaEmpresa: moment(ref.saidaDoCliente, "hh:mm")
-                          .add(ref.tempoRota, "seconds")
-                          .format("kk:mm"),
-                        groupRef: "",
-                        group: "",
-                        visitaConjunta: false,
-                        tipo: "Visita",
-                      }
-                    );
-                });
-               }
-              if (visitsDepois.length > 0) {
-                visitsDepois.map(async (ref) => {
-                    await updateDoc(
-                      doc(dataBase, "Agendas", year, monthSelect, ref.id),
-                      {
-                        saidaEmpresa: moment(ref.chegadaCliente, "hh:mm")
-                          .subtract(ref.tempoRota, "seconds")
-                          .format("kk:mm"),
-                        groupRef: "",
-                        group: "",
-                        visitaConjunta: false,
-                        tipo: "Visita",
-                      }
-                    );
-                });
-              }
-              await deleteDoc(
-                doc(dataBase, "Agendas", year, monthSelect, visit.id)
-              );
-              setBox({name: '', type:''});
-              //setDayVisits(undefined);
-              const date = new Date(visit.data);
-              axios.post('https://n8n.corpbrasil.cloud/webhook/321c02a7-03b7-4f81-b4a0-2958660ff449', {
-                ID: visit.id,
-                data: moment(visit.data).format("DD/MM/YYYY"),
-                dataDelete: moment(new Date()).format("DD/MM/YYYY HH:mm"),
-                nome: visit.tecnico,
-                cliente: visit.cliente,
-                marcado: visit.chegadaCliente,
-                consultora: visit.consultora,
-                city: visit.cidade,
-                semana: getMonthlyWeekNumber(date),
-                mes: moment(visit.data).format("M"),
-                ende: visit.endereco,
-                categoria: visit.categoria,
-                tipo: visit.tipo,
-                confirmar: visit.confirmar,
-                extra: visit.preData
-              })
-              Swal.fire({
-                title: Company,
-                html: `A Visita em <b>${visit.cidade}</b> foi deletada com sucesso.`,
-                icon: "success",
-                showConfirmButton: true,
-                showCloseButton: true,
-                confirmButtonColor: "#F39200",
-              });
-            }
-          });
-        } else {
-          Swal.fire({
-            title: 'Acesso Negado',
-            html: `Somente o responsável pode Excluir a <b>Visita.</b>`,
-            icon: "error",
-            showCloseButton: true,
-            confirmButtonColor: "#F39200",
-            confirmButtonText: "Ok",
-          })
-        }
-      }
-    } catch {}
-  };
+  // const deleteVisit = async (visit) => {
+  //   try {
+  //     if(check) {
+  //       Swal.fire({
+  //         title: 'Sem Conexão',
+  //         icon: "error",
+  //         html: `Não é possível Excluir ${visit.categoria === 'lunch' ? 'um Almoço' : 'uma Visita'} <b>sem internet.</b> Verifique a sua conexão.`,
+  //         confirmButtonText: "Fechar",
+  //         showCloseButton: true,
+  //         confirmButtonColor: "#d33" 
+  //       })
+  //     } else {
+  //       if(permission(visit)) {
+  //         Swal.fire({
+  //           title: Company,
+  //           html: `Você deseja excluir essa <b>Visita</b>?`,
+  //           icon: "warning",
+  //           showCancelButton: true,
+  //           showCloseButton: true,
+  //           confirmButtonColor: "#F39200",
+  //           cancelButtonColor: "#d33",
+  //           confirmButtonText: "Sim",
+  //           cancelButtonText: "Não",
+  //         }).then(async (result) => {
+  //           if (result.isConfirmed) {
+  //             const visitsAntes = visitsFind("antes", visit);
+  //             const visitsDepois = visitsFind("depois", visit);
+  //             if (visitsAntes.length > 0) {
+  //               visitsAntes.map(async (ref) => {
+  //                   await updateDoc(
+  //                     doc(dataBase, "Agendas", year, monthSelect, ref.id),
+  //                     {
+  //                       chegadaEmpresa: moment(ref.saidaDoCliente, "hh:mm")
+  //                         .add(ref.tempoRota, "seconds")
+  //                         .format("kk:mm"),
+  //                       groupRef: "",
+  //                       group: "",
+  //                       visitaConjunta: false,
+  //                       tipo: "Visita",
+  //                     }
+  //                   );
+  //               });
+  //              }
+  //             if (visitsDepois.length > 0) {
+  //               visitsDepois.map(async (ref) => {
+  //                   await updateDoc(
+  //                     doc(dataBase, "Agendas", year, monthSelect, ref.id),
+  //                     {
+  //                       saidaEmpresa: moment(ref.chegadaCliente, "hh:mm")
+  //                         .subtract(ref.tempoRota, "seconds")
+  //                         .format("kk:mm"),
+  //                       groupRef: "",
+  //                       group: "",
+  //                       visitaConjunta: false,
+  //                       tipo: "Visita",
+  //                     }
+  //                   );
+  //               });
+  //             }
+  //             await deleteDoc(
+  //               doc(dataBase, "Agendas", year, monthSelect, visit.id)
+  //             );
+  //             setBox({name: '', type:''});
+  //             //setDayVisits(undefined);
+  //             const date = new Date(visit.data);
+  //             axios.post('https://n8n.corpbrasil.cloud/webhook/321c02a7-03b7-4f81-b4a0-2958660ff449', {
+  //               ID: visit.id,
+  //               data: moment(visit.data).format("DD/MM/YYYY"),
+  //               dataDelete: moment(new Date()).format("DD/MM/YYYY HH:mm"),
+  //               nome: visit.tecnico,
+  //               cliente: visit.cliente,
+  //               marcado: visit.chegadaCliente,
+  //               consultora: visit.consultora,
+  //               city: visit.cidade,
+  //               semana: getMonthlyWeekNumber(date),
+  //               mes: moment(visit.data).format("M"),
+  //               ende: visit.endereco,
+  //               categoria: visit.categoria,
+  //               tipo: visit.tipo,
+  //               confirmar: visit.confirmar,
+  //               extra: visit.preData
+  //             })
+  //             Swal.fire({
+  //               title: Company,
+  //               html: `A Visita em <b>${visit.cidade}</b> foi deletada com sucesso.`,
+  //               icon: "success",
+  //               showConfirmButton: true,
+  //               showCloseButton: true,
+  //               confirmButtonColor: "#F39200",
+  //             });
+  //           }
+  //         });
+  //       } else {
+  //         Swal.fire({
+  //           title: 'Acesso Negado',
+  //           html: `Somente o responsável pode Excluir a <b>Visita.</b>`,
+  //           icon: "error",
+  //           showCloseButton: true,
+  //           confirmButtonColor: "#F39200",
+  //           confirmButtonText: "Ok",
+  //         })
+  //       }
+  //     }
+  //   } catch {}
+  // };
 
 
 
@@ -377,8 +368,9 @@ const Schedule = ({ userRef, members, visits, tecs, sellers, alerts, check }) =>
         confirmButtonColor: "#d33" 
       })
     } else {
-      const visitRef = doc(dataBase, "Agendas", year, monthSelect, ref.id);
-      const financeCol = collection(dataBase, "Financeiro", year, monthSelect);
+      const visitRef = doc(dataBase, "Visitas", ref.id);
+      const estimateRef = doc(dataBase, "Leads", ref.leadRef);
+      const financeCol = collection(dataBase, "Financeiro");
       const financeRef = doc(financeCol, ref.id);
       const date = new Date(ref.data);
       if (type === "confirm") {
@@ -397,6 +389,11 @@ const Schedule = ({ userRef, members, visits, tecs, sellers, alerts, check }) =>
             await updateDoc(visitRef, {
               //Atualizar dados sem sobrescrever os existentes
               confirmar: true
+            }).then(async() => {
+              await updateDoc(estimateRef, {
+                status: 'Apresentação',
+                step: 4
+              })
             });
             if(ref.tipo !== "Almoço") {
               await setDoc(financeRef, {
@@ -407,8 +404,10 @@ const Schedule = ({ userRef, members, visits, tecs, sellers, alerts, check }) =>
                 horario: ref.chegadaCliente,
                 saida: ref.saidaEmpresa,
                 chegada: ref.chegadaEmpresa,
-                consultora: ref.consultora,
-                cor: ref.cor,
+                indicador: ref.consultora,
+                dataRef: new Date(`${ref.data}T${ref.chegadaCliente}`) ,
+                indicadorFull: `${ref.consultora} (${ref.id_user})`,
+                indicadorUID: ref.uid,
                 tecnico: ref.tecnico,
                 tecnicoUID: ref.tecnicoUID,
                 veiculo: ref.veiculo,
@@ -478,7 +477,12 @@ const Schedule = ({ userRef, members, visits, tecs, sellers, alerts, check }) =>
             await updateDoc(visitRef, {
               //Atualizar dados sem sobrescrever os existentes
               confirmar: false,
-            });
+            }).then(async() => {
+              await updateDoc(estimateRef, {
+                status: 'Aguardando Apresentação',
+                step: 3
+              })
+            });;
             await deleteDoc(financeRef);
           }
         });
@@ -722,7 +726,7 @@ const Schedule = ({ userRef, members, visits, tecs, sellers, alerts, check }) =>
             }
           }
         } else if(result.isDenied) {
-          deleteVisit(visit);
+          // deleteVisit(visit);
         }
       })
     } else {
@@ -794,7 +798,7 @@ const Schedule = ({ userRef, members, visits, tecs, sellers, alerts, check }) =>
             }
           }
         } else if(result.dismiss === 'cancel') {
-          deleteVisit(visit);
+          // deleteVisit(visit);
         }
       })
     }
@@ -810,7 +814,7 @@ const Schedule = ({ userRef, members, visits, tecs, sellers, alerts, check }) =>
       <Header user={user} userRef={userRef} alerts={alerts}></Header>
       <div className="title-schedule">
         <ScheduleIcon />
-        <h2>Agenda {year} </h2>
+        <h2>Agenda</h2>
             <div className="schedule-month">
               <select
                 value={monthSelect}
@@ -831,23 +835,31 @@ const Schedule = ({ userRef, members, visits, tecs, sellers, alerts, check }) =>
                 <option value="11">Novembro</option>
                 <option value="12">Dezembro</option>
               </select>
+              <select
+                value={year}
+                className="schedule-month__select"
+                name="year"
+                onChange={(e) => setYear(e.target.value)}
+              >
+                <option value="2023">2023</option>
+                <option value="2024">2024</option>
+              </select>
             </div>
       </div>
       <div className="content-schedule-visit">
-        <Dashboard schedule={schedule} monthSelect={monthSelect} type='visit' />
+        <Dashboard data={schedule} monthSelect={monthSelect} type='visit' sellers={sellers} />
         <div className="box-schedule-visit" ref={boxVisitRef}>
             {
               (box.name === "create" && (
                 <CreateVisit
                   returnSchedule={returnSchedule}
-                  // preData={data}
                   scheduleRef={scheduleRef}
                   membersRef={members}
                   tecs={tecs}
                   sellers={sellersOrder}
                   userRef={userRef}
                   schedule={schedule}
-                  monthNumber={monthNumber}
+                  monthNumber={monthSelect}
                   type={box.type}
                   createVisitGroupChoice={createVisitGroupChoice}
                   checkNet={check}
@@ -880,7 +892,6 @@ const Schedule = ({ userRef, members, visits, tecs, sellers, alerts, check }) =>
                     visitRef={editVisit.info}
                     membersRef={members}
                     schedule={schedule}
-                    monthNumber={monthNumber}
                     monthSelect={monthSelect}
                     year={year}
                     type={editVisit.type}
@@ -899,7 +910,7 @@ const Schedule = ({ userRef, members, visits, tecs, sellers, alerts, check }) =>
                     visitRef={createVisitGroup.info}
                     membersRef={members}
                     schedule={schedule}
-                    monthNumber={monthNumber}
+                    monthNumber={monthSelect}
                     year={year}
                     type={createVisitGroup.type}
                     typeRef={createVisitGroup.typeRef}
@@ -907,7 +918,7 @@ const Schedule = ({ userRef, members, visits, tecs, sellers, alerts, check }) =>
                   />
                 )) // Chama o componente 'Group'
             }
-          {(userRef && userRef.cargo === "Orçamentista" && !box.name) ||
+          {/* {(userRef && userRef.cargo === "Orçamentista" && !box.name) ||
           (userRef && userRef.cargo === "Administrador" && !box.name) ||
           (user.email === Users[0].email && !box.name) ? (
             <><h2>Criar Visita</h2>
@@ -947,7 +958,7 @@ const Schedule = ({ userRef, members, visits, tecs, sellers, alerts, check }) =>
                   </button>
                 </div>
                 }
-                {/* {userRef && (userRef.nome !== 'Pós-Venda' || userRef.cargo === 'Administrador') && 
+                {userRef && (userRef.nome !== 'Pós-Venda' || userRef.cargo === 'Administrador') && 
                 <div className="box-schedule-visit__add">
                   <button
                     onClick={() => {
@@ -958,12 +969,12 @@ const Schedule = ({ userRef, members, visits, tecs, sellers, alerts, check }) =>
                     <span className="visit-icon lunch-fill"><RestaurantIcon /></span>
                     <div className="visit-text"><p>Almoço</p></div>
                   </button>
-                </div>} */}
+                </div>}
               </div>
               </>
           ) : (
             <></>
-          )}
+          )} */}
               <div className="toggle-box desktop">
                 <Filter tableData={schedule} dataFull={dayVisits} sellers={sellers} changeFilter={changeFilter} type={'visit'} />
                 <div className="toggle-box-item">
@@ -1129,21 +1140,21 @@ const Schedule = ({ userRef, members, visits, tecs, sellers, alerts, check }) =>
                                 >
                                   <EditIcon />
                                 </IconButton>
-                                <IconButton
+                                {/* <IconButton
                                   id="basic-button"
                                   aria-label="Excluir Visita"
                                   data-cooltipz-dir="left"
                                   onClick={() => deleteVisit(visita)}
                                 >
                                   <DeleteIcon />
-                                </IconButton>
+                                </IconButton> */}
                             </>
                           ) : (
                             <></>
                           )}
 
                           {visita.confirmar === false &&
-                          (user.email === Users[0].email || (userRef && userRef.cargo === "Administrador") || (userRef && userRef.nome === 'Pós-Venda')) ? (
+                          ((userRef && userRef.cargo === "Closer") || (userRef && userRef.cargo === "Gestor") || (userRef && userRef.nome === 'Pós-Venda')) ? (
                             <>
                                 <IconButton
                                   aria-label="Confirmar Visita"
@@ -1159,7 +1170,7 @@ const Schedule = ({ userRef, members, visits, tecs, sellers, alerts, check }) =>
                           )}
 
                           {visita.confirmar === true &&
-                          (user.email === Users[0].email || (userRef && userRef.cargo === "Administrador") || (userRef && userRef.nome === 'Pós-Venda')) ? (
+                          ((userRef && userRef.cargo === "Closer") || (userRef && userRef.cargo === "Gestor") || (userRef && userRef.nome === 'Pós-Venda')) ? (
                             <>
                                 <IconButton
                                   aria-label="Cancelar Visita"

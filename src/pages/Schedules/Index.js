@@ -1,4 +1,4 @@
-import { useState, memo, forwardRef } from 'react';
+import { memo, forwardRef } from 'react';
 // import moment from "moment";
 // import Geocode from "react-geocode";
 // import axios from 'axios';
@@ -27,6 +27,9 @@ import { Users } from '../../data/Data';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
+import Stack from '@mui/material/Stack';
+import Skeleton from '@mui/material/Skeleton';
+
 // import Badge from '@mui/material/Badge';
 
 // import PeopleIcon from '@mui/icons-material/People';
@@ -53,6 +56,7 @@ const Schedules = ({ userRef, alerts, check, reports }) => {
   });
 
     const { user } = useAuth();
+    // const [rawValue, setRawValue] = useState(" ");
     // const [schedules, setSchedules] = useState();
     // const [posto, setPosto] = useState();
     // const [km, setKm] = useState();
@@ -65,7 +69,6 @@ const Schedules = ({ userRef, alerts, check, reports }) => {
     // const [members, setMembers] = useState(undefined);
     // const [findTec, setFindTec] = useState(undefined);
     // eslint-disable-next-line no-unused-vars
-    const [rawValue, setRawValue] = useState(" ");
     // const [open, setOpen] = useState(false);
     // const [financeSchedules, setFinanceSchedules] = useState();
     // const navigate = useNavigate(); //chamado do hook
@@ -301,12 +304,26 @@ const Schedules = ({ userRef, alerts, check, reports }) => {
 
   return (
     <div className='container-schedules'>
+       {/* <Joyride
+        continuous
+        scrollToFirstStep
+        showProgress
+        showSkipButton
+        steps={steps}
+        run={true}
+        styles={{
+          options: {
+            zIndex: 10000,
+          },
+        }}
+      /> */}
       <Header user={user} userRef={userRef} alerts={alerts} reports={reports}></Header>
       <div className='title-schedule'>
         <HomeOutlinedIcon sx={{ width: '50px', height: '50px' }} />
         <h1>Inicio</h1>
       </div>
        <div className='content-schedule'>
+        {userRef ? 
         <div className='buttons-content'>
           {/* <div className='box-schedule'>
           schedules && schedules.map((schedule, index) => (
@@ -362,18 +379,31 @@ const Schedules = ({ userRef, alerts, check, reports }) => {
             {userRef && userRef.cargo !== 'Indicador' &&
             <div className='box-schedule'>
               <li className='schedule'>
-                <Link className='schedule__content' to="/agenda/2023">
+                <Link className='schedule__content' to="/agenda">
                   <div className='schedule__icon visit'><CalendarMonthIcon /></div>
                   <div className='schedule__text'>
-                    <p>Agenda Visita</p>
-                    <p>2023</p>
+                    <p>Agenda</p>
+                    <p>Visitas</p>
+                  </div>
+                  </Link>
+              </li>
+                </div>
+           }
+            {userRef && userRef.cargo === 'Gestor' &&
+            <div className='box-schedule'>
+              <li className='schedule'>
+                <Link className='schedule__content' to="/financeiro">
+                  <div className='schedule__icon finance'><CalendarMonthIcon /></div>
+                  <div className='schedule__text'>
+                    <p>Agenda</p>
+                    <p>Financeira</p>
                   </div>
                   </Link>
               </li>
                 </div>
            }
             {userRef && (user.email === Users[0].email || userRef.cargo !== "Técnico") && userRef.nome !== 'Pós-Venda' &&
-            <div className='box-schedule'>
+            <div className='box-schedule prospecção'>
               <li className='schedule'>
                 <Link className='schedule__content' to="/prospeccao">
                   <div className='schedule__icon prospection'><Prospection /></div>
@@ -435,7 +465,7 @@ const Schedules = ({ userRef, alerts, check, reports }) => {
         //       </li>
         //     </div>
     // } */}
-            <div className='box-schedule'>
+            <div className='box-schedule cache'>
                 <li className='schedule'>
                   <Link className='schedule__content' onClick={() => clearCacheData()}>
                     <div className='schedule__icon cache'><CachedIcon /></div>
@@ -445,7 +475,12 @@ const Schedules = ({ userRef, alerts, check, reports }) => {
                   </Link>
                 </li>
               </div>
-        </div>
+        </div> :
+        <Stack width={1200} direction='row' spacing={2} justifyContent='center' sx={{ marginTop: '48px' }}>
+          <Skeleton variant='rounded' width={300} height={90} />
+          <Skeleton variant='rounded' width={300} height={90} />
+        </Stack>
+      }
       {/* {user.email === Users[0].email &&   
       <div className='add-schedule'>
               <button onClick={() => setCreateSchedule(true)} className='add-schedule__btn'></button>
