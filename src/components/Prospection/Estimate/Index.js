@@ -5,7 +5,7 @@ import CurrencyInput from "react-currency-input-field";
 import Swal from "sweetalert2"; // cria alertas personalizado
 import axios from 'axios';
 import step from '../../../data/step';
-import Joyride, { ACTIONS, EVENTS } from 'react-joyride';
+import Joyride, { ACTIONS, EVENTS, STATUS } from 'react-joyride';
 // import { dataBase } from '../../../firebase/database';
 // import { Company } from '../../../data/Data'
 // import { usePlacesWidget } from "react-google-autocomplete";
@@ -387,7 +387,7 @@ console.log(stepIndex);
     }
 
     const handleJoyride = (data) => {
-      const { action, index, type } = data;
+      const { action, index, type, status } = data;
       console.log(index);
       if ([EVENTS.STEP_AFTER, EVENTS.TARGET_NOT_FOUND].includes(type)) {
         // Update state to advance the tour
@@ -395,21 +395,22 @@ console.log(stepIndex);
 
           if(index === 19) {
             setviewVisit('visita');
-          } else if(index === 23) {
-            Swal.fire({
-              title: 'Parabéns!',
-              html: `Parabéns por completar o tutorial! Esperamos que tenha sido uma experiência informativa,` + 
-              ` ajudando você a entender todas as funcionalidades.</br> Agora você está pronto para aproveitar ao máximo o aplicativo, e nossa equipe de suporte está disponível para qualquer ajuda adicional.`,
-              icon: "success",
-              showConfirmButton: true,
-              showCloseButton: true,
-              confirmButtonText: 'Fechar',
-              confirmButtonColor: "red"
-            }).then((result) => {
-              close();
-              setviewVisit('dados');
-            })
           }
+      } else if ([STATUS.FINISHED, STATUS.SKIPPED].includes(status)) {
+        setRun(false);
+        return Swal.fire({
+          title: 'Parabéns!',
+          html: `Parabéns por completar o tutorial! Esperamos que tenha sido uma experiência informativa,` + 
+          ` ajudando você a entender todas as funcionalidades.</br> Agora você está pronto para aproveitar ao máximo o aplicativo, e nossa equipe de suporte está disponível para qualquer ajuda adicional.`,
+          icon: "success",
+          showConfirmButton: true,
+          showCloseButton: true,
+          confirmButtonText: 'Fechar',
+          confirmButtonColor: "red"
+        }).then((result) => {
+          close();
+          setviewVisit('dados');
+        })
       }
     }
 
@@ -437,12 +438,12 @@ console.log(stepIndex);
           steps={step}
           run={run}
           stepIndex={stepIndex}
-          continuous={stepIndex < 23 ? true : false}
+          continuous={stepIndex === 23 ? false : true}
           callback={handleJoyride}
           locale={{
             back: 'Voltar',
             close: 'Finalizar',
-            last: 'Próximo',
+            last: 'Finalizar',
             next: 'Próximo'
           }}/>
       <DialogTitle align="center">Solicitar Orçamento</DialogTitle>
