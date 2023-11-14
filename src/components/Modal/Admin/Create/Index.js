@@ -157,7 +157,8 @@ console.log(orcamentista)
                       cor: cidade.cor,
                       cpf: cpf,
                       cnpj: cnpj,
-                      pix: pix
+                      pix: pix,
+                      tutorial: true
                     }
                   break
                   case 'Orçamentista':
