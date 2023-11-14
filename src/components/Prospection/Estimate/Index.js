@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react';
 import CurrencyInput from "react-currency-input-field";
 import Swal from "sweetalert2"; // cria alertas personalizado
 import axios from 'axios';
+import step from '../../../data/step';
+import Joyride, { ACTIONS, EVENTS } from 'react-joyride';
 // import { dataBase } from '../../../firebase/database';
 // import { Company } from '../../../data/Data'
 // import { usePlacesWidget } from "react-google-autocomplete";
@@ -46,7 +48,7 @@ import { KeyMaps } from '../../../data/Data';
 import { dataBase } from '../../../firebase/database';
 
 
-const Estimate = ({data, visits, members, openEstimate, close, open, userRef}) => {
+const Estimate = ({data, visits, members, openEstimate, close, open, userRef, stepIndexRef}) => {
   const storage = getStorage();
   const [nome, setNome] = useState();
   const [telefone, setTelefone] = useState();
@@ -77,8 +79,19 @@ const Estimate = ({data, visits, members, openEstimate, close, open, userRef}) =
   const [loading, setLoading] = useState(false);
   const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
   const [libraries] = useState(["places"]);
+  const [run, setRun] = useState();
+  const [stepIndex, setStepIndex] = useState(17);
 
-  console.log(visits)
+  useEffect(() => {
+    const iniciarTutorial = () => {
+      if(userRef && userRef.tutorial) {
+        setRun(true);
+      }
+  }
+  iniciarTutorial();
+}, [userRef]);
+
+console.log(stepIndex);
 
   let isLoaded;
   window.onload = { isLoaded } = useLoadScript({
@@ -373,6 +386,33 @@ const Estimate = ({data, visits, members, openEstimate, close, open, userRef}) =
       }, 500);
     }
 
+    const handleJoyride = (data) => {
+      const { action, index, type } = data;
+      console.log(index);
+      if ([EVENTS.STEP_AFTER, EVENTS.TARGET_NOT_FOUND].includes(type)) {
+        // Update state to advance the tour
+          setStepIndex(index + (action === ACTIONS.PREV ? -1 : 1));
+
+          if(index === 19) {
+            setviewVisit('visita');
+          } else if(index === 23) {
+            Swal.fire({
+              title: 'Parabéns!',
+              html: `Parabéns por completar o tutorial! Esperamos que tenha sido uma experiência informativa,` + 
+              ` ajudando você a entender todas as funcionalidades.</br> Agora você está pronto para aproveitar ao máximo o aplicativo, e nossa equipe de suporte está disponível para qualquer ajuda adicional.`,
+              icon: "success",
+              showConfirmButton: true,
+              showCloseButton: true,
+              confirmButtonText: 'Fechar',
+              confirmButtonColor: "red"
+            }).then((result) => {
+              close();
+              setviewVisit('dados');
+            })
+          }
+      }
+    }
+
   return (
     <>
     <Dialog
@@ -393,6 +433,18 @@ const Estimate = ({data, visits, members, openEstimate, close, open, userRef}) =
           color: (theme) => theme.palette.grey[500],
         }}
         ><CloseIcon /></IconButton>
+        <Joyride
+          steps={step}
+          run={run}
+          stepIndex={stepIndex}
+          continuous={stepIndex < 23 ? true : false}
+          callback={handleJoyride}
+          locale={{
+            back: 'Voltar',
+            close: 'Finalizar',
+            last: 'Próximo',
+            next: 'Próximo'
+          }}/>
       <DialogTitle align="center">Solicitar Orçamento</DialogTitle>
       {viewVisit && viewVisit === 'loading' &&
       <div className={styles.loading}>
@@ -409,7 +461,7 @@ const Estimate = ({data, visits, members, openEstimate, close, open, userRef}) =
               <TextField
                 autoFocus
                 margin="dense"
-                id="name"
+                id="endereco"
                 label="Endereço"
                 type="text"
                 required
@@ -442,7 +494,7 @@ const Estimate = ({data, visits, members, openEstimate, close, open, userRef}) =
                   variant="outlined" />
               </div>
             </div>
-          <div className={styles.label_content}>
+          <div id='escolherData' className={styles.label_content}>
               <div style={{minWidth: '180px' }} className={styles.input_telefone}>
                 <span>Dia</span>
                 <input 
@@ -469,7 +521,7 @@ const Estimate = ({data, visits, members, openEstimate, close, open, userRef}) =
             <div className={styles.visit_list}>      
             {visits && visits.length > 0  ? 
             <><h2>{dataTexto ? 'Apresentação do dia' : 'Apresentações Marcadas'}</h2>
-            <TableContainer className="table-visits" component={Paper} sx={{ maxHeight: 240 }}>
+            <TableContainer id='listaVisitas' className="table-visits" component={Paper} sx={{ maxHeight: 240 }}>
             <Table size="small" stickyHeader aria-label="sticky table">
               <TableHead>
                 <TableRow className="table-visits_header">
@@ -502,8 +554,8 @@ const Estimate = ({data, visits, members, openEstimate, close, open, userRef}) =
               <h2>Nenhuma Visita Encontrada</h2>
              </div>
              }
-               <div style={{ width: '98%', margin: '0' }} className={visitsFindCount < 0 || visitsFindCount > 0 ? `${styles.visit_info} ${styles.error_aviso}` : `${styles.visit_info} ${styles.check}`}>
-               <span className="">Previsão de Visita (Orçamentista) {(visitsFindCount < 0 || visitsFindCount > 0) ?
+               <div id='previsão' style={{ width: '98%', margin: '0' }} className={visitsFindCount < 0 || visitsFindCount > 0 ? `${styles.visit_info} ${styles.error_aviso}` : `${styles.visit_info} ${styles.check}`}>
+               <span className="">Previsão de Apresentação) {(visitsFindCount < 0 || visitsFindCount > 0) ?
                <div aria-label="Essa Apresentação ultrapassa o horário de uma Apresentação já existente. Verifique os horários disponiveis"
                 data-cooltipz-dir="top" data-cooltipz-size="large" ><ErrorOutlineIcon  sx={{ fill: 'red' }} /></div> 
               :
@@ -520,7 +572,7 @@ const Estimate = ({data, visits, members, openEstimate, close, open, userRef}) =
              </div>
             </div>
              <ThemeProvider theme={theme}>
-            <DialogActions sx={{ justifyContent: 'center' }}>
+            <DialogActions id='botoesApresentação' sx={{ justifyContent: 'center' }}>
               <Button variant='outlined' color='success' type="submit">Solicitar</Button>
               <Button variant='outlined' color="error" onClick={() => setviewVisit('dados')}>Voltar</Button>
             </DialogActions>
@@ -629,8 +681,8 @@ const Estimate = ({data, visits, members, openEstimate, close, open, userRef}) =
                     required
                     variant="outlined" />
               </div>
-              <div className={styles.input_file}>
-                <Button id="enviarFatura" component="label" variant="contained" onChange={(e) => setFatura({ file: URL.createObjectURL(e.target.files[0]), complete: e.target.files[0] })} startIcon={<CloudUploadIcon />}>
+              <div id="enviarFatura" className={styles.input_file}>
+                <Button component="label" variant="contained" onChange={(e) => setFatura({ file: URL.createObjectURL(e.target.files[0]), complete: e.target.files[0] })} startIcon={<CloudUploadIcon />}>
                   Enviar Fatura
                   <VisuallyHiddenInput type="file" accept="image/png,image/jpeg" />
                 </Button>

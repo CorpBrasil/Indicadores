@@ -506,10 +506,11 @@ const closeAnotacaoBox = () => {
          setView(false);
        } else if (index === 9) {
         handleToggle(leads[0].id);
-       } else if (index === 13) {
+       } else if (index === 14) {
         refButton.current.click();
-       } else if (index === 18) {
+       } else if (index === 16) {
         openBox();
+        setRun(false);
        }
     }
   }
@@ -521,18 +522,13 @@ const closeAnotacaoBox = () => {
           run={run}
           stepIndex={stepIndex}
           continuous
-          showProgress
           callback={handleJoyride}
           locale={{
             back: 'Voltar',
             close: 'Fechar',
             last: 'Próximo',
             next: 'Próximo'
-          }}
-          styles={{
-            zIndex: 10000
-          }}
-        />
+          }}/>
       <Header user={user} userRef={userRef}></Header>
       <div className={`${styles.title_panel} ${styles.desktop}`}>
         <div id="titulo">
@@ -594,7 +590,7 @@ const closeAnotacaoBox = () => {
                   >
                     {data.status === 'Ativo' &&
                     <><TableCell align="center" sx={{ backgroundColor: "#03a9f4" }} className={`${styles.icon_status} mobile`}><PersonIcon /></TableCell>
-                      <TableCell align="center" className={`${styles.ativo} desktop`}>{data.status}</TableCell></>
+                      <TableCell id="ativo" align="center" className={`${styles.ativo} desktop`}>{data.status}</TableCell></>
                     }
                     {data.status === 'Orçamento' &&
                       <><TableCell align="center" sx={{ backgroundColor: "#f44b03" }} className={`${styles.icon_status} mobile`}><ContactPageIcon /></TableCell>
@@ -642,7 +638,7 @@ const closeAnotacaoBox = () => {
                   <TableCell style={{ paddingBottom: 0, paddingTop: 0, height: 0 }} colSpan={window.innerWidth < 650 ? 5 : 7}>
                       <Collapse in={open[data.id]} timeout="auto" unmountOnExit colSpan={window.innerWidth < 650 ? 5 : 7}>
                       <Box className={styles.info_anotacao} margin={3}>
-                        <Estimate data={data} visits={visits} members={members} openEstimate={openEstimate} close={close} open={openBox} userRef={userRef} />
+                        <Estimate data={data} visits={visits} members={members} openEstimate={openEstimate} close={close} open={openBox} userRef={userRef} stepIndexRef={stepIndex}/>
                             {data.status === 'Ativo' && 
                             <Box id="status" className={styles.info_step} sx={{ width: '87%', marginBottom: '1rem' }}>
                               <p><b>{data && data.data.replace('-', 'às')}</b></p>
@@ -685,8 +681,8 @@ const closeAnotacaoBox = () => {
                               <p>O lead negou a proposta. Motivo: <b>{data && data.motivo}</b></p>
                             </Box>
                             }
-                        <Box class={styles.box_stepper}>
-                          <Stepper id="etapa" activeStep={data && data.step} orientation={'horizontal'}>
+                        <Box id="etapa" class={styles.box_stepper}>
+                          <Stepper  activeStep={data && data.step} orientation={'horizontal'}>
                             {steps.map((label, index) => {
                               const labelProps = {};
                               if(data && data.status === 'Perdido' && index === data.step - 1) { // Pega a ultima etapa e gera um erro
