@@ -16,8 +16,6 @@ import Prospecction from "./pages/Prospection/Index";
 import Commercial from "./pages/Management_commercial/Index";
 import Report from "./pages/Report/Index";
 import Estimate from "./pages/Estimate/Index";
-// import { home } from "./joyride/home";
-// import { prospection } from "./joyride/prospection";
 
 function App() {
   const { user } = useAuth();
@@ -41,19 +39,7 @@ function App() {
   const relatorioCollectionRef = collection(dataBase, "Relatorio");
   const VisitasCollectionRef = collection(dataBase,"Visitas");
   let { status } = useNavigatorOnline();
-  // const location = useLocation();
 
-  // useEffect(() => {
-  //   if(location) {
-  //     if (location.pathname === '/') {
-  //       setSteps(home);
-  //       console.log('eeeee')
-  //     } else if (location.pathname === '/prospecção') {
-  //       setSteps(prospection);
-  //       console.log('eeeee')
-  //     }
-  //   }
-  // },[location])
 
   useEffect(() => {
     if(status === 'online') {

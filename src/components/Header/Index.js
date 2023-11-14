@@ -91,7 +91,7 @@ const deleteNotification = async (type,data) => {
       </div>
       <div className="container-header__nav">
            <Badge badgeContent={notification && notification.length} color="error">
-            <Link to="" onClick={(e) => setAnchorEl(e.currentTarget)} aria-label="Notificaçôes" data-cooltipz-dir="left">
+            <Link id="notificação" to="" onClick={(e) => setAnchorEl(e.currentTarget)} aria-label="Notificaçôes" data-cooltipz-dir="left">
               <NotificationsIcon className="icon-notification" />
             </Link>
           </Badge>
@@ -150,7 +150,7 @@ const deleteNotification = async (type,data) => {
             :
             <></>
           }
-          <Link to="" onClick={logoff} aria-label="Sair" data-cooltipz-dir="left">
+          <Link id="sair" to="" onClick={logoff} aria-label="Sair" data-cooltipz-dir="left">
             <Exit />
           </Link>
         </div>

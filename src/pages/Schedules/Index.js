@@ -1,4 +1,4 @@
-import { memo, forwardRef } from 'react';
+import { memo, forwardRef, useState, useEffect } from 'react';
 // import moment from "moment";
 // import Geocode from "react-geocode";
 // import axios from 'axios';
@@ -12,6 +12,8 @@ import Swal from 'sweetalert2/dist/sweetalert2.js';
 import useAuth from '../../hooks/useAuth';
 import Header from '../../components/Header/Index';
 import { Users } from '../../data/Data';
+import { useNavigate } from 'react-router-dom';
+import Joyride from 'react-joyride';
 
 // import Button from '@mui/material/Button';
 // import TextField from '@mui/material/TextField';
@@ -50,12 +52,55 @@ const Schedules = ({ userRef, alerts, check, reports }) => {
   // Geocode.setRegion("br");
   // Geocode.setApiKey(KeyMaps);
   // Geocode.setLocationType("ROOFTOP");
+  const navigate = useNavigate();
+  const [run, setRun] = useState(false);
+
+ const step = [
+  {
+     title: 'Prospecção',
+     target: '.prospecção',
+     disableBeacon: true,
+     content: 'Passo 1: Descrição da primeira etapa na Página 1'
+  },
+  {
+     title: 'Cache',
+     target: '.cache',
+     disableBeacon: true,
+     content: 'Passo 3: Descrição da primeira etapa na Página 1',
+  },
+  {
+     title: 'Notificação',
+     target: '#notificação',
+     disableBeacon: true,
+     content: 'Passo 4: Descrição da primeira etapa na Página 1',
+  },
+  {
+     title: 'Sair',
+     target: '#sair',
+     disableBeacon: true,
+     content: 'Passo 4: Descrição da primeira etapa na Página 1',
+  },
+  // Adicione mais etapas conforme necessário
+]
 
   const Alert = forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
   });
 
     const { user } = useAuth();
+
+    useEffect(() => {
+
+        const iniciarTutorial = () => {
+          setTimeout(() => {
+            setRun(true);
+        }, 2000);
+        } 
+      
+        iniciarTutorial();
+    },[])
+    
+
     // const [rawValue, setRawValue] = useState(" ");
     // const [schedules, setSchedules] = useState();
     // const [posto, setPosto] = useState();
@@ -301,22 +346,23 @@ const Schedules = ({ userRef, alerts, check, reports }) => {
   //   }
   // }
   
+  const handleJoyride = (data) => {
+    const { index, status } = data; // Continuar por aqui
+
+    console.log(index);
+
+    if(status === 'finished' && index === step.length - 1) {
+      navigate('/prospeccao');
+    }
+  }
 
   return (
     <div className='container-schedules'>
-       {/* <Joyride
-        continuous
-        scrollToFirstStep
-        showProgress
-        showSkipButton
-        steps={steps}
-        run={true}
-        styles={{
-          options: {
-            zIndex: 10000,
-          },
-        }}
-      /> */}
+      <Joyride
+          steps={step}
+          run={run}
+          callback={handleJoyride}
+        />
       <Header user={user} userRef={userRef} alerts={alerts} reports={reports}></Header>
       <div className='title-schedule'>
         <HomeOutlinedIcon sx={{ width: '50px', height: '50px' }} />
