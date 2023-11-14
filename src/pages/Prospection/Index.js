@@ -1,4 +1,4 @@
-import { useState, useEffect, memo } from "react";
+import { useState, useEffect, memo, useRef } from "react";
 import { dataBase } from "../../firebase/database";
 import Header from "../../components/Header/Index";
 import Swal from 'sweetalert2/dist/sweetalert2.js';
@@ -7,6 +7,8 @@ import axios from "axios";
 import * as moment from "moment";
 import { collection, query, serverTimestamp, onSnapshot, orderBy, updateDoc, doc, deleteDoc } from "firebase/firestore";
 import { getStorage, ref, deleteObject } from "firebase/storage";
+import Joyride, { ACTIONS, EVENTS } from 'react-joyride';
+import step from "../../data/step";
 
 // Css
 import "cooltipz-css";
@@ -25,8 +27,8 @@ import Estimate from "../../components/Prospection/Estimate/Index";
 import Filter from "../../components/Filter/Index";
 import Dashboard from "../../components/Dashboard/Visit_and_Prospection/Index";
 // import ImportLeads from "../../components/Prospection/ImportLeads";
-import ContentPasteGoIcon from '@mui/icons-material/ContentPasteGo';
 
+import ContentPasteGoIcon from '@mui/icons-material/ContentPasteGo';
 import { ReactComponent as ProspectionIcon } from '../../images/icons/Prospection.svg';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import BlockIcon from '@mui/icons-material/Block';
@@ -91,9 +93,18 @@ const Prospection = ({ user, leads, visits, userRef, members, sellers }) => {
   // eslint-disable-next-line no-unused-vars
   const [activityAll, setActivityAll] = useState();
   // const [viewImport, setViewImport] = useState(false);
+  const [run, setRun] = useState(false);
+  const [stepIndex, setStepIndex] = useState(4);
+  const refButton = useRef(null);
 
-  console.log(visits)
-
+  useEffect(() => {
+    const iniciarTutorial = () => {
+      if(userRef && userRef.tutorial) {
+        setRun(true);
+      }
+  }
+  iniciarTutorial();
+}, [userRef]);
 
   useEffect(() => {
     if(sellers) {
@@ -482,28 +493,68 @@ const closeAnotacaoBox = () => {
   })
   }
 
+  const handleJoyride = (data) => {
+    const { action, index, type } = data;
+    console.log(index);
+    if ([EVENTS.STEP_AFTER, EVENTS.TARGET_NOT_FOUND].includes(type)) {
+      // Update state to advance the tour
+        setStepIndex(index + (action === ACTIONS.PREV ? -1 : 1));
+
+      if(index === 5) {
+        return setView(true);
+       } else if (index === 8) {
+         setView(false);
+       } else if (index === 9) {
+        handleToggle(leads[0].id);
+       } else if (index === 13) {
+        refButton.current.click();
+       } else if (index === 18) {
+        openBox();
+       }
+    }
+  }
+
   return (
     <div className={styles.container_panel}>
+      <Joyride
+          steps={step}
+          run={run}
+          stepIndex={stepIndex}
+          continuous
+          showProgress
+          callback={handleJoyride}
+          locale={{
+            back: 'Voltar',
+            close: 'Fechar',
+            last: 'Próximo',
+            next: 'Próximo'
+          }}
+          styles={{
+            zIndex: 10000
+          }}
+        />
       <Header user={user} userRef={userRef}></Header>
       <div className={`${styles.title_panel} ${styles.desktop}`}>
-        <ProspectionIcon className={styles.prospecction_icon}/>
-        <h2>Prospecção</h2>
+        <div id="titulo">
+          <ProspectionIcon className={styles.prospecction_icon}/>
+          <h2>Prospecção</h2>
+        </div>
         { userRef && userRef.cargo !== 'Indicador' &&
          <Dashboard data={leads} type={'prospeccao'} sellers={sellers} />
         }
       </div>
       <div className={styles.content_panel}>
         <div className={styles.box_panel}>
-            <h2 class={styles.desktop}>Leads</h2>
+            <h2 class={styles.desktop}>Clientes</h2>
           <div className={`${styles.box_panel_add}`}>
           <div className={`${styles.title_panel} ${styles.mobile}`}>
             <ProspectionIcon className={styles.prospecction_icon}/>
             <h2>Prospecção</h2>
           </div>
-            {!view && !view ? 
-            <button className={styles.box_panel_add_activity} onClick={() => setView(true)}>
+            {!view && !view ?
+            <button id="cadastrar" className={styles.box_panel_add_activity} onClick={() => setView(true)}>
                 <ProspectionIcon className={styles.prospecction_icon} />
-                <p>Cadastrar Lead</p>
+                <p>Cadastrar Cliente</p>
               </button> 
               :
               <CreateProspection userRef={userRef} returnPage={returnPage} changeLoading={changeLoading} />
@@ -515,10 +566,10 @@ const closeAnotacaoBox = () => {
             sellers={sellersOrder} 
             userRef={userRef} 
             changeFilter={changeFilter}
-            type={'prospeccao'}
+            type={'prospeccao'} 
             />
           </div>  
-          <div className={styles.box_activity}>
+          <div id="lista" className={styles.box_activity}>
           <TableContainer className={styles.table_center} component={Paper}>
             <Table stickyHeader aria-label="sticky table">
               <TableHead>
@@ -572,8 +623,8 @@ const closeAnotacaoBox = () => {
                       data-cooltipz-dir="right" className={`${styles.perdido} desktop`}>{data.status}</TableCell></>
                     }
                   <TableCell align="center" className="desktop">{data.data.replace('-', 'às')}</TableCell>
-                  <TableCell align="center">{data.nome ? data.nome.substring(0, 30) + '...' : ""}</TableCell>
-                  <TableCell align="center">{data.empresa}</TableCell>
+                  <TableCell align="center">{data.nome ? data.nome.substring(0, 10) + '...' : ""}</TableCell>
+                  <TableCell align="center">{data.empresa ? data.empresa.substring(0, 10) + '...' : ""}</TableCell>
                   <TableCell align="center">{data.cidade ? data.cidade.substring(0, 10) + '...' : ""}</TableCell>
                   <TableCell align="center" className="desktop-650"><b>{data.indicador} ({data && members.filter((member) => member.id === data.uid)[0].id_user})</b></TableCell>
                   {/* <TableCell align="center">{activity.filter((act) => act.idRef === data.id).length}</TableCell> */}
@@ -593,7 +644,7 @@ const closeAnotacaoBox = () => {
                       <Box className={styles.info_anotacao} margin={3}>
                         <Estimate data={data} visits={visits} members={members} openEstimate={openEstimate} close={close} open={openBox} userRef={userRef} />
                             {data.status === 'Ativo' && 
-                            <Box className={styles.info_step} sx={{ width: '87%', marginBottom: '1rem' }}>
+                            <Box id="status" className={styles.info_step} sx={{ width: '87%', marginBottom: '1rem' }}>
                               <p><b>{data && data.data.replace('-', 'às')}</b></p>
                               <p>Lead ativo</p>
                             </Box>
@@ -635,7 +686,7 @@ const closeAnotacaoBox = () => {
                             </Box>
                             }
                         <Box class={styles.box_stepper}>
-                          <Stepper activeStep={data && data.step} orientation={'horizontal'}>
+                          <Stepper id="etapa" activeStep={data && data.step} orientation={'horizontal'}>
                             {steps.map((label, index) => {
                               const labelProps = {};
                               if(data && data.status === 'Perdido' && index === data.step - 1) { // Pega a ultima etapa e gera um erro
@@ -684,7 +735,7 @@ const closeAnotacaoBox = () => {
                           > 
                             <EditIcon />
                           </IconButton></div>}
-                        <EditProspection changeLoading={changeLoading} data={data} />
+                        <EditProspection changeLoading={changeLoading} data={data} refButton={refButton}/>
                               <div className={styles.activity_button}>
                                 <ThemeProvider theme={theme}>
                                 {(userRef && userRef.cargo !== 'Indicador') &&
@@ -736,6 +787,7 @@ const closeAnotacaoBox = () => {
                                 </Button></>}
                                   {((data.status === "Ativo" || data.status === "Orçamento Cancelado")  && userRef && userRef.cargo === 'Indicador') &&
                                   <Button
+                                  id="botaoOrçamento"
                                   variant="contained"
                                   color="primary"
                                   size="small"

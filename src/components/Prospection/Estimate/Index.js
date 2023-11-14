@@ -530,7 +530,7 @@ const Estimate = ({data, visits, members, openEstimate, close, open, userRef}) =
       }
       {viewVisit && viewVisit === 'dados' &&
         <DialogContent>
-          <DialogContentText sx={{ textAlign: "center" }}>
+          <DialogContentText id="avisoOrçamento" sx={{ textAlign: "center" }}>
             Preencha os campos abaixo para solicitar um <b>Orçamento</b>.
           </DialogContentText>
           <form onSubmit={onVisit}>
@@ -630,7 +630,7 @@ const Estimate = ({data, visits, members, openEstimate, close, open, userRef}) =
                     variant="outlined" />
               </div>
               <div className={styles.input_file}>
-                <Button component="label" variant="contained" onChange={(e) => setFatura({ file: URL.createObjectURL(e.target.files[0]), complete: e.target.files[0] })} startIcon={<CloudUploadIcon />}>
+                <Button id="enviarFatura" component="label" variant="contained" onChange={(e) => setFatura({ file: URL.createObjectURL(e.target.files[0]), complete: e.target.files[0] })} startIcon={<CloudUploadIcon />}>
                   Enviar Fatura
                   <VisuallyHiddenInput type="file" accept="image/png,image/jpeg" />
                 </Button>
@@ -641,7 +641,7 @@ const Estimate = ({data, visits, members, openEstimate, close, open, userRef}) =
             </ThemeProvider>
             <ThemeProvider theme={theme}>
               <DialogActions sx={{ justifyContent: 'center' }}>
-                <Button variant='outlined' type="submit">Proximo</Button>
+                <Button id="botãoProximo" variant='outlined' type="submit">Proximo</Button>
                 <Button variant='outlined' color="error" onClick={() => close()}>Cancelar</Button>
               </DialogActions>
             </ThemeProvider>

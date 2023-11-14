@@ -12,8 +12,8 @@ import Swal from 'sweetalert2/dist/sweetalert2.js';
 import useAuth from '../../hooks/useAuth';
 import Header from '../../components/Header/Index';
 import { Users } from '../../data/Data';
-import { useNavigate } from 'react-router-dom';
 import Joyride from 'react-joyride';
+import step from '../../data/step';
 
 // import Button from '@mui/material/Button';
 // import TextField from '@mui/material/TextField';
@@ -52,36 +52,7 @@ const Schedules = ({ userRef, alerts, check, reports }) => {
   // Geocode.setRegion("br");
   // Geocode.setApiKey(KeyMaps);
   // Geocode.setLocationType("ROOFTOP");
-  const navigate = useNavigate();
   const [run, setRun] = useState(false);
-
- const step = [
-  {
-     title: 'Prospecção',
-     target: '.prospecção',
-     disableBeacon: true,
-     content: 'Passo 1: Descrição da primeira etapa na Página 1'
-  },
-  {
-     title: 'Cache',
-     target: '.cache',
-     disableBeacon: true,
-     content: 'Passo 3: Descrição da primeira etapa na Página 1',
-  },
-  {
-     title: 'Notificação',
-     target: '#notificação',
-     disableBeacon: true,
-     content: 'Passo 4: Descrição da primeira etapa na Página 1',
-  },
-  {
-     title: 'Sair',
-     target: '#sair',
-     disableBeacon: true,
-     content: 'Passo 4: Descrição da primeira etapa na Página 1',
-  },
-  // Adicione mais etapas conforme necessário
-]
 
   const Alert = forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -92,13 +63,29 @@ const Schedules = ({ userRef, alerts, check, reports }) => {
     useEffect(() => {
 
         const iniciarTutorial = () => {
-          setTimeout(() => {
-            setRun(true);
-        }, 2000);
+          if(userRef && userRef.tutorial) {
+            Swal.fire({
+                    title: `Olá ${userRef.nome}!`,
+                    html: `Seja bem vindo a família <b>CORPBRASIL</b>!</br></br>` +
+                    `É um prazer ter você conosco! Preparamos um tutorial especial para que você possa explorar e dominar todas as funcionalidades incríveis do nosso aplicativo. </br></br> ` +
+                    `Este guia passo a passo foi criado pensando em você, para garantir uma experiência de aprendizado tranquila e eficiente. </br></br><b>Vamos começar?</b>`,
+                    confirmButtonText: "Vamos!",
+                    confirmButtonColor: "#d33",
+                    imageUrl: 'https://corpbrasilindicadores.netlify.app/static/media/LogoCORPBRASIL.b19f9ae36d07a183bb3e.png',
+                    imageWidth: 295,
+                    imageHeight: 64,
+                    allowEscapeKey: false,
+                    allowEnterKey: false,
+                    allowOutsideClick: false,
+                    imageAlt: "CORPBRASIL Energia Renovável"  
+                  }).then(() => {
+                    setRun(true);
+                  })
+          }
         } 
       
         iniciarTutorial();
-    },[])
+    },[userRef])
     
 
     // const [rawValue, setRawValue] = useState(" ");
@@ -347,12 +334,10 @@ const Schedules = ({ userRef, alerts, check, reports }) => {
   // }
   
   const handleJoyride = (data) => {
-    const { index, status } = data; // Continuar por aqui
+    const { index } = data;
 
-    console.log(index);
-
-    if(status === 'finished' && index === step.length - 1) {
-      navigate('/prospeccao');
+    if(index === 3) {
+      sessionStorage.setItem('step', 4);
     }
   }
 
@@ -361,7 +346,15 @@ const Schedules = ({ userRef, alerts, check, reports }) => {
       <Joyride
           steps={step}
           run={run}
+          continuous
+          showProgress
           callback={handleJoyride}
+          locale={{
+            back: 'Voltar',
+            close: 'Fechar',
+            last: 'Próximo',
+            next: 'Próximo'
+          }}
         />
       <Header user={user} userRef={userRef} alerts={alerts} reports={reports}></Header>
       <div className='title-schedule'>
@@ -449,7 +442,7 @@ const Schedules = ({ userRef, alerts, check, reports }) => {
                 </div>
            }
             {userRef && (user.email === Users[0].email || userRef.cargo !== "Técnico") && userRef.nome !== 'Pós-Venda' &&
-            <div className='box-schedule prospecção'>
+            <div id='prospecção' className='box-schedule prospecção'>
               <li className='schedule'>
                 <Link className='schedule__content' to="/prospeccao">
                   <div className='schedule__icon prospection'><Prospection /></div>

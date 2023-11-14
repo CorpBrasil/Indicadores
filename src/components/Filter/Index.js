@@ -210,8 +210,8 @@ const handleClick = (event) => {
   return (
     <div className='filter-container'>
     <ThemeProvider theme={theme}>
-      <Button aria-describedby={id} variant="outlined" color="primary" onClick={handleClick} startIcon={<AddCircleOutlineIcon />}>
-      Adicionar Filtro
+      <Button id='filtro' aria-describedby={id} variant="outlined" color="primary" onClick={handleClick} startIcon={<AddCircleOutlineIcon />}>
+        Adicionar Filtro
       </Button>
       <div className="filter-search">
       {searchParams && searchParams &&

@@ -148,7 +148,7 @@ const CreateProspection = ({
         <h4>Cadastrar Lead</h4>
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="box-visit__container">
-            <span className="box-visit__notice">Campo com * é obrigatório</span>
+            <span id="aviso" className="box-visit__notice">Campo com * é obrigatório</span>
             <div className="box-visit__form"> 
                   <label className="label">
                     <p>Responsável *</p>
@@ -211,7 +211,7 @@ const CreateProspection = ({
                       autoComplete="off"
                       {...register("consumo")} />
                   </label>
-                  <label className="label-max">
+                  <label id="anotação" className="label-max">
                     <p>Anotação</p>
                     <textarea
                       className="label__textarea"
@@ -222,7 +222,7 @@ const CreateProspection = ({
                   </label>
           </div>
           </div>
-          <input className="box-visit__btn" type="submit" value="CRIAR" />
+          <input id="criar" className="box-visit__btn" type="submit" value="CRIAR" />
         </form>
       </div>
     </div>

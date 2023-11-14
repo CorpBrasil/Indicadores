@@ -16,7 +16,8 @@ import Button from "@mui/material/Button";
 import "../../Box/style.scss";
 
 const EditProspection = ({
-  data
+  data,
+  refButton
 }) => {
   // const [view, setView] = useState(false);
   const { register, handleSubmit, setValue, watch } = useForm();
@@ -110,7 +111,7 @@ const EditProspection = ({
     <div className="box-visit__container">
                   <form onSubmit={handleSubmit(onSubmit)}>
                   <div className="box-visit__form"> 
-                  <label className="label">
+                  <label id="nome" className="label">
                     <p>Nome *</p>
                     <input
                       className="label__input"
@@ -196,6 +197,8 @@ const EditProspection = ({
                       </form>
                       {!viewEdit && !viewEdit &&
                       <Button
+                       id="alterarDados"
+                       ref={refButton}
                        variant="outlined"
                        color="primary"
                        sx={{ maxWidth: '10rem' }}
