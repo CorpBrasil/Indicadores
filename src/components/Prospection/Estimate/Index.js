@@ -84,7 +84,7 @@ const Estimate = ({data, visits, members, openEstimate, close, open, userRef, st
 
   useEffect(() => {
     const iniciarTutorial = () => {
-      if(userRef && userRef.tutorial) {
+      if(userRef && userRef.tutorial === true) {
         setRun(true);
       }
   }
@@ -407,9 +407,13 @@ console.log(stepIndex);
           showCloseButton: true,
           confirmButtonText: 'Fechar',
           confirmButtonColor: "red"
-        }).then((result) => {
+        }).then(async (result) => {
           close();
           setviewVisit('dados');
+          await updateDoc(doc(dataBase, 'Membros', userRef && userRef.id), {
+            tutorial: false
+          })
+          window.location.reload();
         })
       }
     }
@@ -434,18 +438,20 @@ console.log(stepIndex);
           color: (theme) => theme.palette.grey[500],
         }}
         ><CloseIcon /></IconButton>
-        <Joyride
-          steps={step}
-          run={run}
-          stepIndex={stepIndex}
-          continuous={stepIndex === 23 ? false : true}
-          callback={handleJoyride}
-          locale={{
-            back: 'Voltar',
-            close: 'Finalizar',
-            last: 'Finalizar',
-            next: 'Próximo'
-          }}/>
+        {userRef && userRef.tutorial &&    
+          <Joyride
+            steps={step}
+            run={run}
+            stepIndex={stepIndex}
+            continuous={stepIndex === 23 ? false : true}
+            callback={handleJoyride}
+            locale={{
+              back: 'Voltar',
+              close: 'Finalizar',
+              last: 'Finalizar',
+              next: 'Próximo'
+            }}/>
+        }
       <DialogTitle align="center">Solicitar Orçamento</DialogTitle>
       {viewVisit && viewVisit === 'loading' &&
       <div className={styles.loading}>

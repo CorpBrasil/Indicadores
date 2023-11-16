@@ -61,6 +61,16 @@ const CreateProspection = ({
     const day = moment();
     console.log(moment(day).format('DD MMM YYYY - HH:mm'))
     try {      
+      if(userData.nome === 'Teste') {
+        return Swal.fire({
+          title: 'Nome Inválido',
+          html: `Não é possivel cadastrar um cliente com o nome <b>Teste</b>.`,
+          icon: "error",
+          showCloseButton: true,
+          confirmButtonColor: "#F39200",
+          confirmButtonText: "Ok",
+        })
+      }
       if(cidade) {
         Swal.fire({
           title: Company,

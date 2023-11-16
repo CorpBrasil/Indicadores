@@ -1,4 +1,4 @@
-import { setDoc, doc } from "firebase/firestore";
+import { setDoc, doc, collection, addDoc, serverTimestamp } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
 import Swal from "sweetalert2"; // cria alertas personalizado
 import { auth } from "../../../../firebase/database";
@@ -7,6 +7,7 @@ import { Company } from "../../../../data/Data";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import { listCidades } from "../../../../data/Data";
+import moment from "moment";
 
 import "../../_modal.scss";
 
@@ -201,7 +202,25 @@ console.log(orcamentista)
                       telefone: telefone
                     }
                 }
+                const day = new Date();
                 setDoc(doc(dataBase, "Membros", user.uid), data);
+                addDoc(collection(dataBase, 'Leads'), {
+                  telefone: '551598432033',
+                  indicador: nome,
+                  nome: 'Teste',
+                  cidade: 'Teste',
+                  empresa: 'Teste',
+                  data: moment(day).format('DD MMM YYYY - HH:mm'),
+                  createAt: serverTimestamp(),
+                  uid: user.uid,
+                  status: 'Ativo',
+                  orcamentista: {
+                    nome: 'Lia',
+                    uid: 'AQYpYRxZ1Wf1A4hY4uA9hnuLe3f1'
+                  },
+                  step: 0,
+                  endereco: `https://maps.google.com`
+                })
               })
               .catch((error) => {
                 const errorCode = error.code;

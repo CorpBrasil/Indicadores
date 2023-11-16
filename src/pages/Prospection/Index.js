@@ -347,11 +347,11 @@ const Prospection = ({ user, leads, visits, userRef, members, sellers }) => {
             if (data.visitRef) {
               await deleteDoc(doc(dataBase, 'Visitas', data.visitRef))
             }
-            deleteObject(faturatRef).then(() => {
-              console.log('Fatura Deletada!')
-            }).catch((error) => {
-              // Uh-oh, an error occurred!
-            });
+            if(data.storageRf) {
+              deleteObject(faturatRef).then(() => {
+                console.log('Fatura Deletada!')
+              })
+            } 
             Swal.fire({
               title: Company,
               html: `O Lead foi excluido com sucesso.`,
@@ -517,6 +517,7 @@ const closeAnotacaoBox = () => {
 
   return (
     <div className={styles.container_panel}>
+      {userRef && userRef.tutorial &&
       <Joyride
           steps={step}
           run={run}
@@ -528,7 +529,7 @@ const closeAnotacaoBox = () => {
             close: 'Fechar',
             last: 'Próximo',
             next: 'Próximo'
-          }}/>
+          }}/>}
       <Header user={user} userRef={userRef}></Header>
       <div className={`${styles.title_panel} ${styles.desktop}`}>
         <div id="titulo">
@@ -589,32 +590,32 @@ const closeAnotacaoBox = () => {
                   // sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                   >
                     {data.status === 'Ativo' &&
-                    <><TableCell align="center" sx={{ backgroundColor: "#03a9f4" }} className={`${styles.icon_status} mobile`}><PersonIcon /></TableCell>
+                    <><TableCell align="center" aria-label='Ativo' data-cooltipz-dir="right" sx={{ backgroundColor: "#03a9f4" }} className={`${styles.icon_status} mobile`}><PersonIcon /></TableCell>
                       <TableCell id="ativo" align="center" className={`${styles.ativo} desktop`}>{data.status}</TableCell></>
                     }
                     {data.status === 'Orçamento' &&
-                      <><TableCell align="center" sx={{ backgroundColor: "#f44b03" }} className={`${styles.icon_status} mobile`}><ContactPageIcon /></TableCell>
+                      <><TableCell align="center" aria-label='Orçamento' data-cooltipz-dir="right" sx={{ backgroundColor: "#f44b03" }} className={`${styles.icon_status} mobile`}><ContactPageIcon /></TableCell>
                       <TableCell align="center" className={`${styles.orcamento} desktop`}>{data.status}</TableCell></>
                     }
                     {data.status === 'Orçamento Cancelado' &&
-                      <><TableCell align="center" sx={{ backgroundColor: "#f44b03" }} className={`${styles.icon_status} mobile`}><ContactPageIcon /></TableCell>
+                      <><TableCell align="center" aria-label='Orçamento Cancelado' data-cooltipz-dir="right" sx={{ backgroundColor: "#f44b03" }} className={`${styles.icon_status} mobile`}><ContactPageIcon /></TableCell>
                       <TableCell align="center" className={`${styles.orcamento_negado} desktop`}>{data.status}</TableCell></>
                     }
                     {data.status === 'Aguardando Apresentação' &&
-                      <><TableCell align="center" sx={{ backgroundColor: "#4e12fc" }} className={`${styles.icon_status} mobile`}><AssignmentIndIcon /></TableCell>
+                      <><TableCell align="center" aria-label='Aguardando Apresentação' data-cooltipz-dir="right" sx={{ backgroundColor: "#4e12fc" }} className={`${styles.icon_status} mobile`}><AssignmentIndIcon /></TableCell>
                       <TableCell align="center" className={`${styles.apresentacao_wait} desktop`}>{data.status}</TableCell></>
                     }
                     {data.status === 'Apresentação' &&
-                      <><TableCell align="center" sx={{ backgroundColor: "#126cfc" }} className={`${styles.icon_status} mobile`}><AssignmentIndIcon /></TableCell>
+                      <><TableCell align="center" aria-label='Apresentação' data-cooltipz-dir="right" sx={{ backgroundColor: "#126cfc" }} className={`${styles.icon_status} mobile`}><AssignmentIndIcon /></TableCell>
                       <TableCell align="center" className={`${styles.apresentacao} desktop`}>{data.status}</TableCell></>
                     }
                     {data.status === 'Ganho' &&
-                    <><TableCell align="center" sx={{ backgroundColor: "green" }} className={`${styles.icon_status} mobile`}><HowToRegIcon /></TableCell>
+                    <><TableCell align="center" aria-label='Ganho' data-cooltipz-dir="right" sx={{ backgroundColor: "green" }} className={`${styles.icon_status} mobile`}><HowToRegIcon /></TableCell>
                       <TableCell align="center" aria-label={data.dataStatus && data.dataStatus.replace('-','às')}
                       data-cooltipz-dir="right" className={`${styles.ganho} desktop`}>{data.status}</TableCell></>
                     }
                     {data.status === 'Perdido' &&
-                    <><TableCell align="center" sx={{ backgroundColor: "#db2324" }} className={`${styles.icon_status} mobile`}><PersonOffIcon /></TableCell>
+                    <><TableCell align="center" aria-label='Perdido'data-cooltipz-dir="right" sx={{ backgroundColor: "#db2324" }} className={`${styles.icon_status} mobile`}><PersonOffIcon /></TableCell>
                       <TableCell align="center" aria-label={data.dataStatus && data.dataStatus.replace('-','às')}
                       data-cooltipz-dir="right" className={`${styles.perdido} desktop`}>{data.status}</TableCell></>
                     }
@@ -793,16 +794,18 @@ const closeAnotacaoBox = () => {
                                 >
                                   Gerar Orçamento
                                 </Button>}
-                                  <ThemeProvider theme={redTheme}>
-                                <Button
-                                  variant="contained"
-                                  size="small"
-                                  type="submit"
-                                  startIcon={<DeleteIcon />}
-                                  onClick={() => deleteLead(data)}
-                                >
-                                    Excluir
-                                  </Button>
+                                <ThemeProvider theme={redTheme}>
+                                {data.nome !== 'Teste' && 
+                                  <Button
+                                    variant="contained"
+                                    size="small"
+                                    type="submit"
+                                    startIcon={<DeleteIcon />}
+                                    onClick={() => deleteLead(data)}
+                                  >
+                                      Excluir
+                                    </Button>
+                                }
                                   </ThemeProvider>
                                 
                             </div>

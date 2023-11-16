@@ -22,12 +22,8 @@ export const step = [
    title: 'Prospecção',
    target: '.prospecção',
    disableBeacon: true,
-   disableOverlayClose: true,
-   hideCloseButton: true,
    placement: 'bottom',
-   hideFooter: true,
-   spotlightClicks: true,
-   content: <p>Esse botão levará você a página de <b>Prospecção</b>, aonde você irá cadastrar os seus clientes e solicitar orçamento. <b>Clique 2 vezes no botão para continuar</b></p>
+   content: <p>Esse botão levará você a página de <b>Prospecção</b>, aonde você irá cadastrar os seus clientes e solicitar orçamento. <b>Clique no botão para continuar</b></p>
 },
  {
    title: 'Página de Prospecção',
@@ -126,6 +122,8 @@ export const step = [
    target: '#avisoOrçamento',
    placement: 'bottom',
    disableBeacon: true,
+   disableScrolling: true,
+   hideBackButton: true,
    content: <p> Para solicitar o orçamento, é necessario <b>preencher todos os campos e enviar uma foto da fatura de energia</b> do cliente.</p>
 },
  {
@@ -133,6 +131,7 @@ export const step = [
    target: '#enviarFatura',
    placement: 'top',
    disableBeacon: true,
+   disableScrolling: true,
    content: <p> Para enviar a fatura, clique em <b>ENVIAR FATURA</b> e escolha foto da fatura</p>
 },
  {
@@ -140,6 +139,7 @@ export const step = [
    target: '#botãoProximo',
    placement: 'top',
    disableBeacon: true,
+   disableScrolling: true,
    content: <p> Após ter preenchido todos os campos e enviado a fatura, clique em <b>PROXIMO</b> para escolher o <b>data de apresentação do orçamento.</b></p>
 },
  {

@@ -42,10 +42,13 @@ import { ReactComponent as Prospection } from '../../images/icons/Prospection.sv
 import ContentPasteIcon from '@mui/icons-material/ContentPaste';
 // import { ReactComponent as ReportIcon } from '../../images/icons/Report.svg';
 import CachedIcon from '@mui/icons-material/Cached';
+import LiveHelpIcon from '@mui/icons-material/LiveHelp';
 
 
 
 import './_style.scss';
+import { doc, updateDoc } from 'firebase/firestore';
+import { dataBase } from '../../firebase/database';
 
 const Schedules = ({ userRef, alerts, check, reports }) => {
   // Geocode.setLanguage("pt-BR");
@@ -336,26 +339,35 @@ const Schedules = ({ userRef, alerts, check, reports }) => {
   const handleJoyride = (data) => {
     const { index } = data;
 
-    if(index === 3) {
-      sessionStorage.setItem('step', 4);
+    console.log(index)
+    if(index === 4) {
+      window.location.href = '/prospeccao'
+      
     }
+  }
+
+  const tutorialOn = async () => {
+    await updateDoc(doc(dataBase, 'Membros', userRef && userRef.id), {
+      tutorial: true
+    })
   }
 
   return (
     <div className='container-schedules'>
-      <Joyride
-          steps={step}
-          run={run}
-          continuous
-          showProgress
-          callback={handleJoyride}
-          locale={{
-            back: 'Voltar',
-            close: 'Fechar',
-            last: 'Próximo',
-            next: 'Próximo'
-          }}
-        />
+      {userRef && userRef.tutorial && 
+        <Joyride
+            steps={step}
+            run={run}
+            continuous
+            callback={handleJoyride}
+            locale={{
+              back: 'Voltar',
+              close: 'Fechar',
+              last: 'Próximo',
+              next: 'Próximo'
+            }}
+          />
+      }
       <Header user={user} userRef={userRef} alerts={alerts} reports={reports}></Header>
       <div className='title-schedule'>
         <HomeOutlinedIcon sx={{ width: '50px', height: '50px' }} />
@@ -491,19 +503,17 @@ const Schedules = ({ userRef, alerts, check, reports }) => {
              </Link>
          </li>
            </div> */}
-       {/* {userRef && (user.email === Users[0].email || userRef.cargo === "Administrador" || userRef.cargo === "Técnico" || findTec) && 
-        // <><div className='box-schedule'>
-        //       <li className='schedule'>
-        //         <Link className='schedule__content' onClick={() => handleClickOpen()}>
-        //           <div className='schedule__icon fuel'><LocalGasStationIcon /></div>
-        //           <div className='schedule__text'>
-        //             <p>Confirmar</p>
-        //             <p>Combustivel</p>
-        //           </div>
-        //         </Link>
-        //       </li>
-        //     </div>
-    // } */}
+       {userRef && userRef.cargo === "Indicador" && 
+          <div className='box-schedule'>
+              <li className='schedule'>
+                <Link className='schedule__content' onClick={() => tutorialOn()}>
+                  <div className='schedule__icon fuel'><LiveHelpIcon /></div>
+                  <div className='schedule__text'>
+                    <p>Tutorial</p>
+                  </div>
+                </Link>
+              </li>
+            </div>}
             <div className='box-schedule cache'>
                 <li className='schedule'>
                   <Link className='schedule__content' onClick={() => clearCacheData()}>
