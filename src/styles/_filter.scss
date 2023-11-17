@@ -25,6 +25,11 @@
   flex-direction: column;
   gap: 0.5rem;
   width: 260px;
+
+  div {
+    text-align: center;
+  }
+  
 }
 
 .filter-header {

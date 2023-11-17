@@ -280,6 +280,10 @@ const handleClick = (event) => {
               onChange={(e) => setSearchValue(e.target.value)}
             >
               <MenuItem value='Ativo'>Ativo</MenuItem>
+              <MenuItem value='Orçamento'>Orçamento</MenuItem>
+              <MenuItem value='Orçamento Cancelado'>Orçamento Cancelado</MenuItem>
+              <MenuItem value='Aguardando Apresentação'>Aguardando Apresentação</MenuItem>
+              <MenuItem value='Apresentação'>Apresentação</MenuItem>
               <MenuItem value='Ganho'>Ganho</MenuItem>
               <MenuItem value='Perdido'>Perdido</MenuItem>
             </Select>

@@ -505,7 +505,7 @@ const closeAnotacaoBox = () => {
        } else if (index === 8) {
          setView(false);
        } else if (index === 9) {
-        handleToggle(leads[0].id);
+        handleToggle(leads && leads.filter(lead => lead.nome === 'Teste').id);
        } else if (index === 14) {
         refButton.current.click();
        } else if (index === 16) {

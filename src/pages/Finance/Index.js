@@ -147,6 +147,8 @@ useEffect(() => {
     setSchedule(data);
   }
 
+  console.log(tecs)
+
   return (
     <div className="container-schedule">
       <Header user={user} userRef={userRef} alerts={alerts}></Header>
@@ -206,9 +208,9 @@ useEffect(() => {
                   <tbody>
                     {schedule && sales && sales.map((vend, index) => (
                       <tr className="table" key={index}>
-                      <td>{schedule.filter((ref) => ref.indicador === vend && ref.tecnico === tec && ref.tecnico !== 'Bruna' && ref.tecnico !== 'Lia').length}</td>
+                      <td>{schedule.filter((ref) => ref.indicadorFull === vend && ref.tecnico === tec && ref.tecnico !== 'Bruna' && ref.tecnico !== 'Lia').length}</td>
                       <td>
-                      {(schedule.filter((ref) => ref.indicador === vend && ref.tecnico === tec && ref.tecnico !== 'Bruna' && ref.tecnico !== 'Lia').length * 20).toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})}
+                      {(schedule.filter((ref) => ref.indicadorFull === vend && ref.tecnico === tec && ref.tecnico !== 'Bruna' && ref.tecnico !== 'Lia').length * 20).toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})}
                       </td>
                     </tr>
                     ))}
