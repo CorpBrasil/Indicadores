@@ -167,7 +167,7 @@ const CreateProspection = ({
       //     // Authorization: `Bearer 539a73a237da073291badf63d3033602ecb0b0b540dc15de27b8e1bb3d97fe69`
       //   }
       // };
-     await axios.get(`https://corpbrasilindicadores.netlify.app/www.receitaws.com.br/v1/cnpj/${docFormat}`)
+     await axios.get(`https://receitaws.com.br/v1/cnpj/${docFormat}`)
      .then((result) => {
         console.log(result)
       })
