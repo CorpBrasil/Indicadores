@@ -7,11 +7,14 @@ import { useForm } from "react-hook-form"; // cria formulário personalizado
 import Swal from 'sweetalert2/dist/sweetalert2.js';
 import * as moment from "moment";
 import "moment/locale/pt-br";
+import axios from 'axios';
 
 import { KeyMaps } from "../../../data/Data";
 import { Company } from "../../../data/Data";
 import { dataBase } from "../../../firebase/database";
-
+import RadioGroup from '@mui/material/RadioGroup';
+import Radio from '@mui/material/Radio';
+import FormControlLabel from '@mui/material/FormControlLabel';
 import "../../Box/style.scss";
 
 const CreateProspection = ({
@@ -24,6 +27,8 @@ const CreateProspection = ({
   const [lng, setLng] = useState();
   const [lat, setLat] = useState();
   const [cidade, setCidade] = useState(undefined);
+  const [cpfCnpj, setCpfCnpj] = useState('CPF');
+  const [doc, setDoc] = useState(undefined);
 
   Geocode.setLanguage("pt-BR");
   Geocode.setRegion("br");
@@ -149,6 +154,27 @@ const CreateProspection = ({
     }
   };
 
+  const findDoc = async (data) => {
+    if(cpfCnpj === 'CPF') {
+
+    } else {
+      let docFormat = doc.replace(/\D/g, '');
+      // const options = {
+      //   method: 'GET',
+      //   url: `https://receitaws.com.br/v1/cnpj/34691677000135`,
+      //   headers: {
+      //     Accept: 'application/json',
+      //     // Authorization: `Bearer 539a73a237da073291badf63d3033602ecb0b0b540dc15de27b8e1bb3d97fe69`
+      //   }
+      // };
+     await axios.get(`https://corpbrasilindicadores.netlify.app/www.receitaws.com.br/v1/cnpj/${docFormat}`)
+     .then((result) => {
+        console.log(result)
+      })
+      console.log('eae')
+    }
+  }
+
   return (
     <div className="box-visit">
       <div className="box-visit__box">
@@ -191,6 +217,29 @@ const CreateProspection = ({
                       {...register("cidade")} />
                   </label>
                     <label className="label">
+                    <RadioGroup
+                      className="input-radio"
+                      aria-labelledby="demo-radio-buttons-group-label"
+                      value={cpfCnpj}
+                      onChange={(e) => setCpfCnpj(e.target.value)}
+                      name="radio-buttons-group"
+                    >
+                      <FormControlLabel value="CPF" control={<Radio />} label="CPF" />
+                      <FormControlLabel value="CNPJ" control={<Radio />} label="CNPJ" />
+                    </RadioGroup>
+                    <PatternFormat
+                    className="label__input"
+                    value={doc || ''}
+                    onChange={(e) => setDoc(e.target.value)}
+                    onBlur={() => findDoc(cpfCnpj)}
+                    format={cpfCnpj === 'CPF' ? "###.###.###-##" : "##.###.###/####-##"}
+                    mask="_"
+                    placeholder={cpfCnpj === 'CPF' ? "000.000.000-00" : "00.000.000/0000-00"}
+                    label="Celular"
+                    variant="outlined"
+                    color="primary"/>
+                  </label>
+                    <label className="label">
                     <p>Telefone</p>
                     <PatternFormat
                     className="label__input"
@@ -198,6 +247,7 @@ const CreateProspection = ({
                     onChange={(e) => setCelular(e.target.value)}
                     format="(##) ##### ####"
                     mask="_"
+                    required
                     placeholder="(DD) 00000-0000"
                     label="Celular"
                     variant="outlined"

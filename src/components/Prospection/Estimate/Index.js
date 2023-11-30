@@ -731,8 +731,8 @@ console.log(stepIndex);
       </div>
       <ThemeProvider theme={theme}>
       <DialogActions className={styles.fatura_buttons} sx={{ justifyContent: 'center' }}>
-              <Button variant='contained' onClick={() => setOpenFatura(false)}>FECHAR</Button>
-            </DialogActions>
+          <Button variant='contained' onClick={() => setOpenFatura(false)}>FECHAR</Button>
+      </DialogActions>
       </ThemeProvider>
       </Dialog>
       {isLoaded && 

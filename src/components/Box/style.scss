@@ -26,6 +26,17 @@
       font-size: 0.8rem;
     }
 
+    .input-radio {
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      height: 21px;
+
+      label {
+        height: 100%!important;
+      }
+    }
+
     &__box {
         width: 100%;
         max-width: 1200px;

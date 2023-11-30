@@ -60,7 +60,7 @@ import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 
 
-const Commercial = ({ user, leads, activity, userRef, members}) => {
+const Commercial = ({ visits, user, leads, activity, userRef, members}) => {
   const [anotacao, setAnotacao] = useState('');
   const [anotacaoBox, setAnotacaoBox] = useState(false);
   const [view, setView] = useState(false);
@@ -465,7 +465,7 @@ const closeAnotacaoBox = () => {
                 <p>Imprimir</p>
               </button>
           </div>
-          <Dashboard dataBase={dataBase} activity={activity} dateValue={value} leads={leads} consultora={consultora} sendData={sendData} />
+          <Dashboard visits={visits} dataBase={dataBase} activity={activity} dateValue={value} leads={leads} consultora={consultora} sendData={sendData} />
       </div>
       <div className={styles.content_panel}>
         <div className={styles.box_panel}>
