@@ -167,7 +167,14 @@ const CreateProspection = ({
       //     // Authorization: `Bearer 539a73a237da073291badf63d3033602ecb0b0b540dc15de27b8e1bb3d97fe69`
       //   }
       // };
-     await axios.get(`https://receitaws.com.br/v1/cnpj/${docFormat}`)
+    const token = 'f05d24a09286b0b524eca47d563355cdfa5efa458a7e9bd5f3f1ae94a9010150';
+     await axios.get(`https://receitaws.com.br/v1/cnpj/${docFormat}`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        "Access-Control-Allow-Origin": "true",
+        'Accept': 'application/json'
+      }
+    })
      .then((result) => {
         console.log(result)
       })
