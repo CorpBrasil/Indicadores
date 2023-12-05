@@ -691,10 +691,11 @@ console.log(stepIndex);
               <div id="enviarFatura" className={styles.input_file}>
                 <Button component="label" variant="contained" onChange={(e) => setFatura({ file: URL.createObjectURL(e.target.files[0]), complete: e.target.files[0] })} startIcon={<CloudUploadIcon />}>
                   Enviar Fatura
-                  <VisuallyHiddenInput type="file" accept="image/png,image/jpeg" />
+                <VisuallyHiddenInput type="file" accept="image/png,image/jpeg" />
                 </Button>
                 {fatura &&
-                  <Button variant='outlined' color='success' onClick={() => setOpenFatura(true)} endIcon={<CheckIcon />}>Visualizar</Button>}
+                  <Button variant='outlined' color='success' onClick={() => setOpenFatura(true)} endIcon={<CheckIcon />}>Visualizar</Button>
+                }
                 <div className={styles.input_file_icon}></div>
               </div>
             </ThemeProvider>

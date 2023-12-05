@@ -1,4 +1,5 @@
 import { setDoc, doc, collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { getStorage, ref, uploadBytesResumable, getDownloadURL} from "firebase/storage";
 import React, { useEffect, useState } from "react";
 import Swal from "sweetalert2"; // cria alertas personalizado
 import { auth } from "../../../../firebase/database";
@@ -23,17 +24,23 @@ import FormControl from "@mui/material/FormControl";
 import Button from "@mui/material/Button";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import { theme } from '../../../../data/theme';
 import { ThemeProvider } from "@mui/material";
 import Autocomplete from "@mui/material/Autocomplete";
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
+import { styled } from '@mui/material/styles';
+
+import Profile from '../../../../images/profile.jpg';
 
 import styles from "./styles.module.scss";
 
 const CreateAdmin = ({ members, open, close, openBox}) => {
   // const { register, handleSubmit } = useForm();
+  const storage = getStorage();
   const navigate = useNavigate();
+  const [photo, setPhoto] = useState();
   const [cargo, setCargo] = useState("Indicador");
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
@@ -65,6 +72,8 @@ useEffect(() => {
   }
 // eslint-disable-next-line react-hooks/exhaustive-deps
 },[idCidade])
+
+console.log(photo)
 
 useEffect(() => {
   const fethData = () => {
@@ -101,153 +110,336 @@ useEffect(() => {
 // eslint-disable-next-line react-hooks/exhaustive-deps
 },[email])
 
-console.log(orcamentista)
+const VisuallyHiddenInput = styled('input')({
+  clip: 'rect(0 0 0 0)',
+  clipPath: 'inset(50%)',
+  height: 1,
+  position: 'absolute',
+  bottom: 0,
+  left: 0,
+  whiteSpace: 'nowrap',
+  width: 1,
+})
 
-  const onSubmit = async (e) => {
-    e.preventDefault();
-    if(checkID || checkEmail || checkCidade){
-      return null
-    } else {
+const onSubmit = async (e) => {
+  e.preventDefault();
+  if (checkID || checkEmail || checkCidade) {
+      return null;
+  } else {
       close();
-      console.log(cidade.cor)
+      console.log(cidade.cor);
       try {
-        Swal.fire({
-          title: Company,
-          text: `Você deseja cadastrar um novo Colaborador(a)?`,
-          icon: "question",
-          showCancelButton: true,
-          showCloseButton: true,
-          confirmButtonColor: "#F39200",
-          cancelButtonColor: "#d33",
-          confirmButtonText: "Sim",
-          cancelButtonText: "Não",
-        }).then(async (result) => {
-          if (result.isConfirmed) {
-            await createUserWithEmailAndPassword(
-              auth,
-              email,
-              senha
-            )
-              .then((userCredential) => {
-                // Signed in
-                updateProfile(auth.currentUser, {
-                  displayName: nome,
-                })
-                  .then(() => {})
-                  .catch((error) => {
-                    // console.error(error);
-                  });
-                const user = userCredential.user;
-                let data;
-                switch(cargo) {
-                  case 'Indicador':
-                    data = {
-                      email: email,
-                      nome: nome,
-                      senha: senha,
-                      cargo: cargo,
-                      uid: user.uid,
-                      relatorio: 0,
-                      cidade: cidade,
-                      id_user: cidade.code + ' - ' + idCidade,
-                      telefone: telefone,
-                      orcamentista: {
-                        nome: orcamentista[0].nome,
-                        uid: orcamentista[0].uid
-                      },
-                      cor: cidade.cor,
-                      cpf: cpf,
-                      cnpj: cnpj,
-                      pix: pix,
-                      tutorial: true
-                    }
-                  break
-                  case 'Orçamentista':
-                    data = {
-                      email: email,
-                      nome: nome,
-                      senha: senha,
-                      cargo: cargo,
-                      uid: user.uid,
-                      relatorio: 0,
-                      id_user: 0,
-                      id_crm: idCRM,
-                      telefone: telefone,
-                      pix: pix
-                    }
-                  break
-                  case 'Closer':
-                    data = {
-                      email: email,
-                      nome: nome,
-                      id_user: 0,
-                      senha: senha,
-                      veiculo: veiculo,
-                      cargo: cargo,
-                      uid: user.uid,
-                      relatorio: 0,
-                      telefone: telefone,
-                      pix: pix
-                    }
-                  break
-                  default: 
-                    data = {
-                      email: email,
-                      nome: nome,
-                      senha: senha,
-                      id_user: 0,
-                      cargo: cargo,
-                      uid: user.uid,
-                      relatorio: 0,
-                      telefone: telefone
-                    }
-                }
-                const day = new Date();
-                setDoc(doc(dataBase, "Membros", user.uid), data);
-                addDoc(collection(dataBase, 'Leads'), {
-                  telefone: '551598432033',
-                  indicador: nome,
-                  nome: 'Teste',
-                  cidade: 'Teste',
-                  empresa: 'Teste',
-                  data: moment(day).format('DD MMM YYYY - HH:mm'),
-                  createAt: serverTimestamp(),
-                  uid: user.uid,
-                  status: 'Ativo',
-                  orcamentista: {
-                    nome: 'Lia',
-                    uid: 'AQYpYRxZ1Wf1A4hY4uA9hnuLe3f1'
-                  },
-                  step: 0,
-                  endereco: `https://maps.google.com`
-                })
-              })
-              .catch((error) => {
-                const errorCode = error.code;
-                const errorMessage = error.message;
-                console.log(errorCode, errorMessage);
-                // ..
-              });
-            navigate("/");
-            Swal.fire({
+          Swal.fire({
               title: Company,
-              html: `O Colaborador(a) <b> ${nome}</b> foi cadastrado com sucesso.`,
-              icon: "success",
-              showConfirmButton: true,
+              text: `Você deseja cadastrar um novo Colaborador(a)?`,
+              icon: "question",
+              showCancelButton: true,
               showCloseButton: true,
               confirmButtonColor: "#F39200",
-            })
-          } else {
-            openBox('create')
-          }
-        });
-      } catch (error) {
-        // console.log(error);
-      }
-    }
-  };
+              cancelButtonColor: "#d33",
+              confirmButtonText: "Sim",
+              cancelButtonText: "Não",
+          }).then(async (result) => {
+              if (result.isConfirmed) {
+                  await createUserWithEmailAndPassword(auth, email, senha)
+                      .then((userCredential) => {
+                          const user = userCredential.user;
+                          const storageRef = ref(storage, `${user.uid}/${nome}`);
+                          const uploadTask = uploadBytesResumable(storageRef, photo.complete);
+                          
+                          uploadTask.on(
+                              "state_changed",
+                              (snapshot) => {
+                                  const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                                  console.log('Upload is ' + progress + '% done');
+                              },
+                              (error) => {
+                                  alert(error);
+                              },
+                              () => {
+                                  getDownloadURL(uploadTask.snapshot.ref).then(async (downloadURL) => {
+                                      console.log('File available at', downloadURL);
 
-  console.log(cidade)
+                                      updateProfile(auth.currentUser, {
+                                          displayName: nome,
+                                          photoURL: downloadURL
+                                      });
+
+                                      let data;
+                                      switch (cargo) {
+                                      case 'Indicador':
+                                          data = {
+                                            email: email,
+                                            nome: nome,
+                                            senha: senha,
+                                            cargo: cargo,
+                                            uid: user.uid,
+                                            relatorio: 0,
+                                            cidade: cidade,
+                                            id_user: cidade.code + ' - ' + idCidade,
+                                            telefone: telefone,
+                                            orcamentista: {
+                                                nome: orcamentista[0].nome,
+                                                uid: orcamentista[0].uid
+                                            },
+                                            cor: cidade.cor,
+                                            cpf: cpf,
+                                            cnpj: cnpj,
+                                            pix: pix,
+                                            tutorial: true
+                                          };
+                                          break;
+                                      case 'Orçamentista':
+                                          data = {
+                                            email: email,
+                                            nome: nome,
+                                            senha: senha,
+                                            cargo: cargo,
+                                            uid: user.uid,
+                                            relatorio: 0,
+                                            id_user: 0,
+                                            id_crm: idCRM,
+                                            telefone: telefone,
+                                            pix: pix
+                                          };
+                                          break;
+                                      case 'Closer':
+                                          data = {
+                                            email: email,
+                                            nome: nome,
+                                            id_user: 0,
+                                            senha: senha,
+                                            veiculo: veiculo,
+                                            cargo: cargo,
+                                            uid: user.uid,
+                                            relatorio: 0,
+                                            telefone: telefone,
+                                            pix: pix
+                                          };
+                                          break;
+                                      default:
+                                          data = {
+                                            email: email,
+                                            nome: nome,
+                                            senha: senha,
+                                            id_user: 0,
+                                            cargo: cargo,
+                                            uid: user.uid,
+                                            relatorio: 0,
+                                            telefone: telefone
+                                          };
+                                  }
+                                  setDoc(doc(dataBase, "Membros", user.uid), {
+                                    ...data,
+                                    photo: downloadURL
+                                  });
+                                });                  
+                                  const day = new Date();
+                                  addDoc(collection(dataBase, 'Leads'), {
+                                    telefone: '551598432033',
+                                    indicador: nome,
+                                    nome: 'Teste',
+                                    cidade: 'Teste',
+                                    empresa: 'Teste',
+                                    data: moment(day).format('DD MMM YYYY - HH:mm'),
+                                    createAt: serverTimestamp(),
+                                    uid: user.uid,
+                                    status: 'Ativo',
+                                    orcamentista: {
+                                      nome: 'Lia',
+                                      uid: 'AQYpYRxZ1Wf1A4hY4uA9hnuLe3f1'
+                                    },
+                                    step: 0,
+                                    endereco: `https://maps.google.com`
+                                  })
+                              }
+                          )
+                      })
+                      .catch((error) => {
+                          const errorCode = error.code;
+                          const errorMessage = error.message;
+                          console.log(errorCode, errorMessage);
+                      });
+                  navigate("/");
+                  Swal.fire({
+                      title: Company,
+                      html: `O Colaborador(a) <b> ${nome}</b> foi cadastrado com sucesso.`,
+                      icon: "success",
+                      showConfirmButton: true,
+                      showCloseButton: true,
+                      confirmButtonColor: "#F39200",
+                  });
+              } else {
+                  openBox('create');
+              }
+          });
+      } catch (error) {
+          // console.log(error);
+      }
+  }
+};
+
+  // const onSubmit = async (e) => {
+  //   e.preventDefault();
+  //   if(checkID || checkEmail || checkCidade){
+  //     return null
+  //   } else {
+  //     close();
+  //     console.log(cidade.cor)
+  //     try {
+  //       Swal.fire({
+  //         title: Company,
+  //         text: `Você deseja cadastrar um novo Colaborador(a)?`,
+  //         icon: "question",
+  //         showCancelButton: true,
+  //         showCloseButton: true,
+  //         confirmButtonColor: "#F39200",
+  //         cancelButtonColor: "#d33",
+  //         confirmButtonText: "Sim",
+  //         cancelButtonText: "Não",
+  //       }).then(async (result) => {
+  //         if (result.isConfirmed) {
+  //           await createUserWithEmailAndPassword(
+  //             auth,
+  //             email,
+  //             senha
+  //           ).then((userCredential) => {
+  //               // Signed in
+  //                 const user = userCredential.user;
+  //                 const storageRef = ref(storage, `${user.uid}/${fatura.complete.name}`);
+  //                 const uploadTask = uploadBytesResumable(storageRef, fatura.complete);
+  //                 uploadTask.on(
+  //                   "state_changed",
+  //                   (snapshot) => {
+  //                     const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+  //                     console.log('Upload is ' + progress + '% done');
+  //                   },
+  //                   (error) => {
+  //                     alert(error);
+  //                   },
+  //                   () => {
+  //                     getDownloadURL(uploadTask.snapshot.ref).then(async (downloadURL) => {
+  //                       console.log('File available at', downloadURL);
+  //                       await updateDoc(doc(dataBase, "Orcamento", result.id), {
+  //                         fatura_url: downloadURL,
+  //                         storageRef: storageRef.fullPath
+  //                       })
+  //                     })
+  //                         updateProfile(auth.currentUser, {
+  //                           displayName: nome,
+  //                           photoURL: ''
+  //                         })
+  //               let data;
+  //               switch(cargo) {
+  //                 case 'Indicador':
+  //                   data = {
+  //                     email: email,
+  //                     nome: nome,
+  //                     senha: senha,
+  //                     cargo: cargo,
+  //                     uid: user.uid,
+  //                     relatorio: 0,
+  //                     cidade: cidade,
+  //                     id_user: cidade.code + ' - ' + idCidade,
+  //                     telefone: telefone,
+  //                     orcamentista: {
+  //                       nome: orcamentista[0].nome,
+  //                       uid: orcamentista[0].uid
+  //                     },
+  //                     cor: cidade.cor,
+  //                     cpf: cpf,
+  //                     cnpj: cnpj,
+  //                     pix: pix,
+  //                     tutorial: true
+  //                   }
+  //                 break
+  //                 case 'Orçamentista':
+  //                   data = {
+  //                     email: email,
+  //                     nome: nome,
+  //                     senha: senha,
+  //                     cargo: cargo,
+  //                     uid: user.uid,
+  //                     relatorio: 0,
+  //                     id_user: 0,
+  //                     id_crm: idCRM,
+  //                     telefone: telefone,
+  //                     pix: pix
+  //                   }
+  //                 break
+  //                 case 'Closer':
+  //                   data = {
+  //                     email: email,
+  //                     nome: nome,
+  //                     id_user: 0,
+  //                     senha: senha,
+  //                     veiculo: veiculo,
+  //                     cargo: cargo,
+  //                     uid: user.uid,
+  //                     relatorio: 0,
+  //                     telefone: telefone,
+  //                     pix: pix
+  //                   }
+  //                 break
+  //                 default: 
+  //                   data = {
+  //                     email: email,
+  //                     nome: nome,
+  //                     senha: senha,
+  //                     id_user: 0,
+  //                     cargo: cargo,
+  //                     uid: user.uid,
+  //                     relatorio: 0,
+  //                     telefone: telefone
+  //                   }
+  //               }
+  //               const day = new Date();
+  //               setDoc(doc(dataBase, "Membros", user.uid), data);
+  //               addDoc(collection(dataBase, 'Leads'), {
+  //                 telefone: '551598432033',
+  //                 indicador: nome,
+  //                 nome: 'Teste',
+  //                 cidade: 'Teste',
+  //                 empresa: 'Teste',
+  //                 data: moment(day).format('DD MMM YYYY - HH:mm'),
+  //                 createAt: serverTimestamp(),
+  //                 uid: user.uid,
+  //                 status: 'Ativo',
+  //                 orcamentista: {
+  //                   nome: 'Lia',
+  //                   uid: 'AQYpYRxZ1Wf1A4hY4uA9hnuLe3f1'
+  //                 },
+  //                 step: 0,
+  //                 endereco: `https://maps.google.com`
+  //               })
+  //             })
+  //             .catch((error) => {
+  //               const errorCode = error.code;
+  //               const errorMessage = error.message;
+  //               console.log(errorCode, errorMessage);
+  //               // ..
+  //             });
+  //           navigate("/");
+  //           Swal.fire({
+  //             title: Company,
+  //             html: `O Colaborador(a) <b> ${nome}</b> foi cadastrado com sucesso.`,
+  //             icon: "success",
+  //             showConfirmButton: true,
+  //             showCloseButton: true,
+  //             confirmButtonColor: "#F39200",
+  //           })
+  //         } else {
+  //           openBox('create');
+  //         }
+        
+  //     }})
+  //     } catch (error) {
+  //       // console.log(error);
+  //     }
+  //   }
+  // };
+
+  console.log(photo)
 
   return (
     <Dialog
@@ -269,11 +461,27 @@ console.log(orcamentista)
         ><CloseIcon /></IconButton>
       <DialogTitle align="center">Cadastrar Colaborador(a)</DialogTitle>
       <DialogContent>
-        {/* <DialogContentText sx={{ textAlign: "center" }}>
-          Preencha os campos abaixo para agendar a <b>Visita</b>.
-        </DialogContentText> */}
+        <div className={styles.photo}>
+          {photo ? 
+          <img src={photo.file}
+          alt="" />
+          :
+          <img src={Profile} alt=""/>
+          }
+        </div>
         <form onSubmit={onSubmit}>
         <ThemeProvider theme={theme}>
+        <div id="enviarFoto" className={styles.input_file}>
+                <Button component="label" variant="contained" onChange={(e) => setPhoto({ file: URL.createObjectURL(e.target.files[0]), complete: e.target.files[0] })} startIcon={<CloudUploadIcon />}>
+                  Enviar Foto
+                  <VisuallyHiddenInput type="file" accept="image/png,image/jpeg" />
+                </Button>
+                {photo && 
+                  <Button component="label" onClick={() => setPhoto()} color="error" variant="contained">
+                    Remover
+                  </Button>
+                }
+              </div>
           <div className={styles.label_content}>
             <TextField
               autoFocus

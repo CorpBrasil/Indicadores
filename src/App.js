@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom"; // Cria rotas de páginas
 import { useEffect, useState } from 'react'
 import Login from './pages/Login/Index';
-import Schedules from './pages/Schedules/Index';
+import Schedules from './pages/Main/Index';
 import PanelAdmin from './pages/PanelAdmin/Index';
 // import Alert from './pages/Alert/Index';
 import useAuth from './hooks/useAuth';
@@ -120,7 +120,7 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route exact element={<PrivateRoute />}>
-            <Route exact path="/" element={<Schedules userRef={userRef} check={check} reports={reports} />} />
+            <Route exact path="/" element={<Schedules userRef={userRef} check={check} reports={reports} orcamento={orcamento} />} />
               {user && userRef && (user.email === Users[0].email) &&
             <Route exact path="/admin" element={<PanelAdmin user={user} userRef={userRef} alerts={orcamento} check={check} reports={reports} />} />
             }
@@ -139,7 +139,7 @@ function App() {
             {userRef && userRef.cargo === 'Gestor' && 
               <Route exact path="/gestao-comercial" element={<Commercial user={user} userRef={userRef} leads={leads} activity={activity} listLeads={listLeads} members={members} sellers={sellers} check={check} reports={reports}/>} />
             }
-            <Route path="*" element={<Schedules userRef={userRef} check={check} reports={reports} />} />
+            <Route path="*" element={<Schedules userRef={userRef} check={check} reports={reports} orcamento={orcamento} />} />
           </Route>
           <Route exact path="/login" element={<Login />} />
         </Routes>

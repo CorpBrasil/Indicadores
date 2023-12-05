@@ -11,11 +11,12 @@ export default function AuthContextProvider(props) {
   useEffect(() => {
     const getUser = onAuthStateChanged(auth, (user) => {
       if (user) {
-        const { uid, displayName, email } = user;
+        const { uid, displayName, email, photoURL } = user;
         setUser({
           id: uid,
           name: displayName,
           email: email,
+          photo: photoURL
         });
       } else {
         setUser(null);

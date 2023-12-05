@@ -4,6 +4,7 @@ import Header from "../../components/Header/Index";
 import Swal from 'sweetalert2/dist/sweetalert2.js';
 import moment from "moment";
 import { getStorage, ref, deleteObject } from "firebase/storage";
+import CurrencyInput from "react-currency-input-field";
 // import axios from "axios";
 // import * as moment from "moment";
 import { updateDoc, doc, collection, serverTimestamp, addDoc, deleteDoc } from "firebase/firestore";
@@ -49,6 +50,8 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import Collapse from '@mui/material/Collapse';
 import { Box, ThemeProvider } from "@mui/material";
+import TextField from "@mui/material/TextField";
+import DialogTitle from "@mui/material/DialogTitle";
 import CloseIcon from '@mui/icons-material/Close';
 import useMediaQuery from '@mui/material/useMediaQuery';
 
@@ -58,6 +61,9 @@ const Estimate = ({ user, orcamento, visits, userRef, sellers }) => {
   const [open, setOpen] = useState(false);
   const [page, setPage] = useState(0);
   const [openFatura, setOpenFatura] = useState(false);
+  const [openConfirm, setOpenConfirm] = useState(false);
+  const [valor, setValor] = useState(false);
+  const [comissao, setComissao] = useState(false);
   const [rowsPerPage, setRowsPerPage] = useState(20);
   const [orcamentosUser, setOrcamentoUser] = useState(undefined);
   // const [loading, setLoading] = useState(false);
@@ -155,13 +161,21 @@ const Estimate = ({ user, orcamento, visits, userRef, sellers }) => {
   //   setViewImport(true);
   // }
 
-const confirmEstimate = (data) => {
+  const handleOnValueChange = (value, type) => {
+    if(type === 'valor') {
+      setValor(value);
+    } else {
+      setComissao(value);
+    }
+  };
+
+const confirmEstimate = async (e, data) => {
+  e.preventDefault();
   try{
     Swal.fire({
       title: 'Orçamento',
       icon: "question",
       text: 'Deseja confirmar que o orçamento foi criado?',
-      input: 'text',
       showCancelButton: true,
       showCloseButton: true,
       confirmButtonColor: "#F39200",
@@ -173,13 +187,17 @@ const confirmEstimate = (data) => {
         await updateDoc(doc(dataBase, 'Orcamento', data.id), {
           status: 'Concluido',
           dataStatus: moment().format('DD MMMM YYYY - HH:mm'),
+          valor: valor,
+          comissao: comissao
         }).then(async() => {
           await updateDoc(doc(dataBase, 'Leads', data.leadRef), {
             status: 'Aguardando Apresentação',
             step: 3,
             orcamento: {
               data: moment().format('DD MMMM YYYY - HH:mm'),
-              anotacao: result.value
+              anotacao: result.value,
+              valor: valor,
+              comissao: comissao
             }
           }).then(async () => {
             await addDoc(collection(dataBase, "Membros", data.indicador.uid, 'Notificacao'), {
@@ -197,6 +215,7 @@ const confirmEstimate = (data) => {
                 showCloseButton: true,
                 confirmButtonColor: "#F39200"
               })
+              setOpenConfirm(false)
             })
         })
       }
@@ -431,6 +450,24 @@ const closeFatura = () => {
                               </li>
                             </ul>
                           </div>
+                          <h3>Valores</h3>
+                          <div className={styles.info_content}>
+                            {data.valor && data.comissao ? 
+                            <ul className={`${styles.info_content_item} ${styles.info_content_value}`}>
+                              <li>
+                                <h4>Orçamento: </h4>
+                                <p>{data.valor &&
+                                 Number(data.valor).toLocaleString("pt-BR", { style: 'currency', currency: 'BRL' })}</p>
+                              </li>
+                              <li>
+                                <h4>Comissão: </h4>
+                                <p>{data.comissao && Number(data.comissao).toLocaleString("pt-BR", { style: 'currency', currency: 'BRL' })}</p>
+                              </li>
+                              </ul> :
+                              <p>Confirme o Orçamento para visualizar os valores</p>
+                              
+                             }
+                          </div>
                               <div className={styles.activity_button}>
                                 <ThemeProvider theme={theme}>
                                   <Button
@@ -450,7 +487,7 @@ const closeFatura = () => {
                                 color="success"
                                 size="small"
                                 type="submit"
-                                onClick={() => confirmEstimate(data)}
+                                onClick={() => setOpenConfirm(true)}
                               >
                                 Confirmar
                               </Button><Button
@@ -494,17 +531,63 @@ const closeFatura = () => {
                                 </DialogActions>
                           </ThemeProvider>
                           </Dialog>
-                      {/* <Tabs value={TabsValue} onChange={(e, newValue) => setTabsValue(newValue)} aria-label="Informações do Lead" centered>
-                        <Tab label="Atividades" {...a11yProps(1)} />
-                        <Tab label="Dados" {...a11yProps(2)} />
-                      </Tabs> */}
-                    {/* <CustomTabPanel value={TabsValue} index={0}>
-                      <CreateActivity activityAll={activityAll} changeLoading={changeLoading} data={data} />
-                    </CustomTabPanel> */}
-                    {/* <CustomTabPanel value={TabsValue} index={1}>
-                  <h3 className={styles.title_info}>Geral</h3>
-                    <EditProspection changeLoading={changeLoading} data={data} />
-                    </CustomTabPanel> */}
+                          <Dialog
+                          className={styles.fatura_container}
+                          open={openConfirm}
+                          maxWidth="lg"
+                          onClose={() => setOpenConfirm(false)}
+                          >
+                            <IconButton
+                              aria-label="close"
+                              onClick={() => setOpenConfirm(false)}
+                              sx={{
+                                position: 'absolute',
+                                right: 8,
+                                top: 8,
+                                color: (theme) => theme.palette.grey[500],
+                              }}
+                            ><CloseIcon /></IconButton>
+                          <DialogTitle align="center">Confirmar Orçamento</DialogTitle>
+                          <div className={styles.value_container}>
+                          <p>Para confirmar o orçamento, informe o valor do projeto e a comissão do indicador.</p>
+                          <form onSubmit={(e) => confirmEstimate(e, data)}>
+                            <div>
+                              <CurrencyInput
+                                fullWidth
+                                customInput={TextField}
+                                className="label__text"
+                                label="Valor do Orçamento"
+                                placeholder="R$ 00"
+                                intlConfig={{ locale: "pt-BR", currency: "BRL" }}
+                                onValueChange={(v) => handleOnValueChange(v, 'valor')}
+                                fixedDecimalLength={0}
+                                value={valor || ''}
+                                min={50}
+                                required
+                                color="primary" />
+                              <CurrencyInput
+                                fullWidth
+                                customInput={TextField}
+                                className="label__text"
+                                label="Comissão do Indicador"
+                                placeholder="R$ 00"
+                                intlConfig={{ locale: "pt-BR", currency: "BRL" }}
+                                onValueChange={(v) => handleOnValueChange(v, 'comissao')}
+                                fixedDecimalLength={0}
+                                value={comissao || ''}
+                                min={50}
+                                required
+                                color="primary" />
+                            </div>
+                            <div>
+                          <ThemeProvider theme={theme}>
+                              <Button variant='contained' type="submit">Confirmar</Button>
+                              <Button variant='contained' onClick={closeFatura}>Cancelar</Button>
+                          </ThemeProvider>
+                            </div>
+                          </form>
+                          </div>
+                          </Dialog>
                     </Collapse>
                 </TableCell>
               </TableRow>

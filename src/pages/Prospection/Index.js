@@ -27,6 +27,7 @@ import Estimate from "../../components/Prospection/Estimate/Index";
 import Filter from "../../components/Filter/Index";
 import Dashboard from "../../components/Dashboard/Visit_and_Prospection/Index";
 // import ImportLeads from "../../components/Prospection/ImportLeads";
+import Ranking from "./Components/Ranking/Index";
 
 import ContentPasteGoIcon from '@mui/icons-material/ContentPasteGo';
 import { ReactComponent as ProspectionIcon } from '../../images/icons/Prospection.svg';
@@ -536,6 +537,7 @@ const closeAnotacaoBox = () => {
           <ProspectionIcon className={styles.prospecction_icon}/>
           <h2>Prospecção</h2>
         </div>
+        <Ranking leads={leads} members={members} />
         { userRef && userRef.cargo !== 'Indicador' &&
          <Dashboard data={leads} type={'prospeccao'} sellers={sellers} />
         }
@@ -661,7 +663,8 @@ const closeAnotacaoBox = () => {
                             {data.status === 'Aguardando Apresentação' && 
                             <Box className={styles.info_step} sx={{ width: '87%', marginBottom: '1rem' }}>
                               <p><b>{data.orcamento && data.orcamento.data.replace('-', 'às')}</b></p>
-                              <p>Orçamento gerado pela <b>{data.orcamentista && data.orcamentista.nome}</b>. A data de apresentação está prevista para o dia <b>{visits && visits.filter((visit) => visit.id === data.visitRef)[0].data_completa.replace('-', ' às ')}</b>.</p>
+                              <p>Orçamento gerado pela <b>{data.orcamentista && data.orcamentista.nome}</b>. O valor do orçamento ficou <b>{data.orcamento &&
+                                 Number(data.orcamento.valor).toLocaleString("pt-BR", { style: 'currency', currency: 'BRL' })}</b> e a comissão <b>{data.orcamento && Number(data.orcamento.comissao).toLocaleString("pt-BR", { style: 'currency', currency: 'BRL' })}</b>. A data de apresentação está prevista para o dia <b>{visits && visits.filter((visit) => visit.id === data.visitRef)[0].data_completa.replace('-', ' às ')}</b>.</p>
                             </Box>
                             }
                             {data.status === 'Apresentação' && 

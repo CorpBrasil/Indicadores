@@ -338,11 +338,10 @@ const Schedules = ({ userRef, alerts, check, reports }) => {
   
   const handleJoyride = (data) => {
     const { index } = data;
-
     console.log(index)
+
     if(index === 4) {
-      window.location.href = '/prospeccao'
-      
+      window.location.href = '/prospeccao';
     }
   }
 

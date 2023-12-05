@@ -29,6 +29,8 @@ const CreateProspection = ({
   const [cidade, setCidade] = useState(undefined);
   const [cpfCnpj, setCpfCnpj] = useState('CPF');
   const [doc, setDoc] = useState(undefined);
+  const [checkCpfCNPJ, setCheckCpfCNPJ] = useState(false);
+  
 
   Geocode.setLanguage("pt-BR");
   Geocode.setRegion("br");
@@ -65,11 +67,14 @@ const CreateProspection = ({
   const onSubmit = async (userData) => {
     const day = moment();
     console.log(moment(day).format('DD MMM YYYY - HH:mm'))
-    try {      
-      if(userData.nome === 'Teste') {
+    try {
+      let msg;
+      if(userData.nome === 'Teste') msg = 'Não é possivel cadastrar um cliente com o nome <b>Teste</b>.';     
+      if(checkCpfCNPJ) msg = 'Não é possivel cadastrar um cliente <b>sem um documento válido.</b>';     
+      if(userData.nome === 'Teste' || checkCpfCNPJ) {
         return Swal.fire({
           title: 'Nome Inválido',
-          html: `Não é possivel cadastrar um cliente com o nome <b>Teste</b>.`,
+          html: msg,
           icon: "error",
           showCloseButton: true,
           confirmButtonColor: "#F39200",
@@ -93,6 +98,7 @@ const CreateProspection = ({
             changeLoading(true);
             await addDoc(collection(dataBase, 'Leads'), {
               ...userData,
+              cpfCnpj: doc,
               telefone: '55' + telefoneFormatado,
               indicador: userRef.nome,
               data: moment(day).format('DD MMM YYYY - HH:mm'),
@@ -154,33 +160,59 @@ const CreateProspection = ({
     }
   };
 
-  const findDoc = async (data) => {
+  const findDoc = async () => {
     if(cpfCnpj === 'CPF') {
-
+      if(!validaCPF(doc)) {
+        setCheckCpfCNPJ(true);
+      } else {
+        setCheckCpfCNPJ(false);
+      }
     } else {
       let docFormat = doc.replace(/\D/g, '');
-      // const options = {
-      //   method: 'GET',
-      //   url: `https://receitaws.com.br/v1/cnpj/34691677000135`,
-      //   headers: {
-      //     Accept: 'application/json',
-      //     // Authorization: `Bearer 539a73a237da073291badf63d3033602ecb0b0b540dc15de27b8e1bb3d97fe69`
-      //   }
-      // };
-    const token = 'f05d24a09286b0b524eca47d563355cdfa5efa458a7e9bd5f3f1ae94a9010150';
-     await axios.get(`https://receitaws.com.br/v1/cnpj/${docFormat}`, {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        "Access-Control-Allow-Origin": "true",
-        'Accept': 'application/json'
-      }
-    })
-     .then((result) => {
-        console.log(result)
-      })
+     await axios.get(`https://publica.cnpj.ws/cnpj/${docFormat}`)
+     .then(result => {
+          console.log(result.data)
+          setCheckCpfCNPJ(false);
+      }).catch(e => setCheckCpfCNPJ(true))
       console.log('eae')
     }
   }
+
+  //CPF 
+
+  const validaCPF = (cpf) => {
+    cpf = cpf.replace(/[^\d]+/g, ''); // Remove caracteres não numéricos
+
+    if (cpf.length !== 11 || !!cpf.match(/(\d)\1{10}/))
+        return false;
+
+    let soma = 0;
+    let resto;
+
+    // Calcula o primeiro dígito verificador
+    for (let i = 1; i <= 9; i++) 
+        soma += parseInt(cpf.substring(i - 1, i)) * (11 - i);
+    resto = (soma * 10) % 11;
+
+    if ((resto === 10) || (resto === 11)) 
+        resto = 0;
+    if (resto !== parseInt(cpf.substring(9, 10)) ) 
+        return false;
+
+    soma = 0;
+
+    // Calcula o segundo dígito verificador
+    for (let i = 1; i <= 10; i++) 
+        soma += parseInt(cpf.substring(i-1, i)) * (12 - i);
+    resto = (soma * 10) % 11;
+
+    if ((resto === 10) || (resto === 11)) 
+        resto = 0;
+    if (resto !== parseInt(cpf.substring(10, 11) ) ) 
+        return false;
+
+    return true;
+}
 
   return (
     <div className="box-visit">
@@ -235,16 +267,19 @@ const CreateProspection = ({
                       <FormControlLabel value="CNPJ" control={<Radio />} label="CNPJ" />
                     </RadioGroup>
                     <PatternFormat
-                    className="label__input"
+                    className='label__input'
                     value={doc || ''}
+                    style={{ marginBottom: '0.2rem', 
+                    border: `${checkCpfCNPJ ? '1px solid red' : '1px solid #ccc'}` 
+                    }}
                     onChange={(e) => setDoc(e.target.value)}
                     onBlur={() => findDoc(cpfCnpj)}
                     format={cpfCnpj === 'CPF' ? "###.###.###-##" : "##.###.###/####-##"}
                     mask="_"
                     placeholder={cpfCnpj === 'CPF' ? "000.000.000-00" : "00.000.000/0000-00"}
-                    label="Celular"
                     variant="outlined"
                     color="primary"/>
+                    {checkCpfCNPJ && <span className="notice red">{cpfCnpj} inválido</span>} 
                   </label>
                     <label className="label">
                     <p>Telefone</p>
