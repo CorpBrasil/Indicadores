@@ -532,7 +532,7 @@ const closeAnotacaoBox = () => {
             next: 'Próximo'
           }}/>}
       <Header user={user} userRef={userRef}></Header>
-      <div className={`${styles.title_panel} ${styles.desktop}`}>
+      <div className={`${styles.title_panel}`}>
         <div id="titulo">
           <ProspectionIcon className={styles.prospecction_icon}/>
           <h2>Prospecção</h2>
@@ -544,12 +544,7 @@ const closeAnotacaoBox = () => {
       </div>
       <div className={styles.content_panel}>
         <div className={styles.box_panel}>
-            <h2 class={styles.desktop}>Clientes</h2>
           <div className={`${styles.box_panel_add}`}>
-          <div className={`${styles.title_panel} ${styles.mobile}`}>
-            <ProspectionIcon className={styles.prospecction_icon}/>
-            <h2>Prospecção</h2>
-          </div>
             {!view && !view ?
             <button id="cadastrar" className={styles.box_panel_add_activity} onClick={() => setView(true)}>
                 <ProspectionIcon className={styles.prospecction_icon} />

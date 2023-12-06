@@ -12,6 +12,8 @@ import { theme } from '../../../../data/theme';
 
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
+import { ReactComponent as Crown } from '../../../../images/icons/Crown.svg';
+
 
 import Profile from '../../../../images/profile.jpg';
 
@@ -66,8 +68,8 @@ const Ranking = ({ leads, members }) => {
         if(a.leads < b.leads) return 1
         return 0 
       })
-      setRankingSales(orderSales);
-      setRankingEstimate(orderEstimate);
+      setRankingSales(orderSales.slice(0,5));
+      setRankingEstimate(orderEstimate.slice(0,5));
     }
   },[leads, members])
 
@@ -117,9 +119,14 @@ CustomTabPanel.propTypes = {
             {rankingSales && rankingSales.map((data, index) => (
             <li className={index === 0 ? styles.ranking_items_top : styles.ranking_items}>
               {index === 0 ? 
-              <><img src={data.photo ? data.photo : Profile} alt="" /><div className={styles.ranking_items_text}>
-                    <h3>{data.nome}</h3>
-                    <p>{data.cidade}</p>
+              <>
+              <div className={styles.top_1}>
+                <h1>1</h1>
+                <img src={data.photo ? data.photo : Profile} alt="" />
+              </div>
+              <div className={styles.ranking_items_text}>
+                    <h3><Crown /> {data.nome}</h3>
+                    <p className={styles.city}>{data.cidade}</p>
                     <p><b>{data.leads}</b> Vendas</p>
                   </div></> : 
                   <><div>
@@ -127,7 +134,7 @@ CustomTabPanel.propTypes = {
                     <img src={data.photo ? data.photo : Profile} alt='' />
                     <div className={styles.ranking_items_info}>
                       <h3>{data.nome}</h3>
-                      <p>{data.cidade}</p>
+                      <p className={styles.city}>{data.cidade}</p>
                     </div>
                   </div><h3>{data.leads}</h3></>
               }
@@ -140,9 +147,15 @@ CustomTabPanel.propTypes = {
             {rankingEstimate && rankingEstimate.map((data, index) => (
             <li className={index === 0 ? styles.ranking_items_top : styles.ranking_items}>
               {index === 0 ? 
-              <><img src={data.photo ? data.photo : Profile} alt="" /><div className={styles.ranking_items_text}>
-                    <h3>{data.nome}</h3>
-                    <p>{data.cidade}</p>
+              <>
+              <div className={styles.top_1}>
+              <h1>1</h1>
+              <img src={data.photo ? data.photo : Profile} alt="" />
+              </div>
+              <div className={styles.ranking_items_text}>
+              
+                    <h3><Crown /> {data.nome}</h3>
+                    <p className={styles.city}>{data.cidade}</p>
                     <p><b>{data.leads}</b> Orçamentos</p>
                   </div></> : 
                   <><div>
@@ -150,7 +163,7 @@ CustomTabPanel.propTypes = {
                     <img src={data.photo ? data.photo : Profile} alt='' />
                     <div className={styles.ranking_items_info}>
                       <h3>{data.nome}</h3>
-                      <p>{data.cidade}</p>
+                      <p className={styles.city}>{data.cidade}</p>
                     </div>
                   </div><h3>{data.leads}</h3></>
               }

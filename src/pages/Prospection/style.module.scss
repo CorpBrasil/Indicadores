@@ -1,11 +1,5 @@
 @import '../../styles/mixins.scss';
 
-@media (max-width: 650px) {
-  .desktop {
-    display: none!important;
-  }
-}
-
 @media (min-width: 650px) {
   .mobile {
     display: none!important;
@@ -96,8 +90,15 @@
     flex-direction: column;
     align-items: center;
 
+    & > div {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
     @media (max-width: 650px) {
-      padding: 0!important;
+      padding: 1.5rem 0!important;
     }
 
     h2 {
@@ -146,12 +147,17 @@
       gap: 1rem;
       text-align: center;
 
+      @media (max-width: 650px) {
+        padding: 1rem 0!important;
+      }
+
       &_add {
         display: flex;
         justify-content: center;
         flex-direction: column;
         align-items: center;
         gap: 1rem;
+        margin-bottom: 2rem;
 
         &_activity {
           margin: 0;

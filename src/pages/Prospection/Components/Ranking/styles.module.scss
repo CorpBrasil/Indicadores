@@ -4,8 +4,12 @@
   margin: 3rem 0;
   align-items: center;
   padding: 0 1rem;
-  width: 100%;
+  width: 95%;
   max-width: 900px;
+
+  @media (max-width: 650px) {
+    margin: 3rem 0 1rem 0!important;
+  }
 }
 
 .ranking_header {
@@ -17,7 +21,7 @@
   margin-top: 1rem;
 
   button {
-    width: 100%;
+    width: 50%;
   }
 }
 
@@ -40,6 +44,12 @@ ul {
   gap: 1rem;
   margin: 1rem 0;
 
+  .top_1 {
+    display: flex;
+    position: relative;
+    right: 0.2rem;
+  }
+
   img {
     width: 100px;
     height: 100px;
@@ -50,7 +60,23 @@ ul {
 
   .ranking_items_text {
     text-align: center;
+
+    h3 {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    p{
+      &:last-child {
+        margin-top: 0.3rem;
+      }
+    }
   }
+}
+
+.city {
+  color: #646464;
 }
 
 .ranking_items {
